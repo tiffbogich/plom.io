@@ -1,0 +1,33 @@
+extends layout
+
+block content 
+
+  if(locals.fail)
+    div.alert.alert-error
+      | <strong>Error:</strong> #{fail}
+
+
+  if(locals.validation)
+    div.alert.alert-error
+      | <strong>Error:</strong> #{validation}
+
+
+  form(action="/register", method="POST")
+    fieldset
+      legend Register
+
+      input(name="_csrf", value=token, type="hidden")      
+      p
+        label username: 
+        input(name="user[_id]", type="text")
+
+      p
+        label email: 
+        input(name="user[email]", type="text", value=(locals.me && me.email) )
+
+      p
+        label password: 
+        input(name="user[password]", type="password")
+
+      p
+        button(type="submit").btn Register

@@ -1,0 +1,33 @@
+extends layout
+
+block content 
+
+  if('fail' in locals)
+    p #{fail}
+
+
+  if(locals.loggin_required)
+    div.alert
+      | You need to be logged in to view this page.
+
+
+  if(locals.username)
+    p Thank you for registering, please log in.
+
+
+  form(action="/login", method="POST")
+    fieldset
+      legend Login
+
+      input(name="_csrf", value=token, type="hidden")
+      input(name="next", value=(locals.next && next), type="hidden")
+      p
+        label username: 
+        input(name="user[_id]", type="text", value=locals.username)
+
+      p
+        label password: 
+        input(name="user[password]", type="password")
+
+      p
+        button(type="submit").btn Log in
