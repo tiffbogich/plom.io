@@ -1,0 +1,52 @@
+<% include ../layout %>
+
+<div class="row">
+
+  <div class="span6">
+    <h1>Learn the concepts</h1>
+
+    <ol>
+      <li><a href="/doc/modeler/create">A layered grammar for epidemiological models</a></li>
+      <li><a href="/doc/modeler/play">The zero framework framework:
+      Unix pipes and inference methods</a></li>
+      <li><a href="/doc/modeler/hfmd">Integrated inference strategy</a></li>
+    </ol>
+    
+  </div>
+
+  <div class="span6">
+    <h1>Enjoy the workflow</h1>
+
+    <p>    
+      <ol>
+        <li>
+          Get a context template
+          <pre class="prettyprint">plom --context -o context.json </pre>
+        </li>
+        <li>
+          Get a model template
+          <pre class="prettyprint">plom --model -o model.json</pre>
+        </li>
+        <li>
+          Get a link template
+          <pre class="prettyprint">plom context.json model.json --link -o link.json</pre>
+        </li>
+        <li>
+          Deleguate the hard work
+          <pre class="prettyprint">plom context.json model.json link.json -o my_model</pre>
+        </li>
+        <li>
+          Play 
+<pre class="prettyprint">
+plom --lhs mif -H 100 -J 1000 --cluster SGE -o lhs.json
+sfi --bootstrap lhs.json && ./lhs.sh
+</pre>
+        </li>
+      </ol>
+    </p>
+
+  </div>
+
+</div>
+
+<% include ../footer %>

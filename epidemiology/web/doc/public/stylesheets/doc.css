@@ -1,0 +1,35 @@
+.sfr-img-center {
+  display: block;   
+  margin-left: auto;   
+  margin-right: auto; 
+}
+
+.sfr-logo-center {
+  display: block;   
+  margin-left: auto;   
+  margin-right: auto; 
+  margin-top: 40px; 
+  margin-bottom: 40px; 
+}
+
+#sfr-main{
+  background-color: white;  
+
+  border: 2px solid rgb(238,238,238);
+
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+
+p.sfr-brand {
+  font-size: 16pt;
+}
+
+code.sfr-pattern{
+  color:black;
+}
+code.sfr-pattern strong{
+  color:#D14;
+}

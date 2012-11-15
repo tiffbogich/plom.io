@@ -1,0 +1,720 @@
+<% include ../layout %>
+
+<div class="page-header">
+  <h1>The idea <small>One pattern</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span12">
+
+    <p>
+      <strong>One pattern: </strong><code class="sfr-pattern">sfi [options] | ./algorithm command [options]</code>
+      <ul>
+        <li>
+          invoked from the command line
+        </li>
+        <li>
+          or from the programming languages you love.
+        </li>
+      </ul>      
+    </p>
+
+  </div>
+</div>
+
+
+<div class="page-header">
+  <h1>Making sense of noise <small>All noise</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span12">
+
+    <p>
+        Your model:
+      <ul>
+        <li>
+          doesn't have environmental stochasticity or diffusions
+          <ul>
+            <li>You care about demograpic stochasticity: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>sto</strong> [options]</code></li>
+            <li>You don't: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>deter</strong> [options]</code></li>
+          </ul>
+        </li>
+
+
+        <li>
+          contains <strong>environmental stochasticity</strong>:
+          <ul>
+            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>sto</strong> [options]</code></li>
+            <li>You don't: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>deter</strong> [options]</code></li>
+          </ul>
+        </li>
+
+
+        <li>
+          contains some <strong>diffusions</strong>:
+          <ul>
+            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>sto</strong> [options]</code></li>
+            <li>You don't: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>deter</strong> [options]</code></li>
+          </ul>
+        </li>
+
+
+        <li>
+          contains some diffusions <strong>and</strong> environmental stochasticity :
+          <ul>
+            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>sto</strong> [options]</code></li>
+            <li>You don't: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>deter</strong> [options]</code></li>
+          </ul>
+        </li>
+
+      </ul>
+    </p>
+
+    <p>
+      You want to:
+      <ul>
+        <li>
+          Quickly turn off environmental stochasticity: 
+          <code class="sfr-pattern">sfi <strong>--no_env</strong> [options] | ./algorithm command [options]</code>
+        </li>
+        <li>
+          Quickly turn off the diffusions: 
+          <code class="sfr-pattern">sfi <strong>--no_drift</strong> [options] | ./algorithm command [options]</code>
+        </li>
+      </ul>
+    </p>
+
+    <p><strong>Let's explore the possibilities...</strong></p>
+
+  </div>
+
+</div>
+
+
+
+
+<div class="page-header">
+  <h1>Playing around <small>Simulation and filtering</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span4">
+    <h3>Simulation</h3>
+
+    <p>100 realisations of the observation process of your model,
+      neglecting <strong>demographic stochasticity</strong>:</p>
+
+    <pre class="prettyprint">
+sfi | ./simul deter -J 100 --traj
+</pre>
+
+    <p>The same, but <strong>with</strong> demographic stochasticity:</p>
+
+    <pre class="prettyprint">
+sfi | ./simul sto -J 100 --traj --no_filter
+</pre>
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.X()</code> and <code>plot.hat()</code>
+    </p>
+
+  </div>
+
+  <div class="span4">
+    <h3>Particle Filter</h3>
+
+    <p>Trying to reconstruct some hidden states: run a particle filter
+      (a.k.a <strong>Sequential Monte Carlo</strong>) using 100
+      particles:</p>
+
+    <pre class="prettyprint">
+sfi | ./smc sto -J 100 --traj
+</pre>
+
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.X()</code> and <code>plot.hat()</code>
+    </p>
+
+
+  </div>
+
+  <div class="span4">
+    <h3>Kalman Filter</h3>
+
+    <p>
+      No time to waste with particles? Strongly believe the world is
+      gaussian?<br/> Use an <strong>Extended Kalman Filter</strong>.
+    </p>
+
+<pre class="prettyprint">
+sfi | ./kalman sto --traj
+</pre>
+
+    <p>
+      <code>sto</code>? Yes, we compute a diffusion approximation of
+      your stochastic process so that you can assess to the demographic
+      stochasticity.
+    </p>
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.X()</code>
+    </p>
+
+
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="span12">
+    <p>
+      Yes, <strong>all this (and what follows) work with</strong> <code class="sfr-pattern">deter</code>
+      <strong>or</strong> <code class="sfr-pattern">sto</code> and
+      without requiring you to recode different implementations of your
+      model. Express your idea; PLoM does the dirty work.
+    </p>
+  </div>
+</div>
+
+
+<div class="page-header">
+  <h1>Maximizing time and fitness <small>Trajectory matching</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span4">
+    <h3>Simplex (and least-squares)</h3>
+    <p>There is no stochasticity in your world and you don't even care
+    about the observation process: Run a Simplex for 10000
+    iterations.</p>
+
+    <pre class="prettyprint">
+sfi | ./simplex -M 10000 --least_square
+</pre>
+
+    <p>OK, observation noise might matter:</p>
+
+    <pre class="prettyprint">
+sfi | ./simplex -M 10000
+</pre>
+
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.best()</code>
+    </p>
+
+    
+  </div>
+
+  <div class="span4">
+    <h3>Simplex-Kalman (ksimplex)</h3>
+
+    <p>You think that demographic stochasticity matters, but you want
+    to keep it fast?</p>
+
+    <pre class="prettyprint">
+sfi | ./ksimplex sto
+</pre>
+
+    <p>You neglect demographic stochasticity?</p>
+
+    <pre class="prettyprint">
+sfi | ./ksimplex deter
+</pre>
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.best()</code>
+    </p>
+
+
+  </div>
+
+  <div class="span4">
+    <h3>Use the results in simulation</h3>
+
+    <p>
+      Want to check out the results? Tell PLoM to use the
+      previous results as initial conditions of your new algorithm using
+      the <code>-B</code> option of <code>sfi</code>:
+    </p>
+
+    <ul>
+      <li>
+        Start with a simplex:
+<pre class="prettyprint">
+sfi | ./simplex -M 1000
+</pre>
+      </li>
+<li>
+      Use the result for a SMC:
+<pre class="prettyprint">
+sfi -B | ./smc sto -J 100 --traj
+</pre>
+</li>
+      
+    </ul>
+
+    
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.X()</code> and <code>plot.hat()</code>
+    </p>
+
+  </div>
+
+</div>
+
+<div class="row">
+<div class="span12">
+  Yes, you can <strong>chain</strong> PLoM methods without
+  having to edit any scripts or configuration files. Learn more about PLoM
+  pipes with <code>sfi --help</code>.
+</div>
+</div>
+
+
+
+
+
+<div class="page-header">
+  <h1>No more approximations <small>Because sometimes noise matters</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span4">
+    <h3>MIF</h3>
+
+    <p>Want to find the <strong>maximum likelihood estimates</strong> taking into account <strong>both</strong>
+        process and observation noise? Use <em>Maximum Likelihood via
+        Iterated filtering</em> (MIF):</p>
+
+    <pre class="prettyprint">
+sfi | ./mif sto -J 1000 -M 100 -a 0.95 -b 3
+</pre>
+
+    <p>Lost with the options (<code>-a</code>, <code>-M</code>, ...)? Ask for
+    help: <code>./mif --help</code>. This works with every PLoM program.</p>
+
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.best()</code>
+    </p>
+
+
+  </div>
+
+  <div class="span4">
+    <h3>pMCMC</h3>
+
+    <p>Have some priors, want to try a Bayesian approach? Use <em>particle
+        Monte Carlo Markov chain</em> (pMCMC):</p>
+
+    <pre class="prettyprint">
+sfi | ./pmcmc sto -J 1000 -M 10000
+</pre>
+
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.best()</code>, <code>plot.posteriors()</code> and <code>plot.corr()</code>
+    </p>
+
+
+  </div>
+
+  <div class="span4">
+    <h3>Combine</h3>
+
+    <p>Ok, let's have fun:</p>
+
+    <ul>
+    <li>Start with a simplex:
+<pre class="prettyprint">
+sfi | ./simplex -M 1000
+</pre>
+    </li>
+
+    <li>Refine it with a ksimplex:
+<pre class="prettyprint">
+sfi -B | ./ksimplex sto -M 1000
+</pre>
+    </li>
+
+
+    <li>Refine it with a MIF:
+<pre class="prettyprint">
+sfi -B | ./mif sto -J 1000 -M 100 -a 0.95 -b 3
+</pre>
+    </li>
+
+    <li>Terminate with a pMCMC:
+<pre class="prettyprint">
+sfi -B | ./pmcmc sto -J 1000 -M 100000
+</pre>
+</li>
+    </ul>
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.best()</code>
+    </p>
+
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="span12">
+    <p>
+      Your laptop fans are spinning? Yes, by default PLoM uses all
+      the available cores of your machine and runs parallel versions of the
+      particle methods. <strong>C code</strong> + <strong>parallel
+      computing</strong> = <strong><i class="icon-fire"></i> fast!</strong>
+    </p>
+  </div>
+</div>
+
+
+
+<div class="page-header">
+  <h1>Don't get stuck in that local maxima <small>Advanced design on the cloud</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span4">
+    <h3>LHS simplex</h3>
+
+    <p>
+      Sometimes a brute force method is all you need to explore a
+      complex likelihood space. Start from 100 different initial
+      conditions sampled from a <strong>Latin Hyper Square</strong>.
+    </p>
+
+
+    <p>Write your design in <a href="http://www.json.org/">JSON</a> <code><i class="icon-file"></i>design.json</code></p>
+
+    <pre class="prettyprint">
+{
+ "meta": {"id": "lhs",
+          "comment": "LHS design"},
+
+ "action": {"id": "lhs",
+            "H": 100,
+            "seed": 12334216564},
+
+ "cmd": [["D",  "", "simplex -M 100", 1]],
+
+ "cluster": {"type": PBS,
+             "walltime": "01:20:00"}
+}
+</pre>
+
+    <p>Or be lazy and <strong>template</strong> it:</p>
+    <pre class="prettyprint">
+plom --lhs simplex -M 100 --cluster PBS -H 100 -o design.json
+</pre>
+
+
+    <p>Run it on the <strong>cloud</strong>:</p>
+
+    <pre class="prettyprint">
+sfi --bootstrap design.json && ./design.sh
+</pre>
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.convergence()</code> and <code>plot.prs()</code>
+    </p>
+
+  </div>
+
+  <div class="span4">
+    <h3>LHS MIF</h3>
+
+    <p>The same, with a MIF but this time using an SGE cluster.</p>
+    <p>Write your design in <a href="http://www.json.org/">JSON</a> <code><i class="icon-file"></i>lhs_mif.json</code></p>
+    
+    <pre class="prettyprint">
+{
+ "meta": {"id": "lhs_mif",
+          "comment": "LHS mif design"},
+
+ "action": {"id": "lhs",
+            "H": 100,
+            "seed": 12334216564},
+
+ "cmd": [["D",  "", "mif sto -M 100 -J 1000", 1]],
+
+ "cluster": {"type": SGE,
+             "walltime": "01:20:00"}
+}
+</pre>
+
+    <p>Or template it:</p>
+    <pre class="prettyprint">
+plom --lhs mif --sto -M 100 -J 1000 -H 100 --cluster SGE -o lhs_mif.json
+</pre>
+
+    <p>Run it on the cloud:</p>
+
+    <pre class="prettyprint">
+sfi --bootstrap lhs_mif.json && ./lhs_mif.sh
+</pre>
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.convergence()</code> and <code>plot.prs()</code>
+    </p>
+  </div>
+
+  <div class="span4">
+    <h3>Chaining methods</h3>
+    
+    <p>
+      Wonder why <code>cmd</code> is a list of lists? Well, here too you can
+      chain methods... Here is a <code><i class="icon-file"></i>design.json</code> that, for
+      each sample of an LHS:
+    </p>
+
+    <ul>
+      <li>Gets the state variables initial conditions by skipping a
+      transiant of 1000 time steps.</li>
+      <li>Refines the estimate of these values <strong>only</strong>
+        using a simplex (least-squares).</li>
+      <li>Concludes with a MIF that is now happily initialized.</li>
+    </ul>
+<pre class="prettyprint">
+{
+ "meta": {"id": "lhss",
+          "comment": "LHS on steroids"},
+
+ "action": {"id": "lhs",
+            "H": 100,
+            "seed": 12334216564},
+
+ "cmd": [["D","","simul deter -T 1000", 1],
+         ["DX","-I", "simplex -s -M 20000", 1],
+         ["B","", "mif sto -J 4000 -M 100", 1]],
+
+ "cluster": {"type": SGE,
+             "walltime": "01:20:00"}
+}
+</pre>
+
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="span12">
+    <p>
+      No magic, PLoM uses a very simple
+      API: <code>lhs.sh</code> <code>all_profiles.sh</code> are just
+      successions of <code>sfi</code> invocations (and some goodies to
+      save you the hassle of specifying path and cluster specific
+      options.
+    </p>
+  </div>
+</div>
+
+
+
+
+
+
+<div class="page-header">
+  <h1>Take a first quick walk around <small>before you run a pMCMC</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span4">
+    <h3>Hey, I have priors!</h3>
+
+    <p>
+      The pMCMC is not an optimisation algorithm, so you may want to
+      help it by launching an LHS ksimplex combination first. Note
+      that you are interested in the posterior density rather than in
+      the likelihood alone: say it with the <code>--prior</code>
+      option.
+    </p>
+
+
+    <p>Here would be a <code><i class="icon-file"></i>design.json</code> example:</p>
+
+    <pre class="prettyprint">
+{
+ "action": {"id": "lhs",
+            "H": 100,
+            "seed": 12334216564},
+
+ "cmd": [["D", "", "ksimplex deter -M 10000 --prior"]],
+
+ "cluster": {"type": SGE,
+             "walltime": "01:20:00"}
+}
+</pre>
+</div>
+
+  <div class="span4">
+    <h3>All together?</h3>
+
+     <p>
+        If you have many parameters to estimate, having the pMCMC update them one by one can be long... Try the <code>-- full</code> command to allow updating the whole vector at once! 
+     <p>
+    </p>
+        It will be specifically helpful when your parameters have intricate roles in the model, but it's also a bit more adventurous. Put all luck on your side by first getting a feel of the target's shape!
+    </p>
+     <pre class="prettyprint">
+sfi -B | ./pmcmc sto --full -M 10000
+</pre>
+
+  </div>
+  
+  
+  
+  <div class="span4">
+    <h3>Get a first feel of the target's shape</h3>
+
+     <p>
+        The pMCMC algorithm relies on an underlying covariance that should capture the shape of the target density. Of course, this is something you are not very sure about beforehand, as this is what you are trying to figure out with the pMCMC! Don't worry, the algorithm will correct itself and learn progressively from what it has seen. 
+    <p>
+    </p> 
+        To avoid spending too much time in this learning phase, let the <code>kmcmc</code> do its part of the job: it's about 100 times faster!
+
+    </p>
+    Start with:
+        <pre class="prettyprint">
+sfi -B | ./kmcmc sto --full -M 10000
+</pre>
+    And carry on with the pMCMC:
+        <pre class="prettyprint">
+sfi -B -C | ./pmcmc sto --cov --full -M 10000
+</pre>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="page-header">
+  <h1>Be confident <small>and credible</small></h1>
+</div>
+
+
+<div class="row">
+  <div class="span4">
+    <h3>Store the MLE</h3>
+
+    <p>
+      Store the maximum likelihood estimate from the LHS run that gave
+      the best results (let's say number 68 as reported by <code>plot.convergence()</code>). 
+    </p>
+
+
+<pre class="prettyprint">
+sfi -B -b ../results/lhs/best_68.output > mle.json
+</pre>
+
+
+  </div>
+
+
+  <div class="span4">
+    <h3>Slices</h3>
+
+    <p>Compute your slices super fast and see if it is worth
+    continuing...</p>
+
+
+    <p>Template a design: <code><i class="icon-file"></i>slice.json</code></p>
+<pre class="prettyprint">
+plom --slice smc --sto -J 1000 -H 20 -o slice.json
+</pre>
+
+    <p>Run it:</p>
+
+<pre class="prettyprint">
+sfi -s mle.json --bootstrap slice.json && ./slice.sh
+</pre>
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.all_slices()</code></code>
+    </p>
+    
+  </div>
+
+
+  <div class="span4">
+    <h3>Profiles</h3>
+
+    <p>It is said to be an easy way to get <strong>confidence intervals</strong>.</p>
+
+    <p>Template a design: <code><i class="icon-file"></i>profile.json</code></p>
+<pre class="prettyprint">
+plom --profile mif --sto -J 1000 -M 100 -H 20 --cluster SGE -o profile.json
+</pre>
+
+    <p>Run it:</p>
+
+<pre class="prettyprint">
+sfi -s mle.json --bootstrap profile.json && ./profile.sh
+</pre>
+
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.all_profiles()</code>
+    </p>
+        
+  </div>
+  
+</div>
+
+
+<div class="row">
+  
+  <div class="span6">
+    <h3>Sample the peak(s)</h3>
+
+    <p>
+      Because some good posteriors are all you truly need to get <strong>credible intervals</strong>.
+    </p>
+
+    <pre class="prettyprint">
+sfi -s mle.json | ./pmcmc sto -J 1000 -M 10000
+</pre>
+
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.best()</code>, <code>plot.posteriors()</code> and <code>plot.corr()</code>
+    </p>
+
+  </div>
+
+</div>
+
+
+<div class="page-header">
+  <h1>Inference with style <small>Expand your knowledge</small></h1>
+</div>
+
+<div class="row">
+  <div class="span6">
+      <a href="/doc/modeler/hfmd" class="btn btn-primary">Show me a real life example!</a>   
+  </div>
+</div>
+
+
+
+
+<% include ../footer %>

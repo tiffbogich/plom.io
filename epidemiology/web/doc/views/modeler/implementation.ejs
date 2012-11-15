@@ -1,0 +1,593 @@
+<h1>Implementing a model</h1>
+
+<p>
+  Once we have a context, a model and a link
+  (<code>c</code>, <code>m</code>, and <code>l</code> dictionaries), we
+  can bind the context and the link to the model.
+
+  This can be done using the <strong>simforence_model_builder</strong>
+  Python module.
+</p>
+
+<pre class="prettyprint">
+from simforence_model_builder.SfrModel import SfrModel
+
+#NOTE: we assume that we have access to the dict c, m and l previously defined
+
+model = SfrModel('~/SIR_model/', c, m, l) #path where the model will be rendered, context,  model and link dictionaries
+
+model.prepare() #create the necessary directories
+model.code()    #code the model in C
+model.compile() #compile the C code
+model.write_settings()
+</pre>
+
+<p>  
+  The newly created <em>~/SIR_model</em> directory contains 4
+  sub-directories hosting:
+  <ul>
+    <li><em>src</em>: the sources of the <em>contextualized</em> model
+    and some helpful scripts</li>
+    <li><em>lib</em>: a binary version of the C simforence library</li>
+    <li><em>bin</em>: all the programs that we can execute (and some associated
+    helper scripts)</li>
+    <li><em>settings</em>: a file named <em>settings.json</em> containing the data,
+      meta-data, and the <em>expanded</em> parameter values</li>
+  </ul>
+</p>
+
+<p>
+  To make things more concrete, let's have a look to the generated
+  code for the ODE implementation of our contextualized model.
+</p>
+
+<pre class="prettyprint">
+f[ORDER_S*N_CAC+cac] =  - ((par[ORDER_r0][routers[ORDER_r0]->map[cac]]*par[ORDER_v][routers[ORDER_v]->map[cac]]*(X[ORDER_I0*N_CAC+cac]+X[ORDER_I1*N_CAC+cac]+par[ORDER_iota_0][routers[ORDER_iota_0]->map[cac]])/covar[ORDER_N][nn][cac])*X[ORDER_S*N_CAC+cac]) - ((covar[ORDER_mu_d][nn][cac])*X[ORDER_S*N_CAC+cac]) + (covar[ORDER_mu_b][nn][cac]*covar[ORDER_N][nn][cac]);
+f[ORDER_I0*N_CAC+cac] =  - ((2.0*(par[ORDER_v][routers[ORDER_v]->map[cac]]))*X[ORDER_I0*N_CAC+cac]) - ((covar[ORDER_mu_d][nn][cac])*X[ORDER_I0*N_CAC+cac]) + ((par[ORDER_r0][routers[ORDER_r0]->map[cac]]*par[ORDER_v][routers[ORDER_v]->map[cac]]*(X[ORDER_I0*N_CAC+cac]+X[ORDER_I1*N_CAC+cac]+par[ORDER_iota_0][routers[ORDER_iota_0]->map[cac]])/covar[ORDER_N][nn][cac])*X[ORDER_S*N_CAC+cac]);
+f[ORDER_I1*N_CAC+cac] =  - ((2.0*(par[ORDER_v][routers[ORDER_v]->map[cac]]))*X[ORDER_I1*N_CAC+cac]) - ((covar[ORDER_mu_d][nn][cac])*X[ORDER_I1*N_CAC+cac]) + ((2.0*(par[ORDER_v][routers[ORDER_v]->map[cac]]))*X[ORDER_I0*N_CAC+cac]);
+</pre>
+
+<p>
+  As can be seen in this snapshot of C code (coming from the
+  file <em>~/SIR_model/src/C/core/prediction.c</em>), all parameters
+  and state variables have been transformed into arrays. Arrays make
+  it possible to take into account the fact that our context has
+  multiple cities. In the same way, by carefully looking at the
+  generated code, we can see that the force of infection has been
+  augmented by an extra parameter (<code>iota_0</code>). This new
+  force of infection takes care of the external infections required by
+  the space component of the context(<code>c['space'] =
+  {'model':['external']}</code>). Note also
+  that <code>mu_b</code>, <code>mu_d</code> and <code>N</code> are
+  treated as data, as requested by the <code>par_fixed_values</code>
+  field of the context.
+</p>
+
+<p>
+  A simpler picture can be obtained by discarding the indexing and
+  printing our model object in Python with <code>print(model)</code>:
+</p>
+
+<pre>
+dS/dt= -((noise__trans(sto)*r0/N*v*(iota_0+I0+I1))*S)-((mu_d)*S)+(mu_b*N)
+dI0/dt= -(((v)*2.0)*I0)-((mu_d)*I0)+((noise__trans(sto)*r0/N*v*(iota_0+I0+I1))*S)
+dI1/dt= -(((v)*2.0)*I1)-((mu_d)*I1)+(((v)*2.0)*I0)
+</pre>
+
+<p>
+  In the same way, by
+  inspecting <em>~/SIR_model/settings/settings.json</em> we can see
+  that the parameters have been adapted to fit the context. For
+  instance, running <code>./sfr -p</code> in <em>~/SIR_model/bin/</em>
+  returns:
+</p>
+
+<pre class="prettyprint">
+#note that I has been replaced by I0 and I1 to satisfy the Erlang distribution
+l["par_sv_values"] = {"S": {"min": [0.07], "guess": [0.07], "max": [0.07], "jump_size": [0.0], "grouping": [0, 0], "constraint": "box_0_1"},
+                      "I0": {"min": [3.5e-07], "guess": [5e-06], "max": [0.0005], "jump_size": [1.5e-06], "grouping": [0, 0], "constraint": "box_0_1"},
+                      "I1": {"min": [3.5e-07], "guess": [5e-06], "max": [0.0005], "jump_size": [1.5e-06], "grouping": [0, 0], "constraint": "box_0_1"}}
+
+#note the 2 values (len(cac_id)) for r0 whose grouping was 'variable' also note that a parameter iota_0 was added (coming from the context)
+l["par_proc_values"] = {"r0": {"min": [10.0, 10.0], "guess": [20.0, 28.0], "max": [30.0, 30.0], "jump_size": [1.0, 1.0], "grouping": [0, 1], "constraint": "positive"},
+                        "v": {"min": [5.0], "guess": [11.0], "max": [20.0], "jump_size": [0.5], "grouping": [0, 0], "type": "rate_as_duration", "unit": "D", "constraint": "positive"},
+                        "sto": {"min": [0.05], "guess": [0.1], "max": [0.2], "jump_size": [0.0], "grouping": [0, 0], "constraint": "positive"},
+                        "iota_0": {"min": [0.0], "guess": [0.0], "max": [0.0], "jump_size": [0.0], "grouping": [0, 0], "constraint": "positive"}}
+
+#note the 4 values (len(ts_id)) for phi whose grouping was 'variable'
+l["par_obs_values"] = {"rep2": {"min": [0.2], "guess": [0.6], "max": [0.9], "jump_size": [0.0], "grouping": [0, 0, 0], "constraint": "box_0_1"},
+                       "phi": {"min": [0.05, 0.05, 0.05, 0.05], "guess": [0.1, 0.1, 0.1, 0.1], "max": [0.6, 0.6, 0.6, 0.6], "jump_size": [0.1, 0.1, 0.1, 0.1], "grouping": [0, 1, 2, 3], "constraint": "positive"}}
+</pre>
+
+
+<h1>Interacting with a model</h1>
+
+<p>
+  Let's start with a simple simulation by running the
+  program <em>simul</em> (in <em>~/SIR_model/bin/</em>). Let's run a
+  simulation of 52 weeks starting from week 0 using
+  a <em>deterministic</em> version of the process model of our model
+  and storing the generated trajectory. This can be achieved by
+  typing:
+</p>
+
+<pre class="prettyprint">
+./simul deter --tend 52 --traj < ../settings/settings.json
+</pre>
+
+<div class="alert">
+  Keep in mind that every Simforence program can be invoked with
+  the <code>--help</code> option to have help on the usage and
+  available options (for instance <code>./simul --help</code>)
+</div>
+
+<p>
+  Simforence provides interactive visualization tools in the browser,
+  but quick plots of the results can be generated using R and the
+  script <em>~/SIR_model/src/R/plot.r</em>. This script is a
+  collection of functions coded to quickly visualize the outputs of
+  the C programs without having to worry about path and other
+  cumbersome things. To see the result of the simulation:
+  open <em>R</em> in a terminal in the
+  directory <em>~/SIR_model/src/R/</em> and load <em>plot.r</em> by
+  running <code>source('plot.r')</code>.
+  Running <code>plot.simul()</code> in <em>R</em> then produces the
+  following plot:
+</p>
+
+<p>
+  <img src="/images/doc/tutorial/simul_deter_52.png" class="sfr-img-center"  alt="plotted trajectories"/>
+
+  The blue curve is a realization of the
+  stochastic observation model (on top of the deterministic model)
+  while the black curve shows it's expectancy.
+</p>
+
+<p>Similarly, the evolution of the states variables can be plotted by
+  running <code>plot.SV()</code>
+
+
+  <img src="/images/doc/tutorial/simul_deter_52_SV.png" class="sfr-img-center"  alt="plotted state variables"/>
+</p>
+
+
+
+<p>
+  Simulating from the stochastic process model only requires you to change the
+  command <em>deter</em> to <em>sto</em>:
+</p>
+
+<pre class="prettyprint">
+./simul sto --tend 52 --traj < ../settings/settings.json
+</pre>
+
+<p>
+  Here again, <code>plot.simul()</code> and <code>plot.SV()</code> can
+  be used in <em>R</em> to visualize the results.
+</p>
+
+<p>
+  Let's use the results of the deterministic simulation to generate some
+  simulated data upon which we will introduce simforence inference
+  algorithms. Let's also add missing values in all sort of ways to see
+  how simforence handles them.
+</p>
+
+<pre class="prettyprint">
+#add the simulated data
+model.add_simulated_data() #by default will read X_0.output in bin/
+
+#add missing value to all the time series:
+for time in range(2, 7, 1):
+    for ts in model.get_ts_id():
+        model.set_data_point(ts, time, None)
+
+#add missing value specific to obs_all__CDC__inc:
+for time in range(29, 35, 1):
+    model.set_data_point("obs_all__CDC__inc", time, None)
+
+#add missing value specific to obs_city1__CDC__prev:
+for time in range(9, 11, 1):
+    model.set_data_point("obs_city1__CDC__prev", time, None)
+
+
+#modify parameters value to make the inference problem more interesting
+model.set_par_all('par_proc', 'r0', 'guess', [22.0, 22.0])
+model.set_par('par_proc', 'iota_0', 'guess', 0, 10.0)
+model.set_par('par_proc', 'iota_0', 'jump_size', 0,  1.0)
+model.set_par('par_proc', 'iota_0', 'max', 0, 1.0)
+
+##overwrite settings.json
+model.write_settings()
+</pre>
+
+<p>
+  The resulting data can be plotted by
+  running <code>plot.data()</code> in <em>R</em> (be sure to reload
+  the new settings by re-running <code>source('plot.r')</code>
+  in <em>R</em>.
+
+  <img src="/images/doc/tutorial/simulated_data_52.png" class="sfr-img-center" alt="plotted simulated data"/>
+</p>
+
+
+<h1>Inference</h1>
+
+<p>
+  Let's start by plotting a simulation of 100 realisations of our SSM
+  along with the simulated data. To do that we will use Simforence
+  Sequential Monte Carlo algorithm with an option specifying not to
+  apply the particle filter algorithm
+  (<em>--no_filter</em>). The <em>--no_filter</em> option allows us to
+  reduce the SMC algorithm to a program generating simple independent
+  realisations of our SSM.
+</p>
+
+<pre class="prettyprint">
+./smc deter -J 100 --no_filter --traj  < ../settings/settings.json 
+</pre>
+
+<div class="alert">
+  <strong>Important</strong> When appropriate, simforence programs
+  will use all the cores available on your machine. This can be
+  controlled by the option --N_THREAD (-P)
+</div>
+<p>
+  The resulted trajectories can be plotted against the data
+  (red) using <code>plot.X()</code> or <code>plot.hat()</code>
+
+  <img src="/images/doc/tutorial/smc_deter.png" class="sfr-img-center" alt="100 deter traj"/>
+</p>
+
+<p>
+  We can try to recover the correct parameters value by running a
+  Nelder-Mead simplex algorithm.
+</p>
+
+<pre class="prettyprint">
+./simplex -M 10000 < ../settings/settings.json
+</pre>
+
+<p>
+  The traces can be plotted using <code>plot.best()</code>
+  in <em>R</em>.
+</p>
+
+<p>
+  One potential caveat with the simplex algorithm is that it is a
+  local maximization algorithm. In order to see if our minima has a
+  chance to be the global one, we can restart the simplex algorithm
+  using the previous values. This can be achieved using a simple
+  command line tool called <code>sfr</code> also present
+  in <em>~/SIR_model/bin/</em> (see <code>./sfr --help</code> for all
+  the options). Used with the <em>-B</em> option, <em>sfr</em> will
+  put the previous results into the settings.json file and print it to
+  the standard output (stdout). We can then use an UNIX pipe
+  (<code>|</code>) to redirect the setting to a program standard input
+  (here <em>simplex</em>).
+</p>
+
+<pre class="prettyprint">
+./sfr -B | ./simplex -M 10000
+</pre>
+
+<p>
+  Once the log likelihood value is stable, we can use the same
+  construction to get trajectories simulated from the located maximum
+  likelihood estimate of our parameters by running:
+</p>
+
+<pre class="prettyprint">
+<code>./sfr -B | ./smc deter -J 100 --traj --no_filter</code>
+</pre>
+
+<p> 
+  followed by <code>plot.X()</code> in <em>R</em>
+  <img src="/images/doc/tutorial/smc_deter_mle.png" class="sfr-img-center" alt="100 deter traj for the MLE found with simplex"/>
+</p>
+
+<p>
+  Now that we have a rather good fit, we can use an MCMC sampler to
+  get the posterior distribution of our parameters. To do that we can
+  use Simforence implementation of the particle Monte Carlo Markov
+  chain algorithm stripped down to a regular Metropolis-Hasting
+  sampler using the right set of options. By default,
+  the <em>pmcmc</em> program will assume uniform priors whose
+  boundaries are given by the properties <em>min</em> and <em>max</em>
+  of the parameter dictionaries.
+</p>
+
+<pre class="prettyprint">
+/sfr -B | ./pmcmc deter -J 1 -M 500000
+</pre> 
+
+<p>
+  Traces can be observed by running <code>plot.best()</code> while the
+  posteriors are accessible
+  with <code>plot.posteriors(skip=10000)</code> in <em>R</em>:
+  <img src="/images/doc/tutorial/pmcmc.png" class="sfr-img-center" alt="plotted posteriorspMCMC"/>
+</p>
+
+
+<p>
+  <code>sfr</code> can also be used to generate new settings file. Here to
+  save our estimates in a file called <em>mle.json</em> we can run:
+</p>
+
+<pre class="prettyprint">
+./sfr -B > mle.json
+</pre>
+
+<p>
+  Simforence offers most plug and play inference methods. Try
+  them out keeping in mind that you can <em>chain</em> them
+  using <code>sfr</code>! And don't forget <code>--help</code> to
+  learn the available options.
+</p>
+
+<h1>Simforence Bootstrap</h1>
+
+<p>
+  <code>sfr</code> and the inference algorithm presented in
+  the <em>bin</em> directory are all we really need to do to solve
+  real problems.  All the rest is just a matter of writting 
+  <em>glue code</em> to coordinate all the individual components
+  and deploy computations on computer clusters. <em>SfrBootstrap</em>
+  is a collection of methods that allows us to bootstrap commonly
+  used <em>design</em> (Latin Hyper Square sampling of the parameter
+  space, likelihood slices, profiles, replications, bifurcation
+  analysis ...) either on your local computer or on a Unix cluster.
+</p>
+
+<p>
+  Let's see how we can run likelihood slices locally and likelihood
+  profiles on a cluster using the settings <em>mle.json</em>
+  previously created.
+</p>
+
+<pre class="prettyprint">
+from simforence_model_builder.SfrBootstrap import SfrBootstrap
+
+bootstrap = SfrBootstrap(path_to_settings_json = '~/SIR_model/bin/mle.json'),
+                         path_rendered = '~/SIR_model/')
+
+#likelihood slices (to be run locally)
+bootstrap.all_lin1d(action='slice',
+                    cmd=[('D', '',  'smc deter -J 1')],
+                    H = 30)
+
+#likelihood profiles (to be run on a Unix Cluster)
+bootstrap.all_lin1d(action='profile',
+                    cmd=[('D', '',  'simplex -M 10000')] + [('B', '',  'simplex -M 10000')]*4,
+                    H = 12,
+                    cluster='PBS',
+                    walltime="00:10:00")
+</pre>
+
+<p>
+  The <em>all_lin1d</em> method generates <em>H</em> points equally
+  spaced between the property <em>min</em> and <em>max</em> of the
+  parameter dictionaries for <em>all</em> the parameters.  
+  <em>SfrBootstrap</em> uses <code>sfr</code> to inject these points
+  into the settings file specify in the <em>SfrBootstrap</em> constructor. 
+
+  The <em>cmd</em> argument takes a list of
+  tuples. Each tuple <em>t</em> will be used to generate command of the form:
+  <code>./sfr t[0] t[1] | ./t[2]</code>
+  <ul>
+    <li>
+      The first element of the tuple indicates whether <em>sfr</em>
+      should update the settings using the generated design
+      (<em>D</em>) or using the result of a previous run (<em>B</em>)
+      (see the reference manual for all the
+      options). Depending on the invoked method, <em>SfrBootstrap</em>
+      will add some options (for instance in case of likelihood
+      profile, it will ensure that the parameter on which we run the
+      profile are not allowed to vary by setting
+      its <code>jump_size</code> property to 0)
+    </li> 
+    <li>
+      The second element of the tuple is used to pass extra options
+      to <em>sfr</em>.
+    </li> 
+    <li>
+      The third element of the tuple contains the C program to be run
+      with all its options <em>except</em> the one setting the
+      outputs (which is handled by <em>SfrBootstrap</em>)
+    </li>
+  </ul>  
+
+<div class="alert">
+  <strong>Keep in mind</strong> while creating a <code>cmd</code> list
+  that <code>sfr</code> never modifies a settings file but echoes on the
+  standard output the modified settings.
+</div>
+
+</p>
+
+<p>
+  <em>SfrBootstrap</em> generates bash scripts in the <em>bin</em>
+  directory that are ready to be executed.
+  For instance <code>cat slice_par_proc_r0_1.sh</code> reveals:
+</p>
+
+<pre class="prettyprint">
+#!/bin/bash
+
+path_bin=/xxx/xxx/SIR_model/bin/
+path_settings=/xxx/xxx/SIR_model/bin/mle.json
+path_results=/xxx/xxx/SIR_model/results/slice_par_proc_r0_1/
+path_design=/xxx/xxx/SIR_model/settings/slice_par_proc_r0_1.dat
+
+H=30
+
+cd $path_bin
+
+test -d $path_results || mkdir -p $path_results
+
+for (( h=0; h < $H; h++ )); do
+	echo slice_par_proc_r0_1.sh: iteration $h/$H
+	./sfr -s $path_settings -B -d -b $path_design -M $h   | ./smc deter -J 1 -p $path_results -i $h
+done
+</pre>
+
+<p>
+  For the profiles, as we specified
+  <code>cluster='PBS'</code>, <em>SfrBootstrap</em> generated an
+  appropriate script that will run as an array job on a PBS
+  cluster. Note also that in order to try to prevent local maxima, we
+  chained 5 iterations of the simplex algorithm
+  <code>cat profile_par_proc_r0_0.sh</code>:
+</p>
+
+<pre class="prettyprint">
+#!/bin/bash
+
+path_bin=/xxx/xxx/bin/
+path_settings=/xxx/xxx/settings/settings.json
+path_results=/xxx/xxx/results/profile_par_proc_r0_0/
+path_design=/xxx/xxx/settings/profile_par_proc_r0_0.dat
+
+#PBS -l nodes=1:ppn=1,walltime=00:10:00
+
+#PBS -t 0-11
+h=$PBS_ARRAYID
+
+cd $path_bin
+
+test -d $path_results || mkdir -p $path_results
+
+./sfr -s $path_settings -B -d -b $path_design -M $h  -P $path_design  | ./simplex -M 10000 -p $path_results -i $h
+./sfr -s $path_settings -B -b ${path_results}best_${h}.output  -P $path_design  | ./simplex -M 10000 -p $path_results -i $h
+./sfr -s $path_settings -B -b ${path_results}best_${h}.output  -P $path_design  | ./simplex -M 10000 -p $path_results -i $h
+./sfr -s $path_settings -B -b ${path_results}best_${h}.output  -P $path_design  | ./simplex -M 10000 -p $path_results -i $h
+./sfr -s $path_settings -B -b ${path_results}best_${h}.output  -P $path_design  | ./simplex -M 10000 -p $path_results -i $h
+</pre>
+
+<p>
+  As <em>SfrBootstrap</em> create one slice and profile script per
+  parameter, for user convenience it also produces two extra
+  scripts that can be used to start all the jobs in one
+  command: <em>all_slices.sh</em> and <em>all_profiles.sh</em>
+</p>
+
+<p>
+  Running <code>./all_slices.sh</code> followed
+  by <code>plot.all_slices()</code> in <em>R</em> results in:
+  <img src="/images/doc/tutorial/slice.png" class="sfr-img-center"
+  alt="likelihood slices"/>
+</p>
+
+
+<p>
+  After having run <code>./all_profiles.sh</code> on a PBS cluster, we
+  can observe our likelihood profiles by typing <code>plot.all_profiles()</code> in <em>R</em>:
+  <img src="/images/doc/tutorial/profile.png" class="sfr-img-center" alt="likelihood proflies"/>
+</p>
+
+<p>
+  Now that we have learned about Simforence Bootsrap, we could redo our
+  analysis--but this time starting with our original settings and a
+  Latin Hyper Square sampling of the parameter space.
+</p>
+
+<pre class="prettyprint">
+bootstrap = SfrBootstrap(path_to_settings_json = '~/SIR_model/settings/settings.json'),
+                         path_rendered = '~/SIR_model/')
+
+bootstrap.lhs(H = 120,
+              cmd=[('D', '',  'simplex -M 10000')] + [('B', '',  'simplex -M 10000')]*6,
+              cluster='PBS',
+              walltime="00:20:00")
+</pre>
+
+
+<p>
+  You should now have a good overview of what can be done with
+  Simforence.  It is now time to be <em>social</em> and share your
+  model and context with the world to create the first library of
+  models!
+</p>
+
+<h1>Simforence library</h1>
+
+<h2>Implementing a model from scratch without the library</h2>
+
+<p>
+  Let's start with an executive summary containing only the strict
+  minimum amount of code necessary to implement a
+  full <code>SfrModel</code>. Let's assume that we already have access
+  to a <em>data set</em>. In Simforence, a data set is <em>a subset of
+  a context</em> stored in a
+  simple <a href="http://www.json.org">JSON</a> file. A data file
+  contains the following properties of a context:
+  <code>cac_id</code>, <code>ts_id</code>, <code>map_ts_cac</code>, <code>dates</code>,
+  <code>data</code>, <code>pop_sizes</code>, <code>rep1</code>, <code>frequency</code>, 
+  <code>par_fixed_values</code>.
+
+  An example can be downloaded
+  <a type="application/json" href="{{ STATIC_URL}}data/data.json">here</a>.
+</p>
+
+<pre class="prettyprint">
+import json
+from simforence_model_builder.SfrModel import SfrModel
+
+#model
+m = {} 
+
+m['state_var'] = ['S', 'I']
+m['par_proc'] = ['r0', 'v', 'sto', 'mu_b', 'mu_d']
+
+m['proc_model'] = [ ['U', 'S', 'mu_b*N'],
+                    ['S', 'I', 'noise__trans(sto)*r0/N*v*I', {'tag':'transmission', 'by': ['I']}],
+                    ['I', 'DU', 'v'],
+                    ['I', 'I', 'v', {'tag':'Erlang', 'shape':2}],
+                    ['S', 'U', 'mu_d'],
+                    ['I', 'U', 'mu_d'] ]
+
+m['pop_size_eq_sum_sv'] = False 
+
+#context
+c = json.load(open('data.json')))
+c['space'] = {'model':['external']}
+c['age'] = None
+
+#link
+l={}
+
+l['obs_var'] = ['Inc_out', 'Inc_in', 'Prev']
+l['obs_var_def'] = ['I->DU & I->U', 'S->I', 'I']
+l['par_obs'] = ['rep2', 'phi']
+l['obs_model'] = {'distribution': 'discretized_normal',
+                  'parameters': ['rep1*rep2*x', 'rep2*(1.0-rep2)*rep1*x + (rep2*phi*rep1*x)**2']}
+
+l['map_ts_obs'] = {'obs_all__CDC__inc': 'Inc_out',
+                   'obs_city1__CDC__prev': 'Prev',
+                   'obs_city2__CDC__inc': 'Inc_in',
+                   'obs_all__google__inc': 'Inc_out'}
+
+l['par_sv_values'] = {'S':{'min':0.07, 'guess':0.07, 'max':0.07, 'jump_size': 0.0, 'grouping':'identical', 'constraint':'box_0_1'},
+                      'I':{'min':7e-7, 'guess':1e-05, 'max':1e-3, 'jump_size': 3e-6, 'grouping':'identical', 'constraint':'box_0_1'}}
+
+l['par_proc_values'] = {'r0':{'min':10, 'guess':[20, 28], 'max':30, 'jump_size': 1.0, 'constraint':'positive', 'grouping':'variable'},
+                        'v':{'min':5, 'guess':11, 'max':20, 'jump_size': 0.5, 'constraint':'positive', 'unit':'D', 'type':'rate_as_duration', 'grouping':'identical'},
+                        'sto':{'min':0.05, 'guess':0.1, 'max':0.2, 'jump_size': 0.0, 'constraint':'positive', 'grouping':'identical'}}
+
+l['par_obs_values'] = {'rep2':{'min':0.2, 'guess':0.6, 'max':0.9, 'jump_size': 0.0, 'constraint':'box_0_1', 'grouping':'identical'},
+                       'phi':{'min':0.05, 'guess':0.1, 'max':0.6, 'jump_size': 0.1, 'constraint':'positive', 'grouping':'variable'}}
+
+#implementation
+model = SfrModel('~/SIR_model/', c, m, l)
+
+model.prepare()
+model.code()
+model.compile()
+model.write_settings()
+</pre>
+
+<h2>Modeling made social</h2>
+
+<p>
+  Wouldn't it be nice if...
+</p>

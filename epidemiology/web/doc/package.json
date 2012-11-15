@@ -1,0 +1,14 @@
+{
+  "name": "plom-doc",
+  "version": "0.0.1",
+  "author": "Sebastien Ballesteros <sebastien@plom.io>",
+  "contributors": [ 
+    { "name": "Sebastien Ballesteros", "email": "sebastien@plom.io" }, 
+    { "name": "Joseph Dureau", "email": "dureau.joseph@gmail.com" }
+  ],
+  "description": "plom.io Documentation Website",
+  "dependencies": {
+    "express": "3.x",
+    "ejs": "~0.8.3"
+  }
+}
