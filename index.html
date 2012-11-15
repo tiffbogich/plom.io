@@ -92,7 +92,7 @@
 
 	  <section data-state="blackout">
 	    <h2>process.<a style="text-decoration: none; line-height: 1;" href="http://www.json.org/">json</a></h2>
-            <pre style="background-color:white;">{
+            <pre style="color:white; font-weight:800; background-image: url('lib/pict/sneeze_big.png'); background-repeat: no-repeat; background-position: center center;">{
  "state": [{"id": "S", "comment": "Susceptible"},
            {"id": "I", "comment": "Infectious"}],
 
@@ -108,14 +108,13 @@
 ...
 }
 </pre>
-
 	  </section>
 
 
 	  <section data-state="blackout">
 	    <h2>context.<a style="text-decoration: none; line-height: 1;" href="http://www.json.org/">json</a></h2>
 
-            <pre style="background-color:white;">{
+            <pre  style="color: white; font-weight:800; background-image: url('lib/pict/cities_small.png'); background-repeat: no-repeat; background-position: center center;">{
  "population": [{"id": "city1__all",
                  "size_t0": 1e6,
                  "comment": "city 1, all age classes"},
@@ -140,8 +139,7 @@
 	  <section data-state="blackout">
 	    <h2>link.<a style="text-decoration: none; line-height: 1;" href="http://www.json.org/">json</a></h2>
 
-<pre style="background-color:white;">
-{
+            <pre  style="color: white; font-weight:800; background-image: url('lib/pict/observation_small.png'); background-repeat: no-repeat; background-position: center center;">{
  "observed": [{"id": "prevalence", "comment":"the prevalence",
                "definition": ["I"],
                "time_series_id": ["city1__CDC__prev"]}.
@@ -158,33 +156,31 @@
                  "transformation": "logit",
                   "guess": {"city1__all": 0.7, "city2__all": 0.7}}
            ...
-
-
 </pre>
 	  </section>
 
 
 	  <section data-state="alert">
-	    <h2>Integrated inference</h2>
+	    <h2>Inference made easy</h2>
             
             <ul>
               <li>
                 Create a model (will be rendered in plain C):
-                <pre><code>plom context.json process.json link.json -o my_model</code></pre>
+                <pre style="box-shadow: none; font-size: 18pt; color: white; font-weight:800;">plom context.json process.json link.json -o my_model</pre>
               </li>
 
               <li class="fragment">
                 Solve your problem by <strong>chaining</strong> inference methods:
                 <ul>
                   <li class="fragment">Skip a long transient (80000 time steps):
-                    <pre><code>sfi | ./simul deter -T 80000</code></pre>
+                    <pre style="box-shadow: none; font-size: 18pt; color: white; font-weight:800;">sfi | ./simul deter -T 80000</pre>
                   </li>
                   <li class="fragment">Run a simplex (10000 iterations max) starting
                     from the previously found initial conditions (<em>-X</em>): 
-                    <pre><code>sfi -X | ./simplex -M 10000</code></pre>
+                    <pre style="box-shadow: none; font-size: 18pt; color: white; font-weight:800;">sfi -X | ./simplex -M 10000</pre>
                   </li>
                   <li class="fragment">Take 1 000 000 samples with an MCMC method starting from the previous results (<em>-B</em>):
-                    <code><pre>sfi -B | ./pmcmc deter -M 1e6 </code></pre>
+                    <pre style="box-shadow: none; font-size: 18pt; color: white; font-weight:800;">sfi -B | ./pmcmc deter -M 1e6</pre>
                   </li>
                 </ul>
               </li>
@@ -195,10 +191,11 @@
 
 
 	  <section data-state="soothe">
-	    <h2>Inference for humans</h2>
+	    <h2>Real time web</h2>
             
             <p>
-              Do everything from a web browser.
+              Let the computations run on the cloud and do
+              everything from a web browser.
             </p>
 
 
