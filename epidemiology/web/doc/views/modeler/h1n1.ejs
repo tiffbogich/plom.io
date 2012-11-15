@@ -1,0 +1,565 @@
+<% include ../layout %>
+
+<div class="page-header">
+  <h1>2009 H1N1 pandemic</h1>
+  <h1><small>Using diffusions to track the evolution of contacts among Londoneers</small></h1>
+</div>
+
+<div class="row">
+
+ <div class="span4 offset4">
+    <img src="/images/H1N1data.png" alt="H1N1 data" class="sfr-img-center">
+ </div>
+
+ </div>
+
+<div class="row">
+
+
+  <div class="span6">
+    <h3>Context</h3>
+ </div>
+</div>
+
+
+<div class="row">
+
+
+  <div class="span6">
+
+    <p><strong>Data</strong>:
+      <ul>
+        <li>time series of weekly total H1N1 cases recorded by GPs (provided by the Health Protection Agency, corrected for misdiagnostics with confounding diseases).
+        </li>
+        <li>10% of total cases considered to be monitored due to asymptomatic cases and under-reporting.</li>
+      </ul>      
+    </p>
+   </div>
+
+    
+   <div class="span3">
+
+
+    <p><strong>Meta-data</strong>:
+      <ul>
+        <li>Population size</li>
+      </ul>      
+    </p>
+
+    <p><strong>Structure</strong>:
+      <ul>
+        <li>London as a whole, for a start</li>
+      </ul>      
+    </p>
+  </div>
+
+</div>
+
+
+<div class="row">
+
+  <div class="span12">
+    <h3>in JSON</h3>
+
+    <p>
+      Let's get a blank context: <code>./plom --context context.json</code>
+      and fill it for H1N1:
+    </p>
+
+    <div class="accordion" id="link-json">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#link-json" href="#collapseContext">
+            context.json
+          </a>
+        </div>
+        <div id="collapseContext" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+{
+ "population": [{"id": "London__all",
+                 "size_t0": 1e5,
+                 "comment": "London, all age classes"}],
+
+ "time_series": [{"id": "London__HPA__inc",
+                 "population_id": ["London__all"]}],
+
+ "frequency": "W",
+
+ "data": [{"id": "data",
+           "source": "data/data.csv",
+           "comment": "weekly estimate of H1N1 cases recorded by GPs (per 100000 inhabitants)"},
+          
+          {"id": "N",
+          "source": "data/N.csv",
+          "comment": "population size"},
+          
+          {"id": "prop",
+          "source": "data/prop.csv",
+          "comment": "proportion of the population under surveillance (100%)"}],
+
+ "model": {"space": {},
+           "age": {}}
+ }
+</pre>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+  </div>    
+
+
+</div>
+ 
+
+<div class="page-header">
+  <h1>Process model</h1>
+</div>
+
+
+<div class="row">
+
+  <div class="span12">
+    <h3>Simple model, diffusing parameter</h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span6">
+
+      <ul>
+        <li>Simple deterministic S-E-I-R skeleton, we work with a large population, and environmental noise is attributed to variations in effective contacts.  Homogeneous population as a first approximation, age structure can be added subsequently.</li>
+      </ul>
+  </div>    
+  <div class="span6">
+      <ul>
+
+        <li>To capture how nature and frequency of contacts evolve, the effective contact rate parameter fis allowed to diffuse, with unknown volatility. </li>
+      </ul>
+
+  </div>    
+
+</div>
+
+<div class="row">
+  <div class="span12">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#examples-prog" href="#collapseJson">
+            model.json
+          </a>
+        </div>
+        <div id="collapseJson" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+    <p>
+      We can get a blank model template by running:
+      <code>./plom --model model.json</code>
+    </p>
+
+
+<pre class="prettyprint">
+{
+ "state": [{"id": "S", "comment": "Susceptibles"},
+           {"id": "E", "comment": "Individuals in latent phase"},
+           {"id": "I", "comment": "Infectious"}],
+
+ "parameter": [{"id": "beta",   "comment": "effective contact rate"},
+               {"id": "k",    "comment": "latent phase leaving rate"},
+               {"id": "v",    "comment": "recovery rate"},
+               {"id": "vol",  "comment": "volatility of beta"}],
+
+ "model": [{"from": "S", "to": "E",  "rate": "drift(beta, vol) * I/N", "tag":[{"id": "transmission", "by":["I"]}], "comment":"infection"},
+           {"from": "E", "to": "I" , "rate": "k", "comment":"leaving latent phase"},
+           {"from": "I", "to": "DU", "rate": "v", "comment":"recovery"}],
+
+ "pop_size_eq_sum_sv": false
+}
+</pre>
+
+          </div>
+        </div>
+      </div>
+
+
+  </div>    
+
+   
+
+</div>
+
+
+
+<div class="page-header">
+  <h1>Linking<small> and building</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span12">
+    <h3>Link template</h3>
+
+    <p>
+      To be sure not to forget any parameters we fill in a template
+      generated with:<br/>
+      <code>./plom context.json model.json --link
+      link.json</code>
+    </p>
+    <br/>
+    <p>
+       A few remarks:
+    </p>
+
+  </div>    
+</div>
+
+
+<div class="row">
+  <div class="span6">
+    <p>
+      <ul>
+        <li>
+          the whole beta trajectory will follow the same transformation specified here: <code>log</code> to preserve positivity or <code>logit</code> to impose boundaries.
+        </li>
+        <li>
+          beware of units: here, for example, the effective contact rate can be given in days or in weeks.
+        </li>
+        
+       </ul>
+    </p>
+   </div>
+        
+   <div class="span6">
+    <p>
+      <ul>
+        <li>
+          you can impose strict boundaries setting <code>uniform</code> priors, or bring information while remaining flexible with <code>normal</code> priors. By default, <code>uniform</code> priors are used.
+        </li>
+      </ul>
+    </p>
+
+
+  </div>    
+</div>
+
+
+<div class="row">
+
+<div class="span12">
+
+    <div class="accordion" id="link-json">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#link-json" href="#collapseLink">
+            link.json
+          </a>
+        </div>
+        <div id="collapseLink" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+{
+ "meta": {"id": "my_id",
+          "comment": "my comment"},
+
+ "observed": [{"id": "inc", "comment":"incidence",
+               "definition": [{"from":"E", "to":"I"}],
+               "time_series_id": ["London__HPA__inc"]}],
+
+ "parameter": [{"id": "phi",  "comment": "observation noise"}],
+
+ "model": {"distribution": "discretized_normal",
+           "mean": "prop*x",
+           "var": "(prop*phi*x)**2"},
+
+ "partition": {"data_stream": {"group": [{"id": "HPA",    "time_series_id": ["London__HPA__inc"]}],
+        "comment": "default"}},
+
+ "value": {"S": {"partition_id": "identical_population", "transformation": "logit",
+                  "min":   0.7,
+                  "guess": 0.85,
+                  "max":   0.99,
+                  "sd_transf":  0.02,
+                    "prior": "normal" },
+            "E": {"partition_id": "identical_population", "transformation":"logit",
+                    "min": 0, "guess": 1e-04, "max": 1,
+                "sd_transf": 3e-6,
+                "prior": "uniform"},
+            "I": {"partition_id": "identical_population", "transformation":"logit",
+                  "min": 0, "guess": 1e-04, "max": 1,
+                "sd_transf": 3e-6,
+                "prior": "uniform"},
+            "beta": {"partition_id": "identical_population", "transformation": "log", "unit": "D",
+                   "min": 0, "guess": 1.4, "max": 3.0,
+                "sd_transf": 0.02,
+                "prior": "uniform"},
+            "k": {"partition_id": "identical_population", "transformation": "log", "unit": "D", "type": "rate_as_duration",
+                    "min": 1.55, "guess": 1.6, "max": 1.63,
+                "sd_transf": 0.02,
+                "prior": "normal"},
+            "v": {"partition_id": "identical_population", "transformation": "log", "unit": "D", "type": "rate_as_duration",
+                  "min": 0.93, "guess": 1, "max": 1.23,
+                "sd_transf": 0.02,
+                "prior": "normal"},
+            "vol": {"partition_id": "identical_population", "transformation": "log",
+                    "min": 0, "guess": 0.1, "max": 0.25,
+                "sd_transf": 0.02,
+                "prior": "uniform"},
+            "phi": {"partition_id": "identical_time_series", "transformation": "logit",
+                    "min": 0.01, "guess":0.1, "max": 0.9,
+                    "sd_transf": 0.0}}
+}
+</pre>
+
+
+<p>Note:
+  <ul>
+    <li><code>constraint</code> for <code>par_sv_values</code> default to <code>box_0_1</code></li>
+    <li><code>constraint</code> for <code>par_proc_values</code> default to <code>positive</code></li>
+    <li><code>grouping</code> default to <code>identical</code></li>
+    <li><code>prior</code> default to <code>uniform</code></li>
+  </ul>
+
+</p>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+
+  </div>  
+
+
+
+
+
+
+
+
+ 
+
+
+
+</div>
+
+
+
+
+<div class="row">
+
+  <div class="span6">
+    <h3>Coding the State Space Model</h3>
+
+
+    <p>
+      <i class="icon-play"></i> Run: <pre class="prettyprint">./plom context.json model.json link.json -o h1n1</pre>
+    </p>
+
+      <a href="#" class="btn btn-primary">See it in action from your browser!</a>   
+
+  </div>
+
+  <div class="span6">
+    <h3>Getting prepared</h3>
+
+    <p>We have generated a <code><i class="icon-folder-open"></i> h1n1/</code> <strong>directory.</strong>
+      <ul>
+        <li>The source code of our model are available in <code><i class="icon-folder-open"></i> h1n1/src/C/</code>.</li>
+        <li>Commands have to be run in <code><i class="icon-folder-open"></i> h1n1/bin/</code>.</li>
+        <li>Results will be written in <code><i class="icon-folder-open"></i> h1n1/src/results/</code>.</li>
+        <li>Plots will be generated from <a href="http://www.r-project.org/">R</a> using the script <code><i class="icon-file"></i> plot.r</code> using <code><i class="icon-folder-open"></i> h1n1/src/R/</code> as a working directory.</li>
+      </ul>
+    </p>
+  </div>
+
+
+</div>
+
+
+
+
+
+<div class="page-header">
+  <h1>Exploring the posterior density<small> three simple steps</small></h1>
+</div>
+
+
+<div class="row">
+
+  <div class="span10">
+    <h3>Strategy</h3>
+
+    <p>
+      This is a simple model, follow this simple three steps choreography:
+    </p>
+
+
+      <ul>
+
+        <li>
+            <strong>Get close to the mode</strong>
+            <p>
+            The ksimplex algorithm relies on an approximation of you model that is both quick and able to capture the stochasticity of your diffusing parameter. It should get you close to the mode in a few seconds:
+            <pre class="prettyprint">./ksimplex deter --prior -M 1000 <../settings/settings.json</pre>
+
+        </li>
+
+        <li>
+          <strong>Take a quick walk around</strong>
+            <p>
+            The kmcmc algorithm explores a posterior density that is close to the one we are targetting, and it does it quickly:
+            <pre class="prettyprint">sfi -B | ./kmcmc deter -M 10000 --full</pre>
+        </li>
+
+        <li>
+          <strong>Launch a well-prepared pMCMC</strong>
+            <p>
+            a pMCMC that is initialized close to the mode, with a good covariance matrix, can run very smoothly provided you give it enough particles:
+            <pre class="prettyprint">sfi -B -C | ./pmcmc deter -M 10000 -J 10000 --full</pre>
+        </li>
+
+
+      </ul>
+    </p>
+
+
+  </div>
+
+</div>
+
+<div class="row">
+
+
+
+  <div class="span12">
+ <h3>Results</h3>
+ </div>
+
+ <div class="span10 offset1">
+ <img src="/images/H1N1trajest_all.png" alt="beta trajectory estimate" class="sfr-img-center">
+
+<p style="vertical-align:middle">
+    In a few minutes, the epidemic data can be fitted and translated it into an estimated underlying trajectory of how the contacts among Londoneers have evolved during the pandemic.
+    
+  </div>
+
+
+   
+</div>
+
+
+<div class="page-header">
+  <h1>Real time monitoring?<small> track contacts evolution as you collect data</small></h1>
+</div>
+
+<div class="row">
+
+
+ <div class="span12">
+
+<div id="myCarousel" class="carousel slide" >
+  <!-- Carousel items -->
+  <div class="carousel-inner">
+    
+    <div class="item active"><!-- class of active since it's the first item -->
+      <img src="/images/H1N1trajest_Jul20.png" alt="" />
+      <div class="carousel-caption">
+        <p>July 20th</p>
+      </div>
+    </div>
+
+    <div class="item"><!-- class of active since it's the first item -->
+      <img src="/images/H1N1trajest_Jul27.png" alt="" />
+      <div class="carousel-caption">
+        <p>July 27th</p>
+      </div>
+    </div>
+
+    <div class="item"><!-- class of active since it's the first item -->
+      <img src="/images/H1N1trajest_Aug3.png" alt="" />
+      <div class="carousel-caption">
+        <p>August 3rd</p>
+      </div>
+    </div>
+
+    <div class="item"><!-- class of active since it's the first item -->
+      <img src="/images/H1N1trajest_Aug10.png" alt="" />
+      <div class="carousel-caption">
+        <p>August 10th</p>
+      </div>
+    </div>
+
+    <div class="item"><!-- class of active since it's the first item -->
+      <img src="/images/H1N1trajest_Aug17.png" alt="" />
+      <div class="carousel-caption">
+        <p>August 17th</p>
+      </div>
+    </div>
+
+    <div class="item"><!-- class of active since it's the first item -->
+      <img src="/images/H1N1trajest_Aug24.png" alt="" />
+      <div class="carousel-caption">
+        <p>August 24th</p>
+      </div>
+    </div>
+
+    <div class="item"><!-- class of active since it's the first item -->
+      <img src="/images/H1N1trajest_Aug31.png" alt="" />
+      <div class="carousel-caption">
+        <p>August 31st</p>
+      </div>
+    </div>
+
+    <div class="item"><!-- class of active since it's the first item -->
+      <img src="/images/H1N1trajest_Sep7.png" alt="" />
+      <div class="carousel-caption">
+        <p>September 7th</p>
+      </div>
+    </div>
+
+    <div class="item"><!-- class of active since it's the first item -->
+      <img src="/images/H1N1trajest_Sep14.png" alt="" />
+      <div class="carousel-caption">
+        <p>September 14th</p>
+      </div>
+    </div>
+
+
+    </div>
+    
+  <!-- Carousel nav -->
+  <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+  <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
+</div>
+
+
+
+
+</div>
+
+</div>
+
+
+<div class="row">
+  <div class="span2 offset10">
+    <a class="btn" href="http://arxiv.org/abs/1203.5950">More details?</a>
+</div>
+</div>
+
+
+<script src="twitter-bootstrap-v2/docs/assets/js/jquery.js"></script>  
+    <script src="twitter-bootstrap-v2/docs/assets/js/bootstrap-carousel.js"></script> 
+
+
+
+
+
+<% include ../footer %>
