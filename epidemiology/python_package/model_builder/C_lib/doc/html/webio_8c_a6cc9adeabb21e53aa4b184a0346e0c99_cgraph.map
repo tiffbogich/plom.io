@@ -1,0 +1,14 @@
+<map id="update_walk_rates" name="update_walk_rates">
+<area shape="rect" id="node3" href="$simforence__template_8h.html#aac17f55309d16b571e9042ea45abbd56" title="ask_update" alt="" coords="199,5,289,33"/>
+<area shape="rect" id="node5" href="$json_8c.html#ae16f0ae20bacef68b2d64432627c0a38" title="load_json" alt="" coords="205,57,283,85"/>
+<area shape="rect" id="node7" href="$print_8c.html#ac37aabaddd82f7fb577609b2d06dd80f" title="print_err" alt="" coords="542,213,613,241"/>
+<area shape="rect" id="node9" href="$load_8c.html#a52d0ab1f15309fd77cf508576392385d" title="load_best" alt="" coords="204,273,284,301"/>
+<area shape="rect" id="node30" href="$simforence__template_8h.html#adef41f7b130db9f78e66ced8578e5d43" title="transform_theta" alt="" coords="187,325,301,353"/>
+<area shape="rect" id="node11" href="$json_8c.html#a499d68628d29b6e3a1562cd5bd107c86" title="fast_get_json_object" alt="" coords="350,161,493,189"/>
+<area shape="rect" id="node14" href="$json_8c.html#a3989a6c5f4855538bf99e84bf68a8eff" title="fast_get_json_array" alt="" coords="352,213,491,241"/>
+<area shape="rect" id="node17" href="$json_8c.html#a6fd30a63c168d135104ba10661e51350" title="fast_get_json_string\l_from_array" alt="" coords="351,265,492,309"/>
+<area shape="rect" id="node20" href="$json_8c.html#a21072558108bc290cfe9b75656709447" title="fast_get_json_string\l_from_object" alt="" coords="351,333,492,377"/>
+<area shape="rect" id="node23" href="$metropolis__hastings__prior_8c.html#add6d3d9948e3624408a424d74f63161d" title="normal_prior" alt="" coords="373,401,469,429"/>
+<area shape="rect" id="node25" href="$metropolis__hastings__prior_8c.html#aeeb11b18f9395001e2d1e9b69af80aca" title="pseudo_unif_prior" alt="" coords="357,453,485,481"/>
+<area shape="rect" id="node27" href="$json_8c.html#a2bac29a9b187ef62f02872a5efd46c9d" title="fast_get_json_real\l_from_object" alt="" coords="356,505,486,549"/>
+</map>

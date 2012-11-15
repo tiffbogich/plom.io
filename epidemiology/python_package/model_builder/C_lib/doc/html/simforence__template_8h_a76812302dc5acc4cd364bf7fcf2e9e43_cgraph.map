@@ -1,0 +1,8 @@
+<map id="propose_safe_theta_and_load_X0" name="propose_safe_theta_and_load_X0">
+<area shape="rect" id="node3" href="$simforence__template_8h.html#af69b41fac888b9fd96053a802f540287" title="back_transform_theta2par" alt="" coords="193,5,370,33"/>
+<area shape="rect" id="node5" href="$prediction__util_8c.html#a915a17d972043f6a1e7ed10317c6e4b5" title="linearize_and_repeat" alt="" coords="208,57,354,85"/>
+<area shape="rect" id="node7" href="$prediction__util_8c.html#a87a57b3e294e57f10e0798903c42c89b" title="prop2Xpop_size" alt="" coords="222,109,340,137"/>
+<area shape="rect" id="node11" href="$proposal_8c.html#a7f12783dcd6605dcdaab12eb9cb4c4e6" title="check_IC" alt="" coords="243,161,320,189"/>
+<area shape="rect" id="node14" href="$prediction__util_8c.html#a44a2dad4ed8113dc683116502cf046f3" title="theta_driftIC2Xdrift" alt="" coords="215,213,348,241"/>
+<area shape="rect" id="node9" href="$prediction__util_8c.html#a6ec81ad2081c2f3fe0f34fa93cbad9cb" title="sum_SV" alt="" coords="419,135,491,163"/>
+</map>

@@ -1,0 +1,21 @@
+<map id="set_f_trans" name="set_f_trans">
+<area shape="rect" id="node3" href="$json_8c.html#a21072558108bc290cfe9b75656709447" title="fast_get_json_string\l_from_object" alt="" coords="388,5,529,49"/>
+<area shape="rect" id="node5" href="$print_8c.html#ac37aabaddd82f7fb577609b2d06dd80f" title="print_err" alt="" coords="587,118,658,146"/>
+<area shape="rect" id="node7" href="$simforence__template_8h.html#a137503fb97de0da3e33ad1dd73539be3" title="f_logit_ab" alt="" coords="196,125,276,153"/>
+<area shape="rect" id="node9" href="$simforence__template_8h.html#a1900d1e0d6d29d41a692c5d5a2d17e3f" title="is_duration" alt="" coords="193,177,279,205"/>
+<area shape="rect" id="node11" href="$simforence__template_8h.html#a548b223354fe199152420cba66fb4b96" title="f_inv_logit_ab_duration2rate" alt="" coords="141,229,331,257"/>
+<area shape="rect" id="node13" href="$simforence__template_8h.html#ac614de5284ff45243727a8e57946b9db" title="f_inv_logit_ab" alt="" coords="184,281,288,309"/>
+<area shape="rect" id="node15" href="$simforence__template_8h.html#ab3abbc1987031dd7154a2b78e2ef0f32" title="get_multiplier" alt="" coords="186,333,286,361"/>
+<area shape="rect" id="node21" href="$simforence__template_8h.html#ae7c3dbf040000099558a6011bb271852" title="f_der_logit_ab" alt="" coords="183,385,289,413"/>
+<area shape="rect" id="node23" href="$simforence__template_8h.html#a1bbe9f8834f20ca010b91e621db6cc69" title="f_log" alt="" coords="211,437,261,465"/>
+<area shape="rect" id="node25" href="$simforence__template_8h.html#a15784c96a1a8d943a051c1f21872ed85" title="f_inv_log_duration2rate" alt="" coords="156,489,316,517"/>
+<area shape="rect" id="node27" href="$simforence__template_8h.html#ab52fe962dc5e1a73572997ec56e28175" title="f_inv_log" alt="" coords="199,541,273,569"/>
+<area shape="rect" id="node29" href="$simforence__template_8h.html#ab88ee6a94f37a564bfed4b394117ed02" title="f_der_log" alt="" coords="198,593,274,621"/>
+<area shape="rect" id="node31" href="$simforence__template_8h.html#aa6f679c1869e94def9b16077c6c9c56f" title="f_logit" alt="" coords="208,645,264,673"/>
+<area shape="rect" id="node33" href="$simforence__template_8h.html#a1fbfb263f147d3f833df752ddecc0f94" title="f_inv_logit" alt="" coords="195,697,277,725"/>
+<area shape="rect" id="node35" href="$simforence__template_8h.html#a11e03a1b391cc3fb7a95b76df3c6d431" title="f_der_logit" alt="" coords="194,749,278,777"/>
+<area shape="rect" id="node38" href="$simforence__template_8h.html#a9f2e32618f737fad6c6f869932aebb44" title="f_id" alt="" coords="215,801,257,829"/>
+<area shape="rect" id="node40" href="$simforence__template_8h.html#a8c6d225e8d061ed3f45eadf8b5716a37" title="f_inv_duration2rate" alt="" coords="168,853,304,881"/>
+<area shape="rect" id="node42" href="$simforence__template_8h.html#a1b330e4fd6a93aa6aa11223a785adb1b" title="f_der_id" alt="" coords="201,905,271,933"/>
+<area shape="rect" id="node17" href="$simforence__template_8h.html#a2a39f119e8aedb5312d3e434342afd4f" title="u_duration_par2u_data" alt="" coords="379,294,538,322"/>
+</map>

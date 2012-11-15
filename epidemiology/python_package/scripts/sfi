@@ -1,0 +1,503 @@
+#!/usr/bin/env python
+
+
+##########################################################################
+#    This file is part of plom.
+#
+#    plom is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    plom is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public
+#    License along with plom.  If not, see
+#    <http://www.gnu.org/licenses/>.
+#########################################################################
+
+"""
+run with --help for help
+"""
+
+import sys
+import json
+import csv
+import argparse
+import os
+
+HEADER = '\033[95m'
+OKBLUE = '\033[94m'
+OKGREEN = '\033[92m'
+WARNING = '\033[93m'
+FAIL = '\033[91m'
+ENDC = '\033[0m'
+
+
+def sanitize(parameters, par_name, group, sanitize_max_min):
+    """be sure that guess respect the transf and optionally (if
+    sanitize_max_min == True), ensure that min and max are compatible
+    with the value of guess
+
+    """
+    x = parameters[par_name]['guess'][group]
+
+    ##first we check that new guess respect contraint (log, logit transfo)...
+
+    par_string = ':'.join([par_name, 'guess', group])
+
+    transf = parameters[par_name].get('transf', False)
+    if transf:
+        if transf == 'log' and (x<0.0):
+            parameters[par_name]['guess'][group] = 0.0
+            sys.stderr.write(WARNING + 'sanitized: {0}, (log) {1}->{2}\n'.format(par_string, x, 0.0) + ENDC)
+
+        elif transf == 'logit':
+            if x < 0.0:
+                parameters[par_name]['guess'][group] = 0.0
+                sys.stderr.write(WARNING + 'sanitized: {0}, (logit) {1}->{2}\n'.format(par_string, x, 0.0) + ENDC)
+
+            if x > 1.0:
+                parameters[par_name]['guess'][group] = 1.0
+                sys.stderr.write(WARNING + 'sanitized: {0}, (logit) {1}->{2}\n'.format(par_string, x, 1.0) + ENDC)
+
+
+    ##x now respect contraints. We fix min and max
+    x = parameters[par_name]['guess'][group]
+
+    if x < parameters[par_name]['min'][group]:
+        par_string = ':'.join([par_name, 'min', group])
+
+        if sanitize_max_min:
+            sys.stderr.write(WARNING + 'sanitized: {0}: {1}->{2}\n'.format(par_string, parameters[par_name]['min'][group], x) + ENDC)
+            parameters[par_name]['min'][group] =  x
+        else:
+            sys.stderr.write(WARNING + 'Warning: {0}: {1} > {2}\n'.format(par_string, parameters[par_name]['max'][group], x)+ ENDC)
+            sys.stderr.write(OKBLUE + 'run sfi with the -j option to apply this sanitation\n'+ ENDC)
+
+
+    if x > parameters[par_name]['max'][group]:
+        par_string = ':'.join([par_name, 'max', group])
+
+        if sanitize_max_min:
+            sys.stderr.write(WARNING + 'sanitized: {0}: {1}->{2}\n'.format(par_string, parameters[par_name]['max'][group], x) + ENDC)
+            parameters[par_name]['max'][group] = x
+        else:
+            sys.stderr.write(WARNING + 'Warning: {0}: {1} < {2}\n'.format(par_string, parameters[par_name]['max'][group], x) + ENDC)
+            sys.stderr.write(OKBLUE + 'run sfi with the -j option to apply this sanitation\n' + ENDC)
+
+
+
+def parse_par_string(par_string, parameters, partition):
+    """validate and parse a par_string
+    currently group has to be an integer or 'all'
+    """
+
+    parsed = par_string.split(':')
+
+
+    def is_not_valid(par_string):
+        sys.stderr.write(WARNING + par_string + ' is not a valid parameter string\n' + ENDC)
+
+    if len(parsed) == 4:
+        par_name = parsed[0]
+        prop = parsed[1]
+        group = parsed[2]
+        value = parsed[3]
+
+        try:
+            value = float(value)
+        except ValueError:
+            is_not_valid(par_string)
+            return {}
+        else:
+            if  (par_name in parameters) and (prop in parameters[par_name]):
+
+                if group == 'all':
+                    groups = [x['id'] for x in partition[parameters[par_name]['partition_id']]['group']]
+                else:
+                    try:
+                        group = int(group)
+                    except ValueError:
+                        is_not_valid(par_string)
+                        return {}
+                    else:
+
+                        group_list = [x['id'] for x in partition[parameters[par_name]['partition_id']]['group']]
+                        if group < len(group_list):
+                            groups = [group_list[group]]
+                        else:
+                            is_not_valid(par_string)
+                            return {}
+
+                return {'par_name':par_name, 'prop': prop, 'groups':groups, 'value':value}
+
+            else:
+                is_not_valid(par_string)
+                return {}
+
+    else:
+        is_not_valid(par_string)
+        return {}
+
+
+def getJSON(path):
+
+    try:
+        myjson = json.load(open(path))
+    except IOError:
+        sys.stderr.write(FAIL + 'FAILURE! ' + ENDC + os.path.abspath(path) + ' could not be found\n')
+        sys.exit(1)
+    except ValueError:
+        sys.stderr.write(FAIL + 'FAILURE! ' + ENDC + os.path.abspath(path) + ' could not be parsed. Go check your JSON!\n')
+        sys.exit(1)
+    else:
+        return myjson
+
+
+def main():
+
+    parser = argparse.ArgumentParser(description='Plom sfi: Update settings.json / Bootstrap design.json')
+
+    #we assume that sfi is run from bin/ so the settings should be in ../settings/settings.json ##TODO: test that we are in a plom model directory
+    parser.add_argument('-s', action="store", default=None, help='path to settings.json')
+
+    parser.add_argument('--bootstrap', action="store", default=None, help='Bootstrap a design from the specified design.json file')
+    #parser.add_argument('--link', action="store_true", default=False, help='Update the link.json file')
+
+    parser.add_argument('-B', action="store_true", default=False, help='change best from best.output or a best design')
+    parser.add_argument('-b', action="store", default='best_0.output', help='path to best.output')
+
+    parser.add_argument('-P', action="store", default='', help='ensures that sd_transf of parameters variable on the design (whose path is given as option) are set to 0. This has to be the case if one wants to do likelihood profiles')
+
+    parser.add_argument('-X', action="store_true", default=False, help='change IC from X.output. Note that -X is applied after -B so the initial condition set by -B will be overwritten by X')
+    parser.add_argument('-x', action="store", default='X_0.output', help='path to X.output')
+
+    parser.add_argument('-r', action="store", default=None, help='in addition to the effect of -X or -A, rescale par_obs specified as option so that the mean traj == mean data') ##used for getting good IC
+    parser.add_argument('-S', action="append", default=None, help='set parameter(s) define in par_string (can be called multiple times) string: <id>:<property>:<group>:<value> where name  is the parameter name, property "min", "max", "guess" or "sd_transf" and group an integer or "all"')
+    parser.add_argument('-I', action="store_true", default=False, help='set every jump sizes except par_sv to zero')
+
+    parser.add_argument('-A', action="store_true", default=False, help='change IC from hat.output. Note that -A is applied after -B so the initial condition set by -B will be overwritten by hat')
+    parser.add_argument('-a', action="store", default='hat_0.output', help='path to hat.output')
+
+    parser.add_argument('-G', action="store_true", default=False, help='change grouping to variable to apply X or hat')
+
+    parser.add_argument('-m', action="store", default=-1 , type=int, help='which line of best should we plug into the settings')
+    parser.add_argument('-n', action="store", default=-1 , type=int, help='which line of hat or X should we plug into the settings')
+
+    parser.add_argument('-j', action="store_true", default=False, help='sanitizes min and max')
+
+    parser.add_argument('-C', action="store_true", default=False, help='integrate a covariance.output file to the settings (see also -c)')
+    parser.add_argument('-c', action="store", default='covariance_0.output', help='path to covariance.output')
+
+    mycli = parser.parse_args()
+
+    if mycli.r and not (mycli.A or mycli.X):
+        sys.stderr.write(FAIL + 'FAILURE!' + ENDC + ' -r has to be used with -X or -A!\n')
+        sys.exit(1)
+
+
+    if not mycli.s:
+        if os.path.basename(os.getcwd()) != 'bin':
+            sys.stderr.write(FAIL + 'FAILURE!' +  ENDC + ' without the -s option sfi has to be invoked withing the bin directory of your model\n')
+            sys.exit(1)
+        else:
+            PATH_SETTINGS = os.path.join(os.path.dirname(os.getcwd()), 'settings/settings.json')
+    else:
+        PATH_SETTINGS = mycli.s
+
+    settings = getJSON(PATH_SETTINGS)
+
+
+    if mycli.B:
+
+        with open(mycli.b, 'r') as f:
+            reader = csv.reader(f, delimiter='\t', quotechar='"')
+            next(reader) #skip header
+
+            best = [map(float, filter(lambda x:x!='',row)) for row in reader if row!=[]]
+
+        ##which columns of the design are variable (we will set the corresponding jump size to 0 to do likelihood profiles)...
+        if mycli.P:
+
+            with open(mycli.P, 'r') as f:
+                reader = csv.reader(f, delimiter='\t', quotechar='"')
+                next(reader) #skip header
+
+                design = [map(float, filter(lambda x:x!='',row)) for row in reader if row!=[]]
+
+
+            inds = [i for i in range(len(design[0])-1) if design[0][i+1] != design[1][i+1] ] #+1 to skip index
+
+        offset = mycli.m if mycli.m != -1 else len(best)-1
+        new_par = best[offset][1:]
+
+        o = 0
+        for par_ty in ['par_sv', 'par_proc', 'par_obs']:
+            for par in settings['orders'][ par_ty ]:
+                partition = settings['partition'][ settings['parameters'][par]['partition_id'] ]
+                group = [x['id'] for x in partition['group']]
+
+                for g in group:
+
+                    settings['parameters'][par]['guess'][g] = new_par[o]
+
+                    ##for profiles...
+                    if mycli.P and o in inds:
+                        settings['parameters'][par]['sd_transf'][g] = 0.0
+
+                    sanitize(settings['parameters'],  par,  g, mycli.j)
+
+                    o += 1
+
+
+    if mycli.A or mycli.X:
+        N_CAC = settings['cst']['N_C']*settings['cst']['N_AC']
+        N_PAR_SV = settings['cst']['N_PAR_SV']
+
+        if mycli.A: #X is hat
+            with open(mycli.a, 'r') as f:
+                reader = csv.reader(f, delimiter='\t', quotechar='"')
+                next(reader) #skip header
+                ##we trash the time, low95 and high 95 so that hat behaves like X
+                X = [[y for i, y in enumerate(map(float, filter(lambda x:x!='', row))[2:]) if not i%3 ] for row in reader if row!=[]]
+
+        if mycli.X: #X is X
+            with open(mycli.x, 'r') as f:
+                reader = csv.reader(f, delimiter='\t', quotechar='"')
+                next(reader) #skip header
+                #trash time and particle index
+                X = [map(float, filter(lambda x:x!='',row))[2:] for row in reader if row!=[]]
+
+        offset = mycli.n if mycli.n != -1 else len(X)-1
+
+        ##we get the pop_sizes:
+        if settings['data']['par_fixed_values'].get('N', False):
+            ##make sure that offset is smaller than len(N) (relevant in case of simulation) if not stick with the last N
+            pop_sizes = settings['data']['par_fixed_values']['N'][ min(offset, len(settings['data']['par_fixed_values']['N'])-1) ]
+
+        elif settings['POP_SIZE_EQ_SUM_SV']:
+            pop_sizes = []
+            ##sum of sv per cac:
+            for cac in range(N_CAC):
+                pop_sizes.append( sum([X[offset][sv] for sv in range(cac, N_PAR_SV*N_CAC+cac, N_CAC)]) )
+        else:
+            pop_sizes = settings['data']['pop_sizes_t0']
+
+        ##replace data pop_sizes in settings
+        settings['data']['pop_sizes_t0'] = pop_sizes
+
+
+        if mycli.G:
+            ##change the par_sv grouping to variable and set initial condition from X
+
+            o = 0
+            group = [x['id'] for x in settings['partition']['variable_population']['group']]
+
+            for sv in settings['orders']['par_sv']:
+                val = settings['parameters'][sv]
+                my_min = min(val['min'][g] for g in val['min'])
+                my_max = max(val['max'][g] for g in val['max'])
+                my_sd_transf = min(val['sd_transf'][g] for g in val['sd_transf'])
+
+                val['guess'] = {}
+                val['min'] = {}
+                val['max'] = {}
+                val['sd_transf'] = {}
+
+                for cac, g in enumerate(group):
+                    val['min'][g['id']] = my_min
+                    val['max'][g['id']] = my_max
+                    val['sd_transf'][g['id']] = my_sd_transf
+                    val['guess'][g['id']] = float(X[offset][o])/float(pop_sizes[cac])
+                    o += 1
+
+                    sanitize(settings['parameters'], sv, g['id'], mycli.j)
+
+                val['partition_id'] = 'variable_population'
+
+        else:
+            #average X to respect grp of settings.json
+            o = 0
+
+            ordered_pop = settings['orders']['cac_id']
+
+            for sv in settings['orders']['par_sv']:
+
+                val = settings['parameters'][sv]
+                group = settings['partition'][ val['partition_id'] ]['group']
+
+                #we create a map that goes from cac -> group_id
+                map_group = [0]*N_CAC
+                for g in group:
+                    for p in g['population_id']:
+                        cac = ordered_pop.index(p)
+                        map_group[cac] = g['id']
+
+                #initialize the mean to 0.0
+                for x in val['guess']:
+                    val['guess'][x] = 0.0
+
+                sv_ungrouped = X[offset][o:(o+N_CAC)]
+                o += N_CAC
+
+                for cac in range(N_CAC):
+                    val['guess'][ map_group[cac] ] += float(sv_ungrouped[cac])/float(pop_sizes[cac])
+
+                for g in group:
+                    settings['parameters'][sv]['guess'][g['id']] /= float(len(g['population_id']))
+                    sanitize(settings['parameters'], sv , g['id'], mycli.j)
+
+
+
+        if mycli.r:
+            ##rescale mycli.r (par_obs) so that the mean traj == mean data
+            if ( mycli.r in settings['orders']['par_obs'] ) and settings['data']['data']:
+
+                N_TS = settings['cst']['N_TS']
+                mean_data = []
+                for ts in range(settings['cst']['N_TS']):
+                    data_ts_nonan = [ x[ts] for x in settings['data']['data'] if x[ts] ]
+                    tmp = sum(data_ts_nonan)
+                    tmp = float(tmp) / float(len(data_ts_nonan))
+                    mean_data.append(tmp)
+
+                mean_simul = []
+                offset = N_PAR_SV*N_CAC
+                for ts in range(N_TS):
+                    simul = [ x[ offset + ts ] for x in X ]
+                    tmp = sum( simul )
+                    tmp = float(tmp) / float(len( simul ))
+                    mean_simul.append(tmp)
+
+                val = settings['parameters'][mycli.r]
+                group = settings['partition'][ val['partition_id'] ]['group']
+                ordered_time_series = settings['orders']['ts_id']
+
+                #we create a map that goes from ts -> group_id
+                map_group = [0]*N_TS
+                for g in group:
+                    for p in g['time_series_id']:
+                        ts = ordered_time_series.index(p)
+                        map_group[ts] = g['id']
+
+                ##first get the right rep2 assuming variable grp
+                good_rep2 = []
+                for ts in range(N_TS):
+                    g = map_group[ts]
+                    tmp = mean_data[ts] / (mean_simul[ts] / settings['parameters'][mycli.r]['guess'][g])
+                    good_rep2.append(tmp)
+
+                ##average good_rep2 so that it matches the grp
+                ##reset rep2:
+                for x in val['guess']:
+                    val['guess'][x] = 0.0
+
+                for ts in range(N_TS):
+                    val['guess'][ map_group[ts] ] += good_rep2[ ts ]
+
+                for g in group:
+                    val['guess'][ g['id'] ] /= float(len(g['time_series_id']))
+                    sanitize(settings['parameters'],  mycli.r, g['id'], mycli.j)
+
+            else:
+                sys.stderr.write(FAIL + 'FAILURE! ' + ENDC + mycli.r+ ' is not a valid observation process parameter. Now quitting.\n')
+                sys.exit(1)
+
+
+
+
+
+
+    if mycli.C:
+        cov = [map(float, filter(lambda x:x!='',row)) for row in csv.reader(open(mycli.c, 'r'), delimiter='\t', quotechar='"')  if row!=[]]
+        settings['parameters']['covariance'] = cov
+
+
+    if mycli.I :
+        #set to 0.0 all jump sizes except for par_sv
+        for par_ty in ['par_proc', 'par_obs']:
+            for par in settings['orders'][ par_ty ]:
+                for g in settings['parameters'][ par ]['sd_transf']:
+                    settings['parameters'][ par ]['sd_transf'][g] = 0.0
+
+
+    if mycli.S :
+        #set values
+
+        for par_string in mycli.S:
+            parsed = parse_par_string(par_string, settings['parameters'], settings['partition'])
+            if parsed:
+
+                for g in parsed['groups']:
+                    settings['parameters'][ parsed['par_name'] ][ parsed['prop'] ][ g ] = parsed['value']
+                    sanitize(settings['parameters'], parsed['par_name' ], g, mycli.j)
+
+            else:
+                sys.stderr.write(FAIL + 'FAILURE! ' + ENDC + 'the -S option could not be applied. Now quitting.\n')
+                sys.exit(1)
+
+
+    #########################################################################
+    ##print the settings or bootstrap a design based on the modified settings
+    #########################################################################
+
+    if mycli.bootstrap:
+
+        from plom.Bootstrap import Bootstrap
+
+        design = getJSON(mycli.bootstrap)
+
+        ##we overwrite settings.json
+        json.dump(settings, open(PATH_SETTINGS, 'w'))
+        if mycli.B or mycli.X or mycli.S:
+            print(OKGREEN + 'NOTE: ' + ENDC + PATH_SETTINGS + ' has been modified to take into account the option -B -X or -S')
+
+        path_rendered = os.path.dirname(os.getcwd())
+
+        bs = Bootstrap(path_settings = os.path.abspath(PATH_SETTINGS),
+                          path_rendered = path_rendered)
+
+        action = design['action']['id']
+
+        if 'meta' in design and 'id' in design['meta']:
+            design_id = design['meta']['id']
+        else:
+            design_id = action
+
+        H = design['action'].get('H', 1)
+        cmd = design['cmd']
+        cluster = design.get('cluster', None)
+
+        ######################
+        ##generate the scripts
+        ######################
+
+        if action == 'lhs':
+            f = design['action'].get('f', [])
+
+            bs.lhs(design_id, f, H)
+            bs.bash_it(action, design_id, cmd, cluster=cluster, H=H)
+
+            print(OKGREEN + 'design OK: ' + ENDC + 'run {0}{1} to execute it.'.format('qsub ' if cluster else '', os.path.join(path_rendered, 'results', design_id, 'design.sh')))
+
+        elif action == 'replicate':
+
+            bs.bash_it(action, design_id, cmd, cluster=cluster, H=H)
+
+            print(OKGREEN + 'design OK: ' + ENDC +  'run {0}{1} to execute it.'.format('qsub ' if cluster else '', os.path.join(path_rendered, 'results', design_id, 'design.sh')))
+
+        else: ##slice, profile or bif analysis
+            bs.all_lin1d(action, design_id, cmd, cluster, H)
+
+            print(OKGREEN + 'design OK: ' + ENDC + 'run {0} to execute it.'.format(os.path.join(path_rendered, 'results', design_id, 'all.sh')))
+
+    else:
+        print(json.dumps(settings))
+
+
+if __name__ == '__main__':
+    main()

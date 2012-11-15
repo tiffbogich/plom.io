@@ -1,0 +1,34 @@
+<map id="worker_routine" name="worker_routine">
+<area shape="rect" id="node3" href="$build__template_8c.html#a3d2eb7288ea1e61d46c97edc1fc87cc1" title="build_par" alt="" coords="621,5,697,33"/>
+<area shape="rect" id="node10" href="$build__template_8c.html#af9490349f78e5b56cb6b6af8709b1558" title="build_p_calc" alt="" coords="203,209,298,237"/>
+<area shape="rect" id="node28" href="$core_2prediction__template_8c.html#aecc20ac37caa635cd42e977f24680c45" title="func" alt="" coords="227,485,274,513"/>
+<area shape="rect" id="node30" href="$build__template_8c.html#ac3a0239ed7647668c32d55477a88bef1" title="build_X" alt="" coords="626,313,692,341"/>
+<area shape="rect" id="node34" href="$simforence__template_8h.html#af2ec3c23b63adb47b7245bd8e8932863" title="recv_int" alt="" coords="217,537,285,565"/>
+<area shape="rect" id="node36" href="$simforence__template_8h.html#abce70d383ba14e49537dca8a28087311" title="recv_par" alt="" coords="214,589,287,617"/>
+<area shape="rect" id="node40" href="$simforence__template_8h.html#a2a48164325a1093ae80735accd89eac4" title="recv_X" alt="" coords="219,641,282,669"/>
+<area shape="rect" id="node43" href="$prediction__util_8c.html#a5ca155c05ae50d01f58bb6c132f01152" title="reset_inc" alt="" coords="213,693,288,721"/>
+<area shape="rect" id="node45" href="$prediction__util_8c.html#a99891921d76bffe1357b4ed9e9409ee8" title="f_prediction_with_drift\l_deter" alt="" coords="175,365,326,409"/>
+<area shape="rect" id="node56" href="$prediction__util_8c.html#ae11fe86440f0646db354af69ff06cc06" title="f_prediction_with_drift_sto" alt="" coords="163,433,339,461"/>
+<area shape="rect" id="node62" href="$simforence__template_8h.html#abb9402bca05561381d289d89f6392deb" title="send_int" alt="" coords="215,745,287,773"/>
+<area shape="rect" id="node64" href="$simforence__template_8h.html#ab94f82a1067ffcf8c480e1b96609383e" title="send_X" alt="" coords="217,797,284,825"/>
+<area shape="rect" id="node68" href="$simforence__template_8h.html#ac6e1b526875e03017b71e9684a9729cc" title="recv_str" alt="" coords="216,849,285,877"/>
+<area shape="rect" id="node70" href="$build__template_8c.html#a34b8964710809b0cda5d40c0b68a7051" title="clean_par" alt="" coords="211,901,291,929"/>
+<area shape="rect" id="node74" href="$build__template_8c.html#af217ec29d3df784f81eea3e2503e50c8" title="clean_X" alt="" coords="216,953,285,981"/>
+<area shape="rect" id="node77" href="$build__template_8c.html#a0a920c70cf5c0c85169511f6d8f75c87" title="clean_p_calc" alt="" coords="201,1005,300,1033"/>
+<area shape="rect" id="node5" href="$print_8c.html#ac37aabaddd82f7fb577609b2d06dd80f" title="print_err" alt="" coords="905,185,975,213"/>
+<area shape="rect" id="node7" href="$init__d_8c.html#a2107107f0c78618316696116555d5ffe" title="init1d_set0" alt="" coords="770,262,856,290"/>
+<area shape="rect" id="node14" href="$build__template_8c.html#a0d449a4d8a1698eec318991e7a63f670" title="build_markov" alt="" coords="416,209,517,237"/>
+<area shape="rect" id="node26" href="$init__st_8c.html#a924411a0780f748c9c7c2f050610c6d4" title="init1st_set0" alt="" coords="422,157,511,185"/>
+<area shape="rect" id="node16" href="$init__d_8c.html#a770d2a269e1504e01a914650e43d00b6" title="init2d_var_set0" alt="" coords="603,209,715,237"/>
+<area shape="rect" id="node20" href="$init__u_8c.html#ada69f3caef7f14f034f2002a75dd7306" title="init3u_varp2_set0" alt="" coords="595,157,722,185"/>
+<area shape="rect" id="node23" href="$init__u_8c.html#a41410cdac9c6936046c73ba66e0aba45" title="init1u_set0" alt="" coords="770,158,856,186"/>
+<area shape="rect" id="node38" href="$simforence__template_8h.html#a0e4528ef6dcfbd480c5877af4004eb11" title="recv_array_d" alt="" coords="417,615,516,643"/>
+<area shape="rect" id="node47" href="$drift_8c.html#abf2c1f2aec02306e069aa7cc5d48052a" title="compute_drift" alt="" coords="416,469,518,497"/>
+<area shape="rect" id="node49" href="$drift_8c.html#ab4f7cde349019c2f2134990fb098015c" title="drift_par" alt="" coords="432,417,502,445"/>
+<area shape="rect" id="node51" href="$prediction__util_8c.html#a566c08a98db726fe43c5135c98e3bab3" title="f_prediction_ode_rk" alt="" coords="397,365,536,393"/>
+<area shape="rect" id="node54" href="$print_8c.html#a199114019e84a0f4365baa83d87d6301" title="print_warning" alt="" coords="608,417,709,445"/>
+<area shape="rect" id="node60" href="$core_2prediction__template_8c.html#a4d1ae64773bbe9d349e4ebbfffcf6ed2" title="step_euler_multinomial" alt="" coords="387,521,546,549"/>
+<area shape="rect" id="node66" href="$simforence__template_8h.html#aa2271d6d377b4e4142787687872f8d63" title="send_array_d" alt="" coords="415,797,518,825"/>
+<area shape="rect" id="node72" href="$init__d_8c.html#a319ec6d0b3ec5307c765facd151ba4d7" title="clean2d" alt="" coords="433,953,501,981"/>
+<area shape="rect" id="node80" href="$init__u_8c.html#a45f798c9681364cebcf7c8018147c099" title="clean3u" alt="" coords="433,1005,501,1033"/>
+</map>

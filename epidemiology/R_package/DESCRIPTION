@@ -1,0 +1,10 @@
+Package: plom
+Type: Package
+Title: Plotting utilities for plom.io/epidemiology
+Version: 0.1
+Date: 2012-11-09
+Author: Sebastien Ballesteros
+Maintainer: Sebastien Ballesteros <sebastien@plom.io>
+Description: Quickly visualize plom.io/epidemiology results.
+License: GPL-3
+Depends: RJSONIO, mgcv

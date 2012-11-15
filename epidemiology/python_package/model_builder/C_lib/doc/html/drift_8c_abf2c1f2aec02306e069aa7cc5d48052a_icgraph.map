@@ -1,0 +1,16 @@
+<map id="compute_drift" name="compute_drift">
+<area shape="rect" id="node3" href="$simforence__template_8h.html#a99891921d76bffe1357b4ed9e9409ee8" title="f_prediction_with_drift\l_deter" alt="" coords="170,109,321,153"/>
+<area shape="rect" id="node11" href="$mif_8h.html#a61b3438956088c813599db6e2787e26d" title="mif" alt="" coords="416,265,456,293"/>
+<area shape="rect" id="node21" href="$simulation_8h.html#ae2547c2fde1baa63e4f0e0bbd1240e21" title="traj" alt="" coords="416,213,456,241"/>
+<area shape="rect" id="node25" href="$simforence__template_8h.html#ae11fe86440f0646db354af69ff06cc06" title="f_prediction_with_drift_sto" alt="" coords="157,177,333,205"/>
+<area shape="rect" id="node32" href="$smc_8c.html#aee1f9f6468ba4352b7ce10fe0edf2077" title="run_SMC" alt="" coords="207,57,284,85"/>
+<area shape="rect" id="node36" href="$smc_8c.html#aa085c397f91f5e39a59340866246f4a4" title="run_SMC_zmq" alt="" coords="190,5,300,33"/>
+<area shape="rect" id="node5" href="$smc_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="411,109,461,137"/>
+<area shape="rect" id="node7" href="$worker_2main_8c.html#ab46f874e0c6e5cf5815c864708f13bcf" title="worker_routine" alt="" coords="381,161,491,189"/>
+<area shape="rect" id="node15" href="$pmcmc_8h.html#a296c56b63272b17e71d6ba2e9c0da213" title="run_propag" alt="" coords="391,57,481,85"/>
+<area shape="rect" id="node9" href="$worker_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="550,161,600,189"/>
+<area shape="rect" id="node13" href="$mif_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="550,265,600,293"/>
+<area shape="rect" id="node17" href="$pmcmc_8h.html#a053cabb4dfa2edfbcb6deabb418b032e" title="pMCMC" alt="" coords="540,57,610,85"/>
+<area shape="rect" id="node19" href="$pmcmc_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="659,57,709,85"/>
+<area shape="rect" id="node23" href="$simulation_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="550,213,600,241"/>
+</map>

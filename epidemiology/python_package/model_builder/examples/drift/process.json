@@ -1,0 +1,22 @@
+{
+ "meta": {"id": "SIR",
+          "comment": "SIR model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term"},
+
+ "state": [{"id": "S", "comment": "Susceptible"},
+           {"id": "I", "comment": "Infectious"}],
+
+ "parameter": [{"id": "r0",   "comment": "basic reproduction number"},
+               {"id": "v",    "comment": "recovery rate"},
+               {"id": "vol",  "comment": "volatility"},
+               {"id": "mu_b", "comment": "birth rate"},
+               {"id": "mu_d", "comment": "death rate"}],
+
+ "model": [{"from": "U", "to": "S",  "rate": "mu_b*N", "comment":"birth"},
+           {"from": "S", "to": "I",  "rate": "drift(r0, vol)/N*v*I", "tag":[{"id": "transmission", "by":["I"]}], "comment":"infection with noise on r0"},
+           {"from": "I", "to": "DU", "rate": "v", "comment":"recovery"},
+           {"from": "I", "to": "I",  "rate": "v", "tag":[{"id": "erlang", "shape":2}], "comment":"erlang waiting time"},
+           {"from": "S", "to": "U",  "rate": "mu_d", "comment":"death"},
+           {"from": "I", "to": "U",  "rate": "mu_d", "comment":"death"}],
+
+ "pop_size_eq_sum_sv": false
+}

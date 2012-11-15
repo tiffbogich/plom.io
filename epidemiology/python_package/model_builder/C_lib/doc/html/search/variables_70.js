@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['p',['p',['../structs__router.html#aea4736767d077f7792381316245332e1',1,'s_router']]],
+  ['p_5fbest',['p_best',['../structs__kalman.html#a63ba0aa4c4d054baa63d9bae12d3836b',1,'s_kalman::p_best()'],['../structs__mif.html#a84ead00ee0f962819330f5249cf88c1d',1,'s_mif::p_best()'],['../structs__pmcmc.html#a458fed250bda28fd01153f64d4c3d5f3',1,'s_pmcmc::p_best()'],['../structs__simplex.html#a590246e793d033658e0cb3c3f529d998',1,'s_simplex::p_best()']]],
+  ['p_5fcommon',['p_common',['../structs__kalman.html#abf097afd5939cfac268a27e02906e193',1,'s_kalman']]],
+  ['p_5fdata',['p_data',['../structs__calc.html#a2efeb3065410c2238c3c303948d48d5d',1,'s_calc::p_data()'],['../structs__kalman.html#a4eff7eec23cd78ed898f02bd8e95397e',1,'s_kalman::p_data()'],['../structs__mif.html#a1e06d68f9bea95e159bc495dd0dfcfda',1,'s_mif::p_data()'],['../structs__pmcmc.html#a02e0ee96999e640f7982071b2cdc2139',1,'s_pmcmc::p_data()'],['../structs__simplex.html#ad81b39f824ac4ec31df7733fed7d2e92',1,'s_simplex::p_data()'],['../structs__thread__params.html#a3a0ba941d09f89240fad2abdd8792822',1,'s_thread_params::p_data()']]],
+  ['p_5fdrift',['p_drift',['../structs__data.html#a6e32acd7756acf29684abe84b88f88cc',1,'s_data']]],
+  ['p_5fit_5fall',['p_it_all',['../structs__data.html#aabe2a0c0a146a9f8f5b36760814d91e5',1,'s_data']]],
+  ['p_5fit_5fall_5fno_5fdrift',['p_it_all_no_drift',['../structs__data.html#a736ccf83753c3f4e620464a0bbc961ba',1,'s_data']]],
+  ['p_5fit_5fonly_5fdrift',['p_it_only_drift',['../structs__data.html#a46ae0b82fc36c84801d2e53335891015',1,'s_data']]],
+  ['p_5fit_5fpar_5fproc_5fpar_5fobs_5fno_5fdrift',['p_it_par_proc_par_obs_no_drift',['../structs__data.html#a4c4e91b8c65bdebf24245638ec048c32',1,'s_data']]],
+  ['p_5fit_5fpar_5fsv',['p_it_par_sv',['../structs__data.html#a308519f98fedc02ae540d80a35ff8de9',1,'s_data']]],
+  ['p_5fit_5fpar_5fsv_5fand_5fdrift',['p_it_par_sv_and_drift',['../structs__data.html#a9cf1ce09c4f1900766fd8aebe235f2fb',1,'s_data']]],
+  ['p_5fkal',['p_kal',['../structs__kalman.html#aeaeb97e1fea34c0eaa9380cc84ed5bed',1,'s_kalman']]],
+  ['p_5flike',['p_like',['../structs__mif.html#ab6038b4e987f20c2c84edcbee6e7d645',1,'s_mif::p_like()'],['../structs__pmcmc.html#aa84c51676fbe698efb81531217f4d799',1,'s_pmcmc::p_like()']]],
+  ['p_5fpar',['p_par',['../structs__calc.html#a92f22a417caf91f05cf536b0c4137e63',1,'s_calc::p_par()'],['../structs__kalman.html#a3778342886d2654aa76bdc4914dac540',1,'s_kalman::p_par()'],['../structs__pmcmc.html#adc2dfe9daf46aed6039183301765e382',1,'s_pmcmc::p_par()'],['../structs__simplex.html#accec5803c48e29cfa8ef67284cbe7b5c',1,'s_simplex::p_par()']]],
+  ['p_5fx',['p_X',['../structs__kalman.html#a1219973dd765ee61f6c073de8f083ba7',1,'s_kalman::p_X()'],['../structs__simplex.html#a84fbc4bfa3ec22e442e3aa0ff6ef1490',1,'s_simplex::p_X()']]],
+  ['par_5ffixed',['par_fixed',['../structs__data.html#a645b5ec36166e4bbc796d8b056389cd6',1,'s_data']]],
+  ['par_5fprior',['par_prior',['../structs__best.html#aabf36aa54e0e9b4d16a8eca6a70b4349',1,'s_best']]],
+  ['pop_5fsize_5feq_5fsum_5fsv',['POP_SIZE_EQ_SUM_SV',['../simforence__template_8h.html#a4f6f2e53d1fe16c745f13d1cabcb8498',1,'simforence_template.h']]],
+  ['pop_5fsize_5ft0',['pop_size_t0',['../structs__data.html#a53c8ca962026bcd2f2a133e67bbafcea',1,'s_data']]],
+  ['precision',['PRECISION',['../simulation_8h.html#a523c970e33a3ab0867625009eb20e3b5',1,'simulation.h']]],
+  ['prior',['prior',['../structs__best.html#a08cdf75aaa721f76c328027ff0568b81',1,'s_best']]],
+  ['prob',['prob',['../structs__calc.html#a421917892079965218184d007a8568de',1,'s_calc']]],
+  ['proj',['proj',['../structs___x.html#aeebb7ef0089dcdd0e641a4bba3b7b5cb',1,'s_X']]],
+  ['prop_5fschool',['prop_school',['../structs__data.html#aa64da94c552b7da229bc13a8a47b6cd0',1,'s_data']]],
+  ['proposed',['proposed',['../structs__best.html#a616309fc153bf75e243f6c16327abfbc',1,'s_best']]]
+];

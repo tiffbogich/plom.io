@@ -1,0 +1,36 @@
+<map id="run_propag" name="run_propag">
+<area shape="rect" id="node3" href="$simforence__template_8h.html#af0ad74c0f478e8925862e4a7afe4b426" title="run_SMC_zmq" alt="" coords="177,369,287,397"/>
+<area shape="rect" id="node49" href="$core_2prediction__template_8c.html#a99891921d76bffe1357b4ed9e9409ee8" title="f_prediction_with_drift\l_deter" alt="" coords="156,907,308,951"/>
+<area shape="rect" id="node57" href="$core_2prediction__template_8c.html#ae11fe86440f0646db354af69ff06cc06" title="f_prediction_with_drift_sto" alt="" coords="144,997,320,1025"/>
+<area shape="rect" id="node63" href="$simforence__template_8h.html#a9ccc1e8a65275398b05bcc2868f60f24" title="run_SMC" alt="" coords="193,629,271,657"/>
+<area shape="rect" id="node5" href="$func_8c.html#a3c7aa97658d4775bec0d3854499832c8" title="store_state_current_n_nn" alt="" coords="368,525,541,553"/>
+<area shape="rect" id="node7" href="$simforence__template_8h.html#abb9402bca05561381d289d89f6392deb" title="send_int" alt="" coords="419,213,491,241"/>
+<area shape="rect" id="node9" href="$simforence__template_8h.html#a234c44fe95eab4d917f0f7ee5c2a3276" title="send_par" alt="" coords="416,109,493,137"/>
+<area shape="rect" id="node13" href="$simforence__template_8h.html#ab94f82a1067ffcf8c480e1b96609383e" title="send_X" alt="" coords="421,161,488,189"/>
+<area shape="rect" id="node16" href="$simforence__template_8h.html#af2ec3c23b63adb47b7245bd8e8932863" title="recv_int" alt="" coords="421,57,489,85"/>
+<area shape="rect" id="node18" href="$simforence__template_8h.html#a2a48164325a1093ae80735accd89eac4" title="recv_X" alt="" coords="423,5,486,33"/>
+<area shape="rect" id="node22" href="$core_2prediction__template_8c.html#a396e99f209fbb45cdd59d47def6c0293" title="proj2obs" alt="" coords="418,577,491,605"/>
+<area shape="rect" id="node24" href="$drift_8c.html#abf2c1f2aec02306e069aa7cc5d48052a" title="compute_drift" alt="" coords="404,889,506,917"/>
+<area shape="rect" id="node26" href="$drift_8c.html#ab4f7cde349019c2f2134990fb098015c" title="drift_par" alt="" coords="821,758,891,786"/>
+<area shape="rect" id="node28" href="$likelihood__template_8c.html#afd773162af59f80bb24fe8feea8ab7ae" title="get_log_likelihood" alt="" coords="391,421,519,449"/>
+<area shape="rect" id="node32" href="$simforence__template_8h.html#a3f8efbac5ed7deda792e8734719fc4db" title="weight" alt="" coords="425,473,485,501"/>
+<area shape="rect" id="node36" href="$simforence__template_8h.html#a50a84394b62a8e04290154a5eaf051dc" title="systematic_sampling" alt="" coords="382,369,527,397"/>
+<area shape="rect" id="node38" href="$hat_8c.html#a83fb89d6ca342399b4c3222fdbbcbe3a" title="compute_hat" alt="" coords="405,629,504,657"/>
+<area shape="rect" id="node45" href="$simforence__template_8h.html#a5237aaed79f6d52399a7c46f8e3db9e7" title="resample_X" alt="" coords="408,317,501,345"/>
+<area shape="rect" id="node11" href="$simforence__template_8h.html#aa2271d6d377b4e4142787687872f8d63" title="send_array_d" alt="" coords="625,135,727,163"/>
+<area shape="rect" id="node20" href="$simforence__template_8h.html#a0e4528ef6dcfbd480c5877af4004eb11" title="recv_array_d" alt="" coords="626,5,726,33"/>
+<area shape="rect" id="node30" href="$likelihood__template_8c.html#aaafee243e2d4d402db660f1b6aa8da90" title="likelihood" alt="" coords="638,421,714,449"/>
+<area shape="rect" id="node34" href="$print_8c.html#a76b086742538adcd8347ec18023a4424" title="print_log" alt="" coords="640,473,712,501"/>
+<area shape="rect" id="node40" href="$hat_8c.html#a6807537c2fef8ad0edc853a32e4b46e8" title="get_CI95" alt="" coords="638,603,714,631"/>
+<area shape="rect" id="node43" href="$observation__template_8c.html#a1d484c335972926114446d6936131756" title="obs_mean" alt="" coords="814,629,898,657"/>
+<area shape="rect" id="node47" href="$simforence__template_8h.html#aa1b3048862ae86728d2c7da0ce4f78af" title="swap_X" alt="" coords="642,317,710,345"/>
+<area shape="rect" id="node53" href="$core_2prediction__template_8c.html#a566c08a98db726fe43c5135c98e3bab3" title="f_prediction_ode_rk" alt="" coords="385,993,524,1021"/>
+<area shape="rect" id="node55" href="$print_8c.html#ac37aabaddd82f7fb577609b2d06dd80f" title="print_err" alt="" coords="641,993,711,1021"/>
+<area shape="rect" id="node61" href="$core_2prediction__template_8c.html#a4d1ae64773bbe9d349e4ebbfffcf6ed2" title="step_euler_multinomial" alt="" coords="375,1097,534,1125"/>
+<area shape="rect" id="node66" href="$core_2prediction__template_8c.html#a5ca155c05ae50d01f58bb6c132f01152" title="reset_inc" alt="" coords="417,785,492,813"/>
+<area shape="rect" id="node72" href="$print_8c.html#af367600d61222ab0d9438ae6d4f2710c" title="print_X" alt="" coords="423,681,486,709"/>
+<area shape="rect" id="node84" href="$print_8c.html#aa014833231838ca3c9ed8fb089870f9f" title="print_prediction_residuals" alt="" coords="589,810,763,838"/>
+<area shape="rect" id="node74" href="$print_8c.html#a49a63addf26f8471343c750f85b24f1b" title="print_p_X" alt="" coords="637,655,715,683"/>
+<area shape="rect" id="node78" href="$observation__template_8c.html#a568b0566347ae7eee7777561df3d1956" title="observation" alt="" coords="811,681,901,709"/>
+<area shape="rect" id="node88" href="$observation__template_8c.html#a8c52015c1a472fb1f786e968592d831b" title="obs_var" alt="" coords="822,810,890,838"/>
+</map>

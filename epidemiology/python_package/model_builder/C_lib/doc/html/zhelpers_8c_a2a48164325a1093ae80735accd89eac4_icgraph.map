@@ -1,0 +1,8 @@
+<map id="recv_X" name="recv_X">
+<area shape="rect" id="node3" href="$smc_8c.html#aa085c397f91f5e39a59340866246f4a4" title="run_SMC_zmq" alt="" coords="118,5,228,33"/>
+<area shape="rect" id="node11" href="$worker_2main_8c.html#ab46f874e0c6e5cf5815c864708f13bcf" title="worker_routine" alt="" coords="119,57,228,85"/>
+<area shape="rect" id="node5" href="$pmcmc_8h.html#a296c56b63272b17e71d6ba2e9c0da213" title="run_propag" alt="" coords="278,5,367,33"/>
+<area shape="rect" id="node7" href="$pmcmc_8h.html#a053cabb4dfa2edfbcb6deabb418b032e" title="pMCMC" alt="" coords="417,5,487,33"/>
+<area shape="rect" id="node9" href="$pmcmc_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="536,5,586,33"/>
+<area shape="rect" id="node13" href="$worker_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="298,57,348,85"/>
+</map>

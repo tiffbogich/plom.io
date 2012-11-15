@@ -1,0 +1,31 @@
+<map id="build_routers" name="build_routers">
+<area shape="rect" id="node3" href="$json_8c.html#a499d68628d29b6e3a1562cd5bd107c86" title="fast_get_json_object" alt="" coords="294,43,437,71"/>
+<area shape="rect" id="node5" href="$print_8c.html#ac37aabaddd82f7fb577609b2d06dd80f" title="print_err" alt="" coords="931,343,1002,371"/>
+<area shape="rect" id="node7" href="$json_8c.html#a21072558108bc290cfe9b75656709447" title="fast_get_json_string\l_from_object" alt="" coords="510,523,650,567"/>
+<area shape="rect" id="node11" href="$json_8c.html#a3989a6c5f4855538bf99e84bf68a8eff" title="fast_get_json_array" alt="" coords="296,95,435,123"/>
+<area shape="rect" id="node14" href="$json_8c.html#a6fd30a63c168d135104ba10661e51350" title="fast_get_json_string\l_from_array" alt="" coords="295,147,436,191"/>
+<area shape="rect" id="node17" href="$build__template_8c.html#a3b567d8dbf54b8e364edd2e6efdd3026" title="build_router" alt="" coords="153,291,245,319"/>
+<area shape="rect" id="node20" href="$init__c_8c.html#ab89d88db7e8d75e6738abd4808b105d0" title="init1c" alt="" coords="776,265,829,293"/>
+<area shape="rect" id="node24" href="$init__u_8c.html#a41410cdac9c6936046c73ba66e0aba45" title="init1u_set0" alt="" coords="760,317,846,345"/>
+<area shape="rect" id="node27" href="$init__d_8c.html#a2107107f0c78618316696116555d5ffe" title="init1d_set0" alt="" coords="760,369,846,397"/>
+<area shape="rect" id="node32" href="$json_8c.html#a2bac29a9b187ef62f02872a5efd46c9d" title="fast_get_json_real\l_from_object" alt="" coords="738,473,868,517"/>
+<area shape="rect" id="node35" href="$build__template_8c.html#ac6d7c73224845facc0ded9d3cbaa38c6" title="get_index" alt="" coords="326,419,405,447"/>
+<area shape="rect" id="node39" href="$simforence__template_8h.html#a4f7fb8b104a29f13ae553088a7148402" title="set_f_trans" alt="" coords="322,955,409,983"/>
+<area shape="rect" id="node42" href="$simforence__template_8h.html#a137503fb97de0da3e33ad1dd73539be3" title="f_logit_ab" alt="" coords="540,1215,620,1243"/>
+<area shape="rect" id="node44" href="$simforence__template_8h.html#a1900d1e0d6d29d41a692c5d5a2d17e3f" title="is_duration" alt="" coords="537,1267,623,1295"/>
+<area shape="rect" id="node46" href="$simforence__template_8h.html#a548b223354fe199152420cba66fb4b96" title="f_inv_logit_ab_duration2rate" alt="" coords="485,1319,675,1347"/>
+<area shape="rect" id="node48" href="$simforence__template_8h.html#ac614de5284ff45243727a8e57946b9db" title="f_inv_logit_ab" alt="" coords="528,1371,632,1399"/>
+<area shape="rect" id="node50" href="$simforence__template_8h.html#ab3abbc1987031dd7154a2b78e2ef0f32" title="get_multiplier" alt="" coords="530,1163,630,1191"/>
+<area shape="rect" id="node56" href="$simforence__template_8h.html#ae7c3dbf040000099558a6011bb271852" title="f_der_logit_ab" alt="" coords="527,1423,633,1451"/>
+<area shape="rect" id="node58" href="$simforence__template_8h.html#a1bbe9f8834f20ca010b91e621db6cc69" title="f_log" alt="" coords="555,591,605,619"/>
+<area shape="rect" id="node60" href="$simforence__template_8h.html#a15784c96a1a8d943a051c1f21872ed85" title="f_inv_log_duration2rate" alt="" coords="500,643,660,671"/>
+<area shape="rect" id="node62" href="$simforence__template_8h.html#ab52fe962dc5e1a73572997ec56e28175" title="f_inv_log" alt="" coords="543,695,617,723"/>
+<area shape="rect" id="node64" href="$simforence__template_8h.html#ab88ee6a94f37a564bfed4b394117ed02" title="f_der_log" alt="" coords="542,747,618,775"/>
+<area shape="rect" id="node66" href="$simforence__template_8h.html#aa6f679c1869e94def9b16077c6c9c56f" title="f_logit" alt="" coords="552,799,608,827"/>
+<area shape="rect" id="node68" href="$simforence__template_8h.html#a1fbfb263f147d3f833df752ddecc0f94" title="f_inv_logit" alt="" coords="539,851,621,879"/>
+<area shape="rect" id="node70" href="$simforence__template_8h.html#a11e03a1b391cc3fb7a95b76df3c6d431" title="f_der_logit" alt="" coords="538,903,622,931"/>
+<area shape="rect" id="node73" href="$simforence__template_8h.html#a9f2e32618f737fad6c6f869932aebb44" title="f_id" alt="" coords="559,955,601,983"/>
+<area shape="rect" id="node75" href="$simforence__template_8h.html#a8c6d225e8d061ed3f45eadf8b5716a37" title="f_inv_duration2rate" alt="" coords="512,1007,648,1035"/>
+<area shape="rect" id="node77" href="$simforence__template_8h.html#a1b330e4fd6a93aa6aa11223a785adb1b" title="f_der_id" alt="" coords="545,1059,615,1087"/>
+<area shape="rect" id="node52" href="$simforence__template_8h.html#a2a39f119e8aedb5312d3e434342afd4f" title="u_duration_par2u_data" alt="" coords="723,1163,882,1191"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="metropolis_hastings" name="metropolis_hastings">
+<area shape="rect" id="node3" href="$proposal_8c.html#ada42bdbfbe29c3acbea58b00bd3ce34c" title="log_prob_proposal" alt="" coords="195,5,327,33"/>
+<area shape="rect" id="node9" href="$metropolis__hastings__prior_8c.html#a19567dd01773ccf4b522d152a65c25f7" title="check_prior" alt="" coords="216,57,306,85"/>
+<area shape="rect" id="node11" href="$metropolis__hastings__prior_8c.html#a795d8ae2cd0b2071c81c01a0efb8397a" title="log_prob_prior" alt="" coords="208,109,315,137"/>
+<area shape="rect" id="node5" href="$mvn_8c.html#a8e491a3fc788161526ab077cda39cbc0" title="sfr_dmvnorm" alt="" coords="392,5,491,33"/>
+<area shape="rect" id="node7" href="$print_8c.html#ac37aabaddd82f7fb577609b2d06dd80f" title="print_err" alt="" coords="555,83,626,111"/>
+<area shape="rect" id="node13" href="$likelihood__template_8c.html#ab1091e9300f6a9a98e26dfd325f7bbea" title="sanitize_likelihood" alt="" coords="377,109,506,137"/>
+</map>

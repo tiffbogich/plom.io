@@ -1,0 +1,9 @@
+<map id="propose_safe_theta_and_load_X0" name="propose_safe_theta_and_load_X0">
+<area shape="rect" id="node3" href="$mif_8h.html#a61b3438956088c813599db6e2787e26d" title="mif" alt="" coords="256,5,296,33"/>
+<area shape="rect" id="node7" href="$pmcmc_8h.html#a365ecd5174a77b35f2df26439364b4c3" title="propose_new_theta_and\l_load_X0" alt="" coords="192,57,360,101"/>
+<area shape="rect" id="node5" href="$mif_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="419,5,469,33"/>
+<area shape="rect" id="node9" href="$kmcmc_8c.html#a8cb5c14f1653139f957ee74ad7c1890b" title="kmcmc" alt="" coords="412,61,476,89"/>
+<area shape="rect" id="node13" href="$pmcmc_8h.html#a053cabb4dfa2edfbcb6deabb418b032e" title="pMCMC" alt="" coords="409,113,479,141"/>
+<area shape="rect" id="node11" href="$kmcmc__main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="528,61,578,89"/>
+<area shape="rect" id="node15" href="$pmcmc_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="528,113,578,141"/>
+</map>

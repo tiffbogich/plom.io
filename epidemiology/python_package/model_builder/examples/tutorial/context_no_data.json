@@ -1,0 +1,39 @@
+{
+ "meta": {"id": "my_id",
+          "comment": "my comment"},
+
+ "population": [{"id": "city1__all",
+                 "size_t0": 1e6,
+                 "comment": "city 1, all age classes"},
+                {"id": "city2__all",
+                 "size_t0": 1e6,
+                 "comment": "city 2, all age classes"}],
+
+ "time_series": [{"id": "all__CDC__inc",
+                  "population_id": ["city1__all", "city2__all"],
+                  "comment": ""},
+                 {"id": "all__google__inc",
+                  "population_id": ["city1__all", "city2__all"],
+                  "comment": ""},
+                 {"id": "city2__CDC__inc",
+                  "population_id": ["city2__all"],
+                  "comment": ""},
+                 {"id": "city1__CDC__prev",
+                  "population_id": ["city1__all"],
+                  "comment": ""}],
+
+ "frequency": "W",
+
+ "data": [{"id": "N",
+           "source": "data/N.csv",
+           "comment": "population size"},
+          {"id": "mu_b",
+           "source": "data/mu_b.csv",
+           "comment": "birth rates"},
+          {"id": "mu_d",
+           "source": "data/mu_d.csv",
+           "comment": "death rates"}],
+
+ "model": {"space": {"type": ["external"]},
+           "age": {}}
+}

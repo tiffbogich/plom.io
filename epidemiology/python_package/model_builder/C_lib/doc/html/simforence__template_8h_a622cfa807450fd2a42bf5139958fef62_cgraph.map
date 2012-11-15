@@ -1,0 +1,12 @@
+<map id="clean_data" name="clean_data">
+<area shape="rect" id="node3" href="$init__c_8c.html#a40ef16265bae4a3dcce386a80fe77b49" title="clean2c" alt="" coords="160,5,227,33"/>
+<area shape="rect" id="node5" href="$build__template_8c.html#ae169f107c301d3118a0390d6c83c0c4d" title="clean_iterator" alt="" coords="142,57,244,85"/>
+<area shape="rect" id="node7" href="$build__template_8c.html#abf84c4cfd6eee571b10904759e625311" title="clean_obs2ts" alt="" coords="143,109,243,137"/>
+<area shape="rect" id="node11" href="$build__template_8c.html#a323f0bd38f8d02bc9af19cad5a2df070" title="clean_routers" alt="" coords="142,161,244,189"/>
+<area shape="rect" id="node15" href="$build__template_8c.html#ab797ba5d6b577515d11d0eca37533870" title="clean_drift" alt="" coords="152,213,235,241"/>
+<area shape="rect" id="node17" href="$init__d_8c.html#a319ec6d0b3ec5307c765facd151ba4d7" title="clean2d" alt="" coords="159,265,227,293"/>
+<area shape="rect" id="node19" href="$init__d_8c.html#ac523214f26cc386c672b5bf3de9f15dd" title="clean3d" alt="" coords="159,317,227,345"/>
+<area shape="rect" id="node21" href="$init__d_8c.html#a46b568ca5b8df596d56b20536ef22ceb" title="clean3d_var" alt="" coords="146,369,240,397"/>
+<area shape="rect" id="node9" href="$init__u_8c.html#a72ea9ec2191a75f45e16a8060b7420ff" title="clean3u_var" alt="" coords="294,109,388,137"/>
+<area shape="rect" id="node13" href="$build__template_8c.html#a4185944b2b2ffc77f5ddcd4740986b57" title="clean_router" alt="" coords="294,161,389,189"/>
+</map>
