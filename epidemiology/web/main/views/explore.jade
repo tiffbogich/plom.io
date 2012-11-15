@@ -1,0 +1,87 @@
+extends layout
+
+block append styles
+  link(rel='stylesheet', href='/stylesheets/explore.css')
+
+block append scripts
+  script(src='/javascripts/tree.js')
+  script(src='/javascripts/explore.js')
+  script(src='/javascripts/d3_horizon.js')
+  script(src='/javascripts/horizon.js')
+
+
+block content
+
+  div.row
+    div.span5#sfr-search
+      form.form-inline
+        div.input-append
+          input(type="text").input-xlarge
+          button(type="submit").btn Search
+
+  div.row
+
+    div.span5#sfr-list
+
+
+      ul
+        li: | Measles Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit odio sed nisi vulputate ornare eleifend nibh pellentesque. Donec non leo non elit congue venenatis. Quisque ullamcorper lobortis interdum. Nam mollis, odio in suscipit luctus, justo dui tempus nulla, nec cursus est sapien malesuada sapien. In metus lorem, auctor non adipiscing at, eleifend vitae mauris. Phasellus posuere luctus odio sagittis consectetur. Suspendisse potenti. Etiam viverra odio in diam rhoncus vitae pretium massa blandit. Curabitur commodo lobortis justo et tristique.
+        li: | Measles Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit odio sed nisi vulputate ornare eleifend nibh pellentesque. Donec non leo non elit congue venenatis. 
+
+
+    div.span7
+
+      div.row
+
+        div.span7#sfr-horizon-control
+          div.btn-toolbar
+            div(data-toggle="buttons-checkbox").btn-group
+              button(type="button").btn.btn-small#sfr-substact-median Substract median
+    
+            div(data-toggle="buttons-radio").btn-group#sfr-change-mode
+              button.btn.btn-small Mirror
+              button.btn.btn-small Offset
+
+            div.btn-group#sfr-add-band
+              button.btn.btn-small Add Band
+              button.btn.btn-small Remove Band
+
+            div.btn-group.sfr-follow
+              button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
+
+      div.row
+        div#sfr-horizon-graph
+
+        
+
+  hr
+  
+  div.row
+
+    div.span8
+      div#sfr-tree-graph
+
+
+    div.span4#sfr-model-detail
+
+      div.btn-toolbar
+        div.btn-group
+          button.btn.btn-small.btn-success <i class="icon-play icon-white"></i> Explore
+  
+        div.btn-group
+          button.btn.btn-small <i class="icon-wrench"></i> Refine
+          button.btn.btn-small <i class="icon-random"></i> Fork
+
+
+
+  
+        div.btn-group.sfr-follow
+          button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
+
+
+      div
+        | Model...
+
+
+        p.
+          Measles Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit odio sed nisi vulputate ornare eleifend nibh pellentesque. Donec non leo non elit congue venenatis. Quisque ullamcorper lobortis interdum. Nam mollis, odio in suscipit luctus, justo dui tempus nulla, nec cursus est sapien malesuada sapien. In metus lorem, auctor non adipiscing at, eleifend vitae mauris. Phasellus posuere luctus odio sagittis consectetur. Suspendisse potenti. Etiam viverra odio in diam rhoncus vitae pretium massa blandit. Curabitur commodo lobortis justo et tristique.

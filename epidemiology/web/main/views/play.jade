@@ -1,0 +1,414 @@
+extends layout
+
+block append styles
+  link(rel='stylesheet', href='/stylesheets/play.css')
+
+block append scripts
+  script(src='/javascripts/sfrTs.js')
+  script(src='/javascripts/sfrBest.js')
+  script(src='/javascripts/sfrPmcmc.js')
+  script(src='/javascripts/sfrMif.js')
+  script(src='/javascripts/sfrSimul.js')
+  script(src='/javascripts/sfrIc.js')
+  script(src='/javascripts/sfrGraphModel.js')
+  script(src='/javascripts/play.js')
+  script(src='/socket.io/socket.io.js')
+
+block content
+
+  //SimForEnce
+  div.row
+   
+    div.span8
+
+      div.tabbable#graphs
+        ul.nav.nav-tabs
+          li.active: a(href="#tab-graph-simulation", data-toggle="tab") Simulation
+          if cst.N_DATA
+            li.dropdown
+              a(href="#", data-toggle="dropdown").dropdown-toggle Inference <b class="caret"></b>
+              ul.dropdown-menu
+                li: a(href="#tab-graph-simplex", data-toggle="tab") Simplex
+                li: a(href="#tab-graph-pmcmc", data-toggle="tab") pMCMC
+                li: a(href="#tab-graph-mif", data-toggle="tab") MIF
+          li: a(href="#tab-graph-forecasting", data-toggle="tab") Forecasting
+
+        //graph tab content
+        div.tab-content
+
+          //simulation (smc/kalman)
+          div.tab-pane.active#tab-graph-simulation
+
+            div#graphTs.chartdiv
+            div.ticks
+              mixin tickTs(prefix, className, class_tick)
+                each el, id in orders.ts_id
+                  label(class=class_tick).checkbox.inline
+                    input(type="checkbox", name=id, checked=(id===0), id="#{prefix}___#{id}", class=className)
+                    | #{el.split('__').slice(0, 2).join(' ')}
+
+              mixin tickTs('ts', 'plottedTs', 'sfr-tick-simul')
+
+
+            if orders.drift_var.length && cst.N_DATA
+  
+              div.accordion#accordion1
+                div.accordion-group
+                  div.accordion-heading
+                    a(data-toggle="collapse", data-parent="#accordion1", href="#collapseDrift").accordion-toggle See drift
+                  div(id = "collapseDrift", class="accordion-body collapse")
+                    div.accordion-inner
+                                           
+                      div#graphDrift.chartdiv
+        
+                      div.ticks
+                        - orders.drift_var.forEach(function(el){
+                        -   var par = el.split('__')[2]; //e.g drift__par_proc__r0
+                        -   partition[parameters[par]['partition_id']]['group'].forEach(function(group, i){
+                        label.checkbox.inline.sfr-tick-drift
+                          input(type="checkbox", name=i, checked=(i===0), id="drift___#{i}").plottedDrift
+                          | #{par} #{group.id}
+                        -   });
+                        - })
+
+          //Inference
+          if cst.N_DATA
+            //simplex
+            div.tab-pane#tab-graph-simplex
+              div#graphSimplex.chartdiv            
+  
+              mixin tickitAllpar(id_prefix, plot_class, last_name, class_tick)
+                //parameters (and groups...)
+                - var offset = 0;
+                - ['par_sv', 'par_proc', 'par_obs'].forEach(function(el){
+                -   orders[el].forEach(function(p){
+                -     partition[parameters[p]['partition_id']]['group'].forEach(function(group, i){
+                label(class=class_tick).checkbox.inline
+                  input(type="checkbox", name=offset, id="#{id_prefix}___#{offset}", class=plot_class)
+                  | #{p} #{group.id.split('__').slice(0, 2).join(' ')}
+                -       offset++;
+                -      });
+                -   });
+                - })
+                //log likelihood
+                label(class=class_tick).checkbox.inline
+                  input(type="checkbox", name=offset, checked="checked", id="#{id_prefix}___#{offset}", class=plot_class)
+                  | #{last_name}  
+  
+              div.ticks
+                mixin tickitAllpar('parSimplex', 'plottedParSimplex', 'log likelihood', 'sfr-tick-simplex')
+  
+            //pMCMC
+            div.tab-pane#tab-graph-pmcmc
+
+              div#graphBestPmcmc.chartdiv            
+
+              div.ticks
+                mixin tickitAllpar('parBestPmcmc', 'plottedParBestPmcmc', 'log likelihood', 'sfr-tick-bestpmcmc')
+
+              div.accordion#accordionPmcmc
+                div.accordion-group
+                  div.accordion-heading
+                    a(data-toggle="collapse", data-parent="#accordionPmcmc", href="#collapsePmcmc").accordion-toggle See acceptance rates
+                  div(id = "collapsePmcmc", class="accordion-body collapse")
+                    div.accordion-inner  
+                      div#graphPmcmc.chartdiv
+                      mixin tickitAllpar('parPmcmc', 'plottedParPmcmc', 'global', 'sfr-tick-pmcmc')
+  
+
+            //MIF
+            div.tab-pane#tab-graph-mif
+
+              div#graphBestMif.chartdiv            
+
+              div.ticks
+                mixin tickitAllpar('parBestMif', 'plottedParBestMif', 'log likelihood', 'sfr-tick-bestmif')
+
+              div.accordion#accordionMif
+                div.accordion-group
+                  div.accordion-heading
+                    a(data-toggle="collapse", data-parent="#accordionMif", href="#collapseMif").accordion-toggle See within iteration graph
+                  div(id = "collapseMif", class="accordion-body collapse")
+                    div.accordion-inner  
+                      div#graphMif.chartdiv
+
+                      //parameters for within iteration plot (par_proc par_obs WHITHOUT drift)
+                      - var offset = 0;
+                      - ['par_proc', 'par_obs'].forEach(function(el){
+                      -   orders[el].forEach(function(p){
+
+                      -     if(orders.drift_var.indexOf(['drift', 'par_proc', p].join('__')) === -1 ) { //if p is NOT a drift variable
+                      -       partition[parameters[p]['partition_id']]['group'].forEach(function(group, i) {
+
+                      label.sfr-tick-mif.checkbox.inline
+                        input(type="checkbox", name=offset, id="parMif___#{offset}").plottedParMif
+                        | #{p} #{group.id.split('__').slice(0, 2).join(' ')}
+
+                      -       offset++;
+                      -     });
+                      -   }
+
+                      -  });
+                      -});
+
+                      //ess
+                      label.sfr-tick-mif.checkbox.inline
+                        input(type="checkbox", name=offset, checked="checked", id="parMif___#{offset}").plottedParMif
+                        | ESS
+
+
+          //Forecasting
+          div.tab-pane#tab-graph-forecasting.cursorSeringue
+            div#graphPred.chartdiv
+            mixin tickTs('pred', 'plottedPred', 'sfr-tick-pred')
+
+
+    //control tabs
+    div.span4
+      
+      //simulation
+      div#tab-graph-simulation-control.control
+
+        div.btn-toolbar.sfr-action
+          div.btn-group
+            a(href="#").btn.btn-small.start#runSMC <i class="icon-play"></i> Run
+            a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
+            a(href="#").btn.btn-small <i class="icon-ok"></i> Save
+
+
+        if cst.N_DATA
+          label.radio.inline
+            input(type="radio", name="filter", id="traj", value="traj", checked="checked")
+            |Trajectories
+          label.radio.inline
+            input(type="radio", name="filter", id="smc", value="smc")
+            |SMC
+          label.radio.inline
+            input(type="radio", name="filter", id="kalman", value="kalman")
+            |Kalman                        
+             
+        else
+          -var fhr = {D:'days', W:'weeks', M:'months', 'Y':'years'}
+          div.control-group
+            label(for="N_DATA").control-label Number of #{fhr[cst.FREQUENCY]}: 
+              input(type="text", id="N_DATA", value=Math.floor(1*cst.ONE_YEAR_IN_DATA_UNIT)).input-mini
+              span.help-inline !
+
+        label(for="n_realisations").control-label Number of realisations #{(cst.N_DATA) ? ' or particles': ''}: 
+          input(type="text", id="n_realisations", value=1).input-mini     
+            
+      //inference
+      if cst.N_DATA
+        //simplex
+        div#tab-graph-simplex-control.control-hidden.control
+
+          div.btn-toolbar.sfr-action
+            div.btn-group
+
+              a(href="#", data-placement="top", rel="tooltip", data-original-title="Nelder-Mead method").btn.btn-small.start#runSimplex.sfrTooltip <i class="icon-play"></i> Simplex
+              a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
+              a(href="#").btn.btn-small <i class="icon-arrow-right"></i> Simulation
+
+                      
+          form.form-horizontal.form-small
+
+            div.control-group
+              label(for="simplex-M").control-label Max nb of iterations
+              div.controls
+                input(type="text", value="100")#simplex-M.input-mini.span1
+
+            div.control-group
+              label(for="simplex-S").control-label Simplex size (stop)
+              div.controls
+                input(type="text", value="1e-6")#simplex-S.input-mini.span1             
+
+
+        //pmcmc
+        div#tab-graph-pmcmc-control.control-hidden.control
+
+          div.btn-toolbar.sfr-action
+            div.btn-group
+              a(href="#", data-placement="top", rel="tooltip", data-original-title="particle Markov-chain Monte Carlo").btn.btn-small.start#runPmcmc.sfrTooltip <i class="icon-play"></i> pMCMC
+              a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
+              a(href="#").btn.btn-small <i class="icon-arrow-right"></i> Simulation
+
+          form.form-horizontal.form-small
+
+            div.control-group
+              label(for="pmcmc-M").control-label Nb of iterations
+              div.controls
+                input(type="text", value="100")#pmcmc-M.input-mini.span1
+
+            div.control-group
+              label(for="pmcmc-J").control-label Number of particles
+              div.controls
+                input(type="text", value="100")#pmcmc-J.input-mini.span1             
+
+
+        //mif
+        div#tab-graph-mif-control.control-hidden.control
+
+          div.btn-toolbar.sfr-action
+            div.btn-group
+              a(href="#", data-placement="top", rel="tooltip", data-original-title="Maximum Likelihood via Iterated Filtering").btn.btn-small.start#runMif.sfrTooltip <i class="icon-play"></i> MIF
+              a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
+              a(href="#").btn.btn-small <i class="icon-arrow-right"></i> Simulation
+          input(style="display:none;")#set //used to echo the change of jump sizes
+
+
+          form.form-horizontal.form-small
+
+            div.control-group
+              label(for="mif-M").control-label Nb of iterations
+              div.controls
+                input(type="text", value="1")#mif-M.input-mini.span1
+
+            div.control-group
+              label(for="mif-J").control-label Number of particles
+              div.controls
+                input(type="text", value="100")#mif-J.input-mini.span1
+
+            div.control-group
+              label(for="mif-a").control-label Cooling Factor
+              div.controls
+                input(type="text", value="0.975")#mif-a.input-mini.span1
+
+            div.control-group
+              label(for="mif-b").control-label Variance scaling factor
+              div.controls
+                input(type="text", value="2")#mif-b.input-mini.span1
+
+            div.control-group
+              label(for="mif-L").control-label Lag (fixed lag smoothing)
+              div.controls
+                input(type="text", value=0.25)#mif-L.input-mini.span1
+
+          
+
+      //forecasting
+      div#tab-graph-forecasting-control.control-hidden.control
+
+
+        div.btn-toolbar.sfr-action
+          div.btn-group
+            a(href="#", data-placement="top", rel="tooltip", data-original-title="Click on the graph to trigger an intervention").btn.btn-small.start#resetPred.sfrTooltip <i class="icon-refresh"></i> Reset Forecast
+            a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
+            a(href="#").btn.btn-small <i class="icon-ok"></i> Save
+        input(style="display:none;")#runPred //used to trigger runPred from the graph call back
+
+        if cst.N_DATA
+          | Forecast for:   
+          select.input-small#N_EXTRA
+            option(value="0") 0 years
+            option(value="1") 1 year
+            option(value="2") 2 years
+            option(value="3") 3 years
+            option(value="4") 4 years
+        else 
+          p.
+            Percentage of cases prevented:
+  
+          svg
+       
+          div.alert.alert-error#dangerous-intervention
+            strong Warning: 
+            | Dangerous intervention !
+
+
+        //template for intervention parameters: will be rendered from the client side (using jadevu)
+        div#par_int
+          template(id='test'):                      
+            div //div is needed for jadevu but a pull request from visnup is pending
+              div.accordion#accordionIntervention
+                div.accordion-group
+                  div.accordion-heading
+                    a(data-toggle="collapse", data-parent="#accordionIntervention", href="#collapseIntervention").accordion-toggle Intervention Parameters
+                  div(id = "collapseIntervention", class="accordion-body in")
+          
+                    div.accordion-inner
+                      each par in par_int
+                        - par_int_values[par]['guess'].forEach(function(val, group) {
+                          div
+                            | <a href="#" data-placement="top" rel="tooltip" data-original-title="#{par_int_values[par]['description']}" class="sfrTooltip">#{par}</a> #{group} = <span id="caption___#{par}___#{group}">#{val}</span>
+                            input(type="hidden", name="intervention___#{par}___#{group}", value=val)
+                        
+                          div(id="slider___#{par}___#{group}").last
+                        - });
+          
+
+        label(for="n_realisations_pred").control-label Nb of realisations: 
+          input(type="text", id="n_realisations_pred", value=1).input-mini
+
+
+      //shared parts
+      div#shared
+        label.checkbox.inline
+          input(type="checkbox", name="sto", id="sto")
+          | Demographic stochasticity    
+
+
+        div#logs
+          p
+
+
+    
+        div.accordion#accordion2
+    
+          mixin tabit(id, title)
+            div.accordion-group
+              div.accordion-heading
+                a(data-toggle="collapse", data-parent="#accordion2", href="#collapse#{id}").accordion-toggle #{title}
+              div(id = "collapse#{id}", class="accordion-body collapse")
+                div.accordion-inner
+    
+                  - if(id === 'par_sv')
+                    div.form-inline#skip_transiant
+                      if ! cst.N_DATA
+                        input(type="checkbox", name="skip_transiant")
+  
+                      |  Skip   
+                      input(type="text", id="N_TRANSIANT", value=1).input-tiny
+                      - var mytime = {'D':'days', 'W':'weeks', 'M': 'months', 'Y': 'years'}[cst.FREQUENCY]
+                      |  #{mytime} 
+                      input(type="button", value='Get steady states').btn.btn-small.btn-warning#getIc
+                          
+  
+                  each el in orders[id]
+                    table.table.table-condensed.table-tiny.table-parameters
+                      tr
+                        th.groupLabel: a(href="#", data-placement="top", rel="tooltip", data-original-title=parameters[el]['comment']).sfrTooltip #{el}
+                        th min
+                        th guess
+                        th max
+                        if cst.N_DATA
+                          th sd
+  
+                      - partition[parameters[el]['partition_id']]['group'].forEach(function(group, i) {                  
+                        tr
+                          td.groupLabel #{group.id.split('__').slice(0,2).join(' ')}
+                          - var it = ['min', 'guess', 'max'];
+                          - if (cst.N_DATA) it.push('sd_transf');
+                          each prop in it
+                            td
+                              div.control-group 
+                                input(type="text", name="#{prop}___#{el}___#{group.id}", value=parameters[el][prop][group.id].toPrecision(4)).input-tiny.parameters
+                                span.help-inline !
+                      - })
+                     
+          mixin tabit('par_proc', 'Process Model Parameters')
+          mixin tabit('par_sv', 'Initial Conditions')
+          mixin tabit('par_obs', 'Observation Model Parameters')
+    
+
+  hr
+  
+  //tree of knowledge
+  div.row  
+
+      div.span8
+        div#sfr-tree-graph  
+  
+      div.span4#sfr-model-detail
+        h3.title-side Model Structure
+
+        div#sfr-graph-model

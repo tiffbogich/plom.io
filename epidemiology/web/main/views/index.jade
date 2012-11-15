@@ -1,0 +1,116 @@
+extends layout
+
+block append styles
+  link(rel='stylesheet', href='/stylesheets/home.css')
+
+block append scripts
+  script
+    //set the active class of the navbar
+    $(document).ready(function(){
+      $("div.divclickable").click( function(event) {  
+        window.location = $(this).find('a:first').attr('href');
+        event.preventDefault(); 
+        });
+    });
+
+block content
+
+  | <a href="https://github.com/plom"><img style="position:absolute; top:42px; right:0;  border: 0;" src="images/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+
+  div.hero-unit#sfr-main
+    h1 PLoM.io 
+
+    p.sfr-brand Let&#39;s build a Public Library of Models (starting with epidemiology)
+
+    img(src="images/logo-large.png", class="sfr-img-center", alt="plom-logo").sfr-img-center
+
+    p.
+
+     Create and fit your model faster and with more power. Implement
+     intervention strategies in a breeze. Share your results with the
+     world. Get instant feedback.
+
+
+  div.row
+
+    div.span4
+      h3 The Zero-Framework Framework
+
+      p.
+
+        Do you know <em>Unix</em> pipe command <code>|</code> ?  It
+        allows you to connect the output of one program to the input
+        of the next. You can then use a set of simple tools to solve
+        complex problems.
+
+      p.
+
+        PLoM applies this philosophy to help you
+        <strong>fit</strong> epidemiological models to complex data.
+
+      p.
+
+        <strong>Combine</strong> <em>state-of-the-art</em> inference
+        methods in your <strong>own way</strong> and finally make
+        sense of that 20 dimension likelihood space.
+
+
+      p.
+
+        In epidemiology we sometimes face sharp
+        <strong>deadlines</strong>. PLoM methods are all coded
+        so that computational time can be <strong>cut down</strong> by
+        using more computers. Use PLoM to deploy a large cluster
+        on the <strong>cloud</strong> for one night, and get your
+        results the next morning.
+                    
+
+    div.span4
+
+      h3 Building a library of models
+       
+      p.
+
+        Modeling is an art; so is implementing models. PLoM
+        takes care of the implementation.
+
+      p.
+
+        PLoM <strong>layered grammar</strong> for
+        epidemiological models allows models to be
+        <strong>shared</strong> and <strong>forked</strong>. Never
+        re-invent the wheel, but inherit from existing models to
+        create new ones, while building a <strong>tree of
+        knowledge</strong>.
+        
+
+    div.span4
+
+      h3 Connecting science, policy, and people
+
+      p.
+
+        PLoM uses the power of the <strong>real-time
+        web</strong> and advanced visualizaton to shape the future of
+        public health policies.
+
+      p.
+
+        Interact in real time with validated scientific models running
+        at their full speed on the cloud, all within your <strong>web
+        browser</strong>.
+
+      p.
+
+        Customize these models and quickly build custom
+        <strong>intervention strategies</strong>.
+
+      p.
+        
+        Spread your intervention scenario and get instant
+        feedback. PLoM runs on <strong>every device</strong>.
+          
+
+  
+
+

@@ -1,0 +1,46 @@
+doctype 5
+html
+
+  head
+
+    title plom.io
+
+    block styles
+      link(rel='stylesheet', href='lib/bootstrap/css/bootstrap.min.css')
+      link(rel='stylesheet', href='lib/jquery-ui-1.9.0.custom/css/smoothness/jquery-ui-1.9.0.custom.min.css')
+
+    block scripts
+      script(src='lib/jquery-1.8.2.min.js')
+      script(src='lib/jquery-ui-1.9.0.custom/js/jquery-ui-1.9.0.custom.min.js')
+      script(src='lib/bootstrap/js/bootstrap.min.js')
+      script(src='lib/dygraph-combined.js')
+      script(src='lib/d3.v2.min.js')
+      script(src='lib/underscore-min.js')
+      script(src='javascripts/set_active_menu.js')
+
+  body
+
+    div.navbar
+      div.navbar-inner
+        a(href="/").brand <img src="/images/logo-small.png">
+        ul.nav
+          li.active: a(href="/play") Library
+          li: a(href="#") Social
+          li: a(href="/doc") Documentation
+        ul.nav.pull-right
+         if (locals.is_logged_in)
+           li: a(href="/logout") Logout
+         else
+           li: a(href="/login") Login
+           li: a(href="/register") Register
+
+    div.container      
+
+      block content
+
+      hr
+
+      footer
+        - var d = new Date();
+        p &copy; plom.io #{d.getFullYear()}
+

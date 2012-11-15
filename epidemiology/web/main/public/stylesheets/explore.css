@@ -1,0 +1,38 @@
+.node circle {
+  stroke: white;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+
+
+.axis {
+  font-family: arial; font-size:0.6em;
+}
+
+path {
+  fill:none; 
+}
+
+.tick {
+  fill:none;
+  stroke:black; 
+}
+
+.sfr-follow{
+  float:right;
+}
+
+
+#sfr-horizon-control .btn-toolbar{
+  margin-top:0px;
+}
