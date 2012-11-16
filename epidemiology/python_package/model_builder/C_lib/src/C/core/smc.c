@@ -252,7 +252,7 @@ void run_SMC(struct s_X ***D_J_p_X, struct s_X ***D_J_p_X_tmp,
             }
 
             if (p_file_X || (OPTION_TRAJ && FLAG_JSON)) {
-                print_X(p_file_X, &p_par, D_J_p_X[nnp1], p_data, calc[thread_id], (double) nnp1, 1, 0, 0);
+                print_X(p_file_X, &p_par, D_J_p_X[nnp1], p_data, calc[0], (double) nnp1, 1, 0, 0);
             }
 
         } /* end for on nn */
