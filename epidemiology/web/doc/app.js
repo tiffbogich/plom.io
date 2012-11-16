@@ -36,6 +36,6 @@ app.get('/doc/modeler/create', routes.modeler.create);
 app.get('/doc/modeler/play', routes.modeler.play);
 app.get('/doc/modeler/hfmd', routes.modeler.hfmd);
 app.get('/doc/modeler/h1n1', routes.modeler.h1n1);
-
+app.get('/doc/modeler/refs', routes.modeler.refs);
 
 module.exports = http.createServer(app);
