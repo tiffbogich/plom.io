@@ -53,6 +53,9 @@ struct s_iterator *build_iterator(struct s_router **routers, struct s_drift *p_d
     }
 
 
+    //alloc ind and offset and assign nbtot
+    p_it->nbtot = 0; // will be incremented later if p_it->length but need to be assigned systematically!
+
     if (p_it->length) {
         p_it->ind = init1u_set0(p_it->length);
 
@@ -98,7 +101,6 @@ struct s_iterator *build_iterator(struct s_router **routers, struct s_drift *p_d
             all_offset[i] = all_offset[i-1] + routers[ i-1 ]->n_gp; //cumsum
         }
 
-        p_it->nbtot = 0;
         p_it->offset = init1u_set0(p_it->length);
         for(i=0; i<p_it->length; i++) {
             p_it->offset[i] = all_offset[ p_it->ind[i] ];
@@ -1021,8 +1023,10 @@ struct s_hat *build_hat(struct s_data *p_data)
     p_hat->obs = init1d_set0(N_TS);
     p_hat->obs_95 = init2d_set0(N_TS, 2);
 
-    p_hat->drift = init1d_set0(p_data->p_it_only_drift->nbtot);
-    p_hat->drift_95 = init2d_set0(p_data->p_it_only_drift->nbtot, 2);
+    if(p_data->p_it_only_drift->nbtot) {
+        p_hat->drift = init1d_set0(p_data->p_it_only_drift->nbtot);
+        p_hat->drift_95 = init2d_set0(p_data->p_it_only_drift->nbtot, 2);
+    }
 
     return p_hat;
 }
@@ -1036,8 +1040,10 @@ void clean_hat(struct s_hat *p_hat, struct s_data *p_data)
     FREE(p_hat->obs);
     clean2d(p_hat->obs_95, N_TS);
 
-    FREE(p_hat->drift);
-    clean2d(p_hat->drift_95, p_data->p_it_only_drift->nbtot);
+    if(p_data->p_it_only_drift->nbtot) {
+        FREE(p_hat->drift);
+        clean2d(p_hat->drift_95, p_data->p_it_only_drift->nbtot);
+    }
 
     FREE(p_hat);
 }
