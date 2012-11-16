@@ -684,6 +684,10 @@ $(document).ready(function(){
       socket.emit('killme', true);
     });
 
+    $('.use-in-simulation').click(function(){
+      (sfrBest.onClickCalback())(); //sure we can do better
+      $('#runSMC').trigger('click');
+    });
 
     $("#runSMC").click(function(){
       if(sfrGlobal.canRun){

@@ -97,37 +97,48 @@ SfrBest.prototype.makeGraph = function(divGraph, vizSelector, updateSfrSettings)
     xlabel: 'iterations'};
 
   var that = this;
-  options['clickCallback']= function(e, x, pts) {
-    //put values of best in parameters (DOM) and sfrSettings
-
-    var xx = x % that.bufferSize;
-    xx = (xx < that.data.length) ? xx : xx-1;
-
-    var $this;
-    //we need to map x [1, M] into [ 0, this.bufferSize ]
-
-
-    var offset = 0;
-    ['par_sv', 'par_proc', 'par_obs'].forEach(function(el){
-      that.sfrSettings.orders[el].forEach(function(p){
-        var id = that.sfrSettings.parameters[p]['partition_id'];
-        that.sfrSettings.partition[id]['group'].forEach(function(group, i){
-
-          var name = ['guess', p, group.id].join('___');
-          $this = $('input.parameters[name="'+ name +'"]');
-          $this.val(that.data[ xx ][offset+1]);
-          updateSfrSettings(that.sfrSettings, $this);
-          offset++;
-
-        });
-      });
-    });
-
-  };
+  options['clickCallback']= this.onClickCalback();
 
   var g = myDygraph(divGraph, this.data, options);
   var cols = d3.range(this.allParId.length).map(d3.scale.category10());
   g.updateOptions({'colors': cols});
 
   return g;
+};
+
+
+SfrBest.prototype.onClickCalback = function() {
+  var that = this;
+
+  return function(e, x, pts) {
+    //only if the user has done something..
+    if (that.data.length > 1) {
+      var x = x || that.data.length;
+
+      //put values of best in parameters (DOM) and sfrSettings
+
+      var xx = x % that.bufferSize;
+      xx = (xx < that.data.length) ? xx : xx-1;
+
+      var $this;
+      //we need to map x [1, M] into [ 0, that.bufferSize ]
+
+
+      var offset = 0;
+      ['par_sv', 'par_proc', 'par_obs'].forEach(function(el){
+        that.sfrSettings.orders[el].forEach(function(p){
+          var id = that.sfrSettings.parameters[p]['partition_id'];
+          that.sfrSettings.partition[id]['group'].forEach(function(group, i){
+
+            var name = ['guess', p, group.id].join('___');
+            $this = $('input.parameters[name="'+ name +'"]');
+            $this.val(that.data[ xx ][offset+1]);
+            updateSfrSettings(that.sfrSettings, $this);
+            offset++;
+
+          });
+        });
+      });
+    }
+  }
 };

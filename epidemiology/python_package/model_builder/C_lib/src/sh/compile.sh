@@ -2,10 +2,10 @@
 
 cd ../C/core
 
-sed -ie "s/#define FLAG_JSON \([0-9]*\)/#define FLAG_JSON 0/" simforence.h
-sed -ie "s/#define FLAG_VERBOSE \([0-9]*\)/#define FLAG_VERBOSE 0/" simforence.h
-sed -ie "s/#define FLAG_WARNING \([0-9]*\)/#define FLAG_WARNING 0/" simforence.h
-sed -ie "s/#define FLAG_DEBUG \([0-9]*\)/#define FLAG_DEBUG 0/" simforence.h
+sed -ie "s/#define FLAG_JSON \([0-9]*\)/#define FLAG_JSON 0/" plom.h
+sed -ie "s/#define FLAG_VERBOSE \([0-9]*\)/#define FLAG_VERBOSE 0/" plom.h
+sed -ie "s/#define FLAG_WARNING \([0-9]*\)/#define FLAG_WARNING 0/" plom.h
+sed -ie "s/#define FLAG_DEBUG \([0-9]*\)/#define FLAG_DEBUG 0/" plom.h
 
 make clean
 make
