@@ -74,7 +74,7 @@
 
           <ul>
             <li>A web platform to share and interact in real time with epidemiological models.</li>
-            <li>Based on a formal layered grammar for epidemiological model.</li>
+            <li>Based on a formal layered grammar for epidemiological models.</li>
             <li>Offering a common API to fit epidemiological models to data.</li>
           </ul>
 	</section>
@@ -95,18 +95,16 @@
 	  <section data-state="blackout">
 	    <h2>process.<a style="text-decoration: none; line-height: 1;" href="http://www.json.org/">json</a></h2>
             <pre style="color:white; font-weight:800; background-image: url('lib/pict/sneeze_big.png'); background-repeat: no-repeat; background-position: center center;">{
+ "meta": {"id": "SI",
+          "comment": "SI model"},
+
  "state": [{"id": "S", "comment": "Susceptible"},
            {"id": "I", "comment": "Infectious"}],
 
- "parameter": [{"id": "r0", "comment": "basic reproduction nb"},
-               {"id": "v",  "comment": "recovery rate"},
-               ...],
+ "parameter": [{"id": "beta", "comment": "transmission rate"}],
 
- "model": [{"from": "S", 
-            "to":   "I",
-            "rate": "noise__trans(sto)*r0/N*v*I",
-            "comment": "infection with noise on r0",
-            ...], 
+ "model": [{"from": "S", "to": "I", "rate": "beta*I/N",
+            "comment": "infection (N is the population size)"}], 
 ...
 }
 </pre>
@@ -120,7 +118,7 @@
  "population": [{"id": "city1__all",
                  "size_t0": 1e6,
                  "comment": "city 1, all age classes"},
-                  ...],
+                 ...],
 
  "time_series": [{"id": "all__CDC__inc",
                   "population_id": ["city1__all", "city2__all"],
@@ -129,7 +127,8 @@
 
  "data": [{"id": "data",
            "source": "data/data.csv",
-           "comment": "my data"}]
+           "comment": "the path to a csv file with the data"},
+           ...]
 
  "model": {"space":  ...
 }
@@ -142,13 +141,13 @@
 	    <h2>link.<a style="text-decoration: none; line-height: 1;" href="http://www.json.org/">json</a></h2>
 
             <pre  style="color: white; font-weight:800; background-image: url('lib/pict/observation_small.png'); background-repeat: no-repeat; background-position: center center;">{
- "observed": [{"id": "prevalence", "comment":"the prevalence",
-               "definition": ["I"],
+ "observed": [{"id": "incidence", "comment":"new cases per week",
+               "definition": [{"from": "S","to": "I"}],
                "time_series_id": ["city1__CDC__prev"]}.
               ...],
 
  "parameter": [{"id": "rep", "comment": "reporting rate"},
-               {"id": "phi", "comment": "over-dispertion"}],
+               {"id": "phi", "comment": "over-dispertion of rep"}],
 
  "model": {"distribution": "discretized_normal",
            "mean": "rep*prop*x",
@@ -156,7 +155,7 @@
 
  "value": {"S": {"partition_id": "variable_population", 
                  "transformation": "logit",
-                  "guess": {"city1__all": 0.7, "city2__all": 0.7}}
+                 "guess": {"city1__all": 0.6, "city2__all": 0.7}}
            ...
 </pre>
 	  </section>
@@ -174,10 +173,10 @@
               <li class="fragment">
                 Solve your problem by <strong>chaining</strong> inference methods:
                 <ul>
-                  <li class="fragment">Skip a long transient (80000 time steps):
+                  <li class="fragment">Skip a long transient (80 000 time steps):
                     <pre style="box-shadow: none; font-size: 18pt; color: white; font-weight:800;">sfi | ./simul deter -T 80000</pre>
                   </li>
-                  <li class="fragment">Run a simplex (10000 iterations max) starting
+                  <li class="fragment">Run a simplex (10 000 iterations max) starting
                     from the previously found initial conditions (<em>-X</em>): 
                     <pre style="box-shadow: none; font-size: 18pt; color: white; font-weight:800;">sfi -X | ./simplex -M 10000</pre>
                   </li>
@@ -221,9 +220,9 @@
           </p>
 
           <ul>
-            <li>Models can now be shared</li>
-            <li>Fork, don't re-invent the wheel</li>
-            <li>Curate a community of modelers, data providers and decision makers</li>
+            <li>Models can now be shared.</li>
+            <li>Fork, don't re-invent the wheel.</li>
+            <li>Curate a community of modelers, data providers and decision makers.</li>
           </ul>
         </section>
 
