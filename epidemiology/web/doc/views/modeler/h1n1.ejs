@@ -62,7 +62,7 @@
     <h3>in JSON</h3>
 
     <p>
-      Let's get a blank context: <code>./plom --context context.json</code>
+      Let's get a blank context: <code>./plom --context -o context.json</code>
       and fill it for H1N1:
     </p>
 
@@ -158,7 +158,7 @@
 
     <p>
       We can get a blank model template by running:
-      <code>./plom --process process.json</code>
+      <code>./plom --process -o process.json</code>
     </p>
 
 
@@ -206,7 +206,7 @@
     <p>
       To be sure not to forget any parameters we fill in a template
       generated with:<br/>
-      <code>./plom context.json process.json --link
+      <code>./plom context.json process.json --link -o link.json
       link.json</code>
     </p>
     <br/>
@@ -375,7 +375,7 @@
         <li>The source code of our model are available in <code><i class="icon-folder-open"></i> h1n1/src/C/</code>.</li>
         <li>Commands have to be run in <code><i class="icon-folder-open"></i> h1n1/bin/</code>.</li>
         <li>Results will be written in <code><i class="icon-folder-open"></i> h1n1/src/results/</code>.</li>
-        <li>Plots will be generated from <a href="http://www.r-project.org/">R</a> using the script <code><i class="icon-file"></i> plot.r</code> using <code><i class="icon-folder-open"></i> h1n1/src/R/</code> as a working directory.</li>
+        <li>Plots will be generated from <a href="http://www.r-project.org/">R</a> using the package <code>plom</code>.</li>
       </ul>
     </p>
   </div>
