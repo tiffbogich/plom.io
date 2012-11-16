@@ -23,3 +23,8 @@ exports.modeler.hfmd = function(req, res){
 exports.modeler.intro = function(req, res){
     res.render('modeler/intro');
 };
+
+exports.modeler.refs = function(req, res){
+    res.render('modeler/refs');
+};
+
