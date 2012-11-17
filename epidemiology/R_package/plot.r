@@ -645,12 +645,12 @@ plot.slices <- function(s, res="slice", llike.min=NA, ylab='log likelihood'){
 plot.prs <- function(s, res='lhs', navg=NA, par_sv=FALSE, par_proc=TRUE, par_obs=FALSE){
 
   
-  path.design <- file.path(s$rout,'results', res, 'design.des')
+  path.design <- file.path(s$root,'results', res, 'design.des')
 
   if (file.exists(path.design)) {
-    s$reload()
+    s$settings <- s$load()
     des <- read.table(path.design, header=TRUE)
-    res <- NULL
+    resbest <- NULL
     for(i in 1:nrow(des)) {
       mypath <- file.path(s$root, 'results', res, paste("best_", i-1, ".output", sep=''))
       best <- tryCatch(read.table(mypath, header=TRUE), error=function(e) t(as.matrix(rep(NA, ncol(des)+1))))
@@ -659,7 +659,7 @@ plot.prs <- function(s, res='lhs', navg=NA, par_sv=FALSE, par_proc=TRUE, par_obs
       } else {
           best <- best[nrow(best), 2:ncol(best)]
       }
-      res <- rbind(res,best)      
+      resbest <- rbind(resbest, best)      
     }
 
     ##trash what we don't want par_sv par_proc or par_obs AND sd_transf > 0.0
@@ -678,9 +678,9 @@ plot.prs <- function(s, res='lhs', navg=NA, par_sv=FALSE, par_proc=TRUE, par_obs
     }    
     
 
-    like <- c(rep(NA, nrow(des)), as.numeric(res[,ncol(res)]))  
-    res <- res[,-ncol(res)]
-    full <- rbind(as.matrix(des[,2:ncol(des)]),as.matrix(res))
+    like <- c(rep(NA, nrow(des)), as.numeric(resbest[,ncol(resbest)]))  
+    resbest <- resbest[,-ncol(resbest)]
+    full <- rbind(as.matrix(des[,2:ncol(des)]),as.matrix(resbest))
   
     full <- full[,keep]
     
