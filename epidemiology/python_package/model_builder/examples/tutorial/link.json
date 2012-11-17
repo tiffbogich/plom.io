@@ -33,7 +33,7 @@
                   "sd_transf": 0.01},
 
             "r0": {"partition_id": "variable_population", "transformation": "log",
-                   "min": 20.0, "guess": 20.0, "max": 25.0,
+                   "min": 15.0, "guess": 20.0, "max": 35.0,
                    "sd_transf": 0.02},
             "v": {"partition_id": "identical_population", "transformation": "log", "unit": "D", "type": "rate_as_duration",
                   "min": 5, "guess": 11, "max": 20,
