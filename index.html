@@ -44,16 +44,14 @@
 	  <img style="border-style: none; box-shadow: none;" src="lib/pict/logo-large.png" alt="process">
 
 	  <p>
-
 	    <small>Created
 	    by <a href="mailto:sebastien@plom.io">Sebastien Ballesteros</a>, <a href="mailto:dureau.joseph@gmail.com">Joseph Dureau</a> and <a href="mailto:tiff.bogich@gmail.com">Tiffany Bogich</a></small>
-
 	  </p>
+
 	</section>
 
 	<section>
 	  <h2>Beyond paper and source code</h2>
-
 
 	  <blockquote cite="http://www.nature.com/nature/journal/v482/n7386/full/nature10836.html">
             Scientific communication relies on evidence that cannot be
@@ -77,6 +75,7 @@
             <li>Based on a formal layered grammar for epidemiological models.</li>
             <li>Offering a common API to fit epidemiological models to data.</li>
           </ul>
+
 	</section>
 
 
@@ -151,7 +150,7 @@
 
  "model": {"distribution": "discretized_normal",
            "mean": "rep*prop*x",
-           "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"},
+           "var":  "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"},
 
  "value": {"S": {"partition_id": "variable_population", 
                  "transformation": "logit",
@@ -160,18 +159,17 @@
 </pre>
 	  </section>
 
-
 	  <section data-state="alert">
-	    <h2>Inference made easy</h2>
+	    <h2>The power of a grammar</h2>
             
             <ul>
               <li>
-                Create a model (will be rendered in plain C):
+                Assemble a model (will be rendered in plain C):
                 <pre style="box-shadow: none; font-size: 18pt; color: white; font-weight:800;">plom context.json process.json link.json -o my_model</pre>
               </li>
 
               <li class="fragment">
-                Solve your problem by <strong>chaining</strong> inference methods:
+                Solve your problem by <strong>chaining</strong> algorithms:
                 <ul>
                   <li class="fragment">Skip a long transient (80 000 time steps):
                     <pre style="box-shadow: none; font-size: 18pt; color: white; font-weight:800;">sfi | ./simul deter -T 80000</pre>
@@ -191,26 +189,77 @@
 	  </section>
 
 
-	  <section data-state="soothe">
-	    <h2>Real time web</h2>
-            
-            <p>
-              Let the computations run on the cloud and do
-              everything from a web browser.
-            </p>
+        </section>
 
+
+
+
+
+
+
+
+	<section>
+
+	  <section>
+	    <h2>Designed for the cloud and the real time web</h2>
+            
+	  </section>
+          
+	  <section data-state="blackout">
+            <h2>Build to face to sharp deadlines</h2>
+
+            <ul>
+              <li>
+                High performance computing made reproducible:
+                design.<a href="http://www.json.org/">json</a>
+              </li>
+
+            <pre style="color: white; font-weight:800;">{ 
+ "meta": {"id": "lhs_mif", 
+          "comment": "Latin Hyper-cube Sampling"},
+
+ "action": {"id": "lhs",
+            "H": 100,
+            "seed": 12334216564},
+
+ "cmd": [["D",  "", "mif sto -M 100 -J 1000", 1]],
+
+ "cluster": {"type": SGE,
+             "walltime": "01:20:00"}
+}</pre>            
+
+            <li>And easy:</li>
+
+            <pre style="color: pink; font-weight:800;">sfi --bootstrap design.json</pre>
+            </ul>
+	  </section>
+
+
+	  <section data-state="soothe">
+	    <h2>Models as a service</h2>
+
+            <p>Enhance your discussions with an access to the library
+            of models from any connected device.</p>
 
             <p>
               <a href="http://www.plom.io/play"><strong>Try it now!</strong></a>
             </p>
-
 	  </section>
 
 
-        </section>
+
+	  <section data-state="blackout">
+
+	    <h2>Real time representation of the dynamic of research</h2>
+
+            <div id="sfr-tree-graph"></div>
+
+          </section>
 
 
-	<section>
+	</section>
+
+
 
 	<section>
 	  <h2>Modeling made social</h2>
@@ -227,28 +276,13 @@
         </section>
 
 
-	<section data-state="blackout">
+	<section>
+	  <h2>Get involved</h2>
 
-	  <h2>Real time representation of the dynamic of research</h2>
+	  <a href="https://github.com/plom">https://github.com/plom</a>
 
-          <div id="sfr-tree-graph"></div>
-
-        </section>
-
-
+          <p>Thank you!</p>
 	</section>
-
-
-
-
-
-	  <section>
-	    <h2>Get involved</h2>
-
-	    <a href="https://github.com/plom">https://github.com/plom</a>
-
-            <p>Thank you!</p>
-	  </section>
 
       </div>
 
