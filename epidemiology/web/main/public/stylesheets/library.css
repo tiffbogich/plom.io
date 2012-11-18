@@ -1,20 +1,4 @@
-.node circle {
-  stroke: white;
-  stroke-width: 1.5px;
-}
-
-.node {
-  font: 10px sans-serif;
-}
-
-.link {
-  fill: none;
-  stroke: #ccc;
-  stroke-width: 1.5px;
-}
-
-
-.axis {
+#sfr-horizon-graph .axis {
   font-family: arial; font-size:0.6em;
 }
 
@@ -22,7 +6,7 @@
   fill:none; 
 }
 
-.tick {
+#sfr-horizon-graph .tick {
   fill:none;
   stroke:black; 
 }

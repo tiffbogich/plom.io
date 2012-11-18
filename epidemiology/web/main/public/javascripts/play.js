@@ -1,4 +1,4 @@
-var sfrGlobal = {'modelId':'tutorial',
+var plomGlobal = {'modelId':'tutorial',
                  'consoleCounter':0,
                  'intervalId': [],
                  'canRun':true}
@@ -62,8 +62,8 @@ function myDygraph(divGraph, data, options){
 function appendLog(msg, err){
   var myconsole = $('div#logs');
 
-  sfrGlobal.consoleCounter++;
-  if( (sfrGlobal.consoleCounter > 200) && (sfrGlobal.consoleCounter % 100) === 0){
+  plomGlobal.consoleCounter++;
+  if( (plomGlobal.consoleCounter > 200) && (plomGlobal.consoleCounter % 100) === 0){
     $("div#logs p").slice(0,100).remove();
   }
 
@@ -77,7 +77,7 @@ function appendLog(msg, err){
 
 function runSimul(socket, sfrSimul){
 
-  sfrGlobal.consoleCounter = 0;
+  plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
   sfrSimul.data_ts = sfrSimul.set_data(sfrSimul.N_TS);
@@ -95,9 +95,9 @@ function runSimul(socket, sfrSimul){
 
     var opt = [integration, '--traj', '-D ' +sfrSimul.N_SIMUL, '-T ' + N_TRANSIANT, '-J ' + J];
 
-    socket.emit('start', {'exec':{exec:'simul', opt:opt}, 'sfrModelId':sfrGlobal.modelId, 'sfrSettings':sfrSimul.sfrSettings});
+    socket.emit('start', {'exec':{exec:'simul', opt:opt}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrSimul.sfrSettings});
 
-    sfrGlobal.intervalId.push(setInterval(function(){
+    plomGlobal.intervalId.push(setInterval(function(){
       sfrSimul.graph_ts.updateOptions( { 'file': sfrSimul.data_ts } );
     }, 100));
 
@@ -112,13 +112,13 @@ function runGetIc(socket, sfrIc){
 
   var integration = $('input[name=sto]').is(':checked') ? 'sto': 'deter';
 
-  sfrGlobal.consoleCounter = 0;
+  plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
   var N_TRANSIANT = parseInt($('input#N_TRANSIANT').val(), 10);
 
   if(socket){
-    socket.emit('start', {'exec':{'exec':'ic', 'opt':[integration, '--traj', '-D 0', '-T ' + N_TRANSIANT]}, 'sfrModelId':sfrGlobal.modelId, 'sfrSettings':sfrIc.sfrSettings});
+    socket.emit('start', {'exec':{'exec':'ic', 'opt':[integration, '--traj', '-D 0', '-T ' + N_TRANSIANT]}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrIc.sfrSettings});
   } else{
     alert("Can't connect to the websocket server");
   }
@@ -133,7 +133,7 @@ function runGetIc(socket, sfrIc){
  */
 function runPred(socket, sfrSimul){
 
-  sfrGlobal.consoleCounter = 0;
+  plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
   if(socket){
@@ -152,8 +152,8 @@ function runPred(socket, sfrSimul){
     var tend = sfrSimul.data_pred.length-1;
     var J = parseInt($('input#n_realisations_pred').val(), 10);
 
-    socket.emit('start', {'exec':{'exec':'simul', 'opt':[integration, '--traj', '-D '+ tend, '-o '+ t0, '-J ' + J]}, 'sfrModelId':sfrGlobal.modelId, 'sfrSettings': sfrSimul.updateiSettings()});
-    sfrGlobal.intervalId.push(setInterval(function(){
+    socket.emit('start', {'exec':{'exec':'simul', 'opt':[integration, '--traj', '-D '+ tend, '-o '+ t0, '-J ' + J]}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings': sfrSimul.updateiSettings()});
+    plomGlobal.intervalId.push(setInterval(function(){
       sfrSimul.graph_pred.updateOptions( { 'file': sfrSimul.data_pred } );
     }, 100));
 
@@ -167,7 +167,7 @@ function runPred(socket, sfrSimul){
 
 function runSMC(socket, sfrTs){
 
-  sfrGlobal.consoleCounter = 0;
+  plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
   sfrTs.data_ts = sfrTs.set_data_ts();
@@ -186,9 +186,9 @@ function runSMC(socket, sfrTs){
                 smc:    {exec:'smc',    opt: [integration, '--traj', '-J ' +J, '-b', '-P 1']},
                 kalman: {exec:'kalman', opt: [integration, '--traj']}};
 
-    socket.emit('start', {'exec':exec[method], 'sfrModelId':sfrGlobal.modelId, 'sfrSettings':sfrTs.sfrSettings});
+    socket.emit('start', {'exec':exec[method], 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrTs.sfrSettings});
 
-    sfrGlobal.intervalId.push(setInterval(function(){
+    plomGlobal.intervalId.push(setInterval(function(){
       sfrTs.graph_ts.updateOptions( { 'file': sfrTs.data_ts } );
       if(sfrTs.graph_drift){
         sfrTs.graph_drift.updateOptions( { 'file': sfrTs.data_drift } );
@@ -202,7 +202,7 @@ function runSMC(socket, sfrTs){
 
 function runSimplex(socket, sfrBest) {
 
-  sfrGlobal.consoleCounter = 0;
+  plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
   sfrBest.data = sfrBest.set_data();
@@ -226,9 +226,9 @@ function runSimplex(socket, sfrBest) {
 
     opt = opt.concat(['-M '+ M, '-S '+S ]);
 
-    socket.emit('start', {'exec':{'exec': exec, 'opt':opt}, 'sfrModelId':sfrGlobal.modelId, 'sfrSettings':sfrBest.sfrSettings});
+    socket.emit('start', {'exec':{'exec': exec, 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrBest.sfrSettings});
 
-    sfrGlobal.intervalId.push(setInterval(function(){
+    plomGlobal.intervalId.push(setInterval(function(){
       sfrBest.graph.updateOptions( { 'file': sfrBest.data } );
     }, 200));
   } else {
@@ -238,7 +238,7 @@ function runSimplex(socket, sfrBest) {
 
 function runPmcmc(socket, sfrPmcmc){
 
-  sfrGlobal.consoleCounter = 0;
+  plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
   sfrPmcmc.data_ar = sfrPmcmc.set_data_ar();
@@ -251,9 +251,9 @@ function runPmcmc(socket, sfrPmcmc){
     var J = parseInt($('input#pmcmc-J').val(), 10);
     var opt = [integration, '-M ' + M, '-J ' + J, '-P 1'];
 
-    socket.emit('start', {'exec':{'exec':'pmcmc', 'opt':opt}, 'sfrModelId':sfrGlobal.modelId, 'sfrSettings':sfrPmcmc.sfrSettings});
+    socket.emit('start', {'exec':{'exec':'pmcmc', 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrPmcmc.sfrSettings});
 
-    sfrGlobal.intervalId.push(setInterval(function(){
+    plomGlobal.intervalId.push(setInterval(function(){
       sfrPmcmc.graph_ar.updateOptions( { 'file': sfrPmcmc.data_ar } );
       sfrPmcmc.graph.updateOptions( { 'file': sfrPmcmc.data } );
     }, 200));
@@ -266,7 +266,7 @@ function runPmcmc(socket, sfrPmcmc){
 
 function runMif(socket, sfrMif){
 
-  sfrGlobal.consoleCounter = 0;
+  plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
   sfrMif.data_mif = sfrMif.set_data_mif();
@@ -282,9 +282,9 @@ function runMif(socket, sfrMif){
     var L = parseFloat($('input#mif-L').val());
     var opt = [integration, '--traj', '-M ' + M, '-J ' + J, '-a ' + a, '-b ' + b, '-L ' + L, '-P 1'];
 
-    socket.emit('start', {'exec':{'exec':'mif', 'opt':opt}, 'sfrModelId':sfrGlobal.modelId, 'sfrSettings':sfrMif.sfrSettings});
+    socket.emit('start', {'exec':{'exec':'mif', 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrMif.sfrSettings});
 
-    sfrGlobal.intervalId.push(setInterval(function(){
+    plomGlobal.intervalId.push(setInterval(function(){
       sfrMif.graph_mif.updateOptions( { 'file': sfrMif.data_mif } );
       sfrMif.graph.updateOptions( { 'file': sfrMif.data } );
     }, 200));
@@ -317,8 +317,20 @@ $(document).ready(function(){
   ////////////////////////////////////////////////////////////////////////////////////////
   var qs = window.location.search;
   $.getJSON('/process', function(answer){
-    sfrGraphModel(answer, '#sfr-graph-model');
+    sfrGraphModel(answer, '#plom-graph-model');
   });
+
+  $.getJSON('/tree', function(answer){
+
+    d3.select("#plom-tree-graph")
+      .datum(answer)
+      .call(sfr_tree(null, function(){
+      }));
+
+  });
+
+
+
 
 
   ////////////////////////////////////////////////////////////////////////////////////////
@@ -416,7 +428,7 @@ $(document).ready(function(){
       }
 
       //nothing can be run until the error are fixed...
-      sfrGlobal.canRun = (nbError === 0);
+      plomGlobal.canRun = (nbError === 0);
 
       updateSfrSettings(sfrSettings, $(this));
 
@@ -651,8 +663,8 @@ $(document).ready(function(){
         socket.on('theEnd', function (msg) {
 
           //remove actions set with setInterval
-          for(var i=0; i<sfrGlobal.intervalId.length; i++){
-            clearInterval(sfrGlobal.intervalId.pop());
+          for(var i=0; i<plomGlobal.intervalId.length; i++){
+            clearInterval(plomGlobal.intervalId.pop());
           }
 
           //be sure that the graph contain all the data (the graph is only updated every x msgs)
@@ -678,7 +690,7 @@ $(document).ready(function(){
 
           }
 
-          sfrGlobal.canRun = true;
+          plomGlobal.canRun = true;
 
         });
 
@@ -699,8 +711,8 @@ $(document).ready(function(){
     });
 
     $("#runSMC").click(function(){
-      if(sfrGlobal.canRun){
-        sfrGlobal.canRun = false;
+      if(plomGlobal.canRun){
+        plomGlobal.canRun = false;
         $('#graphs a:first').tab('show');
         if(sfrSettings.cst.N_DATA) {
           runSMC(socket, sfrTs);
@@ -711,31 +723,31 @@ $(document).ready(function(){
     });
 
     $("#getIc").click(function(){
-      if(sfrGlobal.canRun){
-        sfrGlobal.canRun = false;
+      if(plomGlobal.canRun){
+        plomGlobal.canRun = false;
         runGetIc(socket, sfrIc);
       }
     });
 
     $("#runSimplex").click(function(){
-      if(sfrGlobal.canRun){
-        sfrGlobal.canRun = false;
+      if(plomGlobal.canRun){
+        plomGlobal.canRun = false;
         $('#graphs a[href=#tab-graph-simplex]').tab('show');
         runSimplex(socket, sfrBest);
       }
     });
 
     $("#runPmcmc").click(function(){
-      if(sfrGlobal.canRun){
-        sfrGlobal.canRun = false;
+      if(plomGlobal.canRun){
+        plomGlobal.canRun = false;
         $('#graphs a[href=#tab-graph-pmcmc]').tab('show');
         runPmcmc(socket, sfrPmcmc);
       }
     });
 
     $("#runMif").click(function(){
-      if(sfrGlobal.canRun){
-        sfrGlobal.canRun = false;
+      if(plomGlobal.canRun){
+        plomGlobal.canRun = false;
         $('#graphs a[href=#tab-graph-mif]').tab('show');
         runMif(socket, sfrMif);
       }
@@ -750,8 +762,8 @@ $(document).ready(function(){
     });
 
     $("#runPred").click(function(){
-      if(sfrGlobal.canRun){
-        sfrGlobal.canRun = false;
+      if(plomGlobal.canRun){
+        plomGlobal.canRun = false;
         runPred(socket,(sfrSettings.cst.N_DATA) ? sfrTs : sfrSimul);
       }
     });

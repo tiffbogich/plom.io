@@ -2,11 +2,10 @@ function sfr_tree($button, onModelClickCallback) {
   var margin = {top: 20, right: 80, bottom: 20, left: 80},
   duration = 500;
 
-  var myStyle = {model: {r:15.5, color:'red'},
-                 intervention: {r:15.5, color:'orange'},
-                 context: {r:7.5, color:'blue'},
-                 link: {r:4.5, color:'gray'},
-                 zazaza: {r:4.5, color:'gray'}};
+  var myStyle = {model: {r:15.5, color: '#f15b22'},   //'#b4469a'},
+                 intervention: {r:15.5, color: '#29b34a'},
+                 context: {r:7.5, color: '#006fb9'},
+                 link: {r:4.5, color:'gray'}};
 
   var width = 580 - margin.right - margin.left,
   height = 400 - margin.top - margin.bottom;
@@ -144,7 +143,7 @@ function sfr_tree($button, onModelClickCallback) {
         if ((d.type === 'context') && d.children) {
           d._children = d.children;
           d.children = null;
-          $button.addClass('disabled');
+          $button && $button.addClass('disabled');
 
           if (plomGlobal.process !== d.parent.name){
             onModelClickCallback();
@@ -154,7 +153,7 @@ function sfr_tree($button, onModelClickCallback) {
         } else if((d.type === 'context')) {
           d.children = d._children;
           d._children = null;
-          $button.addClass('disabled');
+          $button && $button.addClass('disabled');
 
           if (plomGlobal.process !== d.parent.name){
             onModelClickCallback();
@@ -175,7 +174,7 @@ function sfr_tree($button, onModelClickCallback) {
           plomGlobal.link = d.name;
           plomGlobal.context = mynode.name;
           plomGlobal.process = mynode.parent.name;
-          $button.removeClass('disabled');
+          $button && $button.removeClass('disabled');
         } else {
 
           if (plomGlobal.process !== d.name){
@@ -183,7 +182,7 @@ function sfr_tree($button, onModelClickCallback) {
           }
           plomGlobal.process = d.name;
 
-          $button.addClass('disabled');
+          $button && $button.addClass('disabled');
         }
         update(d);
       }

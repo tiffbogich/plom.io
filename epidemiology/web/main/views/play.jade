@@ -3,6 +3,7 @@ extends layout
 block append styles
   link(rel='stylesheet', href='/stylesheets/play.css')
   link(rel='stylesheet', href='/stylesheets/process.css')
+  link(rel='stylesheet', href='/stylesheets/tree.css')
 
 block append scripts
   script(src='/javascripts/sfrTs.js')
@@ -14,6 +15,7 @@ block append scripts
   script(src='/javascripts/sfrGraphModel.js')
   script(src='/javascripts/play.js')
   script(src='/socket.io/socket.io.js')
+  script(src='/javascripts/tree.js')
 
 block content
 
@@ -407,9 +409,9 @@ block content
   div.row  
 
       div.span8
-        div#sfr-tree-graph  
+        div#plom-tree-graph
   
       div.span4#sfr-model-detail
         h3.title-side Model Structure
 
-        div#sfr-graph-model
+        div#plom-graph-model

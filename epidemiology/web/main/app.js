@@ -45,6 +45,7 @@ app.get('/', routes.index);
 app.get('/play', routes.play);
 app.get('/library', routes.library);
 app.get('/process', routes.process);
+app.get('/tree', routes.tree);
 
 
 //app.get('/test', routes.test);

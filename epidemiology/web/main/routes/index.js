@@ -56,3 +56,72 @@ exports.process = function (req, res, next) {
 ////    console.log(t);
 //    res.send(t);
 //};
+
+exports.tree = function (req, res, next) {
+
+  var tree = {
+    "name": "SI",
+    "type": "model",
+    "children": [
+      {
+        "name": "Simple",
+        "type": "context",
+        "children": [
+          {
+            "name": "link 1",
+            "type": "link",
+            "privacy": "public",
+            "children": [
+              {"name": "link 2", "type": "link"},
+              {"name": "link 3", "type": "link"},
+              {"name": "link 4", "type": "link"}
+            ]
+          },
+          {
+            "name": "link5",
+            "type": "link",
+            "privacy": "public",
+            "children": [
+              {"name": "link 6", "type": "link"},
+              {"name": "link 7", "type": "link"}
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Age",
+        "type": "context",
+        "children": [
+          {
+            "name": "link13",
+            "type": "link",
+            "children": [
+              {"name": "link 8",
+               "type": "link",
+               "children": [
+                 {"name": "link 9", "type": "link"}
+               ]},
+              {"name": "link 10", "type": "link"}
+            ]
+          },
+          {"name": "link 11", "type": "link"},
+          {"name": "link 12", "type": "link"}
+        ]
+      },
+      {
+        "name": "SIR",
+        "type": "model",
+        "children": [{"name": "Simple", "type": "context", "children":[
+          {"name": "link 19", "type": "link"}
+        ]},
+                     {
+                       "name": "Vaccination",
+                       "type": "intervention"
+                     }
+                    ]
+      }
+    ]
+  }
+
+  res.send(tree);
+};
