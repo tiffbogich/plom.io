@@ -14,12 +14,11 @@
 }
 
 
-
 .axis {
   font-family: arial; font-size:0.6em;
 }
 
-path {
+#sfr-horizon-graph path {
   fill:none; 
 }
 

@@ -1,4 +1,4 @@
-function sfrGraphModel(process) {
+function sfrGraphModel(process, graphId) {
 
   var graph = {nodes:[], links:[]};
 
@@ -57,7 +57,7 @@ function sfrGraphModel(process) {
   , height = 300;
 
 
-  var svg = d3.select("#sfr-graph-model").append("svg:svg")
+  var svg = d3.select(graphId).append("svg:svg")
     .attr("width", width)
     .attr("height", height);
 

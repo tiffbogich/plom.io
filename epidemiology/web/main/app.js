@@ -42,9 +42,9 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
-app.get('/play', routes.sfrSettings(process.env['HOME'] + '/tutorial/settings/settings.json',
-                                    process.env['HOME'] + '/websites/simforence/simforence-population-based/simforence_model_builder/examples/hfmd/process.json'));
-app.get('/explore', routes.explore);
+app.get('/play', routes.play);
+app.get('/library', routes.library);
+app.get('/process', routes.process);
 
 
 //app.get('/test', routes.test);

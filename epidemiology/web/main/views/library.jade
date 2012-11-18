@@ -1,13 +1,15 @@
 extends layout
 
 block append styles
-  link(rel='stylesheet', href='/stylesheets/explore.css')
+  link(rel='stylesheet', href='/stylesheets/library.css')
+  link(rel='stylesheet', href='/stylesheets/process.css')
 
 block append scripts
   script(src='/javascripts/tree.js')
-  script(src='/javascripts/explore.js')
+  script(src='/javascripts/library.js')
   script(src='/javascripts/d3_horizon.js')
   script(src='/javascripts/horizon.js')
+  script(src='/javascripts/sfrGraphModel.js')
 
 
 block content
@@ -66,12 +68,11 @@ block content
 
       div.btn-toolbar
         div.btn-group
-          button.btn.btn-small.btn-success <i class="icon-play icon-white"></i> Explore
+          button.btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
   
         div.btn-group
-          button.btn.btn-small <i class="icon-wrench"></i> Refine
           button.btn.btn-small <i class="icon-random"></i> Fork
-
+          button.btn.btn-small.disabled <i class="icon-trash"></i> Delete
 
 
   
@@ -80,8 +81,4 @@ block content
 
 
       div
-        | Model...
-
-
-        p.
-          Measles Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit odio sed nisi vulputate ornare eleifend nibh pellentesque. Donec non leo non elit congue venenatis. Quisque ullamcorper lobortis interdum. Nam mollis, odio in suscipit luctus, justo dui tempus nulla, nec cursus est sapien malesuada sapien. In metus lorem, auctor non adipiscing at, eleifend vitae mauris. Phasellus posuere luctus odio sagittis consectetur. Suspendisse potenti. Etiam viverra odio in diam rhoncus vitae pretium massa blandit. Curabitur commodo lobortis justo et tristique.
+        div#plom-graph-process

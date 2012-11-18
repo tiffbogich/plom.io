@@ -313,13 +313,22 @@ function updateSfrSettings(sfrSettings, $this) {
 $(document).ready(function(){
 
   ////////////////////////////////////////////////////////////////////////////////////////
+  //get the process.json from the server!
+  ////////////////////////////////////////////////////////////////////////////////////////
+  var qs = window.location.search;
+  $.getJSON('/process', function(answer){
+    sfrGraphModel(answer, '#sfr-graph-model');
+  });
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////
   //get the settings.json from the server!
   ////////////////////////////////////////////////////////////////////////////////////////
-  $.getJSON('/play', function(answer){
-    var sfrSettings = answer.settings;
-    var sfrModel = answer.model;
 
-    sfrGraphModel(sfrModel);
+
+  $.getJSON('/play', function(answer){
+    var sfrSettings = answer;
+
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //when user changes values, we update the object originaly fetched from the sfrSettings
@@ -761,7 +770,7 @@ $(document).ready(function(){
     ////////////////////////////////////////////////////////////////////////////////////////
 
     $.getJSON('/play', function(answer) {
-      var iSettings = answer.settings;
+      var iSettings = answer;
 
       if(sfrSettings.cst.N_DATA) {
         sfrTs.iSettings = iSettings;

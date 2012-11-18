@@ -5,59 +5,50 @@ var fs = require('fs')
 
 
 /**
- *Serve Sfrsettings in JSON or HTML
+ *Serve PlomSettings in JSON or HTML
  */
-exports.sfrSettings = function(path_settings, path_model){
+exports.play = function(req, res, next){
 
-  return function(req, res, next){
+  var path_settings = process.env['HOME'] + '/tutorial/settings/settings.json';
 
-    fs.readFile(path_settings, function (err, settings){
+  fs.readFile(path_settings, function (err, settings){
 
-      if(err){
-        next(err);
-        return;
+    if(err){
+      next(err);
+      return;
+    }
+
+    settings = JSON.parse(settings);
+    describePar(settings);
+
+    res.format({
+      json: function(){
+        res.send(settings);
+      },
+      html: function(){
+        res.render('play', settings);
       }
-
-      fs.readFile(path_model, function (err, model){
-
-        if(err){
-          next(err);
-          return;
-        }
-
-        settings = JSON.parse(settings);
-        describePar(settings);
-        model = JSON.parse(model);
-
-        res.format({
-          json: function(){
-            res.send({settings:settings, model:model});
-          },
-          html: function(){
-            res.render('play', settings);
-          }
-        });
-      });
-
     });
-
-  };
+  });
 
 };
+
 
 exports.index = function(req, res){
   res.render('index');
 };
 
 
-exports.explore = function(req, res){
-  res.render('explore');
+exports.library = function(req, res){
+  res.render('library');
 };
 
 
-//exports.settingsJSON = function (req, res, next) {
-//    fs.createReadStream(process.env['HOME'] + '/tutorial/settings/settings.json').pipe(res);
-//}
+exports.process = function (req, res, next) {
+  var path_process =   process.env['HOME'] + '/websites/simforence/simforence-population-based/simforence_model_builder/examples/hfmd/process.json';
+
+  fs.createReadStream(path_process).pipe(res);
+}
 
 
 //exports.test = function(req, res){
