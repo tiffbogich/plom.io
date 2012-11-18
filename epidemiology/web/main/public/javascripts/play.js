@@ -10,8 +10,9 @@ function addSlider(par, group, iSettings){
 
   var slideMax=1000;
   var par_val = parseFloat($input.val());
-  var par_min = 0;
-  var par_max = 1;
+
+  var par_min = iSettings['parameters'][par]['min'][group];
+  var par_max = iSettings['parameters'][par]['max'][group];
 
   $caption.html((par_val*100).toFixed(1) + '%');
   $('#slider___'+ par + '___' + group).slider({
@@ -28,7 +29,7 @@ function addSlider(par, group, iSettings){
     stop: function(event, ui) {
       //update iSettings
       var id = $(this).attr('id').split('___');
-      iSettings['parameters']['par_proc_values'][id[1]]['guess'][id[2]] = ui.value/slideMax;
+      iSettings['parameters'][id[1]]['guess'][id[2]] = ui.value/slideMax;
       //run the intervention simulation
       $('#runPred').trigger('click');
     }
@@ -139,6 +140,9 @@ function runPred(socket, sfrSimul){
   if(socket){
     sfrSimul.is_pred = true;
     var integration = $('input[name=sto]').is(':checked') ? 'sto': 'deter';
+
+    //TO BE CHECKED
+    sfrSimul.indexDataClicked = sfrSimul.indexDataClicked || 1;
 
     var extraYears = parseInt($('select#N_EXTRA').val(), 10) || 0;
     //convert extraYears in timesteps
@@ -777,49 +781,42 @@ $(document).ready(function(){
       }
     });
 
+
+
+
     ////////////////////////////////////////////////////////////////////////////////////////
     // INTERVENTION
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    $.getJSON('/play', function(answer) {
-      var iSettings = answer;
+    var iSettings = $.extend(true, {}, sfrSettings);
 
-      if(sfrSettings.cst.N_DATA) {
-        sfrTs.iSettings = iSettings;
-      } else{
-        sfrSimul.iSettings = iSettings;
-      }
-
-      //link par_proc and par_obs of iSettings present in sfrSettings so
-      //that the 2 stay synchronized. Note that we do not link par_sv has they have to remain independant...
-      ['par_proc', 'par_obs'].forEach(function(el){
-        sfrSettings['orders'][el].forEach(function(par){
-          if(par in iSettings['parameters']) {
-            iSettings['parameters'][par] = sfrSettings['parameters'][par];
-          }
-        });
+    //link par_proc and par_obs of iSettings and sfrSettings !=intervention  so
+    //that the 2 stay synchronized. Note that we do not link par_sv has they have to remain independent...
+    ['par_proc', 'par_obs'].forEach(function(el){
+      sfrSettings['orders'][el].forEach(function(par){
+        if (! ('intervention' in  iSettings.parameters[par]) && ! iSettings.parameters[par]['intervention']) {
+          iSettings['parameters'][par] = sfrSettings['parameters'][par];
+        }
       });
-
-//      if(!sfrSettings.cst.N_DATA) {
-//        //get the intervention parameters
-//        sfrSimul.par_int = _.difference(iSettings.orders.par_proc, sfrSettings.orders.par_proc);
-//        sfrSimul.par_int = ['pst', 'z', 'link'];
-//
-//        var sdata = {par_int: ['pst', 'z', 'link'],
-//                     par_int_values: {'pst': {'min': [0.0], 'guess': [0.0], 'max':[1.0], 'constraint': 'box_0_1', 'description': 'proportion suppressed when treated'},
-//                                      'z': {'min': [0.0],  'guess': [0.7], 'max':[1.0], 'constraint': 'box_0_1', 'description': 'proportion tested'},
-//                                      'link': {'min': [0.0], 'guess': [0.0], 'max':[1.0], 'constraint': 'box_0_1', 'description': 'composite linkage parameter'}}};
-//
-//        template('test', sdata).appendTo('#par_int');
-//        $('.sfrTooltip').tooltip({delay: { show: 500, hide: 100 }});
-//
-//        addSlider('pst', 0, iSettings);
-//        addSlider('z', 0, iSettings);
-//        addSlider('link', 0, iSettings);
-//      }
-
     });
 
-  }); //end getJSON for sfrSettings
+
+    if(sfrSettings.cst.N_DATA) {
+      sfrTs.iSettings = iSettings;
+    } else{
+      sfrSimul.iSettings = iSettings;
+    }
+
+    if (!sfrSettings.cst.N_DATA) {
+      iSettings.orders.par_sv.concat(iSettings.orders.par_proc, iSettings.orders.par_obs).forEach(function(el){
+        if (('intervention' in  iSettings.parameters[el]) && iSettings.parameters[el]['intervention']) {
+          iSettings.partition[iSettings.parameters[el]['partition_id']]['group'].forEach(function(group, i) {
+            addSlider(el, group.id, iSettings);
+          });
+        }
+      });
+    }
+
+  });
 
 });

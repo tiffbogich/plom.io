@@ -14,7 +14,6 @@ function SfrSimul(sfrSettings, divGraph_ts, divGraph_pred, vizSelector_ts, vizSe
 
   this.offsetHat = 1+sfrSettings.cst.N_PAR_SV*sfrSettings.cst.N_C*sfrSettings.cst.N_AC*3;
 
-  this.saved_graph_updater = graphD32();
 
   this.N_SIMUL = 0;
 
@@ -25,6 +24,8 @@ function SfrSimul(sfrSettings, divGraph_ts, divGraph_pred, vizSelector_ts, vizSe
 
   this.saved_cases = []; for(var i = this.N_TS; i--;) this.saved_cases.push(0);
   this.total_cases_no_intervention = []; for(var i = this.N_TS; i--;) this.total_cases_no_intervention.push(0);
+
+  this.saved_graph_updater = graphD32(this.saved_cases);
 
   this.states = [];
   this.indexDataClicked = 0;
@@ -105,8 +106,8 @@ SfrSimul.prototype.process_hat = function(msg){
         this.data_pred[n][1+this.N_TS+ts][j] = msg[this.offsetHat+ts*3+j];
       }
 
-      this.saved_cases[ts] += (this.data_pred[n][ts+1] - this.data_pred[n][this.N_TS+ts+1]);
-      this.total_cases_no_intervention[ts] += this.data_pred[n][ts+1];
+      this.saved_cases[ts] += (this.data_pred[n][1+ts][1] - this.data_pred[n][1+this.N_TS+ts][1]);
+      this.total_cases_no_intervention[ts] += this.data_pred[n][1+ts][1];
     }
 
   } else {
@@ -252,7 +253,7 @@ SfrSimul.prototype.makeGraphPred = function(divGraph, vizSelector){
 SfrSimul.prototype.updateiSettings = function(){
   //extend grouping, place hat values in guess and transform pop size into proportion...
 
-  var indexClicked= this.indexDataClicked-1; //to be fixed
+  var indexClicked= this.indexDataClicked-1;
 
   //get the population size at time t (pop_size_t)
 
@@ -300,7 +301,6 @@ SfrSimul.prototype.updateiSettings = function(){
     var pmax = Math.max.apply( Math, arrayify(par_object.max));
     var psd =  Math.min.apply( Math, arrayify(par_object.sd_transf));
 
-
     par_object = that.iSettings.parameters[par];
 
     par_object.guess = {};
@@ -335,11 +335,11 @@ SfrSimul.prototype.resetForecast = function(){
 };
 
 
-function graphD32(){
+function graphD32(data){
+  //data is an array of data in percent ([0-100]): e.g [10, 23.1, 9, 75]
 
   $('#dangerous-intervention').hide();
 
-  var data = [0,0]; //in percent ([0-100]): e.g 10, 23, 9, 75
   var margin = 15;
   var width = 300;
   var height = 15*data.length+margin;
@@ -434,7 +434,6 @@ function graphD32(){
 
   return function(newData){
 
-    newData = newData.slice(0,2); //DELETE THIS LINE AFTER HIV TUTO
     chart.selectAll("rect")
       .data(newData)
       .transition()
@@ -442,7 +441,7 @@ function graphD32(){
       .attr("width", safe_x)
       .style("fill", cols);
 
-    if(newData.some(function(el) {return (el < -2.0)})) { //NOTE: limit is 2% (should be 0 but numerical issues)
+    if(newData.some(function(el) {return (el < -5.0)})) { //NOTE: limit is 5% (should be 0 but numerical issues and stochastic)
       $('#dangerous-intervention').show();
     } else {
       $('#dangerous-intervention').hide();

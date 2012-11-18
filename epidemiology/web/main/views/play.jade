@@ -318,26 +318,26 @@ block content
             | Dangerous intervention !
 
 
-        //template for intervention parameters: will be rendered from the client side (using jadevu)
-        div#par_int
-          template(id='test'):                      
-            div //div is needed for jadevu but a pull request from visnup is pending
-              div.accordion#accordionIntervention
-                div.accordion-group
-                  div.accordion-heading
-                    a(data-toggle="collapse", data-parent="#accordionIntervention", href="#collapseIntervention").accordion-toggle Intervention Parameters
-                  div(id = "collapseIntervention", class="accordion-body in")
-          
-                    div.accordion-inner
-                      each par in par_int
-                        - par_int_values[par]['guess'].forEach(function(val, group) {
-                          div
-                            | <a href="#" data-placement="top" rel="tooltip" data-original-title="#{par_int_values[par]['description']}" class="sfrTooltip">#{par}</a> #{group} = <span id="caption___#{par}___#{group}">#{val}</span>
-                            input(type="hidden", name="intervention___#{par}___#{group}", value=val)
-                        
-                          div(id="slider___#{par}___#{group}").last
-                        - });
-          
+          div.accordion#accordionIntervention
+            div.accordion-group
+              div.accordion-heading
+                a(data-toggle="collapse", data-parent="#accordionIntervention", href="#collapseIntervention").accordion-toggle Intervention Parameters
+              div(id = "collapseIntervention", class="accordion-body in")
+
+                div.accordion-inner
+                  each el in orders.par_sv.concat(orders.par_proc, orders.par_obs)
+                    - if (('intervention' in  parameters[el]) && parameters[el]['intervention']) {      
+                      - partition[parameters[el]['partition_id']]['group'].forEach(function(group, i) {                  
+                        - var val = parameters[el]['guess'][group.id]; 
+                        div
+                          | <a href="#" data-placement="top" rel="tooltip" data-original-title="#{parameters[el]['comment']}" class="sfrTooltip">#{el}</a> (#{group.id}) = <span id="caption___#{el}___#{group.id}">#{val}</span>
+                          input(type="hidden", name="intervention___#{el}___#{group.id}", value=val)
+
+                        div(id="slider___#{el}___#{group.id}").last
+
+                      - })
+                     -}
+
 
         label(for="n_realisations_pred").control-label Nb of realisations: 
           input(type="text", id="n_realisations_pred", value=1).input-mini
@@ -377,27 +377,28 @@ block content
                           
   
                   each el in orders[id]
-                    table.table.table-condensed.table-tiny.table-parameters
-                      tr
-                        th.groupLabel: a(href="#", data-placement="top", rel="tooltip", data-original-title=parameters[el]['comment']).sfrTooltip #{el}
-                        th min
-                        th guess
-                        th max
-                        if cst.N_DATA
-                          th sd
-  
-                      - partition[parameters[el]['partition_id']]['group'].forEach(function(group, i) {                  
+                    - if (! ('intervention' in  parameters[el]) && ! parameters[el]['intervention']) {
+                      table.table.table-condensed.table-tiny.table-parameters
                         tr
-                          td.groupLabel #{group.id.split('__').slice(0,2).join(' ')}
-                          - var it = ['min', 'guess', 'max'];
-                          - if (cst.N_DATA) it.push('sd_transf');
-                          each prop in it
-                            td
-                              div.control-group 
-                                input(type="text", name="#{prop}___#{el}___#{group.id}", value=parameters[el][prop][group.id].toPrecision(4)).input-tiny.parameters
-                                span.help-inline !
-                      - })
-                     
+                          th.groupLabel: a(href="#", data-placement="top", rel="tooltip", data-original-title=parameters[el]['comment']).sfrTooltip #{el}
+                          th min
+                          th guess
+                          th max
+                          if cst.N_DATA
+                            th sd
+  
+                        - partition[parameters[el]['partition_id']]['group'].forEach(function(group, i) {                  
+                          tr
+                            td.groupLabel #{group.id.split('__').slice(0,2).join(' ')}
+                            - var it = ['min', 'guess', 'max'];
+                            - if (cst.N_DATA) it.push('sd_transf');
+                            each prop in it
+                              td
+                                div.control-group 
+                                  input(type="text", name="#{prop}___#{el}___#{group.id}", value=parameters[el][prop][group.id].toPrecision(4)).input-tiny.parameters
+                                  span.help-inline !
+                        - })
+                     -}
           mixin tabit('par_proc', 'Process Model Parameters')
           mixin tabit('par_sv', 'Initial Conditions')
           mixin tabit('par_obs', 'Observation Model Parameters')
