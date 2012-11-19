@@ -11,10 +11,12 @@ exports.play = function(req, res, next){
 
   var s = req.query.s || 'tutorial';
   var c = req.query.c || 'homogeneous-mixing';
-  var p = req.query.p || 'SI-g2R';
+  var p = req.query.p || ((s === 'tutorial') ? 'SI-g2R' : 'SIR-mHB2');
   var l = req.query.l || 'default';
 
+  console.log(req.query, s, c, p);
   var path_settings =  path.join(process.env['HOME'], 'demo', s, p, c, l, 'model', 'settings', 'settings.json');
+  console.log(path_settings);
 
   fs.readFile(path_settings, function (err, settings){
 

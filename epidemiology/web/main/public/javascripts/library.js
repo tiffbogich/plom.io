@@ -4,7 +4,7 @@ $(document).ready(function(){
 
   var storyId = $('#search').val();
 
-  $.getJSON('/play?', function(answer){
+  $.getJSON('/play?s=' + storyId, function(answer){
 
     var data = [];
 

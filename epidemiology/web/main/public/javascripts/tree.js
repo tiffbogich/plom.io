@@ -168,7 +168,7 @@ function sfr_tree($button, onModelClickCallback) {
           }
 
           if (plomGlobal.process !== mynode.parent.name){
-            onModelClickCallback(d.parent.name);
+            onModelClickCallback(mynode.parent.name);
           }
 
           plomGlobal.link = d.name;
@@ -178,7 +178,8 @@ function sfr_tree($button, onModelClickCallback) {
         } else {
 
           if (plomGlobal.process !== d.name){
-            onModelClickCallback(d.parent.name);
+            console.log(d.name);
+            onModelClickCallback(d.name);
           }
           plomGlobal.process = d.name;
 
