@@ -2,6 +2,13 @@ var plomGlobal = {link: null, context: null, process: null};
 
 $(document).ready(function(){
 
+
+  $('#submit-search').click(function(event){
+    event.preventDefault();
+    window.location.replace('/library?q=' + $('#search').val());
+  });
+
+
   var storyId = $('#search').val();
 
   $.getJSON('/play?s=' + storyId, function(answer){

@@ -26,7 +26,6 @@ exports.play = function(req, res, next){
     }
 
     settings = JSON.parse(settings);
-    describePar(settings);
 
     res.format({
       json: function(){
@@ -38,9 +37,22 @@ exports.play = function(req, res, next){
                   link: l});
 
       },
-      html: function(){
-        res.render('play', settings);
-      }
+        html: function(){
+
+          var path_process = path.join(process.env['HOME'], 'demo',  s, p, 'process.json');
+          fs.readFile(path_process, function (err, proc){
+
+            if(err){
+              next(err);
+              return;
+            }
+
+            proc = JSON.parse(proc);
+            describePar(settings, proc);
+            res.render('play', settings);
+          });
+
+        }
     });
   });
 

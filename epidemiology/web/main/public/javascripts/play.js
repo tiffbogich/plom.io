@@ -358,11 +358,10 @@ $(document).ready(function(){
         //not found
         return {};
       }
-      console.log(answer);
+
       var queue = [answer];
       //get SIR subtree
       var my  = breadthFirstSearch(plomGlobal.process);
-      console.log(plomGlobal.process, my);
 
       //get SIR/simple subtree
       var queue = [my];
@@ -370,7 +369,8 @@ $(document).ready(function(){
 
       d3.select("#plom-tree-graph")
         .datum(my)
-        .call(sfr_tree(null, function(){
+        .call(sfr_tree(null, function(link){
+          window.location.replace('/play?s=' + plomGlobal.story + '&c=' + plomGlobal.context + '&p=' + plomGlobal.process + '&l=' + link);
         }));
 
     });

@@ -2,7 +2,14 @@
  * add a comment property to the parameters dictionaries of settings.json
  */
 
-module.exports.describePar = function (settings) {
+module.exports.describePar = function (settings, proc) {
+
+  var proc_comments = {};
+  ['state', 'parameter'].forEach(function(el){
+    proc[el].forEach(function(par){
+      proc_comments[par.id] = par.comment || '';
+    });
+  });
 
   var units = {D:'days', W:'weeks', M:'months', Y:'years'};
   var constraints = {log: '(>0)', logit: '([0,1])'};
@@ -15,7 +22,7 @@ module.exports.describePar = function (settings) {
 
     var unit_string = ''
     , constraint_string = ''
-    , comment_string = settings['parameters'][p]['comment'] || '';
+    , comment_string = settings['parameters'][p]['comment'] || proc_comments[p];
 
     if(u){
       unit_string = (t === 'rate_as_duration') ? 'in ' : 'per ';
