@@ -1,15 +1,20 @@
 var fs = require('fs')
 , jade = require('jade')
 , jadevu = require('jadevu')
-, describePar = require('../lib/helper').describePar;
-
+, describePar = require('../lib/helper').describePar
+, path = require('path');
 
 /**
  *Serve PlomSettings in JSON or HTML
  */
 exports.play = function(req, res, next){
 
-  var path_settings = process.env['HOME'] + '/tutorial/settings/settings.json';
+  var s = req.query.s || 'tutorial';
+  var c = req.query.c || 'homogeneous-mixing';
+  var p = req.query.p || 'SI-g2R';
+  var l = req.query.l || 'default';
+
+  var path_settings =  path.join(process.env['HOME'], 'demo', s, p, c, l, 'model', 'settings', 'settings.json');
 
   fs.readFile(path_settings, function (err, settings){
 
@@ -23,7 +28,13 @@ exports.play = function(req, res, next){
 
     res.format({
       json: function(){
-        res.send(settings);
+
+        res.send({settings: settings,
+                  story: s,
+                  context: c,
+                  process: p,
+                  link: l});
+
       },
       html: function(){
         res.render('play', settings);
@@ -40,15 +51,22 @@ exports.index = function(req, res){
 
 
 exports.library = function(req, res){
-  res.render('library');
+  var q = req.query.q || 'tutorial';
+  res.render('library', {q:q});
 };
 
 
 exports.process = function (req, res, next) {
-  var path_process =   process.env['HOME'] + '/websites/simforence/simforence-population-based/simforence_model_builder/examples/hfmd/process.json';
-
-  fs.createReadStream(path_process).pipe(res);
+  var path_process = path.join(process.env['HOME'], 'demo',  req.query.s, req.query.p, 'process.json');
+  console.log(path_process);
+  res.sendfile(path_process);
 }
+
+
+exports.tree = function (req, res, next) {
+  var path_tree =  path.join(process.env['HOME'], 'demo',  req.query.q, 'tree.json');
+  res.sendfile(path_tree);
+};
 
 
 //exports.test = function(req, res){
@@ -56,72 +74,3 @@ exports.process = function (req, res, next) {
 ////    console.log(t);
 //    res.send(t);
 //};
-
-exports.tree = function (req, res, next) {
-
-  var tree = {
-    "name": "SI",
-    "type": "model",
-    "children": [
-      {
-        "name": "Simple",
-        "type": "context",
-        "children": [
-          {
-            "name": "link 1",
-            "type": "link",
-            "privacy": "public",
-            "children": [
-              {"name": "link 2", "type": "link"},
-              {"name": "link 3", "type": "link"},
-              {"name": "link 4", "type": "link"}
-            ]
-          },
-          {
-            "name": "link5",
-            "type": "link",
-            "privacy": "public",
-            "children": [
-              {"name": "link 6", "type": "link"},
-              {"name": "link 7", "type": "link"}
-            ]
-          }
-        ]
-      },
-      {
-        "name": "Age",
-        "type": "context",
-        "children": [
-          {
-            "name": "link13",
-            "type": "link",
-            "children": [
-              {"name": "link 8",
-               "type": "link",
-               "children": [
-                 {"name": "link 9", "type": "link"}
-               ]},
-              {"name": "link 10", "type": "link"}
-            ]
-          },
-          {"name": "link 11", "type": "link"},
-          {"name": "link 12", "type": "link"}
-        ]
-      },
-      {
-        "name": "SIR",
-        "type": "model",
-        "children": [{"name": "Simple", "type": "context", "children":[
-          {"name": "link 19", "type": "link"}
-        ]},
-                     {
-                       "name": "Vaccination",
-                       "type": "intervention"
-                     }
-                    ]
-      }
-    ]
-  }
-
-  res.send(tree);
-};

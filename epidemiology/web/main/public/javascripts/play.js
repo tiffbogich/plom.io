@@ -1,4 +1,4 @@
-var plomGlobal = {'modelId':'tutorial',
+var plomGlobal = {'modelId':null,
                  'consoleCounter':0,
                  'intervalId': [],
                  'canRun':true}
@@ -317,33 +317,65 @@ function updateSfrSettings(sfrSettings, $this) {
 $(document).ready(function(){
 
   ////////////////////////////////////////////////////////////////////////////////////////
-  //get the process.json from the server!
-  ////////////////////////////////////////////////////////////////////////////////////////
-  var qs = window.location.search;
-  $.getJSON('/process', function(answer){
-    sfrGraphModel(answer, '#plom-graph-model');
-  });
-
-  $.getJSON('/tree', function(answer){
-
-    d3.select("#plom-tree-graph")
-      .datum(answer)
-      .call(sfr_tree(null, function(){
-      }));
-
-  });
-
-
-
-
-
-  ////////////////////////////////////////////////////////////////////////////////////////
   //get the settings.json from the server!
   ////////////////////////////////////////////////////////////////////////////////////////
+  $.getJSON('/play' + window.location.search, function(answer){
+
+    var sfrSettings = answer.settings;
+    plomGlobal.story = answer.story;
+    plomGlobal.context = answer.context;
+    plomGlobal.process = answer.process;
+    plomGlobal.link = answer.link;
+    plomGlobal.modelId = ['demo', plomGlobal.story, plomGlobal.process, plomGlobal.context, plomGlobal.link, 'model'].join('/');
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //get the process.json from the server!
+    ////////////////////////////////////////////////////////////////////////////////////////
+
+    $.getJSON('/process?s='+plomGlobal.story + '&p='+plomGlobal.process, function(answer){
+      sfrGraphModel(answer, '#plom-graph-model');
+    });
+
+    $.getJSON('/tree?q='+plomGlobal.story, function(answer){
+
+      function breadthFirstSearch(my) {
+
+        while (queue.length) {
+          var node = queue.shift();
+
+          if (node.name === my) {
+            //found!
+            return node;
+          } else {
+            if (node.children) {
+              node.children.forEach(function(el){
+                queue.push(el);
+              });
+            }
+          }
+        }
+
+        //not found
+        return {};
+      }
+      console.log(answer);
+      var queue = [answer];
+      //get SIR subtree
+      var my  = breadthFirstSearch(plomGlobal.process);
+      console.log(plomGlobal.process, my);
+
+      //get SIR/simple subtree
+      var queue = [my];
+      var my  = breadthFirstSearch(plomGlobal.context);
+
+      d3.select("#plom-tree-graph")
+        .datum(my)
+        .call(sfr_tree(null, function(){
+        }));
+
+    });
 
 
-  $.getJSON('/play', function(answer){
-    var sfrSettings = answer;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -780,9 +812,6 @@ $(document).ready(function(){
         sfrSimul.saved_graph_updater([0,0,0,0]);
       }
     });
-
-
-
 
     ////////////////////////////////////////////////////////////////////////////////////////
     // INTERVENTION

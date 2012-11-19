@@ -25,16 +25,17 @@ circle {
   stroke-width: 1.5px;
 }
 
+
+circle.erlang {
+  fill: rgb(253,254,133);
+}
+
 circle.infector {
   fill: #f15b22;
 }
 
 circle.source {
   fill: #6ba5c5;
-}
-
-circle.Erlang {
-  fill: blue;
 }
 
 circle.DU {

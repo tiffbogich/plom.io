@@ -2,7 +2,7 @@ var sfr_horizon = function(data){
 
     var margin = {top: 0, right: 20, bottom: 0, left: 20},
     width = 580 - margin.right - margin.left,
-    height = 100 - margin.top - margin.bottom;
+    height = 60 - margin.top - margin.bottom;
 
     var medians = [];
     data.forEach(function(d, i){

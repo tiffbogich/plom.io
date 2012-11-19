@@ -1,5 +1,5 @@
 function sfr_tree($button, onModelClickCallback) {
-  var margin = {top: 20, right: 80, bottom: 20, left: 80},
+  var margin = {top: 20, right: 90, bottom: 20, left: 110},
   duration = 500;
 
   var myStyle = {model: {r:15.5, color: '#f15b22'},   //'#b4469a'},
@@ -146,7 +146,7 @@ function sfr_tree($button, onModelClickCallback) {
           $button && $button.addClass('disabled');
 
           if (plomGlobal.process !== d.parent.name){
-            onModelClickCallback();
+            onModelClickCallback(d.parent.name);
           }
           plomGlobal.process = d.parent.name;
 
@@ -156,7 +156,7 @@ function sfr_tree($button, onModelClickCallback) {
           $button && $button.addClass('disabled');
 
           if (plomGlobal.process !== d.parent.name){
-            onModelClickCallback();
+            onModelClickCallback(d.parent.name);
           }
           plomGlobal.process = d.parent.name;
 
@@ -168,7 +168,7 @@ function sfr_tree($button, onModelClickCallback) {
           }
 
           if (plomGlobal.process !== mynode.parent.name){
-            onModelClickCallback();
+            onModelClickCallback(d.parent.name);
           }
 
           plomGlobal.link = d.name;
@@ -178,7 +178,7 @@ function sfr_tree($button, onModelClickCallback) {
         } else {
 
           if (plomGlobal.process !== d.name){
-            onModelClickCallback();
+            onModelClickCallback(d.parent.name);
           }
           plomGlobal.process = d.name;
 
