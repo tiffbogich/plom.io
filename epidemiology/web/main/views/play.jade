@@ -78,7 +78,7 @@ block content
           if cst.N_DATA
             //simplex
             div.tab-pane#tab-graph-simplex
-              div#graphSimplex.chartdiv            
+              div#graphSimplex.chartdiv
   
               mixin tickitAllpar(id_prefix, plot_class, last_name, class_tick)
                 //parameters (and groups...)
@@ -104,7 +104,7 @@ block content
             //pMCMC
             div.tab-pane#tab-graph-pmcmc
 
-              div#graphBestPmcmc.chartdiv            
+              div#graphBestPmcmc.chartdiv
 
               div.ticks
                 mixin tickitAllpar('parBestPmcmc', 'plottedParBestPmcmc', 'log likelihood', 'sfr-tick-bestpmcmc')
@@ -122,7 +122,7 @@ block content
             //MIF
             div.tab-pane#tab-graph-mif
 
-              div#graphBestMif.chartdiv            
+              div#graphBestMif.chartdiv
 
               div.ticks
                 mixin tickitAllpar('parBestMif', 'plottedParBestMif', 'log likelihood', 'sfr-tick-bestmif')
@@ -161,7 +161,7 @@ block content
 
 
           //Forecasting
-          div.tab-pane#tab-graph-forecasting.cursorSeringue
+          div.tab-pane#tab-graph-forecasting
             div#graphPred.chartdiv
             mixin tickTs('pred', 'plottedPred', 'sfr-tick-pred')
 

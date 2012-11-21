@@ -75,6 +75,9 @@ h3.simul{
     cursor: url("/images/seringue3.png"), pointer;
 }
 
+.cursorPointer{
+  cursor: pointer;
+}
 
 .chart rect {
   stroke: white;

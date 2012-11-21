@@ -78,12 +78,12 @@ def fill_default_params(values, par_sv, par_proc, par_obs):
 
         if 'sd_transf' not in values[k]:
             if isinstance(values[k]['guess'], dict):
-                values[k]['sd_transf'] = {group:0 for group in  values[k]['guess']}
+                values[k]['sd_transf'] = {group:0.0 for group in  values[k]['guess']}
             else:
                 values[k]['sd_transf'] = 0.0
 
         if 'partition_id' not in values[k]:
-            values[k]['partition_id'] = 'identical_' + 'population' if i < N_SV_PROC else 'time_series'
+            values[k]['partition_id'] = 'identical_' + ('population' if i < N_SV_PROC else 'time_series')
 
         if 'prior' not in values[k]:
             values[k]['prior'] = 'uniform'
@@ -306,8 +306,9 @@ class Model(Context, Ccoder):
 
         if not django_settings.configured:
             django_settings.configure(TEMPLATE_DIRS = (self.path_rendered,), DEBUG = False, FILE_CHARSET = 'utf-8')
-        elif not django_settings.TEMPLATE_DIRS:
-            django_settings.TEMPLATE_DIRS = (self.path_rendered,)
+
+        #elif not django_settings.TEMPLATE_DIRS:
+        django_settings.TEMPLATE_DIRS = (self.path_rendered,)
 
 
         is_drift = True if len(self.drift_var) > 0 else False

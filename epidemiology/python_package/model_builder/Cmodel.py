@@ -81,7 +81,9 @@ class Cmodel:
         ##list [{'id':'X'}, ...] => ['X', ...]
         self.par_sv = self.expand_par_sv([x['id'] for x in process['state']], process['model'])
 
-        self.par_fixed = [x['id'] for x in context['data'] if x['id'] != 'data' and x['id'] != 'prop']
+        self.par_fixed = []
+        if 'data' in context:
+            self.par_fixed = [x['id'] for x in context['data'] if x['id'] != 'data' and x['id'] != 'prop']
 
         ##remove par_fixed from par_proc and par_obs (be sure to conserve the original order so don't use set')
         self.par_proc = [x['id'] for x in process['parameter'] if x['id'] not in self.par_fixed]
