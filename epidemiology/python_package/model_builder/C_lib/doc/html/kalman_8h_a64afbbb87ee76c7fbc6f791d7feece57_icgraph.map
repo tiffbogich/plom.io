@@ -1,8 +1,0 @@
-<map id="ekf_update" name="ekf_update">
-<area shape="rect" id="node3" href="$kalman_8h.html#a5380c92e14bb079aa318516ccb39b95d" title="run_kalman" alt="" coords="141,57,232,85"/>
-<area shape="rect" id="node5" href="$kmcmc_8c.html#a8cb5c14f1653139f957ee74ad7c1890b" title="kmcmc" alt="" coords="312,5,376,33"/>
-<area shape="rect" id="node9" href="$kalman_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="319,57,369,85"/>
-<area shape="rect" id="node11" href="$simplex__kalman_8c.html#ab9d851a5cef109a6e42ad6395869e442" title="f_simplex_kalman" alt="" coords="280,109,408,137"/>
-<area shape="rect" id="node7" href="$kmcmc__main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="456,5,506,33"/>
-<area shape="rect" id="node13" href="$simplex__kalman_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="456,109,506,137"/>
-</map>

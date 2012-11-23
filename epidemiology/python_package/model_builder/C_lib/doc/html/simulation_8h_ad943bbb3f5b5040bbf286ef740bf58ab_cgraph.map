@@ -1,6 +1,0 @@
-<map id="lyapunov" name="lyapunov">
-<area shape="rect" id="node3" href="$lyap__template_8c.html#a874658f2789a2a3394421b44ba605afc" title="func_lyap" alt="" coords="174,5,253,33"/>
-<area shape="rect" id="node5" href="$lyap__template_8c.html#a87b1b58aa3e2f7d0b1c4ae5f1c154b0c" title="gram_schmidt_normalize" alt="" coords="128,57,298,85"/>
-<area shape="rect" id="node7" href="$print_8c.html#a36a59d4eaf7353fbcbebe04b7674fbb9" title="sfr_fopen" alt="" coords="175,109,252,137"/>
-<area shape="rect" id="node9" href="$print_8c.html#ac5a6a9eb93a0fe8b63323e176cb833fa" title="sfr_fclose" alt="" coords="174,161,253,189"/>
-</map>

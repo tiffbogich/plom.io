@@ -1,9 +1,0 @@
-<map id="max_min" name="max_min">
-<area shape="rect" id="node3" href="$print_8c.html#a36a59d4eaf7353fbcbebe04b7674fbb9" title="sfr_fopen" alt="" coords="135,5,212,33"/>
-<area shape="rect" id="node5" href="$bif_8c.html#a2bc6690b9d369a956c5193c538f63b29" title="get_min" alt="" coords="266,83,334,111"/>
-<area shape="rect" id="node7" href="$bif_8c.html#aaf73493c2d2cade2a87629b4d7c63597" title="get_max" alt="" coords="264,187,336,215"/>
-<area shape="rect" id="node9" href="$bif_8c.html#af9d94bb9b44ce54765586d91a3692141" title="b_max" alt="" coords="143,109,204,137"/>
-<area shape="rect" id="node12" href="$observation__template_8c.html#a1d484c335972926114446d6936131756" title="obs_mean" alt="" coords="132,213,215,241"/>
-<area shape="rect" id="node14" href="$bif_8c.html#aad894eb7f74dae94bf316cae7caa647c" title="b_min" alt="" coords="145,265,202,293"/>
-<area shape="rect" id="node17" href="$print_8c.html#ac5a6a9eb93a0fe8b63323e176cb833fa" title="sfr_fclose" alt="" coords="134,317,213,345"/>
-</map>

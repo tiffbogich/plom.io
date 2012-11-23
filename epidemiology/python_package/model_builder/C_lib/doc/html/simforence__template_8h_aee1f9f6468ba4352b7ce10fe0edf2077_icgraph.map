@@ -1,6 +1,0 @@
-<map id="run_SMC" name="run_SMC">
-<area shape="rect" id="node3" href="$smc_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="151,5,201,33"/>
-<area shape="rect" id="node5" href="$pmcmc_8h.html#a296c56b63272b17e71d6ba2e9c0da213" title="run_propag" alt="" coords="131,57,221,85"/>
-<area shape="rect" id="node7" href="$pmcmc_8h.html#a053cabb4dfa2edfbcb6deabb418b032e" title="pMCMC" alt="" coords="270,57,340,85"/>
-<area shape="rect" id="node9" href="$pmcmc_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="390,57,440,85"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="f_prediction_with_drift_deter" name="f_prediction_with_drift_deter">
-<area shape="rect" id="node3" href="$drift_8c.html#abf2c1f2aec02306e069aa7cc5d48052a" title="compute_drift" alt="" coords="224,5,326,33"/>
-<area shape="rect" id="node5" href="$drift_8c.html#ab4f7cde349019c2f2134990fb098015c" title="drift_par" alt="" coords="240,57,310,85"/>
-<area shape="rect" id="node7" href="$core_2prediction__template_8c.html#a566c08a98db726fe43c5135c98e3bab3" title="f_prediction_ode_rk" alt="" coords="205,109,344,137"/>
-<area shape="rect" id="node9" href="$print_8c.html#ac37aabaddd82f7fb577609b2d06dd80f" title="print_err" alt="" coords="393,109,463,137"/>
-</map>

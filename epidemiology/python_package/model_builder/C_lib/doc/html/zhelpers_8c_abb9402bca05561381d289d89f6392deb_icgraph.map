@@ -1,8 +1,0 @@
-<map id="send_int" name="send_int">
-<area shape="rect" id="node3" href="$smc_8c.html#aa085c397f91f5e39a59340866246f4a4" title="run_SMC_zmq" alt="" coords="126,5,236,33"/>
-<area shape="rect" id="node11" href="$worker_2main_8c.html#ab46f874e0c6e5cf5815c864708f13bcf" title="worker_routine" alt="" coords="127,57,236,85"/>
-<area shape="rect" id="node5" href="$pmcmc_8h.html#a296c56b63272b17e71d6ba2e9c0da213" title="run_propag" alt="" coords="286,5,375,33"/>
-<area shape="rect" id="node7" href="$pmcmc_8h.html#a053cabb4dfa2edfbcb6deabb418b032e" title="pMCMC" alt="" coords="425,5,495,33"/>
-<area shape="rect" id="node9" href="$pmcmc_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="544,5,594,33"/>
-<area shape="rect" id="node13" href="$worker_2main_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="306,57,356,85"/>
-</map>
