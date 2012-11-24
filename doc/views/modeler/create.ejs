@@ -119,8 +119,8 @@
 
 <pre class="prettyprint">
 {
- "meta": {"id": "SIR",
-          "comment": "SIR model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term"},
+ "id": "SIR",
+ "comment": "SIR model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term",
 
  "state": [{"id": "S", "comment": "Susceptible"},
            {"id": "I", "comment": "Infectious"}],
@@ -166,12 +166,14 @@
     <h4>Meta information</h4>
     <ul>
       <li>
-        <code>meta</code>: An optional description.
+        <code>id</code>: The name of the process model (optional).
+      </li>
+      <li>
+        <code>comment</code>: An optional description.
       </li>
     </ul>
 
-    <p>Note: the <code><strong>meta</strong></code> object and the
-      <code>comment</code> properties are optional.</p>
+    <p>Note: All the <code>comment</code> properties are optional.</p>
 
     <h4>State variable and parameters</h4>
     <ul>
@@ -696,8 +698,8 @@ write(toJSON(m, collapse=''), file="model.json")
 
 <pre class="prettyprint">
 {
- "meta": {"id": "my_fake_context",
-          "comment": "A fake context from the real life"},
+ "id": "my_fake_context",
+ "comment": "A fake context from the real life",
  
  "population": [{"id": "city1__all",
                  "size_t0": 1e6,
@@ -878,8 +880,8 @@ write(toJSON(m, collapse=''), file="model.json")
 
 <pre class="prettyprint">
 {
-"meta": {"id": "SIR+my_fake_context",
-         "comment": "hopefully this can be templated"},
+ "id": "SIR+my_fake_context",
+ "comment": "hopefully this can be templated",
 
 "observed": [
     {"id": "prev", "comment":"prevalence",

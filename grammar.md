@@ -1,15 +1,16 @@
 plom.io/epidemiology grammar
 ==================
 
-- `meta` objects are optional.
+- `id` properties at the root of context, process and link objects are
+  optional.
 - `comment` properties are optional and can be placed anywhere
 
 context.json
 ============
 
     {
-     "meta": {"id": "my_id",
-              "comment": "my comment"},
+     "id": "my_id",
+     "comment": "my comment",
     
      "population": [{"id": "city1__all",
                      "size_t0": 1e6,
@@ -70,8 +71,8 @@ process.json
 ==========
 
     {
-     "meta": {"id": "SIR",
-              "comment": "SIR model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term"},
+     "id": "SIR",
+     "comment": "SIR model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term",
     
      "state": [{"id": "S", "comment": "Susceptible"},
                {"id": "I", "comment": "Infectious"}],
@@ -120,8 +121,8 @@ link.json
 =========
 
     {
-     "meta": {"id": "my_id",
-              "comment": "my comment"},
+     "id": "my_id",
+     "comment": "my comment",
     
      "observed": [{"id": "prev", "comment":"prevalence",
                    "definition": ["I"],

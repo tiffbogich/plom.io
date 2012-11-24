@@ -575,7 +575,7 @@ json.dump(m, open('model.json', 'w'))
 
 <pre class="prettyprint">
 { 
- "meta": {"id": "lhs_simplex"}
+ "id": "lhs_simplex",
 
  "action": {"id": "lhs",
             "H": 120,
@@ -723,7 +723,7 @@ plom --slice smc -J 1 -H 100 --cluster SGE -o slice_deter.json
 import json
 d = json.load(open('lhs_simplex.json'))
 
-d['meta']['id'] = 'lhs_mif'
+d['id'] = 'lhs_mif'
 
 d['cmd'] = [['D', '-S e:guess:all:0.0', 'simul deter -T 100000'],
             ['DX',
