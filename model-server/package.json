@@ -1,0 +1,16 @@
+{
+  "name": "model-server",
+  "version": "0.0.0",
+  "description": "A server for plom-sfi models",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "Sebastien Ballesteros",
+  "license": "GPLv3",
+  "dependencies": {
+    "connect": "~2.7.0",
+    "csv2array": "0.0.1"
+  }
+}
