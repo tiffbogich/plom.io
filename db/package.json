@@ -1,0 +1,21 @@
+{
+  "name": "plom-db",
+  "version": "0.0.0",
+  "description": "mongodb components of plom.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plom/plom.io.git"
+  },
+  "author": "Sebastien Ballesteros",
+  "license": "GPLv3",
+  "dependencies": {
+    "underscore": "~1.4.2",
+    "mongodb": "~1.2.2",
+    "bcrypt": "~0.7.3",
+    "natural": "~0.1.18"
+  }
+}
