@@ -1,16 +1,20 @@
-plom.io/epidemiology grammar
+plom.io/epidemiology layered grammar
 ==================
 
-- `id` properties at the root of context, process and link objects are
-  optional.
 - `comment` properties are optional and can be placed anywhere
+
+4 components:
+ - context.json
+ - process.json
+ - link.json
+ - theta.json
 
 context.json
 ============
 
     {
-     "id": "my_id",
-     "comment": "my comment",
+     "name": "my_context",
+     "description": "my description",
     
      "population": [{"id": "city1__all",
                      "size_t0": 1e6,
@@ -18,7 +22,12 @@ context.json
                     {"id": "city2__all",
                      "size_t0": 1e5,
                      "comment": "city 2, all age classes"}],
-    
+
+     "model": {"space": {"type": ["external"]},
+               "age": {}},
+
+     "disease": ["Disease name"],
+
      "time_series": [{"id": "all__CDC__inc",
                       "population_id": ["city1__all", "city2__all"],
                       "comment": ""},
@@ -31,7 +40,7 @@ context.json
                      {"id": "all__google__inc",
                       "population_id": ["city1__all", "city2__all"],
                       "comment": ""}],
-    
+
      "frequency": "W",
     
      "data": [{"id": "data",
@@ -50,10 +59,8 @@ context.json
                "comment": "birth rates"},
               {"id": "mu_d",
                "source": "data/mu_d.csv",
-               "comment": "death rates"}],
+               "comment": "death rates"}]
     
-     "model": {"space": {"type": ["external"]},
-               "age": {}}
      }
 
 
@@ -61,18 +68,22 @@ in `data` 2 objects are mandatory:
  - `{"id": "data", ...}` 
  - `{"id": "prop", ...}`
 
+`source` is a path to a csv or a native JSON array of array whose
+first row is an header and first column is a date. Missing values are
+represented as `null`.
+
 frequency is either (same notation are used for parameter unit in link):
-- `D`
-- `W`
-- `M`
-- `Y`
+ - `D`
+ - `W`
+ - `M`
+ - `Y`
 
 process.json
 ==========
 
     {
-     "id": "SIR",
-     "comment": "SIR model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term",
+     "name": "SIR",
+     "description": "SIR model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term",
     
      "state": [{"id": "S", "comment": "Susceptible"},
                {"id": "I", "comment": "Infectious"}],
@@ -121,8 +132,8 @@ link.json
 =========
 
     {
-     "id": "my_id",
-     "comment": "my comment",
+     "name": "my link",
+     "description": "my description",
     
      "observed": [{"id": "prev", "comment":"prevalence",
                    "definition": ["I"],
@@ -139,12 +150,27 @@ link.json
      
      "model": {"distribution": "discretized_normal",
                "mean": "prop*rep*x",
-               "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"},
+               "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"}
+    }
+
+
+
+
+observation models (`model`):
+- `discretized_normal`
+
+
+theta.json
+=========
+
+    {
+     "name": "my parameters",
+     "description": "my description",
 
      "partition": {"data_stream": {"group": [{"id": "CDC",    "time_series_id": ["all__CDC__inc", "city1__CDC__prev", "city2__CDC__inc"]},
                                              {"id": "google", "time_series_id": ["all__google__inc"]}],
                                    "comment": "split by data stream"}},
-
+    
      "value": {"S": {"partition_id": "variable_population", "transformation": "logit",
                       "min":   {"city1__all": 0.01, "city2__all": 0.01},
                       "guess": {"city1__all": 0.06, "city2__all": 0.07},
@@ -183,7 +209,3 @@ have an well defined order for the groups (not necessarily useful but we never k
 - 'variable_time_series'
 - 'identical_population'
 - 'identical_time_series'
-
-
-observation models (`model`):
-- `discretized_normal`

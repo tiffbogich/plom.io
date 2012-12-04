@@ -15,7 +15,6 @@
   "dependencies": {
     "underscore": "~1.4.2",
     "mongodb": "~1.2.2",
-    "bcrypt": "~0.7.3",
     "natural": "~0.1.18"
   }
 }
