@@ -189,7 +189,7 @@ PlomTrees.prototype.insertComponentAt = function(component, tree_idString , pare
 
             if(doc){
               node['_id'] = component['_id'];
-              trees.update({_id:new ObjectID(tree_idString)}, {$addToSet: {node: node}}, {safe:true}, function(err){
+              trees.update({_id: new ObjectID(tree_idString)}, {$addToSet: {node: node}}, {safe:true}, function(err){
                 if(err) return callback(err);
                 callback(err, doc);
               });
@@ -207,7 +207,7 @@ PlomTrees.prototype.insertComponentAt = function(component, tree_idString , pare
 
             if(docs.length){
               node['_id'] = docs[0]['_id'];
-              trees.update({_id:new ObjectID(tree_idString)}, {$addToSet: {node: node}}, {safe:true}, function(err){
+              trees.update({_id: new ObjectID(tree_idString)}, {$addToSet: {node: node}}, {safe:true}, function(err){
                 if(err) return callback(err);
                 callback(err, docs[0]);
               });
@@ -217,6 +217,8 @@ PlomTrees.prototype.insertComponentAt = function(component, tree_idString , pare
 
         }
 
+      } else {
+        return callback(new Error('invalid insertion'));
       } //end if is_good
 
     } //end if parent

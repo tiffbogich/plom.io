@@ -1,10 +1,7 @@
 var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
-  , http = require('http')
-  , path = require('path')
-  , mongodb = require('mongodb')
-  , bcrypt = require('bcrypt');
+  , path = require('path');
 
 var app = express();
 
@@ -23,8 +20,6 @@ app.configure(function(){
 
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
-
-
 });
 
 app.configure('development', function(){
@@ -36,7 +31,6 @@ app.configure('development', function(){
 var csrf = require('./lib/middleware').csrf
   , secure = require('./lib/middleware').secure;
 
-
 app.get('/', secure, routes.index);
 app.get('/login', csrf, user.login);
 app.get('/success', function(req, res, next){res.send("authenticated");});
@@ -46,19 +40,4 @@ app.get('/register', csrf, user.register);
 app.post('/login', csrf, user.login_post);
 app.post('/register', csrf, user.register_post);
 
-var server = http.createServer(app);
-
-var db = exports.db = new mongodb.Db('plom', new mongodb.Server("127.0.0.1", 27017), {safe:true});
-db.open(function (err, client) {
-
-  if (err) throw err;
-  console.log("Connected to mongodb");
-
-  //store ref to the collection so that it is easily accessible (app is accessible in req and res!)
-  app.set('users',  new mongodb.Collection(client, 'users'));
-
-  server.listen(app.get('port'), function(){
-    console.log("Express server listening on port " + app.get('port'));
-  });
-
-});
+module.exports = app;

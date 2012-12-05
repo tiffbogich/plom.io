@@ -12,6 +12,8 @@ Validator.prototype.getErrors = function () {
 
 
 exports.login = function(req, res) {
+  console.log(req.query.next);
+
   res.render('login', {username: req.query.username,
                        loggin_required: req.query.loggin_required,
                        next: req.query.next});

@@ -1,7 +1,3 @@
-/**
- * Module dependencies.
- */
-
 var express = require('express')
   , http = require('http')
   , routes = require('./routes');
@@ -38,4 +34,4 @@ app.get('/doc/modeler/hfmd', routes.modeler.hfmd);
 app.get('/doc/modeler/h1n1', routes.modeler.h1n1);
 app.get('/doc/modeler/refs', routes.modeler.refs);
 
-module.exports = http.createServer(app);
+module.exports = app;

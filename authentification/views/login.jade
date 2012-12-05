@@ -3,7 +3,8 @@ extends layout
 block content 
 
   if('fail' in locals)
-    p #{fail}
+    div.alert.alert-error
+      | #{fail}
 
 
   if(locals.loggin_required)

@@ -29,27 +29,33 @@ db.open(function (err, client) {
 
                 ptrees.insertComponentAt({name:"SIR", description: "SIR model with birth and death", type: "process"}, doc._id.toString(),  doc.node[0]._id.toString(), function(err){
                   if (err) throw err;
-                  ptrees.insertComponentAt({name:"SEIR", description: "exposed class", type: "process"}, doc._id.toString(),  doc.node[0]._id.toString(), function(err){
+                  ptrees.insertComponentAt({name:"SEIR", description: "exposed class", type: "process"}, doc._id.toString(),  doc.node[0]._id.toString(), function(err, doc2){
                     if (err) throw err;
 
-                    ptrees.search("SEIR", function(err, cursor){
-                      cursor.each(function(err, doc){
+
+                    //insert link
+                    ptrees.insertComponentAt({name:"link1", description: "binomial obs process", type: "link"}, doc._id.toString(),  doc2._id.toString(), function(err){
+                      if (err) throw err;
+
+                      ptrees.search("SEIR", function(err, cursor){
+                        cursor.each(function(err, doc){
+                          if(doc){
+                            console.log('tree: ');
+                            console.log(doc);
+                            console.log('\n');
+                          }
+                        });
+                      });
+
+                      ptrees.findComponents("binomial").each(function(err, doc){
                         if(doc){
-                          console.log('tree: ')
+                          console.log('component: ');
                           console.log(doc);
-                          console.log('\n')
+                          console.log('\n');
                         }
                       });
-                    });
 
-                    ptrees.findComponents("exposed").each(function(err, doc){
-                      if(doc){
-                        console.log('component: ')
-                        console.log(doc);
-                        console.log('\n')
-                      }
                     });
-
                   });
                 });
 

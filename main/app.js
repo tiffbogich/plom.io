@@ -3,10 +3,16 @@
  */
 
 var express = require('express')
-, routes = require('./routes')
-, fs = require('fs')
-, http = require('http')
-, sfrWsServer = require('../ws-server/plomWsServer');
+  , routes = require('./routes')
+  , fs = require('fs')
+  , http = require('http')
+  , mongodb = require('mongodb')
+  , sfrWsServer = require('../ws-server/plomWsServer')
+  , plomAuth = require('../authentification/app')
+  , csrf = require('../authentification/lib/middleware').csrf
+  , is_logged_in = require('../authentification/lib/middleware').is_logged_in
+  , secure = require('../authentification/lib/middleware').secure;
+
 
 var app = express();
 
@@ -17,13 +23,22 @@ app.configure(function(){
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(app.router);
+
   app.use(express.cookieParser());
+  app.use(express.methodOverride());
   app.use(express.session({ secret: 'my secret'}));
+
+  app.use(is_logged_in);
+  app.use(app.router);
+
   app.use(express.static(__dirname + '/public'));
 
   //documentation website
   app.use(require('../doc/app'));
+
+  //authentification
+  app.use(plomAuth);
+
 });
 
 
@@ -42,8 +57,8 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
-app.get('/play', routes.play);
-app.get('/library', routes.library);
+app.get('/play', secure, routes.play);
+app.get('/library', secure, routes.library);
 app.get('/process', routes.process);
 app.get('/tree', routes.tree);
 
@@ -51,14 +66,30 @@ app.get('/tree', routes.tree);
 //app.get('/test', routes.test);
 
 
-// Listen
-var server  = module.exports = http.createServer(app);
-server.listen(3000, function(){
-  console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
+var server = http.createServer(app);
+var db = new mongodb.Db('plom', new mongodb.Server("127.0.0.1", 27017), {safe:true});
+db.open(function (err, client) {
+
+  if (err) throw err;
+  console.log("Connected to mongodb");
+
+  //store ref to the collection so that it is easily accessible (app is accessible in req and res!)
+  app.set('users',  new mongodb.Collection(client, 'users'));
+
+  server.listen(3000, function(){
+    console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
+  });
+
+  //attach socket.io
+  sfrWsServer.listen(server);
+
 });
 
-//attach socket.io
-sfrWsServer.listen(server);
+
+
+
+
+
 
 
 

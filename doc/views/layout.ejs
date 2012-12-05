@@ -37,8 +37,12 @@
         </ul>
 
         <ul class="nav pull-right">
-          <li> <a href="#">Login</a> </li>
-          <li> <a href="#">Sign up</a> </li>
+          <% if(locals.is_logged_in) { %>
+          <li> <a href="/logout">Logout</a> </li>
+          <% } else { %>
+          <li> <a href="/login">Login</a> </li>
+          <li> <a href="/register">Register</a> </li>
+          <% } %>
         </ul>
 
       </div>
