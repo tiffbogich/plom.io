@@ -28,47 +28,46 @@ block content
 
 
 
-    if results.length
-      div.span7
-        div.btn-toolbar.plom-toolbar
-          div.btn-group
-            button.btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
-    
-          div.btn-group
-            button(data-toggle="button").btn.btn-small <i class="icon-random"></i> Fork
-            button(data-toggle="button").btn.btn-small <i class="icon-plus"></i> Attach
-    
-          div.btn-group
-            button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
+
+    div.span7#tree.hidden
+      div.btn-toolbar.plom-toolbar
+        div.btn-group
+          button.btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
+  
+        div.btn-group
+          button(data-toggle="button").btn.btn-small <i class="icon-random"></i> Fork
+          button(data-toggle="button").btn.btn-small <i class="icon-plus"></i> Attach
+  
+        div.btn-group
+          button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
 
 
-        div#plom-tree-graph
+      div#plom-tree-graph
           
   
-  if results.length  
+  div#model.row.hidden
     hr
-    div.row
-      div.span8
-        div.row  
-          div.span7#plom-horizon-control
-            div.btn-toolbar
-              div(data-toggle="buttons-checkbox").btn-group
-                button(type="button").btn.btn-small#plom-substact-median Substract median
-      
-              div(data-toggle="buttons-radio").btn-group#plom-change-mode
-                button.btn.btn-small Mirror
-                button.btn.btn-small Offset
-  
-              div.btn-group#plom-add-band
-                button.btn.btn-small Add Band
-                button.btn.btn-small Remove Band
-   
-        div.row
-          div#plom-horizon-graph
-  
-      div.span4   
-        div
-          div#plom-detail-description
+    div.span8
+      div.row  
+        div.span7#plom-horizon-control
+          div.btn-toolbar
+            div(data-toggle="buttons-checkbox").btn-group
+              button(type="button").btn.btn-small#plom-substact-median Substract median
+    
+            div(data-toggle="buttons-radio").btn-group#plom-change-mode
+              button.btn.btn-small Mirror
+              button.btn.btn-small Offset
 
-          div#plom-detail-model
+            div.btn-group#plom-add-band
+              button.btn.btn-small Add Band
+              button.btn.btn-small Remove Band
+ 
+      div.row
+        div#plom-horizon-graph
+
+    div.span4   
+      div
+        div#plom-detail-description
+
+        div#plom-detail-model
 

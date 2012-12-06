@@ -19,3 +19,7 @@
 #plom-horizon-control .btn-toolbar{
   margin-top:0px;
 }
+
+.hidden{
+  display:none;
+}

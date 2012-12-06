@@ -39,6 +39,8 @@ $(document).ready(function(){
     event.preventDefault();
 
     $.getJSON($(this).attr("href"), function(tree){
+      $('#tree').removeClass('hidden');
+
       plomGlobal.tree = tree._id;
 
       var treeData = makeTreeData(tree);
@@ -48,6 +50,7 @@ $(document).ready(function(){
       d3.select("#plom-tree-graph")
         .datum(treeData)
         .call(plom_tree(function(report){ //callback onClickNode
+          $('#model').removeClass('hidden');
 
           if(report.action === 'theta'){
             $('button#explore').removeClass('disabled');

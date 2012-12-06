@@ -13,7 +13,10 @@ block append scripts
         });
     });
 
+
+
 block content
+
 
   | <a href="https://github.com/plom"><img style="position:absolute; top:42px; right:0;  border: 0;" src="images/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
 
@@ -24,14 +27,11 @@ block content
 
     img(src="images/logo-large.png", class="sfr-img-center", alt="plom-logo").sfr-img-center
 
-    p
-     a(href="http://plom.github.com/plom.io").btn.btn-large.btn-danger Take a tour
-     
-     //Create and fit your model faster and with more power. Implement
-     //intervention strategies in a breeze. Share your results with the
-     //world. Get instant feedback.
-
-
+    form(action="/library", method="get")
+      div.input-append
+        input(type="text", name="q").input-xlarge
+        button(type="submit").btn Search the library
+            
   div.row
 
     div.span4

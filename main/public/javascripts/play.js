@@ -347,7 +347,6 @@ $(document).ready(function(){
         }
       }));
 
-
     if(!plomSettings.cst.N_DATA) {
       $('#tab-graph-forecasting').addClass('cursorSeringue');
     }
