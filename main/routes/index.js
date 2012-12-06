@@ -13,11 +13,11 @@ var fs = require('fs')
 
 exports.play = function(req, res, next){
 
-  var a = req.query.a
-    , c = req.query.c
-    , p = req.query.p
-    , l = req.query.l
-    , t = req.query.t;
+  var a = req.session.tree
+    , c = req.session.context
+    , p = req.session.process
+    , l = req.session.link
+    , t = req.session.theta;
 
   var trees = req.app.get('trees')
     , components = req.app.get('components');
@@ -64,9 +64,11 @@ exports.play = function(req, res, next){
  */
 exports.build = function(req, res, next){
 
-  var c = req.body.c
-    , p = req.body.p
-    , l = req.body.l;
+  var a = req.session.tree = req.body.a
+    , c = req.session.context = req.body.c
+    , p = req.session.process = req.body.p
+    , l = req.session.link = req.body.l
+    , t = req.session.theta = req.body.t;
 
   var path_rendered = path.join(process.env.HOME, 'plom_models', c, p, l);
   fs.exists(path_rendered, function (exists) {

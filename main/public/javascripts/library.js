@@ -121,14 +121,11 @@ $(document).ready(function(){
 
   });
 
-
   $('#explore').click(function() {
     if(! $('#button#explore').hasClass('disabled')) {
-      $.post("/build", {c: plomGlobal.context, p:plomGlobal.process, l: plomGlobal.link}, function(answer){
-        console.log(answer);
-        window.location.replace('/play?a=' + plomGlobal.tree + '&c=' + plomGlobal.context + '&p=' + plomGlobal.process + '&l=' + plomGlobal.link + '&t=' + plomGlobal.theta);
+      $.post("/build", {a: plomGlobal.tree, c: plomGlobal.context, p:plomGlobal.process, l: plomGlobal.link, t: plomGlobal.theta}, function(answer){
+        window.location.replace('/play');
       });
-
     }
   });
 

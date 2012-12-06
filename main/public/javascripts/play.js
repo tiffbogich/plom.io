@@ -321,7 +321,7 @@ $(document).ready(function(){
   ////////////////////////////////////////////////////////////////////////////////////////
   //get the settings.json from the server
   ////////////////////////////////////////////////////////////////////////////////////////
-  $.getJSON('/play' + window.location.search, function(answer){
+  $.getJSON('/play', function(answer){
 
     var plomSettings = answer.settings;
     var theta = answer.theta;
