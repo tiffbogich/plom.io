@@ -32,15 +32,14 @@ block content
     div.span7#tree.hidden
       div.btn-toolbar.plom-toolbar
         div.btn-group
-          button.btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
+          button(data-loading-text="Building...").btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
+  
+        div.btn-group(data-toggle="buttons-radio")#forkchange
+          button#fork.btn.btn-small <i class="icon-random"></i> Fork
+          button#attach.btn.btn-small <i class="icon-plus"></i> Attach
   
         div.btn-group
-          button(data-toggle="button").btn.btn-small <i class="icon-random"></i> Fork
-          button(data-toggle="button").btn.btn-small <i class="icon-plus"></i> Attach
-  
-        div.btn-group
-          button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
-
+          button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow        
 
       div#plom-tree-graph
           
@@ -71,3 +70,16 @@ block content
 
         div#plom-detail-model
 
+
+  div#myModal.modal.hide.fade
+    div.modal-header
+     button(type="button", data-dismiss="modal", aria-hidden="true").close &times;
+     h3 Modal header
+
+    div.modal-body
+      form(action="...", method="post", enctype="multipart/form-data")
+        input(type="file", name="component")
+        input(type="submit").hide
+
+    div.modal-footer
+      a(href="#", data-dismiss="modal").btn Cancel

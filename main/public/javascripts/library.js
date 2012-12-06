@@ -79,18 +79,32 @@ $(document).ready(function(){
             plomGlobal.theta = report.theta;
           }
 
+          if($('#fork').hasClass('active')){
+            //$('#demo').collapse('show')
+            //add a node
+            $('#myModal').modal();
+
+          }
+
+
         }));
     });
 
   });
 
   $('#explore').click(function() {
-    if(! $('#button#explore').hasClass('disabled')) {
+    if(! $(this).hasClass('disabled')) {
+      $(this).button('loading');
       $.post("/build", {a: plomGlobal.tree, c: plomGlobal.context, p:plomGlobal.process, l: plomGlobal.link, t: plomGlobal.theta}, function(answer){
         window.location.replace('/play');
       });
     }
   });
 
+  $('#forkchange').on('click', '.active',  function(e){
+    //.removeClass doesn't work, because there are multiple listeners, listening to the same event => we need e.stopImmediatePropagation()
+    e.stopImmediatePropagation();
+    $(this).removeClass('active');
+  });
 
 });
