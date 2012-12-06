@@ -1,4 +1,4 @@
-var sfr_horizon = function(data){
+var plom_horizon = function(data){
 
     var margin = {top: 0, right: 20, bottom: 0, left: 20},
     width = 580 - margin.right - margin.left,
@@ -11,7 +11,7 @@ var sfr_horizon = function(data){
     });
 
     //togle mirror button:
-    $("#sfr-change-mode button:first").addClass('active');
+    $("#plom-change-mode button:first").addClass('active');
 
     var chart = d3.horizon()
         .width(width)
@@ -20,7 +20,7 @@ var sfr_horizon = function(data){
         .mode("mirror")
         .interpolate("step_before"); //"linear", // or basis, monotone, step-before, etc.
 
-    var svg = d3.select("#sfr-horizon-graph")
+    var svg = d3.select("#plom-horizon-graph")
         .selectAll("svg")
         .data(data)
         .enter()
@@ -42,7 +42,7 @@ var sfr_horizon = function(data){
 
     var time_axis = d3.svg.axis().scale(time_scale);
 
-    var xaxis = d3.select("#sfr-horizon-graph").append("svg")
+    var xaxis = d3.select("#plom-horizon-graph").append("svg")
         .attr("width", width + margin.right + margin.left)
         .attr("height", 20)
         .append("g")
@@ -54,7 +54,7 @@ var sfr_horizon = function(data){
     //interactions
 
     //bands buttons
-    d3.selectAll("#sfr-add-band button").data([1, -1]).on("click", function(d) {
+    d3.selectAll("#plom-add-band button").data([1, -1]).on("click", function(d) {
         var n = Math.max(1, chart.bands() + d);
         //svgs[0].call(charts[0].duration(1000).bands(n).height(height / n));
         svg.call(chart.duration(500).bands(n));
@@ -63,7 +63,7 @@ var sfr_horizon = function(data){
     });
 
     //substract median
-    d3.select("#sfr-substact-median").on("click", function() {
+    d3.select("#plom-substact-median").on("click", function() {
         //add or substract median depending on button state
         var mul = $(this).hasClass('active') ? -1 : 1;
 
@@ -78,7 +78,7 @@ var sfr_horizon = function(data){
     });
 
     //mode buttons
-    d3.selectAll("#sfr-change-mode button")
+    d3.selectAll("#plom-change-mode button")
         .data(['mirror', 'offset'])
         .on("click", function(d) {
             svg.call(chart.duration(0).mode(d));

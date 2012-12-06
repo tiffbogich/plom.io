@@ -6,79 +6,84 @@ block append styles
   link(rel='stylesheet', href='/stylesheets/tree.css')
 
 block append scripts
-  script(src='/javascripts/tree.js')
+  script(src='/javascripts/plom_tree.js')
   script(src='/javascripts/library.js')
   script(src='/javascripts/d3_horizon.js')
   script(src='/javascripts/horizon.js')
-  script(src='/javascripts/sfrGraphModel.js')
+  script(src='/javascripts/plomGraphModel.js')
 
 
 block content
 
   div.row
-    div.span5#sfr-search
-      form.form-inline
+    div.span5#plom-search
+      form(action="/library", method="get").form-inline
         div.input-append
-          input(type="text", value=q).input-xlarge#search
-          button(type="submit").btn#submit-search Search
-
-  div.row
-
-    div.span5#sfr-list
+          input(type="text", name="q", value=q).input-xlarge#search
+          button(type="submit").btn Search
 
 
-      ul
-        li: | 1 story matched.
+  if results.length
 
-
-    div.span7
-
-      div.row
-
-        div.span7#sfr-horizon-control
-          div.btn-toolbar
-            div(data-toggle="buttons-checkbox").btn-group
-              button(type="button").btn.btn-small#sfr-substact-median Substract median
+    div.row
+  
+      div.span5#plom-list
+  
+        ul
+          each res in results
+            li: a(href="/tree?_idString=" + res._id).getTree diseases: #{res.disease.join(';')}, nodes: #{res.node.length}  
+  
+      div.span7
+  
+        div.row
+  
+          div.span7#plom-horizon-control
+            div.btn-toolbar
+              div(data-toggle="buttons-checkbox").btn-group
+                button(type="button").btn.btn-small#plom-substact-median Substract median
+      
+              div(data-toggle="buttons-radio").btn-group#plom-change-mode
+                button.btn.btn-small Mirror
+                button.btn.btn-small Offset
+  
+              div.btn-group#plom-add-band
+                button.btn.btn-small Add Band
+                button.btn.btn-small Remove Band
+ 
+  
+        div.row
+          div#plom-horizon-graph
+  
+          
+  
+    hr
     
-            div(data-toggle="buttons-radio").btn-group#sfr-change-mode
-              button.btn.btn-small Mirror
-              button.btn.btn-small Offset
-
-            div.btn-group#sfr-add-band
-              button.btn.btn-small Add Band
-              button.btn.btn-small Remove Band
-
-            div.btn-group.sfr-follow
-              button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
-
-      div.row
-        div#sfr-horizon-graph
-
-        
-
-  hr
+    div.row
   
-  div.row
-
-    div.span8
-      div#plom-tree-graph
-
-
-    div.span4#sfr-model-detail
-
-      div.btn-toolbar
-        div.btn-group
-          button.btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
+      div.span8
+        div#plom-tree-graph
   
-        div.btn-group
-          button.btn.btn-small <i class="icon-random"></i> Fork
-          button.btn.btn-small.disabled <i class="icon-trash"></i> Delete
-
-
   
-        div.btn-group.sfr-follow
-          button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
+      div.span4#plom-detail
+  
+        div.btn-toolbar
+          div.btn-group
+            button.btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
+    
+          div.btn-group
+            button(data-toggle="button").btn.btn-small <i class="icon-random"></i> Fork
+            button(data-toggle="button").btn.btn-small <i class="icon-plus"></i> Attach
+            //button.btn.btn-small.disabled <i class="icon-trash"></i> Delete
+  
+  
+    
+          div.btn-group.plom-follow
+            button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
+  
+  
+        div
+          div#plom-detail-description
+
+          div#plom-detail-model
 
 
-      div
-        div#plom-graph-process

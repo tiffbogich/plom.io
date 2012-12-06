@@ -1,21 +1,21 @@
-#sfr-horizon-graph .axis {
+#plom-horizon-graph .axis {
   font-family: arial; font-size:0.6em;
 }
 
-#sfr-horizon-graph path {
+#plom-horizon-graph path {
   fill:none; 
 }
 
-#sfr-horizon-graph .tick {
+#plom-horizon-graph .tick {
   fill:none;
   stroke:black; 
 }
 
-.sfr-follow{
+.plom-follow{
   float:right;
 }
 
 
-#sfr-horizon-control .btn-toolbar{
+#plom-horizon-control .btn-toolbar{
   margin-top:0px;
 }

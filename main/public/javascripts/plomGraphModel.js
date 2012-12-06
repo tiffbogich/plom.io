@@ -1,4 +1,4 @@
-function sfrGraphModel(process, graphId) {
+function plomGraphModel(process, graphId) {
 
   var graph = {nodes:[], links:[]};
 

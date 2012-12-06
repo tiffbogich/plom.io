@@ -36,7 +36,7 @@ app.configure(function(){
   //documentation website
   app.use(require('../doc/app'));
 
-  //authentification
+  //authentification (/login, /logout, /register)
   app.use(plomAuth);
 
 });
@@ -57,13 +57,10 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
-app.get('/play', secure, routes.play);
-app.get('/library', secure, routes.library);
-app.get('/process', routes.process);
-app.get('/tree', routes.tree);
-
-
-//app.get('/test', routes.test);
+app.get('/play', routes.play);
+app.get('/library', routes.library);
+app.get('/tree', routes.trees);
+app.get('/component', routes.components);
 
 
 var server = http.createServer(app);
@@ -73,8 +70,12 @@ db.open(function (err, client) {
   if (err) throw err;
   console.log("Connected to mongodb");
 
-  //store ref to the collection so that it is easily accessible (app is accessible in req and res!)
+  //store ref to the collections so that it is easily accessible (app is accessible in req and res!)
   app.set('users',  new mongodb.Collection(client, 'users'));
+  app.set('trees',  new mongodb.Collection(client, 'trees'));
+  app.set('components',  new mongodb.Collection(client, 'components'));
+
+  //TODO ensureIndex
 
   server.listen(3000, function(){
     console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
@@ -84,8 +85,6 @@ db.open(function (err, client) {
   sfrWsServer.listen(server);
 
 });
-
-
 
 
 

@@ -1,8 +1,13 @@
 var fs = require('fs')
-, jade = require('jade')
-, jadevu = require('jadevu')
-, describePar = require('../lib/helper').describePar
-, path = require('path');
+  , jade = require('jade')
+  , jadevu = require('jadevu')
+  , describePar = require('../lib/helper').describePar
+  , PlomTrees = require('../../db').PlomTrees
+  , check = require('validator').check
+  , mongodb = require('mongodb')
+  , ObjectID = require('mongodb').ObjectID
+  , path = require('path');
+
 
 /**
  *Serve PlomSettings in JSON or HTML
@@ -14,9 +19,7 @@ exports.play = function(req, res, next){
   var p = req.query.p || ((s === 'tutorial') ? 'SI-g2R' : 'SIR-mHB2');
   var l = req.query.l || 'default';
 
-  console.log(req.query, s, c, p);
   var path_settings =  path.join(process.env['HOME'], 'demo', s, p, c, l, 'model', 'settings', 'settings.json');
-  console.log(path_settings);
 
   fs.readFile(path_settings, function (err, settings){
 
@@ -65,22 +68,70 @@ exports.index = function(req, res){
 
 
 exports.library = function(req, res){
-  var q = req.query.q || 'tutorial';
-  res.render('library', {q:q});
+  var q = req.query.q || '';
+
+  var trees = req.app.get('trees')
+    , components = req.app.get('components');
+
+  var ptrees =  new PlomTrees(components, trees);
+
+  ptrees.search(q, function(err, cursor){
+    if(err) return next(err);
+
+    cursor.toArray(function(err, docs){
+      if(err) return next(err);
+      res.render('library', {q:q, results:docs});
+    });
+  });
+
+
 };
 
 
-exports.process = function (req, res, next) {
-  var path_process = path.join(process.env['HOME'], 'demo',  req.query.s, req.query.p, 'process.json');
-  console.log(path_process);
-  res.sendfile(path_process);
-}
+exports.trees = function (req, res, next) {
 
+  var _idString = req.query._idString;
 
-exports.tree = function (req, res, next) {
-  var path_tree =  path.join(process.env['HOME'], 'demo',  req.query.q, 'tree.json');
-  res.sendfile(path_tree);
+  if (_idString){
+    var trees = req.app.get('trees');
+    trees.findOne({_id: new ObjectID(_idString)}, function(err, doc){
+      if(err) return next(err);
+
+      if(doc){
+        res.json(doc);
+      } else {
+        res.json(500, { error: 'could not find tree' })
+      }
+    });
+  } else {
+    res.json(500, { error: 'invalid URL' });
+  }
+
 };
+
+
+exports.components = function (req, res, next) {
+
+  var _idString = req.query._idString;
+
+  if (_idString){
+    var components = req.app.get('components');
+    components.findOne({_id: new ObjectID(_idString)}, function(err, doc){
+      if(err) return next(err);
+
+      if(doc){
+        res.json(doc);
+      } else {
+        res.json(500, { error: 'could not find component' })
+      }
+    });
+  } else {
+    res.json(500, { error: 'invalid URL' });
+  }
+
+};
+
+
 
 
 //exports.test = function(req, res){

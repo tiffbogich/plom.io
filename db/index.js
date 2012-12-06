@@ -43,6 +43,11 @@ PlomComponents.prototype.add_keywords = function(doc){
 
   //name is a mandatory property of doc, description is not
   doc._keywords = natural.PorterStemmer.tokenizeAndStem(doc.name);
+
+  if('disease' in doc && doc.disease.length){
+    doc._keywords = _.unique(doc._keywords.concat(doc.disease));
+  }
+
   if('description' in doc && doc.description){
     doc._keywords = _.unique(doc._keywords.concat(natural.PorterStemmer.tokenizeAndStem(doc.description)));
   }
@@ -92,7 +97,7 @@ PlomTrees.prototype.search = function(q, callback){
  * if component.type === 'context', create the associated disease tree (if it doesn't exists already')
  * component has to be of type context or process. theta and link have to be inserted in a tree with insertComponentAt
 
- * callback, callback(err, inserted_component) called after the **final** insertion (i.e after tree created in case of context)
+ * callback, callback(err, inserted_component) called after the **final** insertion (i.e after tree created in case of context). In any case inserted component if the component, not the tree!
  */
 
 PlomTrees.prototype.insertComponent = function(component, callback){
@@ -100,25 +105,32 @@ PlomTrees.prototype.insertComponent = function(component, callback){
 
   this.add_keywords(component);
   this.components.insert(component, {safe:true}, function(err, docs){
+
     if(err) return callback(err);
 
     if (component.type === 'context') {
 
-      that.trees.findOne({disease: {$all: component.disease}}, {fields:{_id:1}}, function(err, doc){
+      that.trees.findOne({disease: {$all: component.disease}}, {fields:{_id:1, node:1}}, function(err, doc){
+
         if(err) return callback(err);
 
+        var node = {'name': component.name,
+                    'type': component.type,
+                    'parent_id': null,
+                    '_id': docs[0]['_id']};
+
         if(!doc) { //if tree doen't exists
-          var node = {'name': component.name,
-                      'type': component.type,
-                      'parent_id': null,
-                      '_id': docs[0]['_id']};
-
           that.trees.insert({disease: component.disease, node:[node]}, {safe:true}, function(err, objs){
-
             if(err) return callback(err);
-            callback(err, objs[0]);
+            callback(err, docs[0]);
           });
-        }
+        } else { //a tree already exists, we attach context a the root (the first object of node array by construction)
+          node.parent_id = doc.node[0]['_id'];
+          that.trees.update({_id: doc._id}, {$addToSet: {node: node}}, {safe:true}, function(err){
+            if(err) return callback(err);
+            callback(err, docs[0]);
+          });
+        };
       });
 
     } else {

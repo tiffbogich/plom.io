@@ -1,15 +1,15 @@
-function sfr_tree($button, onModelClickCallback) {
+function plom_tree(callback) {
   var margin = {top: 20, right: 90, bottom: 20, left: 110},
   duration = 500;
 
-  var myStyle = {process: {r:15.5, color: '#f15b22'},   //'#b4469a'},
-                 intervention: {r:15.5, color: '#29b34a'},
-                 context: {r:7.5, color: '#006fb9'},
-                 link: {r:4.5, color:'gray'}};
+  var myStyle = {process: {r:7.5, color: '#f15b22'},   //'#b4469a'},
+                 intervention: {r:7.5, color: '#29b34a'},
+                 context: {r:10.5, color: '#006fb9'},
+                 link: {r:6.5, color:'gray'},
+                 theta: {r:4.5, color:'#8cc48c'}};
 
   var width = 580 - margin.right - margin.left,
   height = 400 - margin.top - margin.bottom;
-
 
   var diagonal = d3.svg.diagonal()
     .projection(function(d) {
@@ -36,7 +36,6 @@ function sfr_tree($button, onModelClickCallback) {
       root.x0 = height / 2;
       root.y0 = 0;
 
-      root.children.forEach(collapse);
       update(root);
 
       //we define update here to be sure that it has is own version of i (starting at 0)!
@@ -72,9 +71,9 @@ function sfr_tree($button, onModelClickCallback) {
         nodeEnter.append("text")
           .attr("dx", function(d) {
             var dx = myStyle[d.type]['r']+3;
-            return d.children || d._children ? -dx : dx; })
+            return d.children ? -dx : dx; })
           .attr("dy", ".35em")
-          .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+          .attr("text-anchor", function(d) { return d.children ? "end" : "start"; })
           .text(function(d) { return d.name; })
           .style("fill-opacity", 1e-6);
 
@@ -140,72 +139,53 @@ function sfr_tree($button, onModelClickCallback) {
       // Toggle children on click.
       function click(d) {
 
-        if ((d.type === 'context') && d.children) {
-          d._children = d.children;
-          d.children = null;
-          $button && $button.addClass('disabled');
+        var report = {};
 
-          if (plomGlobal.process !== d.parent.name){
-            onModelClickCallback(d.parent.name);
-          }
-          plomGlobal.process = d.parent.name;
+        var mynode = d;
 
-        } else if((d.type === 'context')) {
-          d.children = d._children;
-          d._children = null;
-          $button && $button.addClass('disabled');
+        if (d.type === 'theta'){
 
-          if (plomGlobal.process !== d.parent.name){
-            onModelClickCallback(d.parent.name);
-          }
-          plomGlobal.process = d.parent.name;
-
-        } else if ((d.type === 'link')){
-          //find context and model for that link...
-          var mynode = d;
-          while(mynode.type !== 'context'){
-            mynode = mynode.parent;
-          }
-
-          if(mynode.parent){
-            if (plomGlobal.process !== mynode.parent.name){
-              onModelClickCallback(mynode.parent.name);
+          //find _id of link, context and model for that theta...
+          report['action'] = 'theta'
+          report['theta'] = mynode._id;
+          ['link', 'process', 'context'].forEach(function(type){
+            while(mynode.type !== type){
+              mynode = mynode.parent;
             }
-          } else {
-            onModelClickCallback(d.name);
-          }
+            report[type] = mynode._id;
+          });
 
-          plomGlobal.link = d.name;
-          plomGlobal.context = mynode.name;
-          plomGlobal.process = mynode.parent.name;
-          $button && $button.removeClass('disabled');
+        } else if(d.type === 'link') {
+
+          report['action'] = 'link';
+          report['link'] = mynode._id;
+          ['process', 'context'].forEach(function(type){
+            while(mynode.type !== type){
+              mynode = mynode.parent;
+            }
+            report[type] = mynode._id;
+          });
+
+        } else if(d.type === 'process') {
+
+          report['action'] = 'process';
+          report['process'] = mynode._id;
+            while(mynode.type !== 'context'){
+              mynode = mynode.parent;
+            }
+            report['context'] = mynode._id;
+
         } else {
-
-          if (plomGlobal.process !== d.name){
-            console.log(d.name);
-            onModelClickCallback(d.name);
-          }
-          plomGlobal.process = d.name;
-
-          $button && $button.addClass('disabled');
+          report['action'] = 'context';
+          report['context'] = mynode._id;
         }
-        update(d);
+
+        callback(report);
+
+        //TO DO FORK and ATTACH
+        //update(d);
       }
     });
-
-  }
-
-
-  function collapse(d) {
-    if (d.children) {
-      if(d.type === 'context'){
-        d._children = d.children;
-      }
-      d.children.forEach(collapse);
-      if(d.type === 'context'){
-        d.children = null;
-      }
-    }
   }
 
 
