@@ -73,7 +73,6 @@ function updateProcess(idString){
 }
 
 
-
 $(document).ready(function(){
 
   $('a.getTree').click(function(event){
@@ -125,7 +124,11 @@ $(document).ready(function(){
 
   $('#explore').click(function() {
     if(! $('#button#explore').hasClass('disabled')) {
-      window.location.replace('/play?r=' + plomGlobal.tree + '&c=' + plomGlobal.context + '&p=' + plomGlobal.process + '&l=' + plomGlobal.link + '&t=' + plomGlobal.theta);
+      $.post("/build", {c: plomGlobal.context, p:plomGlobal.process, l: plomGlobal.link}, function(answer){
+        console.log(answer);
+        window.location.replace('/play?a=' + plomGlobal.tree + '&c=' + plomGlobal.context + '&p=' + plomGlobal.process + '&l=' + plomGlobal.link + '&t=' + plomGlobal.theta);
+      });
+
     }
   });
 

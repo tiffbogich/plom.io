@@ -62,6 +62,7 @@ app.get('/library', routes.library);
 app.get('/tree', routes.trees);
 app.get('/component', routes.components);
 
+app.post('/build', routes.build); //TODO csrf
 
 var server = http.createServer(app);
 var db = new mongodb.Db('plom', new mongodb.Server("127.0.0.1", 27017), {safe:true});

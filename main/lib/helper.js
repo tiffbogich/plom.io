@@ -1,31 +1,36 @@
 /**
- * add a comment property to the parameters dictionaries of settings.json
+ * add a comment property to the value dictionaries of theta.json
  */
 
-module.exports.describePar = function (settings, proc) {
+module.exports.describeTheta = function (theta, proc, obs) {
 
-  var proc_comments = {};
+  var all_comments = {};
   ['state', 'parameter'].forEach(function(el){
     proc[el].forEach(function(par){
-      proc_comments[par.id] = par.comment || '';
+      all_comments[par.id] = par.comment || '';
     });
   });
+
+  obs.parameter.forEach(function(par){
+    all_comments[par.id] = par.comment || '';
+  });
+
 
   var units = {D:'days', W:'weeks', M:'months', Y:'years'};
   var constraints = {log: '(>0)', logit: '([0,1])'};
 
-  for(var p in settings['parameters']){
+  for(var p in theta['value']){
 
-    var c = settings['parameters'][p]['transformation']  || null;
-    var u = settings['parameters'][p]['unit'] || null;
-    var t = settings['parameters'][p]['type'] || null;
+    var c = theta['value'][p]['transformation']  || null;
+    var u = theta['value'][p]['unit'] || null;
+    var t = theta['value'][p]['type'] || null;
 
     var unit_string = ''
     , constraint_string = ''
-    , comment_string = settings['parameters'][p]['comment'] || proc_comments[p];
+    , comment_string = theta['value'][p]['comment'] || all_comments[p] || '';
 
     if(u){
-      unit_string = (t === 'rate_as_duration') ? 'in ' : 'per ';
+      unit_string = (t === 'rate_as_duration') ? ' in ' : ' per ';
       unit_string += units[u];
     }
 
@@ -33,6 +38,6 @@ module.exports.describePar = function (settings, proc) {
       constraint_string = constraints[c];
     }
 
-    settings['parameters'][p]['comment'] = comment_string + ' ' + constraint_string + ' ' + unit_string;
+    theta['value'][p]['comment'] = comment_string + ' ' + constraint_string + unit_string;
   }
 }

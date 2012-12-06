@@ -1,65 +1,110 @@
 var fs = require('fs')
   , jade = require('jade')
   , jadevu = require('jadevu')
-  , describePar = require('../lib/helper').describePar
+  , describeTheta = require('../lib/helper').describeTheta
   , PlomTrees = require('../../db').PlomTrees
   , check = require('validator').check
   , mongodb = require('mongodb')
+  , spawn = require('child_process').spawn
   , ObjectID = require('mongodb').ObjectID
   , path = require('path');
 
 
-/**
- *Serve PlomSettings in JSON or HTML
- */
+
 exports.play = function(req, res, next){
 
-  var s = req.query.s || 'tutorial';
-  var c = req.query.c || 'homogeneous-mixing';
-  var p = req.query.p || ((s === 'tutorial') ? 'SI-g2R' : 'SIR-mHB2');
-  var l = req.query.l || 'default';
+  var a = req.query.a
+  , c = req.query.c
+  , p = req.query.p
+  , l = req.query.l
+  , t = req.query.t;
 
-  var path_settings =  path.join(process.env['HOME'], 'demo', s, p, c, l, 'model', 'settings', 'settings.json');
+  var trees = req.app.get('trees')
+  , components = req.app.get('components');
 
-  fs.readFile(path_settings, function (err, settings){
+  components.findOne({_id: new ObjectID(p)}, function(err, pDoc){
+    if(err) return next(err);
+    components.findOne({_id: new ObjectID(l)}, function(err, lDoc){
+      if(err) return next(err);
+      components.findOne({_id: new ObjectID(t)}, function(err, tDoc){
+        if(err) return next(err);
+        trees.findOne({_id: new ObjectID(a)}, function(err, aDoc){
+          if(err) return next(err);
 
-    if(err){
-      next(err);
-      return;
-    }
+          var path_settings =  path.join(process.env.HOME, 'plom_models', c, p, l, 'settings', 'settings.json');
 
-    settings = JSON.parse(settings);
+          fs.readFile(path_settings, function (err, settings){
+            if(err) return next(err);
 
-    res.format({
-      json: function(){
-
-        res.send({settings: settings,
-                  story: s,
-                  context: c,
-                  process: p,
-                  link: l});
-
-      },
-        html: function(){
-
-          var path_process = path.join(process.env['HOME'], 'demo',  s, p, 'process.json');
-          fs.readFile(path_process, function (err, proc){
-
-            if(err){
-              next(err);
-              return;
-            }
-
-            proc = JSON.parse(proc);
-            describePar(settings, proc);
-            res.render('play', settings);
+            settings = JSON.parse(settings);
+            res.format({
+              json: function(){
+                res.send({settings: settings, tree: aDoc, process: pDoc, link: lDoc, theta: tDoc});
+              },
+              html: function(){
+                describeTheta(tDoc, pDoc, lDoc);
+                res.render('play', {settings:settings, theta:tDoc});
+              }
+            });
           });
 
-        }
+        });
+      });
     });
   });
+}
 
-};
+
+
+/**
+ * Build model (POST request)
+ */
+exports.build = function(req, res, next){
+
+  var c = req.body.c
+    , p = req.body.p
+    , l = req.body.l;
+
+  var path_rendered = path.join(process.env.HOME, 'plom_models', c, p, l);
+  fs.exists(path_rendered, function (exists) {
+
+    if(!exists){
+      var components = req.app.get('components');
+      components.findOne({_id: new ObjectID(c)}, function(err, cDoc){
+        if(err) return next(err);
+        components.findOne({_id: new ObjectID(p)}, function(err, pDoc){
+          if(err) return next(err);
+          components.findOne({_id: new ObjectID(l)}, function(err, lDoc){
+            if(err) return next(err);
+
+
+            var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '-o', path_rendered]);
+
+            pmbuilder.stdin.write(JSON.stringify({context: cDoc, process: pDoc, link: lDoc})+'\n', encoding="utf8");
+            //echo
+            //pmbuilder.stdout.on('data', function (data) {console.log('stdout: ' + data);});
+            //pmbuilder.stderr.on('data', function (data) {console.log('stderr: ' + data);});
+
+            pmbuilder.on('exit', function (code) {
+              if(code === 0) {
+                res.json({ success: 'ready!' })
+              } else {
+                res.json(500, { error: 'FAIL' })
+              }
+            });
+
+          });
+        });
+      });
+    } else {
+      res.json({ success: 'ready!' })
+    }
+
+  });
+}
+
+
+
 
 
 exports.index = function(req, res){
