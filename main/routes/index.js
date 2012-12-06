@@ -19,6 +19,8 @@ exports.play = function(req, res, next){
   , l = req.query.l
   , t = req.query.t;
 
+  req.session.test = "hello";
+
   var trees = req.app.get('trees')
   , components = req.app.get('components');
 

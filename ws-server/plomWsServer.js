@@ -185,7 +185,7 @@ module.exports.listen = function(server) {
 
                 console.log(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: MODELS_PATH + whatToDo.sfrModelId + '/bin/'});
                 console.log(prog.pid);
-                prog.stdin.write(JSON.stringify(whatToDo.sfrSettings)+'\n', encoding="utf8");
+                prog.stdin.write(JSON.stringify(whatToDo.theta)+'\n', encoding="utf8");
 
                 prog.stderr.on('data', function (data) {
 //                    console.log(data.toString('utf8'));

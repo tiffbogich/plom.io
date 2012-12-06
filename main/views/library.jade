@@ -22,21 +22,34 @@ block content
           input(type="text", name="q", value=q).input-xlarge#search
           button(type="submit").btn Search
 
+      ul
+        each res in results
+          li: a(href="/tree?_idString=" + res._id).getTree diseases: #{res.disease.join(';')}, nodes: #{res.node.length}  
 
-  if results.length
 
-    div.row
-  
-      div.span5#plom-list
-  
-        ul
-          each res in results
-            li: a(href="/tree?_idString=" + res._id).getTree diseases: #{res.disease.join(';')}, nodes: #{res.node.length}  
-  
+
+    if results.length
       div.span7
+        div.btn-toolbar.plom-toolbar
+          div.btn-group
+            button.btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
+    
+          div.btn-group
+            button(data-toggle="button").btn.btn-small <i class="icon-random"></i> Fork
+            button(data-toggle="button").btn.btn-small <i class="icon-plus"></i> Attach
+    
+          div.btn-group
+            button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
+
+
+        div#plom-tree-graph
+          
   
-        div.row
-  
+  if results.length  
+    hr
+    div.row
+      div.span8
+        div.row  
           div.span7#plom-horizon-control
             div.btn-toolbar
               div(data-toggle="buttons-checkbox").btn-group
@@ -49,41 +62,13 @@ block content
               div.btn-group#plom-add-band
                 button.btn.btn-small Add Band
                 button.btn.btn-small Remove Band
- 
-  
+   
         div.row
           div#plom-horizon-graph
   
-          
-  
-    hr
-    
-    div.row
-  
-      div.span8
-        div#plom-tree-graph
-  
-  
-      div.span4#plom-detail
-  
-        div.btn-toolbar
-          div.btn-group
-            button.btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
-    
-          div.btn-group
-            button(data-toggle="button").btn.btn-small <i class="icon-random"></i> Fork
-            button(data-toggle="button").btn.btn-small <i class="icon-plus"></i> Attach
-            //button.btn.btn-small.disabled <i class="icon-trash"></i> Delete
-  
-  
-    
-          div.btn-group.plom-follow
-            button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow
-  
-  
+      div.span4   
         div
           div#plom-detail-description
 
           div#plom-detail-model
-
 

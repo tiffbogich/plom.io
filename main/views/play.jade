@@ -12,10 +12,10 @@ block append scripts
   script(src='/javascripts/sfrMif.js')
   script(src='/javascripts/sfrSimul.js')
   script(src='/javascripts/sfrIc.js')
-  script(src='/javascripts/sfrGraphModel.js')
+  script(src='/javascripts/plomGraphModel.js')
   script(src='/javascripts/play.js')
   script(src='/socket.io/socket.io.js')
-  script(src='/javascripts/tree.js')
+  script(src='/javascripts/plom_tree.js')
 
 block content
 
@@ -27,7 +27,7 @@ block content
       div.tabbable#graphs
         ul.nav.nav-tabs
           li.active: a(href="#tab-graph-simulation", data-toggle="tab") Simulation
-          if cst.N_DATA
+          if settings.cst.N_DATA
             li.dropdown
               a(href="#", data-toggle="dropdown").dropdown-toggle Inference <b class="caret"></b>
               ul.dropdown-menu
@@ -45,7 +45,7 @@ block content
             div#graphTs.chartdiv
             div.ticks
               mixin tickTs(prefix, className, class_tick)
-                each el, id in orders.ts_id
+                each el, id in settings.orders.ts_id
                   label(class=class_tick).checkbox.inline
                     input(type="checkbox", name=id, checked=(id===0), id="#{prefix}___#{id}", class=className)
                     | #{el.split('__').slice(0, 2).join(' ')}
@@ -53,7 +53,7 @@ block content
               mixin tickTs('ts', 'plottedTs', 'sfr-tick-simul')
 
 
-            if orders.drift_var.length && cst.N_DATA
+            if settings.orders.drift_var.length && settings.cst.N_DATA
   
               div.accordion#accordion1
                 div.accordion-group
@@ -65,9 +65,9 @@ block content
                       div#graphDrift.chartdiv
         
                       div.ticks
-                        - orders.drift_var.forEach(function(el){
+                        - settings.orders.drift_var.forEach(function(el){
                         -   var par = el.split('__')[2]; //e.g drift__par_proc__r0
-                        -   partition[parameters[par]['partition_id']]['group'].forEach(function(group, i){
+                        -   theta.partition[theta.value[par]['partition_id']]['group'].forEach(function(group, i){
                         label.checkbox.inline.sfr-tick-drift
                           input(type="checkbox", name=i, checked=(i===0), id="drift___#{i}").plottedDrift
                           | #{par} #{group.id}
@@ -75,7 +75,7 @@ block content
                         - })
 
           //Inference
-          if cst.N_DATA
+          if settings.cst.N_DATA
             //simplex
             div.tab-pane#tab-graph-simplex
               div#graphSimplex.chartdiv
@@ -84,8 +84,8 @@ block content
                 //parameters (and groups...)
                 - var offset = 0;
                 - ['par_sv', 'par_proc', 'par_obs'].forEach(function(el){
-                -   orders[el].forEach(function(p){
-                -     partition[parameters[p]['partition_id']]['group'].forEach(function(group, i){
+                -   settings.orders[el].forEach(function(p){
+                -     theta.partition[theta.value[p]['partition_id']]['group'].forEach(function(group, i){
                 label(class=class_tick).checkbox.inline
                   input(type="checkbox", name=offset, id="#{id_prefix}___#{offset}", class=plot_class)
                   | #{p} #{group.id.split('__').slice(0, 2).join(' ')}
@@ -138,10 +138,10 @@ block content
                       //parameters for within iteration plot (par_proc par_obs WHITHOUT drift)
                       - var offset = 0;
                       - ['par_proc', 'par_obs'].forEach(function(el){
-                      -   orders[el].forEach(function(p){
+                      -   settings.orders[el].forEach(function(p){
 
-                      -     if(orders.drift_var.indexOf(['drift', 'par_proc', p].join('__')) === -1 ) { //if p is NOT a drift variable
-                      -       partition[parameters[p]['partition_id']]['group'].forEach(function(group, i) {
+                      -     if(settings.orders.drift_var.indexOf(['drift', 'par_proc', p].join('__')) === -1 ) { //if p is NOT a drift variable
+                      -       theta.partition[theta.value[p]['partition_id']]['group'].forEach(function(group, i) {
 
                       label.sfr-tick-mif.checkbox.inline
                         input(type="checkbox", name=offset, id="parMif___#{offset}").plottedParMif
@@ -179,7 +179,7 @@ block content
             a(href="#").btn.btn-small <i class="icon-ok"></i> Save
 
 
-        if cst.N_DATA
+        if settings.cst.N_DATA
           label.radio.inline
             input(type="radio", name="filter", id="traj", value="traj", checked="checked")
             |Trajectories
@@ -193,15 +193,15 @@ block content
         else
           -var fhr = {D:'days', W:'weeks', M:'months', 'Y':'years'}
           div.control-group
-            label(for="N_DATA").control-label Number of #{fhr[cst.FREQUENCY]}: 
-              input(type="text", id="N_DATA", value=Math.floor(1*cst.ONE_YEAR_IN_DATA_UNIT)).input-mini
+            label(for="N_DATA").control-label Number of #{fhr[settings.cst.FREQUENCY]}: 
+              input(type="text", id="N_DATA", value=Math.floor(1*settings.cst.ONE_YEAR_IN_DATA_UNIT)).input-mini
               span.help-inline !
 
-        label(for="n_realisations").control-label Number of realisations #{(cst.N_DATA) ? ' or particles': ''}: 
+        label(for="n_realisations").control-label Number of realisations #{(settings.cst.N_DATA) ? ' or particles': ''}: 
           input(type="text", id="n_realisations", value=1).input-mini     
             
       //inference
-      if cst.N_DATA
+      if settings.cst.N_DATA
         //simplex
         div#tab-graph-simplex-control.control-hidden.control
 
@@ -299,7 +299,7 @@ block content
             a(href="#").btn.btn-small <i class="icon-ok"></i> Save
         input(style="display:none;")#runPred //used to trigger runPred from the graph call back
 
-        if cst.N_DATA
+        if settings.cst.N_DATA
           | Forecast for:   
           select.input-small#N_EXTRA
             option(value="0") 0 years
@@ -325,12 +325,12 @@ block content
               div(id = "collapseIntervention", class="accordion-body in")
 
                 div.accordion-inner
-                  each el in orders.par_sv.concat(orders.par_proc, orders.par_obs)
-                    - if (('intervention' in  parameters[el]) && parameters[el]['intervention']) {      
-                      - partition[parameters[el]['partition_id']]['group'].forEach(function(group, i) {                  
-                        - var val = parameters[el]['guess'][group.id]; 
+                  each el in settings.orders.par_sv.concat(settings.orders.par_proc, settings.orders.par_obs)
+                    - if (('intervention' in  theta.value[el]) && theta.value[el]['intervention']) {      
+                      - theta.partition[theta.value[el]['partition_id']]['group'].forEach(function(group, i) {                  
+                        - var val = theta.value[el]['guess'][group.id]; 
                         div
-                          | <a href="#" data-placement="top" rel="tooltip" data-original-title="#{parameters[el]['comment']}" class="sfrTooltip">#{el}</a> (#{group.id}) = <span id="caption___#{el}___#{group.id}">#{val}</span>
+                          | <a href="#" data-placement="top" rel="tooltip" data-original-title="#{theta.value[el]['comment']}" class="sfrTooltip">#{el}</a> (#{group.id}) = <span id="caption___#{el}___#{group.id}">#{val}</span>
                           input(type="hidden", name="intervention___#{el}___#{group.id}", value=val)
 
                         div(id="slider___#{el}___#{group.id}").last
@@ -366,36 +366,36 @@ block content
     
                   - if(id === 'par_sv')
                     div.form-inline#skip_transiant
-                      if ! cst.N_DATA
+                      if ! settings.cst.N_DATA
                         input(type="checkbox", name="skip_transiant")
   
                       |  Skip   
                       input(type="text", id="N_TRANSIANT", value=1).input-tiny
-                      - var mytime = {'D':'days', 'W':'weeks', 'M': 'months', 'Y': 'years'}[cst.FREQUENCY]
+                      - var mytime = {'D':'days', 'W':'weeks', 'M': 'months', 'Y': 'years'}[settings.cst.FREQUENCY]
                       |  #{mytime} 
                       input(type="button", value='Get steady states').btn.btn-small.btn-warning#getIc
                           
   
-                  each el in orders[id]
-                    - if (! ('intervention' in  parameters[el]) && ! parameters[el]['intervention']) {
+                  each el in settings.orders[id]
+                    - if (! ('intervention' in  theta.value[el]) && ! theta.value[el]['intervention']) {
                       table.table.table-condensed.table-tiny.table-parameters
                         tr
-                          th.groupLabel: a(href="#", data-placement="top", rel="tooltip", data-original-title=parameters[el]['comment']).sfrTooltip #{el}
+                          th.groupLabel: a(href="#", data-placement="top", rel="tooltip", data-original-title=theta.value[el]['comment']).sfrTooltip #{el}
                           th min
                           th guess
                           th max
-                          if cst.N_DATA
+                          if settings.cst.N_DATA
                             th sd
   
-                        - partition[parameters[el]['partition_id']]['group'].forEach(function(group, i) {                  
+                        - theta.partition[theta.value[el]['partition_id']]['group'].forEach(function(group, i) {                  
                           tr
                             td.groupLabel #{group.id.split('__').slice(0,2).join(' ')}
                             - var it = ['min', 'guess', 'max'];
-                            - if (cst.N_DATA) it.push('sd_transf');
+                            - if (settings.cst.N_DATA) it.push('sd_transf');
                             each prop in it
                               td
                                 div.control-group 
-                                  input(type="text", name="#{prop}___#{el}___#{group.id}", value=parameters[el][prop][group.id].toPrecision(4)).input-tiny.parameters
+                                  input(type="text", name="#{prop}___#{el}___#{group.id}", value=theta.value[el][prop][group.id].toPrecision(4)).input-tiny.parameters
                                   span.help-inline !
                         - })
                      -}

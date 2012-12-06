@@ -3,7 +3,7 @@ var plomGlobal = {'modelId':null,
                  'intervalId': [],
                  'canRun':true}
 
-function addSlider(par, group, iSettings){
+function addSlider(par, group, itheta){
 
   var $input = $('input[name= "intervention___' + par + '___' + group + '"]');
   var $caption = $('#caption___' + par + '___' + group);
@@ -11,8 +11,8 @@ function addSlider(par, group, iSettings){
   var slideMax=1000;
   var par_val = parseFloat($input.val());
 
-  var par_min = iSettings['parameters'][par]['min'][group];
-  var par_max = iSettings['parameters'][par]['max'][group];
+  var par_min = itheta.value[par]['min'][group];
+  var par_max = itheta.value[par]['max'][group];
 
   $caption.html((par_val*100).toFixed(1) + '%');
   $('#slider___'+ par + '___' + group).slider({
@@ -27,9 +27,9 @@ function addSlider(par, group, iSettings){
       $caption.html((res*100).toFixed(1) + '%');
     },
     stop: function(event, ui) {
-      //update iSettings
+      //update itheta
       var id = $(this).attr('id').split('___');
-      iSettings['parameters'][id[1]]['guess'][id[2]] = ui.value/slideMax;
+      itheta.value[id[1]]['guess'][id[2]] = ui.value/slideMax;
       //run the intervention simulation
       $('#runPred').trigger('click');
     }
@@ -96,7 +96,7 @@ function runSimul(socket, sfrSimul){
 
     var opt = [integration, '--traj', '-D ' +sfrSimul.N_SIMUL, '-T ' + N_TRANSIANT, '-J ' + J];
 
-    socket.emit('start', {'exec':{exec:'simul', opt:opt}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrSimul.sfrSettings});
+    socket.emit('start', {'exec':{exec:'simul', opt:opt}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrSimul.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
       sfrSimul.graph_ts.updateOptions( { 'file': sfrSimul.data_ts } );
@@ -119,7 +119,7 @@ function runGetIc(socket, sfrIc){
   var N_TRANSIANT = parseInt($('input#N_TRANSIANT').val(), 10);
 
   if(socket){
-    socket.emit('start', {'exec':{'exec':'ic', 'opt':[integration, '--traj', '-D 0', '-T ' + N_TRANSIANT]}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrIc.sfrSettings});
+    socket.emit('start', {'exec':{'exec':'ic', 'opt':[integration, '--traj', '-D 0', '-T ' + N_TRANSIANT]}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrIc.theta});
   } else{
     alert("Can't connect to the websocket server");
   }
@@ -147,7 +147,7 @@ function runPred(socket, sfrSimul){
     var extraYears = parseInt($('select#N_EXTRA').val(), 10) || 0;
     //convert extraYears in timesteps
     var multiplier = {'D': 365, 'W': 365/7, 'M': 12, 'Y':1};
-    var N_EXTRA = Math.round(extraYears * multiplier[sfrSimul.sfrSettings.cst.FREQUENCY]);
+    var N_EXTRA = Math.round(extraYears * multiplier[sfrSimul.FREQUENCY]);
 
     sfrSimul.data_pred = sfrSimul.set_data_pred(N_EXTRA);
     sfrSimul.graph_pred.updateOptions( { 'file': sfrSimul.data_pred } );
@@ -156,7 +156,7 @@ function runPred(socket, sfrSimul){
     var tend = sfrSimul.data_pred.length-1;
     var J = parseInt($('input#n_realisations_pred').val(), 10);
 
-    socket.emit('start', {'exec':{'exec':'simul', 'opt':[integration, '--traj', '-D '+ tend, '-o '+ t0, '-J ' + J]}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings': sfrSimul.updateiSettings()});
+    socket.emit('start', {'exec':{'exec':'simul', 'opt':[integration, '--traj', '-D '+ tend, '-o '+ t0, '-J ' + J]}, 'sfrModelId':plomGlobal.modelId, 'theta': sfrSimul.updateitheta()});
     plomGlobal.intervalId.push(setInterval(function(){
       sfrSimul.graph_pred.updateOptions( { 'file': sfrSimul.data_pred } );
     }, 100));
@@ -190,7 +190,7 @@ function runSMC(socket, sfrTs){
                 smc:    {exec:'smc',    opt: [integration, '--traj', '-J ' +J, '-b', '-P 1']},
                 kalman: {exec:'kalman', opt: [integration, '--traj']}};
 
-    socket.emit('start', {'exec':exec[method], 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrTs.sfrSettings});
+    socket.emit('start', {'exec':exec[method], 'sfrModelId':plomGlobal.modelId, 'theta':sfrTs.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
       sfrTs.graph_ts.updateOptions( { 'file': sfrTs.data_ts } );
@@ -215,10 +215,9 @@ function runSimplex(socket, sfrBest) {
     var M = parseInt($('input#simplex-M').val(), 10);
     var S = parseFloat($('input#simplex-S').val());
     var integration = $('input[name=sto]').is(':checked') ? 'sto': 'deter';
-    var is_drift = (sfrBest.sfrSettings.orders.drift_var.length > 0);
     var opt = []
 
-    if (is_drift){
+    if (sfrBest.is_drift) {
       var exec = 'ksimplex';
       opt.push(integration);
     } else if (integration=='sto') {
@@ -230,7 +229,7 @@ function runSimplex(socket, sfrBest) {
 
     opt = opt.concat(['-M '+ M, '-S '+S ]);
 
-    socket.emit('start', {'exec':{'exec': exec, 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrBest.sfrSettings});
+    socket.emit('start', {'exec':{'exec': exec, 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrBest.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
       sfrBest.graph.updateOptions( { 'file': sfrBest.data } );
@@ -255,7 +254,7 @@ function runPmcmc(socket, sfrPmcmc){
     var J = parseInt($('input#pmcmc-J').val(), 10);
     var opt = [integration, '-M ' + M, '-J ' + J, '-P 1'];
 
-    socket.emit('start', {'exec':{'exec':'pmcmc', 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrPmcmc.sfrSettings});
+    socket.emit('start', {'exec':{'exec':'pmcmc', 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrPmcmc.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
       sfrPmcmc.graph_ar.updateOptions( { 'file': sfrPmcmc.data_ar } );
@@ -286,7 +285,7 @@ function runMif(socket, sfrMif){
     var L = parseFloat($('input#mif-L').val());
     var opt = [integration, '--traj', '-M ' + M, '-J ' + J, '-a ' + a, '-b ' + b, '-L ' + L, '-P 1'];
 
-    socket.emit('start', {'exec':{'exec':'mif', 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'sfrSettings':sfrMif.sfrSettings});
+    socket.emit('start', {'exec':{'exec':'mif', 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrMif.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
       sfrMif.graph_mif.updateOptions( { 'file': sfrMif.data_mif } );
@@ -299,7 +298,7 @@ function runMif(socket, sfrMif){
 }
 
 
-function updateSfrSettings(sfrSettings, $this) {
+function updateSfrSettings(theta, $this) {
 
   var myName = $this.attr('name').split('___');
 
@@ -307,9 +306,9 @@ function updateSfrSettings(sfrSettings, $this) {
   var parName = myName[1];
   var groupId = myName[2];
 
-  //update sfrSettings value
+  //update theta value
   var newValue = $this.val();
-  sfrSettings.parameters[parName][valType][groupId] = parseFloat(newValue);
+  theta.value[parName][valType][groupId] = parseFloat(newValue);
 }
 
 
@@ -832,7 +831,6 @@ $(document).ready(function(){
         }
       });
     });
-
 
     if(sfrSettings.cst.N_DATA) {
       sfrTs.iSettings = iSettings;

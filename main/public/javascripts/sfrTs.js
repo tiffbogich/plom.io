@@ -361,8 +361,8 @@ SfrTs.prototype.process_X = function(msg){
 };
 
 
-SfrTs.prototype.updateiSettings = function(){
-  return SfrSimul.prototype.updateiSettings.call(this);
+SfrTs.prototype.updateitheta = function(){
+  return SfrSimul.prototype.updateitheta.call(this);
 }
 
 SfrTs.prototype.resetForecast = function(){

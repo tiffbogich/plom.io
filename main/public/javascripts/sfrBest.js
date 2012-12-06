@@ -20,6 +20,8 @@ function SfrBest(sfrSettings, divGraph, vizSelector, updateSfrSettings) {
   allParId.push('log likelihood');
   this.allParId = allParId;
 
+  this.is_drift = (sfrSettings.orders.drift_var.length > 0);
+
   this.data = this.set_data();
   this.graph = this.makeGraph(divGraph, vizSelector, updateSfrSettings);
 };

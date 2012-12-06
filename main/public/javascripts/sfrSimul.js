@@ -7,6 +7,7 @@ function SfrSimul(sfrSettings, divGraph_ts, divGraph_pred, vizSelector_ts, vizSe
   this.iSettings = null; //intervention model settings
   this.par_int = []; //intervention parameters
 
+  this.FREQUENCY = sfrSettings.cst.FREQUENCY;
   this.N_TS = sfrSettings.cst.N_TS;
   this.N_CAC = sfrSettings.cst.N_C* sfrSettings.cst.N_AC;
   this.N_PAR_SV = sfrSettings.cst.N_PAR_SV;
@@ -250,7 +251,7 @@ SfrSimul.prototype.makeGraphPred = function(divGraph, vizSelector){
 };
 
 
-SfrSimul.prototype.updateiSettings = function(){
+SfrSimul.prototype.updateitheta = function(){
   //extend grouping, place hat values in guess and transform pop size into proportion...
 
   var indexClicked= this.indexDataClicked-1;
