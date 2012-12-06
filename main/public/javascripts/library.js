@@ -1,45 +1,5 @@
 var plomGlobal = {context: '', process: '', link: '', theta: '', tree: ''};
 
-function makeTreeData(tree){
-
-  var nodes = tree.node;
-
-  //from adjacency list to tree layout.
-  var map_id2name = {}, treeData = {}, root_id= '';
-
-  nodes.forEach(function(node){
-    map_id2name[node._id] = node.name;
-    if(!node.parent_id) root_id = node._id;
-  });
-
-  // Create nodes for each unique source and target.
-  nodes.forEach(function(node) {
-    var parent = convertData(node.parent_id, node)
-    , child = convertData(node._id, node);
-
-    if (parent.children) {
-      parent.children.push(child)
-    } else {
-      parent.children = [child];
-    }
-  });
-
-  function convertData(_id, node){
-    if(_id in treeData){
-      return treeData[_id];
-    } else {
-      var name = (_id) ? map_id2name[_id] : map_id2name[root_id];
-      return (treeData[_id] = {name: name, _id: _id, type: node.type});
-    }
-  }
-
-  //extract root
-  treeData = treeData[root_id];
-
-  return treeData;
-}
-
-
 function updateContext(idString){
 
   $.getJSON('/component?_idString=' + idString, function(component){

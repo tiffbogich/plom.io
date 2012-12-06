@@ -17,7 +17,7 @@ exports.play = function(req, res, next){
     , c = req.session.context
     , p = req.session.process
     , l = req.session.link
-    , t = req.session.theta;
+    , t = req.query.t || req.session.theta;
 
   var trees = req.app.get('trees')
     , components = req.app.get('components');

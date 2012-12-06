@@ -330,54 +330,22 @@ $(document).ready(function(){
     ////////////////////////////////////////////////////////////////////////////////////////
     //get the process.json from the server
     ////////////////////////////////////////////////////////////////////////////////////////
-
     $.getJSON('/component?_idString=' + answer.process._id, function(process){
       plomGraphModel(process, '#plom-graph-model');
     });
 
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    //get the tree.json from the server and get the theta subtree
+    //draw subtree (starting at link level)
     ////////////////////////////////////////////////////////////////////////////////////////
-
-//    $.getJSON('/tree?q='+plomGlobal.story, function(answer){
-//
-//      function breadthFirstSearch(my) {
-//
-//        while (queue.length) {
-//          var node = queue.shift();
-//
-//          if (node.name === my) {
-//            //found!
-//            return node;
-//          } else {
-//            if (node.children) {
-//              node.children.forEach(function(el){
-//                queue.push(el);
-//              });
-//            }
-//          }
-//        }
-//
-//        //not found
-//        return {};
-//      }
-//
-//      var queue = [answer];
-//      //get SIR subtree
-//      var my  = breadthFirstSearch(plomGlobal.process);
-//
-//      //get SIR/simple subtree
-//      var queue = [my];
-//      var my  = breadthFirstSearch(plomGlobal.context);
-//
-//      d3.select("#plom-tree-graph")
-//        .datum(my)
-//        .call(plom_tree(null, function(link){
-//          window.location.replace('/play?s=' + plomGlobal.story + '&c=' + plomGlobal.context + '&p=' + plomGlobal.process + '&l=' + link);
-//        }));
-//
-//    });
+    var treeData = makeTreeData(answer.tree, answer.link._id);
+    d3.select("#plom-tree-graph")
+      .datum(treeData)
+      .call(plom_tree(function(report){ //callback onClickNode
+        if(report.action === 'theta' && report.theta !== theta._id){
+          window.location.replace('/play?&t=' + theta._id);
+        }
+      }));
 
 
     if(!plomSettings.cst.N_DATA) {

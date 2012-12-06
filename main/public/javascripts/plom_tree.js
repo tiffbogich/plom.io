@@ -1,3 +1,44 @@
+function makeTreeData(tree, subtree_root_id){
+
+  var nodes = tree.node;
+
+  //from adjacency list to tree layout.
+  var map_id2name = {}, treeData = {}, root_id = '';
+
+  nodes.forEach(function(node){
+    map_id2name[node._id] = node.name;
+    if(!node.parent_id) root_id = node._id;
+  });
+
+  // Create nodes for each unique source and target.
+  nodes.forEach(function(node) {
+    var parent = convertData(node.parent_id, node)
+    , child = convertData(node._id, node);
+
+    if (parent.children) {
+      parent.children.push(child)
+    } else {
+      parent.children = [child];
+    }
+  });
+
+  function convertData(_id, node){
+    if(_id in treeData){
+      return treeData[_id];
+    } else {
+      var name = (_id) ? map_id2name[_id] : map_id2name[root_id];
+      return (treeData[_id] = {name: name, _id: _id, type: node.type});
+    }
+  }
+
+  //extract root
+  sub_id = subtree_root_id || root_id;
+  treeData = treeData[sub_id];
+
+  return treeData;
+}
+
+
 function plom_tree(callback) {
   var margin = {top: 20, right: 90, bottom: 20, left: 110},
   duration = 500;
@@ -142,14 +183,13 @@ function plom_tree(callback) {
         var report = {};
 
         var mynode = d;
-
         if (d.type === 'theta'){
 
           //find _id of link, context and model for that theta...
           report['action'] = 'theta'
           report['theta'] = mynode._id;
           ['link', 'process', 'context'].forEach(function(type){
-            while(mynode.type !== type){
+            while(mynode.type !== type && mynode.depth){
               mynode = mynode.parent;
             }
             report[type] = mynode._id;
@@ -160,7 +200,7 @@ function plom_tree(callback) {
           report['action'] = 'link';
           report['link'] = mynode._id;
           ['process', 'context'].forEach(function(type){
-            while(mynode.type !== type){
+            while(mynode.type !== type && mynode.depth){
               mynode = mynode.parent;
             }
             report[type] = mynode._id;
@@ -170,7 +210,7 @@ function plom_tree(callback) {
 
           report['action'] = 'process';
           report['process'] = mynode._id;
-            while(mynode.type !== 'context'){
+          while(mynode.type !== 'context' && mynode.depth){
               mynode = mynode.parent;
             }
             report['context'] = mynode._id;
@@ -204,3 +244,25 @@ function plom_tree(callback) {
 
   return my;
 }
+
+
+//      function breadthFirstSearch(my) {
+//
+//        while (queue.length) {
+//          var node = queue.shift();
+//
+//          if (node.name === my) {
+//            //found!
+//            return node;
+//          } else {
+//            if (node.children) {
+//              node.children.forEach(function(el){
+//                queue.push(el);
+//              });
+//            }
+//          }
+//        }
+//
+//        //not found
+//        return {};
+//      }
