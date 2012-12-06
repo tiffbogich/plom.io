@@ -1,3 +1,7 @@
+var io = require('socket.io')
+  , path = require('path')
+  , spawn = require('child_process').spawn;
+
 var plomProg = {smc:      {bin:'./smc',      flag:'filter'},
                 kalman:   {bin:'./kalman',   flag:'filter'},
                 simul:    {bin:'./simul',    flag:'simul'},
@@ -154,80 +158,78 @@ function handleErrUpd(prog, data, socket, partErr, updateMsg, emitFlag){
 };
 
 
-module.exports.listen = function(server) {
+function wsServer(server) {
 
-    var MODELS_PATH = process.env['HOME'] + '/';
+  io = io.listen(server);
+  io.set('log level', 0);
 
-    var io = require('socket.io').listen(server);
+  //websocket
+  io.sockets.on('connection', function (socket) {
+    var runningProgs = new RunningProgs();
 
-    io.set('log level', 0);
+    socket.on('start', function(whatToDo){
+      console.log('start');
+      console.log(runningProgs);
 
-    //websocket
-    io.sockets.on('connection', function (socket) {
-        var runningProgs = new RunningProgs();
+      var partMsg = {msg:''};
+      var partErr = {msg:''};
+      var updateMsg = {msg:{},
+                       lastTime: new Date(),
+                       timeoutId: null,
+                       lag: 10}; //we wait at least lag ms in between msg in order not to saturate the client with msgs
 
-        socket.on('start', function(whatToDo){
-            console.log('start');
-            console.log(runningProgs);
+      if(plomProg.hasOwnProperty(whatToDo.exec.exec)){
+        var path_rendered = path.join(process.env.HOME, 'plom_models', whatToDo.plomModelId.join('/'));
+        var prog = spawn(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: path_rendered});
+        runningProgs.add(prog);
 
-            var partMsg = {msg:''};
-            var partErr = {msg:''};
-            var updateMsg = {msg:{},
-                             lastTime: new Date(),
-                             timeoutId: null,
-                             lag: 10}; //we wait at least lag ms in between msg in order not to saturate the client with msgs
+        console.log(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: path_rendered});
+        console.log(prog.pid);
+        prog.stdin.write(JSON.stringify(whatToDo.theta)+'\n', encoding="utf8");
 
-            var spawn = require('child_process').spawn;
-
-            if(plomProg.hasOwnProperty(whatToDo.exec.exec)){
-                var prog = spawn(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: MODELS_PATH + whatToDo.sfrModelId + '/bin/'});
-                runningProgs.add(prog);
-
-                console.log(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: MODELS_PATH + whatToDo.sfrModelId + '/bin/'});
-                console.log(prog.pid);
-                prog.stdin.write(JSON.stringify(whatToDo.theta)+'\n', encoding="utf8");
-
-                prog.stderr.on('data', function (data) {
-//                    console.log(data.toString('utf8'));
-                    handleErrUpd(prog, data, socket, partErr, updateMsg, plomProg[whatToDo.exec.exec]['flag']);
-                });
-//
-                prog.stdout.on('data', function (data) {
-//                    console.log(data.toString('utf8'));
-                    dispatch(data, socket, partMsg, plomProg[whatToDo.exec.exec]['flag']);
-                });
-
-                prog.on('exit', function (code) {
-                    //console.log(updateMsg.timeoutId);
-                    clearTimeout(updateMsg.timeoutId); //clear the timeout as prog don't exist anymore'
-                    console.log('child process ' +prog.pid + ' exited with code ' + code);
-                    runningProgs.remove(prog.pid);
-                    socket.emit('theEnd', 'prog end');
-                    socket.removeAllListeners("killme");
-                    socket.removeAllListeners("set");
-                });
-
-                socket.on("set",function(data){
-                    updateMsg.msg = data;
-                });
-
-                socket.on("killme",function(data){
-                    console.log('kill me');
-                    runningProgs.kill(prog.pid);
-                });
-
-            } else {
-                socket.emit('info', {flag:'err', msg: 'Critical failure: ' + whatToDo.exec.exec + ' is not a PLoM program. This incident and your IP have been reported'});
-                socket.emit('theEnd', 'prog end');
-            }
-
-        }); //terminated socket.on('start'... callback
-
-        socket.on("disconnect",function(){
-            console.log('disconnect, killing remaining running prog:');
-            runningProgs.killAll();
+        prog.stderr.on('data', function (data) {
+          //                    console.log(data.toString('utf8'));
+          handleErrUpd(prog, data, socket, partErr, updateMsg, plomProg[whatToDo.exec.exec]['flag']);
+        });
+        //
+        prog.stdout.on('data', function (data) {
+          //                    console.log(data.toString('utf8'));
+          dispatch(data, socket, partMsg, plomProg[whatToDo.exec.exec]['flag']);
         });
 
+        prog.on('exit', function (code) {
+          //console.log(updateMsg.timeoutId);
+          clearTimeout(updateMsg.timeoutId); //clear the timeout as prog don't exist anymore'
+          console.log('child process ' +prog.pid + ' exited with code ' + code);
+          runningProgs.remove(prog.pid);
+          socket.emit('theEnd', 'prog end');
+          socket.removeAllListeners("killme");
+          socket.removeAllListeners("set");
+        });
+
+        socket.on("set",function(data){
+          updateMsg.msg = data;
+        });
+
+        socket.on("killme",function(data){
+          console.log('kill me');
+          runningProgs.kill(prog.pid);
+        });
+
+      } else {
+        socket.emit('info', {flag:'err', msg: 'Critical failure: ' + whatToDo.exec.exec + ' is not a PLoM program. This incident and your IP have been reported'});
+        socket.emit('theEnd', 'prog end');
+      }
+
+    }); //terminated socket.on('start'... callback
+
+    socket.on("disconnect",function(){
+      console.log('disconnect, killing remaining running prog:');
+      runningProgs.killAll();
     });
 
+  });
+
 };
+
+exports.listen = wsServer;

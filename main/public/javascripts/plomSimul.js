@@ -1,24 +1,25 @@
 //////////////////////////////////////////////////////////////////////////////
-//SfrSimul
+//PlomSimul
 //////////////////////////////////////////////////////////////////////////////
-function SfrSimul(sfrSettings, divGraph_ts, divGraph_pred, vizSelector_ts, vizSelector_pred) {
+function PlomSimul(plomSettings, theta, divGraph_ts, divGraph_pred, vizSelector_ts, vizSelector_pred) {
 
-  this.sfrSettings = sfrSettings; //just a ref
-  this.iSettings = null; //intervention model settings
+  this.plomSettings = plomSettings; //just a ref
+  this.theta = theta;
+  this.itheta = null; //intervention model theta
   this.par_int = []; //intervention parameters
 
-  this.FREQUENCY = sfrSettings.cst.FREQUENCY;
-  this.N_TS = sfrSettings.cst.N_TS;
-  this.N_CAC = sfrSettings.cst.N_C* sfrSettings.cst.N_AC;
-  this.N_PAR_SV = sfrSettings.cst.N_PAR_SV;
-  this.ts_id = sfrSettings.orders.ts_id;
+  this.FREQUENCY = plomSettings.cst.FREQUENCY;
+  this.N_TS = plomSettings.cst.N_TS;
+  this.N_CAC = plomSettings.cst.N_C* plomSettings.cst.N_AC;
+  this.N_PAR_SV = plomSettings.cst.N_PAR_SV;
+  this.ts_id = plomSettings.orders.ts_id;
 
-  this.offsetHat = 1+sfrSettings.cst.N_PAR_SV*sfrSettings.cst.N_C*sfrSettings.cst.N_AC*3;
+  this.offsetHat = 1+plomSettings.cst.N_PAR_SV*plomSettings.cst.N_C*plomSettings.cst.N_AC*3;
 
 
   this.N_SIMUL = 0;
 
-  this.unit = {D:'days', W:'weeks', M:'months', 'Y':'years'}[sfrSettings.cst.FREQUENCY];
+  this.unit = {D:'days', W:'weeks', M:'months', 'Y':'years'}[plomSettings.cst.FREQUENCY];
 
   this.data_ts = this.set_data(this.N_TS);
   this.graph_ts = this.makeGraph(divGraph_ts, vizSelector_ts, this.ts_id, this.data_ts);
@@ -37,7 +38,7 @@ function SfrSimul(sfrSettings, divGraph_ts, divGraph_pred, vizSelector_ts, vizSe
 
 }
 
-SfrSimul.prototype.set_data = function(N){
+PlomSimul.prototype.set_data = function(N){
   //reset states
   this.states = [];
 
@@ -51,7 +52,7 @@ SfrSimul.prototype.set_data = function(N){
 };
 
 
-SfrSimul.prototype.set_data_pred = function(){
+PlomSimul.prototype.set_data_pred = function(){
 
   var data = [];
   for(var i=0; i<= this.data_ts.length; i++) {
@@ -78,7 +79,7 @@ SfrSimul.prototype.set_data_pred = function(){
 };
 
 
-SfrSimul.prototype.processMsg = function(msg, appendLog){
+PlomSimul.prototype.processMsg = function(msg, appendLog){
 
   switch(msg.flag){
 
@@ -96,7 +97,7 @@ SfrSimul.prototype.processMsg = function(msg, appendLog){
   }
 };
 
-SfrSimul.prototype.process_hat = function(msg){
+PlomSimul.prototype.process_hat = function(msg){
 
   var n = msg[0];
 
@@ -147,7 +148,7 @@ SfrSimul.prototype.process_hat = function(msg){
 
 };
 
-SfrSimul.prototype.makeGraph = function(divGraph, vizSelector, label, data){
+PlomSimul.prototype.makeGraph = function(divGraph, vizSelector, label, data){
 
   var viz = [];
   $(vizSelector).each(function(){
@@ -184,7 +185,7 @@ SfrSimul.prototype.makeGraph = function(divGraph, vizSelector, label, data){
 };
 
 
-SfrSimul.prototype.makeGraphPred = function(divGraph, vizSelector){
+PlomSimul.prototype.makeGraphPred = function(divGraph, vizSelector){
 
   var viz = [];
   $(vizSelector).each(function(){
@@ -251,20 +252,20 @@ SfrSimul.prototype.makeGraphPred = function(divGraph, vizSelector){
 };
 
 
-SfrSimul.prototype.updateitheta = function(){
+PlomSimul.prototype.updateitheta = function(){
   //extend grouping, place hat values in guess and transform pop size into proportion...
 
   var indexClicked= this.indexDataClicked-1;
 
   //get the population size at time t (pop_size_t)
 
-  var p_t = this.iSettings.data.par_fixed_values.p_t;
+  var p_t = this.plomSettings.data.par_fixed_values.p_t;
 
   if (p_t) {
 
     var pop_size_t = p_t[indexClicked];
 
-  } else if (this.iSettings.POP_SIZE_EQ_SUM_SV) {
+  } else if (this.plomSettings.POP_SIZE_EQ_SUM_SV) {
 
     var pop_size_t = [];
 
@@ -278,12 +279,12 @@ SfrSimul.prototype.updateitheta = function(){
 
   } else {
 
-    var pop_size_t = this.iSettings.data.pop_size_t0;
+    var pop_size_t = this.plomSettings.data.pop_size_t0;
 
   }
 
 
-  //put states into iSettings (and ensure variable grouping)
+  //put states into itheta (and ensure variable grouping)
 
   var arrayify = function(obj){
     var tab = [];
@@ -291,25 +292,23 @@ SfrSimul.prototype.updateitheta = function(){
     return tab;
   }
 
-  var group = this.sfrSettings.partition.variable_population.group; //note the sfrSettings, not iSettings
-
   var that = this;
   var offset = 0;
-  this.sfrSettings.orders.par_sv.forEach(function(par, i){ //note that we loop using the par_sv of sfrSettings, not iSettings
-    var par_object = that.sfrSettings.parameters[par];
+  this.plomSettings.orders.par_sv.forEach(function(par, i){
+    var par_object = that.theta.value[par];
 
     var pmin = Math.min.apply( Math, arrayify(par_object.min));
     var pmax = Math.max.apply( Math, arrayify(par_object.max));
     var psd =  Math.min.apply( Math, arrayify(par_object.sd_transf));
 
-    par_object = that.iSettings.parameters[par];
+    par_object = that.itheta.value[par];
 
     par_object.guess = {};
     par_object.min = {};
     par_object.max = {};
     par_object.sd_transf = {};
 
-    group.forEach(function(g, cac) {
+    that.theta.partition.variable_population.group.forEach(function(g, cac) {
       par_object.guess[g.id] = that.states[indexClicked][offset]/pop_size_t[cac];
       par_object.min[g.id] = pmin;
       par_object.max[g.id] = pmax;
@@ -320,11 +319,11 @@ SfrSimul.prototype.updateitheta = function(){
 
   });
 
-  return this.iSettings;
+  return this.itheta;
 };
 
 
-SfrSimul.prototype.resetForecast = function(){
+PlomSimul.prototype.resetForecast = function(){
   this.data_pred = this.set_data_pred();
 
   this.graph_pred.updateOptions( { 'file': this.data_pred,
@@ -353,7 +352,7 @@ function graphD32(data){
     .attr("transform", "translate(" + margin + "," + margin +")");
 
   d3.select("#tab-graph-forecasting-control").append('div')
-    .attr('id', 'sfrboxsave') //div that will contain the caption (position will be adjusted)
+    .attr('id', 'plomboxsave') //div that will contain the caption (position will be adjusted)
     .style('position', 'absolute')
     .style("display", "none");
 
@@ -393,16 +392,16 @@ function graphD32(data){
 
   chart.selectAll("rect")
     .on('mouseover', function(d,i){
-      var sfrboxsave = d3.select("#sfrboxsave");
+      var plomboxsave = d3.select("#plomboxsave");
       var position = $('svg').position();
-      sfrboxsave.style("display", null);
-      sfrboxsave.style("left", (position.left+ ((d<0) ? 0 : x(d)) +20) + "px" );
-      sfrboxsave.style("top", (position.top +12 + i * y.rangeBand()) + "px");
-      sfrboxsave.html(d + '%');
+      plomboxsave.style("display", null);
+      plomboxsave.style("left", (position.left+ ((d<0) ? 0 : x(d)) +20) + "px" );
+      plomboxsave.style("top", (position.top +12 + i * y.rangeBand()) + "px");
+      plomboxsave.html(d + '%');
     });
   chart.selectAll("rect")
     .on('mouseout', function(d,i){
-      d3.select("#sfrboxsave").style('display', 'none');
+      d3.select("#plomboxsave").style('display', 'none');
     });
 
   //add lines

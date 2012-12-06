@@ -14,42 +14,43 @@ var fs = require('fs')
 exports.play = function(req, res, next){
 
   var a = req.query.a
-  , c = req.query.c
-  , p = req.query.p
-  , l = req.query.l
-  , t = req.query.t;
-
-  req.session.test = "hello";
+    , c = req.query.c
+    , p = req.query.p
+    , l = req.query.l
+    , t = req.query.t;
 
   var trees = req.app.get('trees')
-  , components = req.app.get('components');
+    , components = req.app.get('components');
 
-  components.findOne({_id: new ObjectID(p)}, function(err, pDoc){
+  components.findOne({_id: new ObjectID(c)}, function(err, cDoc){
     if(err) return next(err);
-    components.findOne({_id: new ObjectID(l)}, function(err, lDoc){
+    components.findOne({_id: new ObjectID(p)}, function(err, pDoc){
       if(err) return next(err);
-      components.findOne({_id: new ObjectID(t)}, function(err, tDoc){
+      components.findOne({_id: new ObjectID(l)}, function(err, lDoc){
         if(err) return next(err);
-        trees.findOne({_id: new ObjectID(a)}, function(err, aDoc){
+        components.findOne({_id: new ObjectID(t)}, function(err, tDoc){
           if(err) return next(err);
-
-          var path_settings =  path.join(process.env.HOME, 'plom_models', c, p, l, 'settings', 'settings.json');
-
-          fs.readFile(path_settings, function (err, settings){
+          trees.findOne({_id: new ObjectID(a)}, function(err, aDoc){
             if(err) return next(err);
 
-            settings = JSON.parse(settings);
-            res.format({
-              json: function(){
-                res.send({settings: settings, tree: aDoc, process: pDoc, link: lDoc, theta: tDoc});
-              },
-              html: function(){
-                describeTheta(tDoc, pDoc, lDoc);
-                res.render('play', {settings:settings, theta:tDoc});
-              }
-            });
-          });
+            var path_settings =  path.join(process.env.HOME, 'plom_models', c, p, l, 'settings', 'settings.json');
 
+            fs.readFile(path_settings, function (err, settings){
+              if(err) return next(err);
+
+              settings = JSON.parse(settings);
+              res.format({
+                json: function(){
+                  res.send({settings: settings, tree: aDoc, process: pDoc, context_id: cDoc._id, link: lDoc, theta: tDoc});
+                },
+                html: function(){
+                  describeTheta(tDoc, pDoc, lDoc);
+                  res.render('play', {settings:settings, theta:tDoc});
+                }
+              });
+            });
+
+          });
         });
       });
     });
@@ -80,7 +81,7 @@ exports.build = function(req, res, next){
             if(err) return next(err);
 
 
-            var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '-o', path_rendered]);
+            var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '--web', '-o', path_rendered]);
 
             pmbuilder.stdin.write(JSON.stringify({context: cDoc, process: pDoc, link: lDoc})+'\n', encoding="utf8");
             //echo

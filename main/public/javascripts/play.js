@@ -76,17 +76,17 @@ function appendLog(msg, err){
   myconsole.scrollTop(myconsole[0].scrollHeight - myconsole.height());
 }
 
-function runSimul(socket, sfrSimul){
+function runSimul(socket, plomSimul){
 
   plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
-  sfrSimul.data_ts = sfrSimul.set_data(sfrSimul.N_TS);
+  plomSimul.data_ts = plomSimul.set_data(plomSimul.N_TS);
 
   if(socket){
-    sfrSimul.is_pred = false;
+    plomSimul.is_pred = false;
     var integration = $('input[name=sto]').is(':checked') ? 'sto': 'deter';
-    sfrSimul.N_SIMUL = parseInt($('input#N_DATA').val(), 10);
+    plomSimul.N_SIMUL = parseInt($('input#N_DATA').val(), 10);
     var J = parseInt($('input#n_realisations').val(), 10);
 
     var N_TRANSIANT = 0;
@@ -94,12 +94,12 @@ function runSimul(socket, sfrSimul){
       N_TRANSIANT = parseInt($('input#N_TRANSIANT').val(), 10);
     }
 
-    var opt = [integration, '--traj', '-D ' +sfrSimul.N_SIMUL, '-T ' + N_TRANSIANT, '-J ' + J];
+    var opt = [integration, '--traj', '-D ' +plomSimul.N_SIMUL, '-T ' + N_TRANSIANT, '-J ' + J];
 
-    socket.emit('start', {'exec':{exec:'simul', opt:opt}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrSimul.theta});
+    socket.emit('start', {'exec':{exec:'simul', opt:opt}, 'plomModelId':plomGlobal.modelId, 'theta':plomSimul.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
-      sfrSimul.graph_ts.updateOptions( { 'file': sfrSimul.data_ts } );
+      plomSimul.graph_ts.updateOptions( { 'file': plomSimul.data_ts } );
     }, 100));
 
   } else{
@@ -109,7 +109,7 @@ function runSimul(socket, sfrSimul){
 };
 
 
-function runGetIc(socket, sfrIc){
+function runGetIc(socket, plomIc){
 
   var integration = $('input[name=sto]').is(':checked') ? 'sto': 'deter';
 
@@ -119,7 +119,7 @@ function runGetIc(socket, sfrIc){
   var N_TRANSIANT = parseInt($('input#N_TRANSIANT').val(), 10);
 
   if(socket){
-    socket.emit('start', {'exec':{'exec':'ic', 'opt':[integration, '--traj', '-D 0', '-T ' + N_TRANSIANT]}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrIc.theta});
+    socket.emit('start', {'exec':{'exec':'ic', 'opt':[integration, '--traj', '-D 0', '-T ' + N_TRANSIANT]}, 'plomModelId':plomGlobal.modelId, 'theta':plomIc.theta});
   } else{
     alert("Can't connect to the websocket server");
   }
@@ -130,35 +130,37 @@ function runGetIc(socket, sfrIc){
 
 /**
  * works for simulation or inference model
- * in case of inference model, sfrSimul is sfrTs...
+ * in case of inference model, plomSimul is plomTs...
  */
-function runPred(socket, sfrSimul){
+function runPred(socket, plomSimul){
 
   plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
   if(socket){
-    sfrSimul.is_pred = true;
+    plomSimul.is_pred = true;
     var integration = $('input[name=sto]').is(':checked') ? 'sto': 'deter';
 
     //TO BE CHECKED
-    sfrSimul.indexDataClicked = sfrSimul.indexDataClicked || 1;
+    plomSimul.indexDataClicked = plomSimul.indexDataClicked || 1;
 
     var extraYears = parseInt($('select#N_EXTRA').val(), 10) || 0;
     //convert extraYears in timesteps
     var multiplier = {'D': 365, 'W': 365/7, 'M': 12, 'Y':1};
-    var N_EXTRA = Math.round(extraYears * multiplier[sfrSimul.FREQUENCY]);
 
-    sfrSimul.data_pred = sfrSimul.set_data_pred(N_EXTRA);
-    sfrSimul.graph_pred.updateOptions( { 'file': sfrSimul.data_pred } );
+    var N_EXTRA = Math.round(extraYears * multiplier[plomSimul.FREQUENCY]);
 
-    var t0 = sfrSimul.indexDataClicked;
-    var tend = sfrSimul.data_pred.length-1;
+
+    plomSimul.data_pred = plomSimul.set_data_pred(N_EXTRA);
+    plomSimul.graph_pred.updateOptions( { 'file': plomSimul.data_pred } );
+
+    var t0 = plomSimul.indexDataClicked;
+    var tend = plomSimul.data_pred.length-1;
     var J = parseInt($('input#n_realisations_pred').val(), 10);
 
-    socket.emit('start', {'exec':{'exec':'simul', 'opt':[integration, '--traj', '-D '+ tend, '-o '+ t0, '-J ' + J]}, 'sfrModelId':plomGlobal.modelId, 'theta': sfrSimul.updateitheta()});
+    socket.emit('start', {'exec':{'exec':'simul', 'opt':[integration, '--traj', '-D '+ tend, '-o '+ t0, '-J ' + J]}, 'plomModelId':plomGlobal.modelId, 'theta': plomSimul.updateitheta()});
     plomGlobal.intervalId.push(setInterval(function(){
-      sfrSimul.graph_pred.updateOptions( { 'file': sfrSimul.data_pred } );
+      plomSimul.graph_pred.updateOptions( { 'file': plomSimul.data_pred } );
     }, 100));
 
   } else {
@@ -169,19 +171,19 @@ function runPred(socket, sfrSimul){
 
 
 
-function runSMC(socket, sfrTs){
+function runSMC(socket, plomTs){
 
   plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
-  sfrTs.data_ts = sfrTs.set_data_ts();
+  plomTs.data_ts = plomTs.set_data_ts();
 
-  if(sfrTs.graph_drift){
-    sfrTs.data_drift = sfrTs.set_data_drift();
+  if(plomTs.graph_drift){
+    plomTs.data_drift = plomTs.set_data_drift();
   }
 
   if(socket){
-    sfrTs.is_pred = false;
+    plomTs.is_pred = false;
     var method = $('input[name=filter]:checked').val();
     var integration = $('input[name=sto]').is(':checked') ? 'sto': 'deter';
     var J = parseInt($('input#n_realisations').val(), 10);
@@ -190,12 +192,12 @@ function runSMC(socket, sfrTs){
                 smc:    {exec:'smc',    opt: [integration, '--traj', '-J ' +J, '-b', '-P 1']},
                 kalman: {exec:'kalman', opt: [integration, '--traj']}};
 
-    socket.emit('start', {'exec':exec[method], 'sfrModelId':plomGlobal.modelId, 'theta':sfrTs.theta});
+    socket.emit('start', {'exec':exec[method], 'plomModelId':plomGlobal.modelId, 'theta':plomTs.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
-      sfrTs.graph_ts.updateOptions( { 'file': sfrTs.data_ts } );
-      if(sfrTs.graph_drift){
-        sfrTs.graph_drift.updateOptions( { 'file': sfrTs.data_drift } );
+      plomTs.graph_ts.updateOptions( { 'file': plomTs.data_ts } );
+      if(plomTs.graph_drift){
+        plomTs.graph_drift.updateOptions( { 'file': plomTs.data_drift } );
       }
     }, 100));
 
@@ -204,12 +206,12 @@ function runSMC(socket, sfrTs){
   }
 };
 
-function runSimplex(socket, sfrBest) {
+function runSimplex(socket, plomBest) {
 
   plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
-  sfrBest.data = sfrBest.set_data();
+  plomBest.data = plomBest.set_data();
 
   if(socket){
     var M = parseInt($('input#simplex-M').val(), 10);
@@ -217,7 +219,7 @@ function runSimplex(socket, sfrBest) {
     var integration = $('input[name=sto]').is(':checked') ? 'sto': 'deter';
     var opt = []
 
-    if (sfrBest.is_drift) {
+    if (plomBest.is_drift) {
       var exec = 'ksimplex';
       opt.push(integration);
     } else if (integration=='sto') {
@@ -229,23 +231,23 @@ function runSimplex(socket, sfrBest) {
 
     opt = opt.concat(['-M '+ M, '-S '+S ]);
 
-    socket.emit('start', {'exec':{'exec': exec, 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrBest.theta});
+    socket.emit('start', {'exec':{'exec': exec, 'opt':opt}, 'plomModelId':plomGlobal.modelId, 'theta':plomBest.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
-      sfrBest.graph.updateOptions( { 'file': sfrBest.data } );
+      plomBest.graph.updateOptions( { 'file': plomBest.data } );
     }, 200));
   } else {
     alert("Can't connect to the websocket server");
   }
 }
 
-function runPmcmc(socket, sfrPmcmc){
+function runPmcmc(socket, plomPmcmc){
 
   plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
-  sfrPmcmc.data_ar = sfrPmcmc.set_data_ar();
-  sfrPmcmc.data = sfrPmcmc.set_data();
+  plomPmcmc.data_ar = plomPmcmc.set_data_ar();
+  plomPmcmc.data = plomPmcmc.set_data();
 
   if(socket){
 
@@ -254,11 +256,11 @@ function runPmcmc(socket, sfrPmcmc){
     var J = parseInt($('input#pmcmc-J').val(), 10);
     var opt = [integration, '-M ' + M, '-J ' + J, '-P 1'];
 
-    socket.emit('start', {'exec':{'exec':'pmcmc', 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrPmcmc.theta});
+    socket.emit('start', {'exec':{'exec':'pmcmc', 'opt':opt}, 'plomModelId':plomGlobal.modelId, 'theta':plomPmcmc.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
-      sfrPmcmc.graph_ar.updateOptions( { 'file': sfrPmcmc.data_ar } );
-      sfrPmcmc.graph.updateOptions( { 'file': sfrPmcmc.data } );
+      plomPmcmc.graph_ar.updateOptions( { 'file': plomPmcmc.data_ar } );
+      plomPmcmc.graph.updateOptions( { 'file': plomPmcmc.data } );
     }, 200));
 
 
@@ -267,13 +269,13 @@ function runPmcmc(socket, sfrPmcmc){
   }
 }
 
-function runMif(socket, sfrMif){
+function runMif(socket, plomMif){
 
   plomGlobal.consoleCounter = 0;
   $('div#logs').html('<p></p>');
 
-  sfrMif.data_mif = sfrMif.set_data_mif();
-  sfrMif.data = sfrMif.set_data();
+  plomMif.data_mif = plomMif.set_data_mif();
+  plomMif.data = plomMif.set_data();
 
   if(socket){
 
@@ -285,11 +287,11 @@ function runMif(socket, sfrMif){
     var L = parseFloat($('input#mif-L').val());
     var opt = [integration, '--traj', '-M ' + M, '-J ' + J, '-a ' + a, '-b ' + b, '-L ' + L, '-P 1'];
 
-    socket.emit('start', {'exec':{'exec':'mif', 'opt':opt}, 'sfrModelId':plomGlobal.modelId, 'theta':sfrMif.theta});
+    socket.emit('start', {'exec':{'exec':'mif', 'opt':opt}, 'plomModelId':plomGlobal.modelId, 'theta':plomMif.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
-      sfrMif.graph_mif.updateOptions( { 'file': sfrMif.data_mif } );
-      sfrMif.graph.updateOptions( { 'file': sfrMif.data } );
+      plomMif.graph_mif.updateOptions( { 'file': plomMif.data_mif } );
+      plomMif.graph.updateOptions( { 'file': plomMif.data } );
     }, 200));
 
   } else{
@@ -298,7 +300,7 @@ function runMif(socket, sfrMif){
 }
 
 
-function updateSfrSettings(theta, $this) {
+function updatePlomSettings(theta, $this) {
 
   var myName = $this.attr('name').split('___');
 
@@ -317,72 +319,74 @@ $(document).ready(function(){
 
 
   ////////////////////////////////////////////////////////////////////////////////////////
-  //get the settings.json from the server!
+  //get the settings.json from the server
   ////////////////////////////////////////////////////////////////////////////////////////
   $.getJSON('/play' + window.location.search, function(answer){
 
-    var sfrSettings = answer.settings;
-    plomGlobal.story = answer.story;
-    plomGlobal.context = answer.context;
-    plomGlobal.process = answer.process;
-    plomGlobal.link = answer.link;
-    plomGlobal.modelId = ['demo', plomGlobal.story, plomGlobal.process, plomGlobal.context, plomGlobal.link, 'model'].join('/');
+    var plomSettings = answer.settings;
+    var theta = answer.theta;
+    plomGlobal.modelId = [answer.context_id, answer.process._id, answer.link._id];
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    //get the process.json from the server!
+    //get the process.json from the server
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    $.getJSON('/process?s='+plomGlobal.story + '&p='+plomGlobal.process, function(answer){
-      sfrGraphModel(answer, '#plom-graph-model');
-    });
-
-    $.getJSON('/tree?q='+plomGlobal.story, function(answer){
-
-      function breadthFirstSearch(my) {
-
-        while (queue.length) {
-          var node = queue.shift();
-
-          if (node.name === my) {
-            //found!
-            return node;
-          } else {
-            if (node.children) {
-              node.children.forEach(function(el){
-                queue.push(el);
-              });
-            }
-          }
-        }
-
-        //not found
-        return {};
-      }
-
-      var queue = [answer];
-      //get SIR subtree
-      var my  = breadthFirstSearch(plomGlobal.process);
-
-      //get SIR/simple subtree
-      var queue = [my];
-      var my  = breadthFirstSearch(plomGlobal.context);
-
-      d3.select("#plom-tree-graph")
-        .datum(my)
-        .call(sfr_tree(null, function(link){
-          window.location.replace('/play?s=' + plomGlobal.story + '&c=' + plomGlobal.context + '&p=' + plomGlobal.process + '&l=' + link);
-        }));
-
+    $.getJSON('/component?_idString=' + answer.process._id, function(process){
+      plomGraphModel(process, '#plom-graph-model');
     });
 
 
-    if(!sfrSettings.cst.N_DATA) {
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //get the tree.json from the server and get the theta subtree
+    ////////////////////////////////////////////////////////////////////////////////////////
+
+//    $.getJSON('/tree?q='+plomGlobal.story, function(answer){
+//
+//      function breadthFirstSearch(my) {
+//
+//        while (queue.length) {
+//          var node = queue.shift();
+//
+//          if (node.name === my) {
+//            //found!
+//            return node;
+//          } else {
+//            if (node.children) {
+//              node.children.forEach(function(el){
+//                queue.push(el);
+//              });
+//            }
+//          }
+//        }
+//
+//        //not found
+//        return {};
+//      }
+//
+//      var queue = [answer];
+//      //get SIR subtree
+//      var my  = breadthFirstSearch(plomGlobal.process);
+//
+//      //get SIR/simple subtree
+//      var queue = [my];
+//      var my  = breadthFirstSearch(plomGlobal.context);
+//
+//      d3.select("#plom-tree-graph")
+//        .datum(my)
+//        .call(plom_tree(null, function(link){
+//          window.location.replace('/play?s=' + plomGlobal.story + '&c=' + plomGlobal.context + '&p=' + plomGlobal.process + '&l=' + link);
+//        }));
+//
+//    });
+
+
+    if(!plomSettings.cst.N_DATA) {
       $('#tab-graph-forecasting').addClass('cursorSeringue');
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    //when user changes values, we update the object originaly fetched from the sfrSettings
+    //when user changes values, we update the object originaly fetched from the plomSettings
     ////////////////////////////////////////////////////////////////////////////////////////
     $('input.parameters').change(function() {
       //validation
@@ -392,7 +396,7 @@ $(document).ready(function(){
       var parName = myName[1];
       var groupId = myName[2];
 
-      //update sfrSettings value
+      //update plomSettings value
       var newValue = parseFloat($(this).val());
       $('input.parameters[name="' +  valType + '___' + parName + '___' +groupId + '"]').val(newValue);
 
@@ -441,7 +445,7 @@ $(document).ready(function(){
           }
         }
 
-        switch(sfrSettings.parameters[parName]['transformation']){
+        switch(theta.value[parName]['transformation']){
         case 'log':
           for (k in vals){
             if(vals[k]<0){
@@ -469,7 +473,7 @@ $(document).ready(function(){
       //nothing can be run until the error are fixed...
       plomGlobal.canRun = (nbError === 0);
 
-      updateSfrSettings(sfrSettings, $(this));
+      updatePlomSettings(theta, $(this));
 
       //guess has been changed -> compute traj
       if($(this).attr('name').indexOf("guess") !== -1){
@@ -486,59 +490,58 @@ $(document).ready(function(){
     ////////////////////////////////////////////////////////////////////////////////////////
     //setup graphs and associated listeners
     ////////////////////////////////////////////////////////////////////////////////////////
-    var sfrTs = null
-    , sfrBest = null
-    , sfrPmcmc = null
-    , sfrSimul = null;
+    var plomTs = null
+      , plomBest = null
+      , plomPmcmc = null
+      , plomSimul = null
+      , plomIc = new PlomIc(plomSettings, theta);
 
-    var sfrIc = new SfrIc(sfrSettings);
+    if(plomSettings.cst.N_DATA) {
 
-    if(sfrSettings.cst.N_DATA) {
-
-      var sfrTs = new SfrTs(sfrSettings, "graphTs", "graphDrift", "graphPred", 'input.plottedTs', 'input.plottedDrift', 'input.plottedPred');
+      var plomTs = new PlomTs(plomSettings, theta, "graphTs", "graphDrift", "graphPred", 'input.plottedTs', 'input.plottedDrift', 'input.plottedPred');
       $('input.plottedTs').change(function(){
-        sfrTs.graph_ts.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
-        sfrTs.graph_ts.setVisibility(sfrTs.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked') );
+        plomTs.graph_ts.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomTs.graph_ts.setVisibility(plomTs.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked') );
       });
       $('input.plottedDrift').change(function(){
-        sfrTs.graph_drift.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomTs.graph_drift.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
       });
       $('input.plottedPred').change(function(){
-        sfrTs.graph_pred.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
-        sfrTs.graph_pred.setVisibility(sfrTs.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked'));
-        sfrTs.graph_pred.setVisibility(2*sfrTs.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomTs.graph_pred.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomTs.graph_pred.setVisibility(plomTs.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomTs.graph_pred.setVisibility(2*plomTs.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked'));
       });
 
-      var sfrBest = new SfrBest(sfrSettings, "graphSimplex", 'input.plottedParSimplex', updateSfrSettings);
+      var plomBest = new PlomBest(plomSettings, theta, "graphSimplex", 'input.plottedParSimplex', updatePlomSettings);
       $('input.plottedParSimplex').change(function(){
-        sfrBest.graph.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomBest.graph.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
       });
 
-      var sfrPmcmc = new SfrPmcmc(sfrSettings, "graphBestPmcmc", 'input.plottedParBestPmcmc', updateSfrSettings, "graphPmcmc");
+      var plomPmcmc = new PlomPmcmc(plomSettings, theta, "graphBestPmcmc", 'input.plottedParBestPmcmc', updatePlomSettings, "graphPmcmc");
       $('input.plottedParBestPmcmc').change(function(){
-        sfrPmcmc.graph.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomPmcmc.graph.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
       });
       $('input.plottedParPmcmc').change(function(){
-        sfrPmcmc.graph_ar.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomPmcmc.graph_ar.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
       });
 
-      var sfrMif = new SfrMif(sfrSettings, "graphBestMif", 'input.plottedParBestMif', updateSfrSettings, "graphMif");
+      var plomMif = new PlomMif(plomSettings, theta, "graphBestMif", 'input.plottedParBestMif', updatePlomSettings, "graphMif");
       $('input.plottedParBestMif').change(function(){
-        sfrMif.graph.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomMif.graph.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
       });
       $('input.plottedParMif').change(function(){
-        sfrMif.graph_mif.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomMif.graph_mif.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
       });
 
 
     } else {
-      var sfrSimul = new SfrSimul(sfrSettings, "graphTs", "graphPred", 'input.plottedTs', 'input.plottedPred');
+      var plomSimul = new PlomSimul(plomSettings, theta, "graphTs", "graphPred", 'input.plottedTs', 'input.plottedPred');
       $('input.plottedTs').change(function(){
-        sfrSimul.graph_ts.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomSimul.graph_ts.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
       });
       $('input.plottedPred').change(function(){
-        sfrSimul.graph_pred.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
-        sfrSimul.graph_pred.setVisibility(sfrSimul.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomSimul.graph_pred.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
+        plomSimul.graph_pred.setVisibility(plomSimul.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked'));
       });
 
       //validation
@@ -551,7 +554,7 @@ $(document).ready(function(){
           val = 1;
         }
         //prevent too high values (150 year)
-        var mymax = {'D':150*365, 'W':150*52, 'M':150*12, 'Y':150}[sfrSettings.cst.FREQUENCY]
+        var mymax = {'D':150*365, 'W':150*52, 'M':150*12, 'Y':150}[plomSettings.cst.FREQUENCY]
         if(val > mymax){
           myerror++
           val = mymax
@@ -576,7 +579,7 @@ $(document).ready(function(){
 
     //colors tick boxs:
     var cols = d3.scale.category10();
-    ['.sfr-tick-simul', '.sfr-tick-drift', '.sfr-tick-pred', '.sfr-tick-simplex', '.sfr-tick-bestpmcmc', '.sfr-tick-pmcmc', '.sfr-tick-bestmif', '.sfr-tick-mif'].forEach(function(el){
+    ['.plom-tick-simul', '.plom-tick-drift', '.plom-tick-pred', '.plom-tick-simplex', '.plom-tick-bestpmcmc', '.plom-tick-pmcmc', '.plom-tick-bestmif', '.plom-tick-mif'].forEach(function(el){
       $(el).each(function(i){
         $(this).css('color', cols(i));
       });
@@ -587,7 +590,7 @@ $(document).ready(function(){
     //GUI
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    $('.sfrTooltip').tooltip({delay: { show: 500, hide: 100 }})
+    $('.plomTooltip').tooltip({delay: { show: 500, hide: 100 }})
 
     $('a[data-toggle="tab"]').on('shown', function (e) {
       var activated =  $(e.target).attr('href');
@@ -599,18 +602,18 @@ $(document).ready(function(){
 
       case '#tab-graph-forecasting':
 
-        if(sfrSettings.cst.N_DATA) {
+        if(plomSettings.cst.N_DATA) {
 
-          if(sfrTs.states.length){
-            sfrTs.resetForecast();
+          if(plomTs.states.length){
+            plomTs.resetForecast();
           } else{
             alert('You need to run a Simulation, SMC or Kalman first !!');
             $('#graphs a[href=#tab-graph-simulation]').tab('show');
           }
 
         }else {
-          if(sfrSimul.states.length){
-            sfrSimul.resetForecast();
+          if(plomSimul.states.length){
+            plomSimul.resetForecast();
           } else {
             alert('You need to run a simulation first !!');
             $('#graphs a[href=#tab-graph-simulation]').tab('show');
@@ -621,15 +624,15 @@ $(document).ready(function(){
 
       case '#tab-graph-simulation':
 
-        if(sfrSettings.cst.N_DATA) {
-          sfrTs.graph_ts.resize();
-          if(sfrTs.graph_drift){
-            sfrTs.graph_drift.resize();
+        if(plomSettings.cst.N_DATA) {
+          plomTs.graph_ts.resize();
+          if(plomTs.graph_drift){
+            plomTs.graph_drift.resize();
           }
         } else {
-          sfrSimul.graph_ts.resize();
-          if(sfrSimul.graph_drift){
-            sfrSimul.graph_drift.resize();
+          plomSimul.graph_ts.resize();
+          if(plomSimul.graph_drift){
+            plomSimul.graph_drift.resize();
           }
         }
 
@@ -661,30 +664,30 @@ $(document).ready(function(){
         //set all callbacks
 
         socket.on('ic', function (msg) {
-          sfrIc.processMsg(msg, appendLog);
+          plomIc.processMsg(msg, appendLog);
         });
 
 
-        if(sfrSettings.cst.N_DATA) {
+        if(plomSettings.cst.N_DATA) {
 
           socket.on('filter', function (msg) {
-            sfrTs.processMsg(msg, appendLog);
+            plomTs.processMsg(msg, appendLog);
           });
 
           socket.on('simul', function (msg) {
-            sfrTs.processMsg(msg, appendLog);
+            plomTs.processMsg(msg, appendLog);
           });
 
           socket.on('simplex', function (msg) {
-            sfrBest.processMsg(msg, appendLog);
+            plomBest.processMsg(msg, appendLog);
           });
 
           socket.on('mcmc', function (msg) {
-            sfrPmcmc.processMsg(msg, appendLog);
+            plomPmcmc.processMsg(msg, appendLog);
           });
 
           socket.on('mif', function (msg) {
-            sfrMif.processMsg(msg, appendLog);
+            plomMif.processMsg(msg, appendLog);
           });
 
           socket.on('info', function (msg) {
@@ -694,7 +697,7 @@ $(document).ready(function(){
         } else {
 
           socket.on('simul', function (msg) {
-            sfrSimul.processMsg(msg, appendLog);
+            plomSimul.processMsg(msg, appendLog);
           });
 
         }
@@ -707,24 +710,24 @@ $(document).ready(function(){
           }
 
           //be sure that the graph contain all the data (the graph is only updated every x msgs)
-          if(sfrSettings.cst.N_DATA) {
+          if(plomSettings.cst.N_DATA) {
 
-            if(sfrTs.graph_drift){
-              sfrTs.graph_drift.updateOptions( { 'file': sfrTs.data_drift } );
+            if(plomTs.graph_drift){
+              plomTs.graph_drift.updateOptions( { 'file': plomTs.data_drift } );
             }
-            if(sfrTs.data_ts){
-              sfrTs.graph_ts.updateOptions( { 'file': sfrTs.data_ts } );
+            if(plomTs.data_ts){
+              plomTs.graph_ts.updateOptions( { 'file': plomTs.data_ts } );
             }
-            if(sfrBest.data){
-              sfrBest.graph.updateOptions( { 'file': sfrBest.data } );
+            if(plomBest.data){
+              plomBest.graph.updateOptions( { 'file': plomBest.data } );
             }
-            if(sfrPmcmc.data){
-              sfrPmcmc.graph.updateOptions( { 'file': sfrPmcmc.data } );
-              sfrPmcmc.graph_ar.updateOptions( { 'file': sfrPmcmc.data_ar } );
+            if(plomPmcmc.data){
+              plomPmcmc.graph.updateOptions( { 'file': plomPmcmc.data } );
+              plomPmcmc.graph_ar.updateOptions( { 'file': plomPmcmc.data_ar } );
             }
-            if(sfrMif.data){
-              sfrMif.graph.updateOptions( { 'file': sfrMif.data } );
-              sfrMif.graph_mif.updateOptions( { 'file': sfrMif.data_mif } );
+            if(plomMif.data){
+              plomMif.graph.updateOptions( { 'file': plomMif.data } );
+              plomMif.graph_mif.updateOptions( { 'file': plomMif.data_mif } );
             }
 
           }
@@ -745,7 +748,7 @@ $(document).ready(function(){
     });
 
     $('.use-in-simulation').click(function(){
-      (sfrBest.onClickCalback())(); //sure we can do better
+      (plomBest.onClickCalback())(); //sure we can do better
       $('#runSMC').trigger('click');
     });
 
@@ -753,10 +756,10 @@ $(document).ready(function(){
       if(plomGlobal.canRun){
         plomGlobal.canRun = false;
         $('#graphs a:first').tab('show');
-        if(sfrSettings.cst.N_DATA) {
-          runSMC(socket, sfrTs);
+        if(plomSettings.cst.N_DATA) {
+          runSMC(socket, plomTs);
         } else {
-          runSimul(socket, sfrSimul);
+          runSimul(socket, plomSimul);
         }
       }
     });
@@ -764,7 +767,7 @@ $(document).ready(function(){
     $("#getIc").click(function(){
       if(plomGlobal.canRun){
         plomGlobal.canRun = false;
-        runGetIc(socket, sfrIc);
+        runGetIc(socket, plomIc);
       }
     });
 
@@ -772,7 +775,7 @@ $(document).ready(function(){
       if(plomGlobal.canRun){
         plomGlobal.canRun = false;
         $('#graphs a[href=#tab-graph-simplex]').tab('show');
-        runSimplex(socket, sfrBest);
+        runSimplex(socket, plomBest);
       }
     });
 
@@ -780,7 +783,7 @@ $(document).ready(function(){
       if(plomGlobal.canRun){
         plomGlobal.canRun = false;
         $('#graphs a[href=#tab-graph-pmcmc]').tab('show');
-        runPmcmc(socket, sfrPmcmc);
+        runPmcmc(socket, plomPmcmc);
       }
     });
 
@@ -788,13 +791,13 @@ $(document).ready(function(){
       if(plomGlobal.canRun){
         plomGlobal.canRun = false;
         $('#graphs a[href=#tab-graph-mif]').tab('show');
-        runMif(socket, sfrMif);
+        runMif(socket, plomMif);
       }
     });
 
     $("#set").click(function(){
       if(socket){
-        socket.emit('set', sfrSettings);
+        socket.emit('set', theta);
       } else{
         alert("Can't connect to the websocket server");
       }
@@ -803,16 +806,16 @@ $(document).ready(function(){
     $("#runPred").click(function(){
       if(plomGlobal.canRun){
         plomGlobal.canRun = false;
-        runPred(socket,(sfrSettings.cst.N_DATA) ? sfrTs : sfrSimul);
+        runPred(socket,(plomSettings.cst.N_DATA) ? plomTs : plomSimul);
       }
     });
 
     $("#resetPred").click(function(){
-      if(sfrSettings.cst.N_DATA) {
-        sfrTs.resetForecast();
+      if(plomSettings.cst.N_DATA) {
+        plomTs.resetForecast();
       } else {
-        sfrSimul.resetForecast();
-        sfrSimul.saved_graph_updater([0,0,0,0]);
+        plomSimul.resetForecast();
+        plomSimul.saved_graph_updater([0,0,0,0]);
       }
     });
 
@@ -820,29 +823,26 @@ $(document).ready(function(){
     // INTERVENTION
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    var iSettings = $.extend(true, {}, sfrSettings);
+    var itheta = $.extend(true, {}, theta);
 
-    //link par_proc and par_obs of iSettings and sfrSettings !=intervention  so
+    //link par_proc and par_obs of itheta and theta !=intervention  so
     //that the 2 stay synchronized. Note that we do not link par_sv has they have to remain independent...
     ['par_proc', 'par_obs'].forEach(function(el){
-      sfrSettings['orders'][el].forEach(function(par){
-        if (! ('intervention' in  iSettings.parameters[par]) && ! iSettings.parameters[par]['intervention']) {
-          iSettings['parameters'][par] = sfrSettings['parameters'][par];
+      plomSettings['orders'][el].forEach(function(par){
+        if (! ('intervention' in  theta.value[par]) && ! itheta.value[par]['intervention']) {
+          itheta.value[par] = theta.value[par];
         }
       });
     });
 
-    if(sfrSettings.cst.N_DATA) {
-      sfrTs.iSettings = iSettings;
+    if(plomSettings.cst.N_DATA) {
+      plomTs.itheta = itheta;
     } else{
-      sfrSimul.iSettings = iSettings;
-    }
-
-    if (!sfrSettings.cst.N_DATA) {
-      iSettings.orders.par_sv.concat(iSettings.orders.par_proc, iSettings.orders.par_obs).forEach(function(el){
-        if (('intervention' in  iSettings.parameters[el]) && iSettings.parameters[el]['intervention']) {
-          iSettings.partition[iSettings.parameters[el]['partition_id']]['group'].forEach(function(group, i) {
-            addSlider(el, group.id, iSettings);
+      plomSimul.itheta = itheta;
+      plomSettings.orders.par_sv.concat(plomSettings.orders.par_proc, plomSettings.orders.par_obs).forEach(function(el){
+        if (('intervention' in  itheta.value[el]) && itheta.value[el]['intervention']) {
+          itheta.partition[itheta.value[el]['partition_id']]['group'].forEach(function(group, i) {
+            addSlider(el, group.id, itheta);
           });
         }
       });

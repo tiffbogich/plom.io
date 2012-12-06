@@ -6,12 +6,12 @@ block append styles
   link(rel='stylesheet', href='/stylesheets/tree.css')
 
 block append scripts
-  script(src='/javascripts/sfrTs.js')
-  script(src='/javascripts/sfrBest.js')
-  script(src='/javascripts/sfrPmcmc.js')
-  script(src='/javascripts/sfrMif.js')
-  script(src='/javascripts/sfrSimul.js')
-  script(src='/javascripts/sfrIc.js')
+  script(src='/javascripts/plomTs.js')
+  script(src='/javascripts/plomBest.js')
+  script(src='/javascripts/plomPmcmc.js')
+  script(src='/javascripts/plomMif.js')
+  script(src='/javascripts/plomSimul.js')
+  script(src='/javascripts/plomIc.js')
   script(src='/javascripts/plomGraphModel.js')
   script(src='/javascripts/play.js')
   script(src='/socket.io/socket.io.js')
@@ -50,7 +50,7 @@ block content
                     input(type="checkbox", name=id, checked=(id===0), id="#{prefix}___#{id}", class=className)
                     | #{el.split('__').slice(0, 2).join(' ')}
 
-              mixin tickTs('ts', 'plottedTs', 'sfr-tick-simul')
+              mixin tickTs('ts', 'plottedTs', 'plom-tick-simul')
 
 
             if settings.orders.drift_var.length && settings.cst.N_DATA
@@ -68,7 +68,7 @@ block content
                         - settings.orders.drift_var.forEach(function(el){
                         -   var par = el.split('__')[2]; //e.g drift__par_proc__r0
                         -   theta.partition[theta.value[par]['partition_id']]['group'].forEach(function(group, i){
-                        label.checkbox.inline.sfr-tick-drift
+                        label.checkbox.inline.plom-tick-drift
                           input(type="checkbox", name=i, checked=(i===0), id="drift___#{i}").plottedDrift
                           | #{par} #{group.id}
                         -   });
@@ -99,7 +99,7 @@ block content
                   | #{last_name}  
   
               div.ticks
-                mixin tickitAllpar('parSimplex', 'plottedParSimplex', 'log likelihood', 'sfr-tick-simplex')
+                mixin tickitAllpar('parSimplex', 'plottedParSimplex', 'log likelihood', 'plom-tick-simplex')
   
             //pMCMC
             div.tab-pane#tab-graph-pmcmc
@@ -107,7 +107,7 @@ block content
               div#graphBestPmcmc.chartdiv
 
               div.ticks
-                mixin tickitAllpar('parBestPmcmc', 'plottedParBestPmcmc', 'log likelihood', 'sfr-tick-bestpmcmc')
+                mixin tickitAllpar('parBestPmcmc', 'plottedParBestPmcmc', 'log likelihood', 'plom-tick-bestpmcmc')
 
               div.accordion#accordionPmcmc
                 div.accordion-group
@@ -116,7 +116,7 @@ block content
                   div(id = "collapsePmcmc", class="accordion-body collapse")
                     div.accordion-inner  
                       div#graphPmcmc.chartdiv
-                      mixin tickitAllpar('parPmcmc', 'plottedParPmcmc', 'global', 'sfr-tick-pmcmc')
+                      mixin tickitAllpar('parPmcmc', 'plottedParPmcmc', 'global', 'plom-tick-pmcmc')
   
 
             //MIF
@@ -125,7 +125,7 @@ block content
               div#graphBestMif.chartdiv
 
               div.ticks
-                mixin tickitAllpar('parBestMif', 'plottedParBestMif', 'log likelihood', 'sfr-tick-bestmif')
+                mixin tickitAllpar('parBestMif', 'plottedParBestMif', 'log likelihood', 'plom-tick-bestmif')
 
               div.accordion#accordionMif
                 div.accordion-group
@@ -143,7 +143,7 @@ block content
                       -     if(settings.orders.drift_var.indexOf(['drift', 'par_proc', p].join('__')) === -1 ) { //if p is NOT a drift variable
                       -       theta.partition[theta.value[p]['partition_id']]['group'].forEach(function(group, i) {
 
-                      label.sfr-tick-mif.checkbox.inline
+                      label.plom-tick-mif.checkbox.inline
                         input(type="checkbox", name=offset, id="parMif___#{offset}").plottedParMif
                         | #{p} #{group.id.split('__').slice(0, 2).join(' ')}
 
@@ -155,7 +155,7 @@ block content
                       -});
 
                       //ess
-                      label.sfr-tick-mif.checkbox.inline
+                      label.plom-tick-mif.checkbox.inline
                         input(type="checkbox", name=offset, checked="checked", id="parMif___#{offset}").plottedParMif
                         | ESS
 
@@ -163,7 +163,7 @@ block content
           //Forecasting
           div.tab-pane#tab-graph-forecasting
             div#graphPred.chartdiv
-            mixin tickTs('pred', 'plottedPred', 'sfr-tick-pred')
+            mixin tickTs('pred', 'plottedPred', 'plom-tick-pred')
 
 
     //control tabs
@@ -172,7 +172,7 @@ block content
       //simulation
       div#tab-graph-simulation-control.control
 
-        div.btn-toolbar.sfr-action
+        div.btn-toolbar.plom-action
           div.btn-group
             a(href="#").btn.btn-small.start#runSMC <i class="icon-play"></i> Run
             a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
@@ -205,12 +205,12 @@ block content
         //simplex
         div#tab-graph-simplex-control.control-hidden.control
 
-          div.btn-toolbar.sfr-action
+          div.btn-toolbar.plom-action
             div.btn-group
 
-              a(href="#", data-placement="top", rel="tooltip", data-original-title="Nelder-Mead method").btn.btn-small.start#runSimplex.sfrTooltip <i class="icon-play"></i> Simplex
+              a(href="#", data-placement="top", rel="tooltip", data-original-title="Nelder-Mead method").btn.btn-small.start#runSimplex.plomTooltip <i class="icon-play"></i> Simplex
               a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
-              a(href="#", data-placement="top", rel="tooltip", data-original-title="Use the results in a simulation").btn.btn-small.use-in-simulation.sfrTooltip <i class="icon-arrow-right"></i> Simulation
+              a(href="#", data-placement="top", rel="tooltip", data-original-title="Use the results in a simulation").btn.btn-small.use-in-simulation.plomTooltip <i class="icon-arrow-right"></i> Simulation
 
                       
           form.form-horizontal.form-small
@@ -229,11 +229,11 @@ block content
         //pmcmc
         div#tab-graph-pmcmc-control.control-hidden.control
 
-          div.btn-toolbar.sfr-action
+          div.btn-toolbar.plom-action
             div.btn-group
-              a(href="#", data-placement="top", rel="tooltip", data-original-title="particle Markov-chain Monte Carlo").btn.btn-small.start#runPmcmc.sfrTooltip <i class="icon-play"></i> pMCMC
+              a(href="#", data-placement="top", rel="tooltip", data-original-title="particle Markov-chain Monte Carlo").btn.btn-small.start#runPmcmc.plomTooltip <i class="icon-play"></i> pMCMC
               a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
-              a(href="#", data-placement="top", rel="tooltip", data-original-title="Use the results in a simulation").btn.btn-small.use-in-simulation.sfrTooltip <i class="icon-arrow-right"></i> Simulation
+              a(href="#", data-placement="top", rel="tooltip", data-original-title="Use the results in a simulation").btn.btn-small.use-in-simulation.plomTooltip <i class="icon-arrow-right"></i> Simulation
 
           form.form-horizontal.form-small
 
@@ -251,11 +251,11 @@ block content
         //mif
         div#tab-graph-mif-control.control-hidden.control
 
-          div.btn-toolbar.sfr-action
+          div.btn-toolbar.plom-action
             div.btn-group
-              a(href="#", data-placement="top", rel="tooltip", data-original-title="Maximum Likelihood via Iterated Filtering").btn.btn-small.start#runMif.sfrTooltip <i class="icon-play"></i> MIF
+              a(href="#", data-placement="top", rel="tooltip", data-original-title="Maximum Likelihood via Iterated Filtering").btn.btn-small.start#runMif.plomTooltip <i class="icon-play"></i> MIF
               a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
-              a(href="#", data-placement="top", rel="tooltip", data-original-title="Use the results in a simulation").btn.btn-small.use-in-simulation.sfrTooltip <i class="icon-arrow-right"></i> Simulation
+              a(href="#", data-placement="top", rel="tooltip", data-original-title="Use the results in a simulation").btn.btn-small.use-in-simulation.plomTooltip <i class="icon-arrow-right"></i> Simulation
           input(style="display:none;")#set //used to echo the change of jump sizes
 
 
@@ -292,9 +292,9 @@ block content
       div#tab-graph-forecasting-control.control-hidden.control
 
 
-        div.btn-toolbar.sfr-action
+        div.btn-toolbar.plom-action
           div.btn-group
-            a(href="#", data-placement="top", rel="tooltip", data-original-title="Click on the graph to trigger an intervention").btn.btn-small.start#resetPred.sfrTooltip <i class="icon-refresh"></i> Reset Forecast
+            a(href="#", data-placement="top", rel="tooltip", data-original-title="Click on the graph to trigger an intervention").btn.btn-small.start#resetPred.plomTooltip <i class="icon-refresh"></i> Reset Forecast
             a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
             a(href="#").btn.btn-small <i class="icon-ok"></i> Save
         input(style="display:none;")#runPred //used to trigger runPred from the graph call back
@@ -330,7 +330,7 @@ block content
                       - theta.partition[theta.value[el]['partition_id']]['group'].forEach(function(group, i) {                  
                         - var val = theta.value[el]['guess'][group.id]; 
                         div
-                          | <a href="#" data-placement="top" rel="tooltip" data-original-title="#{theta.value[el]['comment']}" class="sfrTooltip">#{el}</a> (#{group.id}) = <span id="caption___#{el}___#{group.id}">#{val}</span>
+                          | <a href="#" data-placement="top" rel="tooltip" data-original-title="#{theta.value[el]['comment']}" class="plomTooltip">#{el}</a> (#{group.id}) = <span id="caption___#{el}___#{group.id}">#{val}</span>
                           input(type="hidden", name="intervention___#{el}___#{group.id}", value=val)
 
                         div(id="slider___#{el}___#{group.id}").last
@@ -380,7 +380,7 @@ block content
                     - if (! ('intervention' in  theta.value[el]) && ! theta.value[el]['intervention']) {
                       table.table.table-condensed.table-tiny.table-parameters
                         tr
-                          th.groupLabel: a(href="#", data-placement="top", rel="tooltip", data-original-title=theta.value[el]['comment']).sfrTooltip #{el}
+                          th.groupLabel: a(href="#", data-placement="top", rel="tooltip", data-original-title=theta.value[el]['comment']).plomTooltip #{el}
                           th min
                           th guess
                           th max
@@ -412,7 +412,7 @@ block content
       div.span8
         div#plom-tree-graph
   
-      div.span4#sfr-model-detail
+      div.span4#plom-model-detail
         h3.title-side Model Structure
 
         div#plom-graph-model

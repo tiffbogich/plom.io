@@ -1,17 +1,17 @@
 //////////////////////////////////////////////////////////////////////////////
-//SfrIc
+//PlomIc
 //////////////////////////////////////////////////////////////////////////////
-function SfrIc(sfrSettings) {
+function PlomIc(plomSettings, theta) {
 
-  this.sfrSettings = sfrSettings; //just a ref
-  this.N_CAC = sfrSettings.cst.N_C*sfrSettings.cst.N_AC;
-  this.N_PAR_SV = sfrSettings.cst.N_PAR_SV;
+  this.theta = theta;
+  this.plomSettings = plomSettings; //just a ref
+  this.N_CAC = plomSettings.cst.N_C*plomSettings.cst.N_AC;
+  this.N_PAR_SV = plomSettings.cst.N_PAR_SV;
 
 }
 
 
-SfrIc.prototype.processMsg = function(msg, appendLog) {
-
+PlomIc.prototype.processMsg = function(msg, appendLog) {
   switch(msg.flag){
 
   case 'log':
@@ -23,7 +23,7 @@ SfrIc.prototype.processMsg = function(msg, appendLog) {
     break;
 
   case 'hat':
-    this.process_X_and_update_UI(msg.msg);
+    this.process_hat_and_update_UI(msg.msg);
     break;
   }
 };
@@ -31,9 +31,9 @@ SfrIc.prototype.processMsg = function(msg, appendLog) {
 
 
 /**
- * Update this.sfrSettings and the UI with the X message
+ * Update this.plomSettings and the UI with the X message
  */
-SfrIc.prototype.process_X_and_update_UI = function(msg){
+PlomIc.prototype.process_hat_and_update_UI = function(msg){
 
   var hat = [];
   for (var p=0; p< (this.N_PAR_SV*this.N_CAC); p++) {
@@ -41,13 +41,13 @@ SfrIc.prototype.process_X_and_update_UI = function(msg){
   }
 
   //get the population size at time t (pop_size_t)
-  var p_t = this.sfrSettings.data.par_fixed_values.p_t;
+  var p_t = this.plomSettings.data.par_fixed_values.p_t;
 
   if (p_t) {
 
     var pop_size_t = p_t[0];
 
-  } else if (this.sfrSettings.POP_SIZE_EQ_SUM_SV) {
+  } else if (this.plomSettings.POP_SIZE_EQ_SUM_SV) {
 
     var pop_size_t = [];
 
@@ -61,24 +61,24 @@ SfrIc.prototype.process_X_and_update_UI = function(msg){
 
   } else {
 
-    var pop_size_t = this.sfrSettings.data.pop_size_t0;
+    var pop_size_t = this.plomSettings.data.pop_size_t0;
 
   }
 
   var that = this;
   var offset = 0;
   var hat_cac = [];
-  this.sfrSettings.orders.par_sv.forEach(function(par) {
-    var par_object = that.sfrSettings.parameters[par];
+  this.plomSettings.orders.par_sv.forEach(function(par) {
+    var par_object = that.theta.value[par];
 
     //we create a map (here it will be an array) that goes from cac -> group_id
     var map_group = [];
     for(var cac=0; cac< this.N_CAC ; cac++) map_group.push(0.0);
 
-    var group = that.sfrSettings.partition[par_object.partition_id]['group'];
+    var group = that.theta.partition[par_object.partition_id]['group'];
     group.forEach(function(g){
       g.population_id.forEach(function(p){
-        var cac = that.sfrSettings.orders.cac_id.indexOf(p);
+        var cac = that.plomSettings.orders.cac_id.indexOf(p);
         map_group[cac] = g.id;
       });
     });

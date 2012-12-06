@@ -1,17 +1,18 @@
 //////////////////////////////////////////////////////////////////////////////
-//SfrBest
+//PlomBest
 //////////////////////////////////////////////////////////////////////////////
-function SfrBest(sfrSettings, divGraph, vizSelector, updateSfrSettings) {
+function PlomBest(plomSettings, theta, divGraph, vizSelector, updatePlomSettings) {
   //to be improved: Best.prototype.makeGraph depends on things not defined in this file...
 
   this.bufferSize = 100;
-  this.sfrSettings = sfrSettings; //just a ref
+  this.plomSettings = plomSettings; //just a ref
+  this.theta = theta;
 
   var allParId = [];
   ['par_sv', 'par_proc', 'par_obs'].forEach(function(el){
-    sfrSettings.orders[el].forEach(function(p){
-      var id = sfrSettings.parameters[p]['partition_id'];
-      sfrSettings.partition[id]['group'].forEach(function(group, i){
+    plomSettings.orders[el].forEach(function(p){
+      var id = theta.value[p]['partition_id'];
+      theta.partition[id]['group'].forEach(function(group, i){
         allParId.push(p + ' ' + group.id.split('__').slice(0,2).join(' '));
       });
     });
@@ -20,14 +21,14 @@ function SfrBest(sfrSettings, divGraph, vizSelector, updateSfrSettings) {
   allParId.push('log likelihood');
   this.allParId = allParId;
 
-  this.is_drift = (sfrSettings.orders.drift_var.length > 0);
+  this.is_drift = (plomSettings.orders.drift_var.length > 0);
 
   this.data = this.set_data();
-  this.graph = this.makeGraph(divGraph, vizSelector, updateSfrSettings);
+  this.graph = this.makeGraph(divGraph, vizSelector, updatePlomSettings);
 };
 
 
-SfrBest.prototype.processMsg = function(msg, appendLog){
+PlomBest.prototype.processMsg = function(msg, appendLog){
 
   switch(msg.flag){
 
@@ -46,7 +47,7 @@ SfrBest.prototype.processMsg = function(msg, appendLog){
 };
 
 
-SfrBest.prototype.set_data = function(){
+PlomBest.prototype.set_data = function(){
   //will contain the parameter values as a function of number of iterations:
   var data = [];
   data.push(new Array(this.allParId.length+1));
@@ -57,7 +58,7 @@ SfrBest.prototype.set_data = function(){
   return data;
 };
 
-SfrBest.prototype.process_best = function(msg){
+PlomBest.prototype.process_best = function(msg){
   var x;
 
   this.data.push(new Array(this.allParId.length+1));
@@ -72,7 +73,7 @@ SfrBest.prototype.process_best = function(msg){
   this.data[x] = msg.slice(0);//[msg[0], msg[msg.length-1]];
 };
 
-SfrBest.prototype.makeGraph = function(divGraph, vizSelector, updateSfrSettings){
+PlomBest.prototype.makeGraph = function(divGraph, vizSelector, updatePlomSettings){
 
   var viz = [];
   $(vizSelector).each(function(){
@@ -109,7 +110,7 @@ SfrBest.prototype.makeGraph = function(divGraph, vizSelector, updateSfrSettings)
 };
 
 
-SfrBest.prototype.onClickCalback = function() {
+PlomBest.prototype.onClickCalback = function() {
   var that = this;
 
   return function(e, x, pts) {
@@ -117,7 +118,7 @@ SfrBest.prototype.onClickCalback = function() {
     if (that.data.length > 1) {
       var x = x || that.data.length;
 
-      //put values of best in parameters (DOM) and sfrSettings
+      //put values of best in parameters (DOM) and plomSettings
 
       var xx = x % that.bufferSize;
       xx = (xx < that.data.length) ? xx : xx-1;
@@ -128,14 +129,14 @@ SfrBest.prototype.onClickCalback = function() {
 
       var offset = 0;
       ['par_sv', 'par_proc', 'par_obs'].forEach(function(el){
-        that.sfrSettings.orders[el].forEach(function(p){
-          var id = that.sfrSettings.parameters[p]['partition_id'];
-          that.sfrSettings.partition[id]['group'].forEach(function(group, i){
+        that.plomSettings.orders[el].forEach(function(p){
+          var id = that.theta.value[p]['partition_id'];
+          that.theta.partition[id]['group'].forEach(function(group, i){
 
             var name = ['guess', p, group.id].join('___');
             $this = $('input.parameters[name="'+ name +'"]');
             $this.val(that.data[ xx ][offset+1]);
-            updateSfrSettings(that.sfrSettings, $this);
+            updatePlomSettings(that.theta, $this);
             offset++;
 
           });

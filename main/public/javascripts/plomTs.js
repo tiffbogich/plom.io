@@ -1,39 +1,41 @@
 //////////////////////////////////////////////////////////////////////////////
-//SfrTs
+//PlomTs
 //////////////////////////////////////////////////////////////////////////////
-function SfrTs(sfrSettings, divGraph_ts, divGraph_drift, divGraph_pred, vizSelector_ts, vizSelector_drift, vizSelector_pred) {
+function PlomTs(plomSettings, theta, divGraph_ts, divGraph_drift, divGraph_pred, vizSelector_ts, vizSelector_drift, vizSelector_pred) {
 
-  this.sfrSettings = sfrSettings; //just a ref
-  this.iSettings = null; //intervention model settings
+  this.plomSettings = plomSettings; //just a ref
+  this.theta = theta;
+  this.itheta = null; //intervention model settings
 
-  this.N_TS = sfrSettings.cst.N_TS;
-  this.N_CAC = sfrSettings.cst.N_C*sfrSettings.cst.N_AC;
-  this.N_PAR_SV = sfrSettings.cst.N_PAR_SV;
-  this.N_DATA = sfrSettings.cst.N_DATA;
-  this.unit = this.sfrSettings.cst.FREQUENCY;
-  this.ts_id = sfrSettings.orders.ts_id;
+  this.FREQUENCY = plomSettings.cst.FREQUENCY;
+  this.N_TS = plomSettings.cst.N_TS;
+  this.N_CAC = plomSettings.cst.N_C*plomSettings.cst.N_AC;
+  this.N_PAR_SV = plomSettings.cst.N_PAR_SV;
+  this.N_DATA = plomSettings.cst.N_DATA;
+  this.unit = this.plomSettings.cst.FREQUENCY;
+  this.ts_id = plomSettings.orders.ts_id;
 
   var allDrift = [];
-  sfrSettings.orders.drift_var.forEach(function(el){
+  plomSettings.orders.drift_var.forEach(function(el){
     var par = el.split('__')[2]; //e.g drift__par_proc__r0
-    var id = sfrSettings.parameters[par]['partition_id'];
-    sfrSettings.partition[id]['group'].forEach(function(group, i){ //iterate on every group
+    var id = theta.value[par]['partition_id'];
+    theta.partition[id]['group'].forEach(function(group, i){ //iterate on every group
       allDrift.push([par, group.id].join(' '));
     });
   });
   this.allDrift = allDrift;
 
   this.dates = [];
-  for(var i=0; i<sfrSettings.data.dates.length; i++){
-    this.dates[i] = new Date(sfrSettings.data.dates[i]);
+  for(var i=0; i<plomSettings.data.dates.length; i++){
+    this.dates[i] = new Date(plomSettings.data.dates[i]);
   }
 
 
 
-  this.data = sfrSettings.data.data; //just a reference
+  this.data = plomSettings.data.data; //just a reference
 
-  this.offsetX = 2+sfrSettings.cst.N_PAR_SV*sfrSettings.cst.N_C*sfrSettings.cst.N_AC;
-  this.offsetHat = 1+sfrSettings.cst.N_PAR_SV*sfrSettings.cst.N_C*sfrSettings.cst.N_AC*3;
+  this.offsetX = 2+plomSettings.cst.N_PAR_SV*plomSettings.cst.N_C*plomSettings.cst.N_AC;
+  this.offsetHat = 1+plomSettings.cst.N_PAR_SV*plomSettings.cst.N_C*plomSettings.cst.N_AC*3;
   this.offsetDrift = this.offsetX + this.N_TS;
   this.offsetDriftHat = this.offsetHat+ this.N_TS*3;
 
@@ -44,7 +46,7 @@ function SfrTs(sfrSettings, divGraph_ts, divGraph_drift, divGraph_pred, vizSelec
   this.graph_ts = this.makeGraph(divGraph_ts, vizSelector_ts);
 
   //only defined if the model contains drift
-  if(this.sfrSettings.orders.drift_var.length){
+  if(this.plomSettings.orders.drift_var.length){
     this.data_drift = this.set_data_drift();
     this.graph_drift = this.makeGraphDrift(divGraph_drift, vizSelector_drift);
   } else {
@@ -61,7 +63,7 @@ function SfrTs(sfrSettings, divGraph_ts, divGraph_drift, divGraph_pred, vizSelec
 };
 
 
-SfrTs.prototype.processMsg = function(msg, appendLog){
+PlomTs.prototype.processMsg = function(msg, appendLog){
 
   switch(msg.flag){
 
@@ -84,7 +86,7 @@ SfrTs.prototype.processMsg = function(msg, appendLog){
 };
 
 
-SfrTs.prototype.makeGraph = function(divGraph, vizSelector){
+PlomTs.prototype.makeGraph = function(divGraph, vizSelector){
   //vizSelector should be 'input.plottedTs'
 
   var viz = [];
@@ -134,7 +136,7 @@ SfrTs.prototype.makeGraph = function(divGraph, vizSelector){
 };
 
 
-SfrTs.prototype.makeGraphPred = function(divGraph, vizSelector){
+PlomTs.prototype.makeGraphPred = function(divGraph, vizSelector){
 
   var viz = [];
   $(vizSelector).each(function(){
@@ -212,7 +214,7 @@ SfrTs.prototype.makeGraphPred = function(divGraph, vizSelector){
 
 
 
-SfrTs.prototype.makeGraphDrift = function(divGraph, vizSelector){
+PlomTs.prototype.makeGraphDrift = function(divGraph, vizSelector){
 
   var viz = [];
   $(vizSelector).each(function(){
@@ -250,7 +252,7 @@ SfrTs.prototype.makeGraphDrift = function(divGraph, vizSelector){
 
 
 
-SfrTs.prototype.set_data_ts = function(){
+PlomTs.prototype.set_data_ts = function(){
   //get the time series data. Data are repeated 3 times to allow for custom error bars:
   //simulation (X) and (hat) will fill the null values
 
@@ -277,7 +279,7 @@ SfrTs.prototype.set_data_ts = function(){
 };
 
 
-SfrTs.prototype.set_data_drift = function(){
+PlomTs.prototype.set_data_drift = function(){
   //get the time series data. Data are repeated 3 times to allow for custom error bars:
   //simulation (X) and (hat) will fill the null values
 
@@ -295,7 +297,7 @@ SfrTs.prototype.set_data_drift = function(){
 };
 
 
-SfrTs.prototype.process_hat = function(msg){
+PlomTs.prototype.process_hat = function(msg){
   //process an hat message and load this.states
 
   if(! this.is_pred){
@@ -340,7 +342,7 @@ SfrTs.prototype.process_hat = function(msg){
 
 };
 
-SfrTs.prototype.process_X = function(msg){
+PlomTs.prototype.process_X = function(msg){
   //take an X msg and fill a hat data
 
   var n = msg[0][1];
@@ -361,16 +363,16 @@ SfrTs.prototype.process_X = function(msg){
 };
 
 
-SfrTs.prototype.updateitheta = function(){
-  return SfrSimul.prototype.updateitheta.call(this);
+PlomTs.prototype.updateitheta = function(){
+  return PlomSimul.prototype.updateitheta.call(this);
 }
 
-SfrTs.prototype.resetForecast = function(){
-  SfrSimul.prototype.resetForecast.call(this);
+PlomTs.prototype.resetForecast = function(){
+  PlomSimul.prototype.resetForecast.call(this);
 }
 
 
-SfrTs.prototype.set_data_pred = function(extraLength){
+PlomTs.prototype.set_data_pred = function(extraLength){
   //copy data_ts, add future dates if needed and add null for the future steps so that simul can write it's trajectory inside
   //values are repeated 3 times to allow for custom error bars:
 

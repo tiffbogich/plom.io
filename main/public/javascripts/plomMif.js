@@ -1,34 +1,35 @@
 //////////////////////////////////////////////////////////////////////////////
-//SfrMif
+//PlomMif
 //////////////////////////////////////////////////////////////////////////////
 
-//inherit from SfrBest
-function SfrMif(sfrSettings, divGraph, vizSelector, updateSfrSettings, divGraph_mif_within) {
+//inherit from PlomBest
+function PlomMif(plomSettings, theta, divGraph, vizSelector, updatePlomSettings, divGraph_mif_within) {
 
-  SfrBest.call(this, sfrSettings, divGraph, vizSelector, updateSfrSettings);
+  PlomBest.call(this, plomSettings, theta, divGraph, vizSelector, updatePlomSettings);
 
-  this.N_CAC = sfrSettings.cst.N_C*sfrSettings.cst.N_AC;
-  this.N_DATA = sfrSettings.cst.N_DATA;
-  this.unit = this.sfrSettings.cst.FREQUENCY;
+  this.N_CAC = plomSettings.cst.N_C*plomSettings.cst.N_AC;
+  this.N_DATA = plomSettings.cst.N_DATA;
+  this.unit = this.plomSettings.cst.FREQUENCY;
 
   var allParName = [];
   var allParType = [];
-  for(var i=0; i< sfrSettings.orders['par_proc'].length; i++){
-    allParName.push(sfrSettings.orders['par_proc'][i]);
+  for(var i=0; i< plomSettings.orders['par_proc'].length; i++){
+    allParName.push(plomSettings.orders['par_proc'][i]);
     allParType.push('par_proc');
   }
-  for(var i=0; i< sfrSettings.orders['par_obs'].length; i++){
-    allParName.push(sfrSettings.orders['par_obs'][i]);
+  for(var i=0; i< plomSettings.orders['par_obs'].length; i++){
+    allParName.push(plomSettings.orders['par_obs'][i]);
     allParType.push('par_obs');
   }
 
+  var theta= this.theta;
   var theta_mif = [];
   ['par_proc', 'par_obs'].forEach(function(el){
-    sfrSettings.orders[el].forEach(function(p){
+    plomSettings.orders[el].forEach(function(p){
 
-      if(sfrSettings.orders.drift_var.indexOf(['drift', 'par_proc', p].join('__')) === -1 ) { //if p is NOT a drift variable
-        var id = sfrSettings.parameters[p]['partition_id'];
-        sfrSettings.partition[id]['group'].forEach(function(group, i) {
+      if(plomSettings.orders.drift_var.indexOf(['drift', 'par_proc', p].join('__')) === -1 ) { //if p is NOT a drift variable
+        var id = theta.value[p]['partition_id'];
+        theta.partition[id]['group'].forEach(function(group, i) {
           theta_mif.push(p + ' ' + group.id.split('__').slice(0,2).join(' '));
         });
       };
@@ -39,8 +40,8 @@ function SfrMif(sfrSettings, divGraph, vizSelector, updateSfrSettings, divGraph_
   this.N_THETA_MIF = this.theta_mif.length;
 
   this.dates = [];
-  for(var i=0; i<sfrSettings.data.dates.length; i++){
-    this.dates[i] = new Date(sfrSettings.data.dates[i]);
+  for(var i=0; i<plomSettings.data.dates.length; i++){
+    this.dates[i] = new Date(plomSettings.data.dates[i]);
   }
 
   this.data_mif = this.set_data_mif();
@@ -48,10 +49,10 @@ function SfrMif(sfrSettings, divGraph, vizSelector, updateSfrSettings, divGraph_
 };
 
 
-SfrMif.prototype = Object.create(SfrBest.prototype);
-SfrMif.prototype.constructor = SfrMif;
+PlomMif.prototype = Object.create(PlomBest.prototype);
+PlomMif.prototype.constructor = PlomMif;
 
-SfrMif.prototype.makeGraph_mif = function(divGraph){
+PlomMif.prototype.makeGraph_mif = function(divGraph){
 
   //start with only ess visible
   var viz = [];
@@ -89,7 +90,7 @@ SfrMif.prototype.makeGraph_mif = function(divGraph){
   return g;
 };
 
-SfrMif.prototype.set_data_mif = function(){
+PlomMif.prototype.set_data_mif = function(){
   //get the MIF data. Data are repeated 2 times to allow for error bars:
 
   var data = [];
@@ -104,7 +105,7 @@ SfrMif.prototype.set_data_mif = function(){
   return data;
 };
 
-SfrMif.prototype.process_mif = function(msg){
+PlomMif.prototype.process_mif = function(msg){
   //process a mif message
 
   var x = msg[1]-1;
@@ -127,7 +128,7 @@ SfrMif.prototype.process_mif = function(msg){
 };
 
 
-SfrMif.prototype.processMsg = function(msg, appendLog){
+PlomMif.prototype.processMsg = function(msg, appendLog){
 
   switch(msg.flag){
 

@@ -1,21 +1,21 @@
 //////////////////////////////////////////////////////////////////////////////
-//SfrPmcmc
+//PlomPmcmc
 //////////////////////////////////////////////////////////////////////////////
 
-//inherit from SfrBest
-function SfrPmcmc(sfrSettings, divGraph, vizSelector, updateSfrSettings, divGraph_pmcmc_accept) {
+//inherit from PlomBest
+function PlomPmcmc(plomSettings, theta, divGraph, vizSelector, updatePlomSettings, divGraph_pmcmc_accept) {
 
-    SfrBest.call(this, sfrSettings, divGraph, vizSelector, updateSfrSettings);
+    PlomBest.call(this, plomSettings, theta, divGraph, vizSelector, updatePlomSettings);
 
     this.data_ar = this.set_data_ar();
     this.graph_ar = this.makeGraph_ar(divGraph_pmcmc_accept);
 };
 
-SfrPmcmc.prototype = Object.create(SfrBest.prototype);
-SfrPmcmc.prototype.constructor = SfrPmcmc;
+PlomPmcmc.prototype = Object.create(PlomBest.prototype);
+PlomPmcmc.prototype.constructor = PlomPmcmc;
 
 
-SfrPmcmc.prototype.processMsg = function(msg, appendLog){
+PlomPmcmc.prototype.processMsg = function(msg, appendLog){
 
     switch(msg.flag){
 
@@ -38,7 +38,7 @@ SfrPmcmc.prototype.processMsg = function(msg, appendLog){
 
 };
 
-SfrPmcmc.prototype.set_data_ar = function(){
+PlomPmcmc.prototype.set_data_ar = function(){
     //will contain the parameter values as a function of number of iterations:
     var data = [];
     data.push(new Array(this.allParId.length+1));
@@ -49,7 +49,7 @@ SfrPmcmc.prototype.set_data_ar = function(){
     return data;
 };
 
-SfrPmcmc.prototype.process = function(msg){
+PlomPmcmc.prototype.process = function(msg){
     var x;
 
     this.data_ar.push(new Array(this.allParId.length+1));
@@ -64,7 +64,7 @@ SfrPmcmc.prototype.process = function(msg){
     this.data_ar[x] = msg.slice(0);
 };
 
-SfrPmcmc.prototype.makeGraph_ar = function(divGraph){
+PlomPmcmc.prototype.makeGraph_ar = function(divGraph){
 
     //start with only global
     var viz = [];
