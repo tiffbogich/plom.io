@@ -1,4 +1,4 @@
-var plomGlobal = {context: '', process: '', link: '', theta: '', tree: ''};
+var plomGlobal = {context: '', process: '', link: '', theta: '', tree: '', node:null};
 
 function updateContext(idString){
 
@@ -33,6 +33,44 @@ function updateProcess(idString){
 }
 
 
+function onClickNodeTree(report, node, d3tree, update){
+  $('#model').removeClass('hidden');
+
+  $('#fork, #attach, #follow').removeClass('disabled');
+
+  if(report.action === 'theta'){
+    $('button#explore').removeClass('disabled');
+  } else {
+    $('button#explore').addClass('disabled');
+  }
+
+  //update time series:
+  if(plomGlobal.context !== report.context){
+    plomGlobal.context = report.context;
+    updateContext(report.context);
+  }
+
+  if(report.process && (plomGlobal.process !== report.process)){
+    plomGlobal.process = report.process;
+    updateProcess(report.process);
+  }
+
+  if(report.link && (plomGlobal.link !== report.link)){
+    //TODO
+    plomGlobal.link = report.link;
+  }
+
+  if(report.theta && (plomGlobal.theta !== report.theta)){
+    //TODO
+    plomGlobal.theta = report.theta;
+  }
+
+  plomGlobal.node=node;
+  plomGlobal.d3tree=d3tree;
+  plomGlobal.update=update;
+}
+
+
 $(document).ready(function(){
 
   $('a.getTree').click(function(event){
@@ -40,54 +78,17 @@ $(document).ready(function(){
 
     $.getJSON($(this).attr("href"), function(tree){
       $('#tree').removeClass('hidden');
+      $('#explore, #fork, #attach, #follow').addClass('disabled');
+
 
       plomGlobal.tree = tree._id;
 
       var treeData = makeTreeData(tree);
 
       $('#plom-tree-graph svg').remove();
-
       d3.select("#plom-tree-graph")
         .datum(treeData)
-        .call(plom_tree(function(report){ //callback onClickNode
-          $('#model').removeClass('hidden');
-
-          if(report.action === 'theta'){
-            $('button#explore').removeClass('disabled');
-          } else {
-            $('button#explore').addClass('disabled');
-          }
-
-          //update time series:
-          if(plomGlobal.context !== report.context){
-            plomGlobal.context = report.context;
-            updateContext(report.context);
-          }
-
-          if(report.process && (plomGlobal.process !== report.process)){
-            plomGlobal.process = report.process;
-            updateProcess(report.process);
-          }
-
-          if(report.link && (plomGlobal.link !== report.link)){
-            //TODO
-            plomGlobal.link = report.link;
-          }
-
-          if(report.theta && (plomGlobal.theta !== report.theta)){
-            //TODO
-            plomGlobal.theta = report.theta;
-          }
-
-          if($('#fork').hasClass('active')){
-            //$('#demo').collapse('show')
-            //add a node
-            $('#myModal').modal();
-
-          }
-
-
-        }));
+        .call(plom_tree(onClickNodeTree));
     });
 
   });
@@ -95,16 +96,45 @@ $(document).ready(function(){
   $('#explore').click(function() {
     if(! $(this).hasClass('disabled')) {
       $(this).button('loading');
+      console.log(plomGlobal);
       $.post("/build", {a: plomGlobal.tree, c: plomGlobal.context, p:plomGlobal.process, l: plomGlobal.link, t: plomGlobal.theta}, function(answer){
         window.location.replace('/play');
       });
     }
   });
 
-  $('#forkchange').on('click', '.active',  function(e){
-    //.removeClass doesn't work, because there are multiple listeners, listening to the same event => we need e.stopImmediatePropagation()
-    e.stopImmediatePropagation();
-    $(this).removeClass('active');
+
+  $('#fork').click(function(){
+    $('#myModal').modal('show');
   });
+
+
+ $('#fork-submit').click(function(){
+
+   $('#fork-form').ajaxSubmit({
+     success: function(response) {
+
+       var newnodes = plomGlobal.d3tree.nodes({name:"WTF", type:'context'}).reverse();
+
+       if('children' in plomGlobal.node){
+         plomGlobal.node.children.push(newnodes[0]);
+       } else {
+         plomGlobal.node.children = newnodes;
+       };
+       console.log(plomGlobal.node);
+       $('#myModal').modal('hide')
+
+       $('#myModal').on('hidden', function () {
+         plomGlobal.update(plomGlobal.node);
+       })
+
+     }
+   });
+
+ });
+
+
+
+
 
 });

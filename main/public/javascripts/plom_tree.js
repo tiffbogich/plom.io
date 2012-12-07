@@ -83,6 +83,7 @@ function plom_tree(callback) {
       function update(source) {
         // Compute the new tree layout.
         var nodes = tree.nodes(root).reverse();
+        console.log(nodes);
         // Normalize for fixed-depth.
         //nodes.forEach(function(d) { d.y = d.depth * 100; });
 
@@ -220,9 +221,7 @@ function plom_tree(callback) {
           report['context'] = mynode._id;
         }
 
-        callback(report);
-
-        //TO DO FORK and ATTACH
+        callback(report, d, tree, update);
         //update(d);
       }
     });

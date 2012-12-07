@@ -6,12 +6,12 @@ block append styles
   link(rel='stylesheet', href='/stylesheets/tree.css')
 
 block append scripts
+  script(src='/lib/jquery.form.js')
   script(src='/javascripts/plom_tree.js')
   script(src='/javascripts/library.js')
   script(src='/javascripts/d3_horizon.js')
   script(src='/javascripts/horizon.js')
   script(src='/javascripts/plomGraphModel.js')
-
 
 block content
 
@@ -23,9 +23,11 @@ block content
           button(type="submit").btn Search
 
       ul
-        each res in results
-          li: a(href="/tree?_idString=" + res._id).getTree diseases: #{res.disease.join(';')}, nodes: #{res.node.length}  
-
+        if results.length
+          each res in results
+            li: a(href="/tree?_idString=" + res._id).getTree diseases: #{res.disease.join(';')}, nodes: #{res.node.length}  
+        else if results
+          | 0 results found. <a href="#">Add an entry.</a>
 
 
 
@@ -34,12 +36,12 @@ block content
         div.btn-group
           button(data-loading-text="Building...").btn.btn-small.btn-success#explore.disabled <i class="icon-play icon-white"></i> Explore
   
-        div.btn-group(data-toggle="buttons-radio")#forkchange
-          button#fork.btn.btn-small <i class="icon-random"></i> Fork
-          button#attach.btn.btn-small <i class="icon-plus"></i> Attach
+        div.btn-group
+          button#fork.btn.btn-small.disabled <i class="icon-random"></i> Fork
+          button#attach.btn.btn-small.disabled <i class="icon-plus"></i> Attach
   
         div.btn-group
-          button(type="button").btn.btn-small.btn-primary <i class="icon-eye-open icon-white"></i> Follow        
+          button(type="button")#follow.btn.btn-small.btn-primary.disabled <i class="icon-eye-open icon-white"></i> Follow        
 
       div#plom-tree-graph
           
@@ -77,9 +79,26 @@ block content
      h3 Modal header
 
     div.modal-body
-      form(action="...", method="post", enctype="multipart/form-data")
+
+      ul.nav.nav-tabs
+        li.active: a(href="#home", data-toggle="tab") home
+        li: a(href="#profile", data-toggle="tab") profile
+
+      div.tab-content
+        div.tab-pane.active#home
+          p
+            | hddwdwdw
+
+        div.tab-pane#profile
+          p
+            | dwdwdw
+
+
+
+
+      form(action="/component", method="post", enctype="multipart/form-data")#fork-form
         input(type="file", name="component")
-        input(type="submit").hide
 
     div.modal-footer
+      a(href="#")#fork-submit.btn Submit
       a(href="#", data-dismiss="modal").btn Cancel
