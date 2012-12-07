@@ -23,7 +23,7 @@ block content
           button(type="submit").btn Search
 
       ul
-        if results.length
+        if results && results.length
           each res in results
             li: a(href="/tree?_idString=" + res._id).getTree diseases: #{res.disease.join(';')}, nodes: #{res.node.length}  
         else if results
@@ -76,28 +76,25 @@ block content
   div#myModal.modal.hide.fade
     div.modal-header
      button(type="button", data-dismiss="modal", aria-hidden="true").close &times;
-     h3 Modal header
+     h3 Publish
 
     div.modal-body
 
       ul.nav.nav-tabs
-        li.active: a(href="#home", data-toggle="tab") home
-        li: a(href="#profile", data-toggle="tab") profile
+        li.active: a(href="#upload", data-toggle="tab") upload a JSON document
+        li: a(href="#browse", data-toggle="tab") browse the library
 
       div.tab-content
-        div.tab-pane.active#home
+        div.tab-pane.active#upload
+          form(action="/component", method="post", enctype="multipart/form-data")#fork-form
+            input(type="file", name="component")
+            input(type="hidden", name="tree_idString", value="")
+            input(type="hidden", name="parent_idString", value="")
+
+        div.tab-pane#browse
           p
-            | hddwdwdw
+            | coming soon
 
-        div.tab-pane#profile
-          p
-            | dwdwdw
-
-
-
-
-      form(action="/component", method="post", enctype="multipart/form-data")#fork-form
-        input(type="file", name="component")
 
     div.modal-footer
       a(href="#")#fork-submit.btn Submit

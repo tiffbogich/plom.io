@@ -34,6 +34,8 @@ function updateProcess(idString){
 
 
 function onClickNodeTree(report, node, d3tree, update){
+  console.log(node);
+
   $('#model').removeClass('hidden');
 
   $('#fork, #attach, #follow').removeClass('disabled');
@@ -111,23 +113,28 @@ $(document).ready(function(){
 
  $('#fork-submit').click(function(){
 
+   $('input[name="tree_idString"]').val(plomGlobal.tree)
+     .next().val(plomGlobal.node._id);
+
    $('#fork-form').ajaxSubmit({
      success: function(response) {
 
-       var newnodes = plomGlobal.d3tree.nodes({name:"WTF", type:'context'}).reverse();
+       var resnode = {name: response.name,
+                      _id: response._id,
+                      type: response.type};
+
+       var newnodes = plomGlobal.d3tree.nodes(resnode).reverse();
 
        if('children' in plomGlobal.node){
          plomGlobal.node.children.push(newnodes[0]);
        } else {
          plomGlobal.node.children = newnodes;
        };
-       console.log(plomGlobal.node);
-       $('#myModal').modal('hide')
+       $('#myModal').modal('hide');
 
        $('#myModal').on('hidden', function () {
          plomGlobal.update(plomGlobal.node);
-       })
-
+       });
      }
    });
 

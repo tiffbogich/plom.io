@@ -189,18 +189,16 @@ exports.components_post = function (req, res, next) {
 
   fs.readFile(req.files.component.path, function (err, data) {
 
-    res.json(JSON.parse(data));
-
-    //check data...
+    var component = JSON.parse(data);
 
     //insert in the db
-//    var trees = req.app.get('trees')
-//      , components = req.app.get('components');
-//    var ptrees =  new PlomTrees(components, trees);
-//
-//    ptrees.insertComponentAt(data, tree_idString, parent_idString, function(err, doc){
-//      res.json(doc);
-//    });
+    var trees = req.app.get('trees')
+      , components = req.app.get('components');
+    var ptrees =  new PlomTrees(components, trees);
+
+    ptrees.insertComponentAt(component, req.body.tree_idString, req.body.parent_idString, function(err, doc){
+      res.json(doc);
+    });
 
   });
 
