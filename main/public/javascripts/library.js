@@ -28,6 +28,7 @@ function updateContext(idString){
 function updateProcess(idString){
   $.getJSON('/component?_idString=' + idString, function(component){
     $('#plom-detail-model svg').remove();
+    console.log(component);
     plomGraphModel(component, '#plom-detail-model');
   })
 }
@@ -38,7 +39,7 @@ function onClickNodeTree(report, node, d3tree, update){
 
   $('#model').removeClass('hidden');
 
-  $('#fork, #attach, #follow').removeClass('disabled');
+  $('#fork, #follow').removeClass('disabled');
 
   if(report.action === 'theta'){
     $('button#explore').removeClass('disabled');
@@ -80,7 +81,7 @@ $(document).ready(function(){
 
     $.getJSON($(this).attr("href"), function(tree){
       $('#tree').removeClass('hidden');
-      $('#explore, #fork, #attach, #follow').addClass('disabled');
+      $('#explore, #fork, #follow').addClass('disabled');
 
 
       plomGlobal.tree = tree._id;
@@ -107,8 +108,14 @@ $(document).ready(function(){
 
 
   $('#fork').click(function(){
-    $('#myModal').modal('show');
+    $('#forkModal').modal('show');
   });
+
+  //fix bug modal twitter bs
+  $('#forkModal').on('show', function(){
+    $('#upload-active').addClass('active');
+  });
+
 
 
  $('#fork-submit').click(function(){
@@ -130,18 +137,14 @@ $(document).ready(function(){
        } else {
          plomGlobal.node.children = newnodes;
        };
-       $('#myModal').modal('hide');
+       $('#forkModal').modal('hide');
 
-       $('#myModal').on('hidden', function () {
+       $('#forkModal').on('hidden', function () {
          plomGlobal.update(plomGlobal.node);
        });
      }
    });
 
  });
-
-
-
-
 
 });

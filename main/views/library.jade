@@ -38,7 +38,6 @@ block content
   
         div.btn-group
           button#fork.btn.btn-small.disabled <i class="icon-random"></i> Fork
-          button#attach.btn.btn-small.disabled <i class="icon-plus"></i> Attach
   
         div.btn-group
           button(type="button")#follow.btn.btn-small.btn-primary.disabled <i class="icon-eye-open icon-white"></i> Follow        
@@ -73,21 +72,21 @@ block content
         div#plom-detail-model
 
 
-  div#myModal.modal.hide.fade
+  div#forkModal.modal.hide.fade
     div.modal-header
      button(type="button", data-dismiss="modal", aria-hidden="true").close &times;
-     h3 Publish
+     h3 Fork
 
     div.modal-body
 
       ul.nav.nav-tabs
-        li.active: a(href="#upload", data-toggle="tab") upload a JSON document
+        li#upload-active.active: a(href="#upload", data-toggle="tab") upload a JSON document
         li: a(href="#browse", data-toggle="tab") browse the library
 
       div.tab-content
         div.tab-pane.active#upload
           form(action="/component", method="post", enctype="multipart/form-data")#fork-form
-            input(type="file", name="component")
+            input(type="file", name="component", style="line-height: 0px; margin-top:10px;")
             input(type="hidden", name="tree_idString", value="")
             input(type="hidden", name="parent_idString", value="")
 

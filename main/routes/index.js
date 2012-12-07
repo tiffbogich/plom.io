@@ -39,6 +39,19 @@ exports.play = function(req, res, next){
               if(err) return next(err);
 
               settings = JSON.parse(settings);
+
+              //in case of intervention, remove data
+              for(par in tDoc.value){
+                if ('intervention' in tDoc.value[par] && tDoc.value[par]['intervention']){
+                  settings.cst.N_DATA = 0;
+                  if('data' in settings.data){
+                    settings.data.data = [];
+                  }
+                  break;
+                }
+              }
+              console.log(settings.data.data);
+
               res.format({
                 json: function(){
                   res.send({settings: settings, tree: aDoc, process: pDoc, context_id: cDoc._id, link: lDoc, theta: tDoc});

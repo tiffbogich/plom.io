@@ -330,7 +330,7 @@ block content
                       - theta.partition[theta.value[el]['partition_id']]['group'].forEach(function(group, i) {                  
                         - var val = theta.value[el]['guess'][group.id]; 
                         div
-                          | <a href="#" data-placement="top" rel="tooltip" data-original-title="#{theta.value[el]['comment']}" class="plomTooltip">#{el}</a> (#{group.id}) = <span id="caption___#{el}___#{group.id}">#{val}</span>
+                          | <a href="#" data-placement="top" rel="tooltip" data-original-title="#{theta.value[el]['comment']}" class="plomTooltip">#{el}</a> (#{group.id.split('__').join(' ')}) = <span id="caption___#{el}___#{group.id}">#{val}</span>
                           input(type="hidden", name="intervention___#{el}___#{group.id}", value=val)
 
                         div(id="slider___#{el}___#{group.id}").last
