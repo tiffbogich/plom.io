@@ -17,7 +17,12 @@ exports.play = function(req, res, next){
     , c = req.session.context
     , p = req.session.process
     , l = req.session.link
-    , t = req.query.t || req.session.theta;
+    , t = req.session.theta;
+
+  if('t' in req.query){
+    t = req.query.t;
+    req.session.theta = t;
+  }
 
   var trees = req.app.get('trees')
     , components = req.app.get('components');
@@ -50,7 +55,6 @@ exports.play = function(req, res, next){
                   break;
                 }
               }
-              console.log(settings.data.data);
 
               res.format({
                 json: function(){

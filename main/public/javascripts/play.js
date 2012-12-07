@@ -343,7 +343,7 @@ $(document).ready(function(){
       .datum(treeData)
       .call(plom_tree(function(report){ //callback onClickNode
         if(report.action === 'theta' && report.theta !== theta._id){
-          window.location.replace('/play?&t=' + theta._id);
+          window.location.replace('/play?&t=' + report.theta);
         }
       }));
 
