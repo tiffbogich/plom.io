@@ -10,7 +10,8 @@
   "author": "Sebastien Ballesteros",
   "license": "GPLv3",
   "dependencies": {
-    "connect": "~2.7.0",
-    "csv2array": "0.0.1"
+    "csv2array": "0.0.1",
+    "mongodb": "~1.2.2",
+    "express": "~3.0.4"
   }
 }
