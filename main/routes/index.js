@@ -204,20 +204,24 @@ exports.components = function (req, res, next) {
 
 exports.components_post = function (req, res, next) {
 
-  fs.readFile(req.files.component.path, function (err, data) {
+  //insert in the db
+  var trees = req.app.get('trees')
+    , components = req.app.get('components');
+  var ptrees =  new PlomTrees(components, trees);
 
-    var component = JSON.parse(data);
-
-    //insert in the db
-    var trees = req.app.get('trees')
-      , components = req.app.get('components');
-    var ptrees =  new PlomTrees(components, trees);
-
-    ptrees.insertComponentAt(component, req.body.tree_idString, req.body.parent_idString, function(err, doc){
+  //from .json file
+  if (req.files && ('component' in req.files)){
+    fs.readFile(req.files.component.path, function (err, data) {
+      var component = JSON.parse(data);
+      ptrees.insertComponentAt(component, req.body.tree_idString, req.body.parent_idString, function(err, doc){
+        res.json(doc);
+      });
+    });
+  } else { //from post
+    ptrees.insertComponentAt(req.body.component, req.body.tree_idString, req.body.parent_idString, function(err, doc){
       res.json(doc);
     });
-
-  });
+  }
 
 };
 

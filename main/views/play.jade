@@ -176,7 +176,7 @@ block content
           div.btn-group
             a(href="#").btn.btn-small.start#runSMC <i class="icon-play"></i> Run
             a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
-            a(href="#").btn.btn-small <i class="icon-ok"></i> Save
+            a(href="#").btn.btn-small.save <i class="icon-ok"></i> Save
 
 
         if settings.cst.N_DATA
@@ -296,7 +296,7 @@ block content
           div.btn-group
             a(href="#", data-placement="top", rel="tooltip", data-original-title="Click on the graph to trigger an intervention").btn.btn-small.start#resetPred.plomTooltip <i class="icon-refresh"></i> Reset Forecast
             a(href="#").btn.btn-small.stop <i class="icon-remove"></i> Stop
-            a(href="#").btn.btn-small <i class="icon-ok"></i> Save
+            a(href="#").btn.btn-small.save <i class="icon-ok"></i> Save
         input(style="display:none;")#runPred //used to trigger runPred from the graph call back
 
         if settings.cst.N_DATA
@@ -416,3 +416,26 @@ block content
         h3.title-side Model Structure
 
         div#plom-graph-model
+
+
+  div#saveModal.modal.hide.fade
+    div.modal-header
+     button(type="button", data-dismiss="modal", aria-hidden="true").close &times;
+     h3 Save Parameters (theta)
+
+    div.modal-body
+
+      form(action="/component", method="post")#save-form.form-horizontal
+        div.control-group
+         label(for="inputName").control-label Name
+         div.controls
+           input(type="text", name="name", placeholder="name")#inputName
+        div.control-group
+         label(for="inputDescription").control-label Description
+         div.controls
+           textarea(rows="10", name="description", placeholder="description")#inputDescription
+
+    div.modal-footer
+      a(href="#")#save-submit.btn Submit
+      a(href="#", data-dismiss="modal").btn Cancel
+

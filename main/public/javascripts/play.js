@@ -328,29 +328,24 @@ $(document).ready(function(){
     plomGlobal.modelId = [answer.context_id, answer.process._id, answer.link._id];
 
     ////////////////////////////////////////////////////////////////////////////////////////
-    //get the process.json from the server
+    //draw the model
     ////////////////////////////////////////////////////////////////////////////////////////
-    $.getJSON('/component?_idString=' + answer.process._id, function(process){
-      plomGraphModel(process, '#plom-graph-model');
-    });
-
+    plomGraphModel(answer.process, '#plom-graph-model');
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //draw subtree (starting at link level)
     ////////////////////////////////////////////////////////////////////////////////////////
     var treeData = makeTreeData(answer.tree, answer.link._id);
-    d3.select("#plom-tree-graph")
-      .datum(treeData)
-      .call(plom_tree(function(report){ //callback onClickNode
-        if(report.action === 'theta' && report.theta !== theta._id){
-          window.location.replace('/play?&t=' + report.theta);
-        }
-      }));
+
+    plomGlobal.addNodeTo = plom_tree("#plom-tree-graph", treeData, function(report){
+      if(report.action === 'theta' && report.theta !== theta._id){
+        window.location.replace('/play?&t=' + report.theta);
+      }
+    });
 
     if(!plomSettings.cst.N_DATA) {
       $('#tab-graph-forecasting').addClass('cursorSeringue');
     }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //when user changes values, we update the object originaly fetched from the plomSettings
@@ -814,6 +809,46 @@ $(document).ready(function(){
         }
       });
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    // save
+    ////////////////////////////////////////////////////////////////////////////////////////
+    $('.save').click(function(){
+      $('#saveModal').modal('show');
+    });
+
+    $('#save-submit').click(function(){
+
+      var $form = $('#save-form');
+      var data = {tree_idString: answer.tree._id,
+                  parent_idString: theta._id,
+                  component: {name: $form.find( 'input[name="name"]' ).val(),
+                              type: "theta",
+                              description: $form.find( 'textarea[name="description"]' ).val(),
+                              partition: theta.partition,
+                              value:theta.value}};
+
+      $.ajax($form.attr('action'), {
+        data: JSON.stringify(data),
+        contentType : 'application/json',
+        type : 'POST',
+        success: function(response){
+
+          $('#saveModal').modal('hide');
+
+          var resnode = {name: response.name,
+                         _id: response._id,
+                         type: response.type};
+          var parent_id = theta._id;
+          theta._id = response._id;
+
+          $('#saveModal').one('hidden', function () {
+            d3.select('#_id' + parent_id).each(function(d){
+              plomGlobal.addNodeTo(resnode, d);
+            });
+          });
+        }});
+    });
 
   });
 

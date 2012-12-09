@@ -1,4 +1,4 @@
-var plomGlobal = {context: '', process: '', link: '', theta: '', tree: '', node:null};
+var plomGlobal = {context: '', process: '', link: '', theta: '', tree: '', _id:''};
 
 function updateContext(idString){
 
@@ -28,14 +28,12 @@ function updateContext(idString){
 function updateProcess(idString){
   $.getJSON('/component?_idString=' + idString, function(component){
     $('#plom-detail-model svg').remove();
-    console.log(component);
     plomGraphModel(component, '#plom-detail-model');
   })
 }
 
 
-function onClickNodeTree(report, node, d3tree, update){
-  console.log(node);
+function onClickNodeTree(report){
 
   $('#model').removeClass('hidden');
 
@@ -68,9 +66,7 @@ function onClickNodeTree(report, node, d3tree, update){
     plomGlobal.theta = report.theta;
   }
 
-  plomGlobal.node=node;
-  plomGlobal.d3tree=d3tree;
-  plomGlobal.update=update;
+  plomGlobal._id= report[report.action];
 }
 
 
@@ -83,15 +79,13 @@ $(document).ready(function(){
       $('#tree').removeClass('hidden');
       $('#explore, #fork, #follow').addClass('disabled');
 
-
       plomGlobal.tree = tree._id;
 
       var treeData = makeTreeData(tree);
 
       $('#plom-tree-graph svg').remove();
-      d3.select("#plom-tree-graph")
-        .datum(treeData)
-        .call(plom_tree(onClickNodeTree));
+
+      plomGlobal.addNodeTo = plom_tree("#plom-tree-graph", treeData, onClickNodeTree);
     });
 
   });
@@ -99,13 +93,11 @@ $(document).ready(function(){
   $('#explore').click(function() {
     if(! $(this).hasClass('disabled')) {
       $(this).button('loading');
-      console.log(plomGlobal);
       $.post("/build", {a: plomGlobal.tree, c: plomGlobal.context, p:plomGlobal.process, l: plomGlobal.link, t: plomGlobal.theta}, function(answer){
         window.location.replace('/play');
       });
     }
   });
-
 
   $('#fork').click(function(){
     $('#forkModal').modal('show');
@@ -117,34 +109,26 @@ $(document).ready(function(){
   });
 
 
-
  $('#fork-submit').click(function(){
-
    $('input[name="tree_idString"]').val(plomGlobal.tree)
-     .next().val(plomGlobal.node._id);
+     .next().val(plomGlobal._id);
 
    $('#fork-form').ajaxSubmit({
      success: function(response) {
+
+       $('#forkModal').modal('hide');
 
        var resnode = {name: response.name,
                       _id: response._id,
                       type: response.type};
 
-       var newnodes = plomGlobal.d3tree.nodes(resnode).reverse();
-
-       if('children' in plomGlobal.node){
-         plomGlobal.node.children.push(newnodes[0]);
-       } else {
-         plomGlobal.node.children = newnodes;
-       };
-       $('#forkModal').modal('hide');
-
-       $('#forkModal').on('hidden', function () {
-         plomGlobal.update(plomGlobal.node);
+       $('#forkModal').one('hidden', function () {
+         d3.select('#_id' + plomGlobal._id).each(function(d){
+           plomGlobal.addNodeTo(resnode, d);
+         });
        });
      }
    });
-
  });
 
 });
