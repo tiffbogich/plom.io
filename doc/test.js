@@ -1,7 +1,7 @@
 // Listen
 
 var app  = require('./app')
-  , http = requre('http');
+  , http = require('http');
 
 var server = http.createServer(app);
 server.listen(3000, function(){
