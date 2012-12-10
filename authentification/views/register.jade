@@ -2,6 +2,8 @@ extends layout
 
 block content 
 
+
+
   if(locals.fail)
     div.alert.alert-error
       | <strong>Error:</strong> #{fail}
@@ -15,6 +17,11 @@ block content
   form(action="/register", method="POST")
     fieldset
       legend Register
+
+      div.alert.alert-error
+        | <strong>Important</strong> plom.io is not ready for production and the database is deleted on a daily basis.
+        | To help us build plom.io faster, we invite you to contribute on <a href="https://github.com/plom">github</a>.
+
 
       input(name="_csrf", value=token, type="hidden")      
       p
