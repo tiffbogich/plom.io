@@ -617,6 +617,13 @@ write(toJSON(m, collapse=''), file="process.json")
       A context is defined by:
     </p>
 
+      <h4>Diseases</h4>
+      <ul>
+        <li>
+          <code>disease</code>: A list of diseases involved.
+        </li>
+      </ul>      
+
       <h4>Where it takes place</h4>
 
       <ul>
@@ -699,6 +706,7 @@ write(toJSON(m, collapse=''), file="process.json")
 {
  "name": "An explicit name",
  "description": "An explicit description",
+ "disease": ["measles"],
  
  "population": [{"id": "city1__all",
                  "size_t0": 1e6,

@@ -57,13 +57,13 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
-app.get('/play', routes.play);
-app.get('/library', routes.library);
-app.get('/tree', routes.trees);
-app.get('/component', routes.components);
+app.get('/play', secure, routes.play);
+app.get('/library', secure, routes.library);
+app.get('/tree', secure, routes.trees);
+app.get('/component', secure, routes.components);
 
-app.post('/build', routes.build); //TODO csrf
-app.post('/component', routes.components_post);
+app.post('/build', secure, routes.build); //TODO csrf
+app.post('/component', secure, routes.components_post);
 
 
 var server = http.createServer(app);

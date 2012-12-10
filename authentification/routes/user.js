@@ -42,7 +42,7 @@ exports.login_post = function(req, res, next) {
 
         if (is_identical) {
           req.session.username = doc._id;
-          res.redirect(req.body.next || '/success');
+          res.redirect(req.body.next || '/');
         } else {
           res.render('login', {fail: 'invalid password or username'});
         }
