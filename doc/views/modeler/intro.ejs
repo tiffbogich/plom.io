@@ -2,52 +2,144 @@
 
 <div class="row">
 
-  <div class="span6">
+  <div class="span7">
+    <h1>Enjoy the workflow</h1>
+
+    <ol>
+      <li>
+        Get a <a href="/doc/modeler/create#context">context</a> template
+        <img style="float:right; height:40px", src="/images/cities_small.png">
+        <ul>
+          <li>
+            From scratch:
+            <pre class="prettyprint">plom create context -o context.json </pre>
+          </li>
+          <li>
+            From the library:
+            <pre class="prettyprint">plom search measles london
+plom fetch object_id</pre>
+          </li>
+        </ul>
+      </li>
+
+      <li>
+        Get a <a href="/doc/modeler/create#process">process</a> template
+        <img style="float:right; height:45px", src="/images/sneeze_big.png">
+        <ul>
+          <li>
+            From scratch:
+            <pre class="prettyprint">plom create process -o process.json </pre>
+          </li>
+          <li>
+            From the library:
+            <pre class="prettyprint">plom search SIR
+plom fetch object_id</pre>
+          </li>
+        </ul>
+      </li>
+
+      <li>
+        <img style="float:right; height:40px", src="/images/observation_small.png">
+        <a href="/doc/modeler/create#link">Link</a> the process model to the context
+
+        <ul>
+          <li>
+            From scratch:
+            <pre class="prettyprint">plom create link context.json process.json -o link.json </pre>
+          </li>
+          <li>
+            From the library:
+            <pre class="prettyprint">plom search binonial observation process SIR
+plom fetch object_id</pre>
+          </li>
+        </ul>
+
+
+      </li>
+
+      <li>
+        Deleguate the hard work (coding in C, compiling...)
+        <pre class="prettyprint">plom install context.json process.json link.json -o my_model</pre>
+      </li>
+
+
+      <li>
+        Set parameters values and grouping (<a href="/doc/modeler/create#theta">theta</a>)
+        <img style="float:right; height:40px", src="/images/theta_small.png">
+        <ul>
+          <li>
+             From scratch
+            <pre class="prettyprint">plom create theta context.json process.json link.json -o theta.json </pre>
+          </li>
+          <li>
+            From the library
+            <pre class="prettyprint">plom search measles SIR
+plom fetch object_id</pre>
+          </li>
+        </ul>
+      </li>
+
+      <li>
+        Adapt the parameters to the model
+        <pre class="prettyprint">fit adapt theta.json context.json process.json link.json</pre>
+      </li>
+
+      <li>
+        Fit theta <a href="/doc/modeler/play">chaining</a> inference methods
+        <pre class="prettyprint">fit theta | ./simplex -M 10000
+fit theta -B | ./smc deter --traj</pre>
+      </li>
+
+
+
+      <li>
+        Get serious (latin hyper square sampling on the cloud)
+        <pre class="prettyprint">fit lhs theta.json "simplex -M 10000" 100 --queue SGE,01:00:00</pre>
+      </li>
+
+
+      <li>
+        Publish to the library
+        <pre class="prettyprint">plom publish my.json</pre>
+      </li>
+
+
+    </ol>
+
+  </div>
+
+
+  <div class="span5">
     <h1>Learn the concepts</h1>
 
     <ol>
       <li><a href="/doc/modeler/create">A layered grammar for epidemiological models</a></li>
-      <li><a href="/doc/modeler/play">The zero framework framework:
-      Unix pipes and inference methods</a></li>
-      <li><a href="/doc/modeler/hfmd">Real life example 1: integrated inference strategy</a></li>
-      <li><a href="/doc/modeler/h1n1">Real life example 2: capture unknown variations of key parameters</a></li>
-      <li><a href="/doc/modeler/refs">Want more? PLoM references</a></li>
+      <li><a href="/doc/modeler/play">Inference methods with a taste of Unix philosophy</a></li>
+      <li><a href="/doc/modeler/hfmd">Integrated inference strategy</a></li>
+      <li><a href="/doc/modeler/h1n1">Capturing unknown variations of key parameters</a></li>
+      <li><a href="/doc/modeler/refs">References</a></li>
     </ol>
-    
-  </div>
 
-  <div class="span6">
-    <h1>Enjoy the workflow</h1>
+    <h1>Install the packages</h1>
 
-    <p>    
-      <ol>
+    <p>First make sure that you have installed <a href="http://nodejs.org">Node.js</a></p> 
+
+    <p>
+      <ul>
         <li>
-          Get a context template
-          <pre class="prettyprint">plom --context -o context.json </pre>
+          Install plom command line interface<br/>
+          <code>npm install plom-cli -g</code>
         </li>
         <li>
-          Get a model template
-          <pre class="prettyprint">plom --model -o model.json</pre>
+          Install plom command line inference tools<br/>
+          <code>npm install plom-fit -g</code>
         </li>
-        <li>
-          Get a link template
-          <pre class="prettyprint">plom context.json model.json --link -o link.json</pre>
-        </li>
-        <li>
-          Deleguate the hard work
-          <pre class="prettyprint">plom context.json model.json link.json -o my_model</pre>
-        </li>
-        <li>
-          Play 
-<pre class="prettyprint">
-plom --lhs mif -H 100 -J 1000 --cluster SGE -o lhs.json
-sfi --bootstrap lhs.json && ./lhs.sh
-</pre>
-        </li>
-      </ol>
+      </ul>
     </p>
 
   </div>
+
+
 
 </div>
 

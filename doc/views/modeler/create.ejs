@@ -56,14 +56,13 @@
 </div>
 
 <div class="page-header">
-  <h1>The model <small>It's about disease, only diseases</small></h1>
+  <h1 id="process">The process <small>It's about disease, only diseases</small></h1>
 </div>
 
 
 <div class="row">
 
-<img src="/images/sneeze_big.png" class="sfr-img-center"
-  alt="model illustration"/>
+<img src="/images/sneeze_big.png" class="sfr-img-center" alt="model illustration"/>
 
   <div class="span4">
     <h3>The good old SIR model</h3>
@@ -114,13 +113,13 @@
 <div class="row">
 
   <div class="span8">
-    <h3>What does it look like in JSON: model.json?</h3>
+    <h3>What does it look like in JSON: process.json?</h3>
 
 
 <pre class="prettyprint">
 {
- "id": "SIR",
- "comment": "SIR model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term",
+ "name": "SIR",
+ "description": "SIR process model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term",
 
  "state": [{"id": "S", "comment": "Susceptible"},
            {"id": "I", "comment": "Infectious"}],
@@ -166,14 +165,12 @@
     <h4>Meta information</h4>
     <ul>
       <li>
-        <code>id</code>: The name of the process model (optional).
+        <code>name</code>: The name of the process model (optional).
       </li>
       <li>
-        <code>comment</code>: An optional description.
+        <code>description</code>: A description.
       </li>
     </ul>
-
-    <p>Note: All the <code>comment</code> properties are optional.</p>
 
     <h4>State variable and parameters</h4>
     <ul>
@@ -186,7 +183,7 @@
     </ul>
 
 
-    <h4>Model definition</h4>
+    <h4>Process model definition</h4>
     <ul>
       <li>
         <code>model</code>: The process model defined by
@@ -204,6 +201,8 @@
       </li>
 
     </ul>
+
+    <p>Note: All the <code>comment</code> properties are optional.</p>
   </div>
 
 
@@ -311,11 +310,11 @@
   </div>
 
   <div class="span4">
-    <h3>Be lazy: Get a template</h3>
+    <h3>Be lazy: get a template</h3>
 
     <p>      
-      You can use <code>plom</code> to get a blank model.json: <br/>
-      <code>plom --model -o model.json</code>
+      You can use <code>plom</code> to get a process.json: <br/>
+      <code>plom create process -o process.json</code>
     </p>
 
     <p> If you remember this, you will never have to read this
@@ -387,7 +386,7 @@ m.state.forEach(function(X){
 m.pop_size_eq_sum_sv = false;
 
 //write the json file:
-fs.writeFileSync('model.json', JSON.stringify(m));
+fs.writeFileSync('process.json', JSON.stringify(m));
 </pre>
 
 
@@ -424,7 +423,7 @@ for X in m["state"]:
 m["pop_size_eq_sum_sv"] = false
 
 #write the json file:
-json.dump(m, open('model.json', 'w'))
+json.dump(m, open('process.json', 'w'))
 </pre>
 
           </div>
@@ -462,7 +461,7 @@ for(X in m$state){
 m$pop_size_eq_sum_sv <- FALSE
 
 ##write the json file:
-write(toJSON(m, collapse=''), file="model.json")
+write(toJSON(m, collapse=''), file="process.json")
 </pre>
 
           </div>
@@ -478,7 +477,7 @@ write(toJSON(m, collapse=''), file="model.json")
 
 
 <div class="page-header">
-  <h1>The context <small>Define your world smoothly (real and virtual)</small></h1>
+  <h1 id="context">The context <small>Define your world smoothly (real and virtual)</small></h1>
 </div>
 
 <div class="row">
@@ -614,7 +613,9 @@ write(toJSON(m, collapse=''), file="model.json")
   <div class="span4">
     <h3>Encoding the context</h3>
 
-    <p>A context is defined by:
+    <p>
+      A context is defined by:
+    </p>
 
       <h4>Where it takes place</h4>
 
@@ -649,6 +650,22 @@ write(toJSON(m, collapse=''), file="model.json")
         </li>
       </ul>
 
+      <h4>Model</h4>
+
+      <ul>
+        <li>
+          <code>model</code>:
+          <ul>
+            <li>
+              <code>space</code>: A list of models for the spatial structure and dynamic
+            </li>
+            <li>
+              <code>age</code>: A list of models for demographic dynamic and heterogenous contacts
+            </li>
+          </ul>
+        </li>
+      </ul>
+
 
       <h4>Data</h4>
 
@@ -673,24 +690,6 @@ write(toJSON(m, collapse=''), file="model.json")
         </li>
       </ul>
 
-      <h4>Model</h4>
-
-      <ul>
-        <li>
-          <code>model</code>:
-          <ul>
-            <li>
-              <code>space</code>: A list of models for the spatial structure and dynamic
-            </li>
-            <li>
-              <code>age</code>: A list of models for demographic dynamic and heterogenous contacts
-            </li>
-          </ul>
-        </li>
-      </ul>
-
-    </p>
-
   </div>
 
   <div class="span8">
@@ -698,8 +697,8 @@ write(toJSON(m, collapse=''), file="model.json")
 
 <pre class="prettyprint">
 {
- "id": "my_fake_context",
- "comment": "A fake context from the real life",
+ "name": "An explicit name",
+ "description": "An explicit description",
  
  "population": [{"id": "city1__all",
                  "size_t0": 1e6,
@@ -720,7 +719,12 @@ write(toJSON(m, collapse=''), file="model.json")
                  {"id": "all__google__inc",
                   "population_id": ["city1__all", "city2__all"],
                   "comment": ""}],
+
  
+ "model": {"space": {"type": ["external"]},
+           "age": {}},
+ 
+
  "frequency": "W",
  
  "data": [{"id": "data",
@@ -739,10 +743,7 @@ write(toJSON(m, collapse=''), file="model.json")
            "comment": "birth rates"},
           {"id": "mu_d",
            "source": "data/mu_d.csv",
-           "comment": "death rates"}],
- 
- "model": {"space": {"type": ["external"]},
-           "age": {}}
+           "comment": "death rates"}]
 }
 </pre>
 
@@ -771,9 +772,9 @@ write(toJSON(m, collapse=''), file="model.json")
 
     <p>Here again, don't struggle to remember the details, simply run:</p>
     <p>
-    <code>./plom --context -o context.json</code>
+    <code>./plom create context -o context.json</code>
     </p>
-    <p>to get a blank context.json</p>
+    <p>to get a context.json</p>
 
   </div>
 
@@ -781,7 +782,7 @@ write(toJSON(m, collapse=''), file="model.json")
 
 
 <div class="page-header">
-  <h1>The link <small>Connecting the context and the model</small></h1>
+  <h1 id="link">The link <small>Connecting the context and the model</small></h1>
 </div>
 
 
@@ -847,32 +848,6 @@ write(toJSON(m, collapse=''), file="model.json")
         </li>
       </ul>
 
-
-      <h4>Parameter values</h4>
-
-        <ul>
-          <li>
-            <code>transformation</code>: Some parameters have to
-            stay <strong>positive</strong>
-            or <strong>bounded</strong>. Specifying a transformation
-            function is an easy way to ensure these constraints.
-          </li>
-          <li>
-            <code>unit</code>, <code>type</code>: If a parameter is a rate,
-            its unit has to be specified using the <code>unit</code>
-            property. For user convenience, rates can be parametrized as
-            duration (i.e. providing values for 1/rate instead of rate) by
-            setting the property <code>type</code> to the
-            value <em>'rate_as_duration'</em>. In our case, <em>v</em> is
-            the recovery rate, but we decided to parametrize it as a duration
-            with a guess value of 11 days.
-          </li>
-          <li>
-            <code>min</code>, <code>max</code>,<code>guess</code>,<code>sd_transf</code>:
-            Specify the values of the parameters
-          </li>
-        </ul>
-
   </div>
 
   <div class="span8">
@@ -904,9 +879,73 @@ write(toJSON(m, collapse=''), file="model.json")
 
 "model": {"distribution": "discretized_normal",
           "mean": "prop*rep*x",
-          "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"},
+          "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"}
+}
+</pre>
+
+  </div>
+</div>
+
+<div class="row">
+
+  <div class="span8">
+    <h3>Get a template</h3>
+
+    <p>As usual, don't struggle to remember the details, simply run:</p>
+    <p>
+    <code>plom create link context.json process.json -o link.json</code>
+    </p>
+    <p>to get a link.json</p>
+
+  </div>
+</div>
 
 
+<div class="page-header">
+  <h1 id="theta">The parameters <small>what will be inferred</small></h1>
+</div>
+
+
+
+
+<div class="row">
+
+  <img src="/images/theta_large.png" class="sfr-img-center" alt="theta"/>
+
+    <div class="span4">
+
+      <h4>Properties</h4>
+        <ul>
+          <li>
+            <code>transformation</code>: Some parameters have to
+            stay <strong>positive</strong>
+            or <strong>bounded</strong>. Specifying a transformation
+            function is an easy way to ensure these constraints.
+          </li>
+          <li>
+            <code>unit</code>, <code>type</code>: If a parameter is a rate,
+            its unit has to be specified using the <code>unit</code>
+            property. For user convenience, rates can be parametrized as
+            duration (i.e. providing values for 1/rate instead of rate) by
+            setting the property <code>type</code> to the
+            value <em>'rate_as_duration'</em>. In our case, <em>v</em> is
+            the recovery rate, but we decided to parametrize it as a duration
+            with a guess value of 11 days.
+          </li>
+          <li>
+            <code>min</code>, <code>max</code>,<code>guess</code>,<code>sd_transf</code>:
+            Specify the values of the parameters
+          </li>
+        </ul>
+
+    </div>
+
+    <div class="span8">
+      <h4>theta.json</h4>
+
+<pre class="prettyprint">{
+"name": "an explicit name",
+"description": "an explicit description",
 
 "value": {
   "S":   {"transformation": "logit",
@@ -926,11 +965,12 @@ write(toJSON(m, collapse=''), file="model.json")
   "phi": {"transformation":"log",
           "min": 0.1, "guess": 0.1, "max": 0.3, "sd_transf": 0.02}
  }
-}
 </pre>
 
-  </div>
+    </div>
+
 </div>
+
 
 <div class="row">
 
@@ -1003,7 +1043,7 @@ write(toJSON(m, collapse=''), file="model.json")
       <div class="accordion-group">
         <div class="accordion-heading">
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#link" href="#simple-link">
-            link.json with custom partitions and values
+            theta.json with custom partitions and values
           </a>
         </div>
         <div id="simple-link" class="accordion-body collapse">
@@ -1011,6 +1051,9 @@ write(toJSON(m, collapse=''), file="model.json")
 
 <pre class="prettyprint">
 {
+"name": "an explicit name",
+"description": "an explicit description",
+
 "partition": {
    "data_stream": {
       "group": [
@@ -1066,7 +1109,7 @@ write(toJSON(m, collapse=''), file="model.json")
     <h3>Be efficient</h3>
 
     <p>
-      Templates really shine for link.json
+      Templates really shine for theta.json
       <ul>
         <li>No risk to forgot variables added during model expansion</li>
         <li>Way less boilerplate code...</li>
@@ -1075,7 +1118,7 @@ write(toJSON(m, collapse=''), file="model.json")
 
     <p>      
       Want one?<br/>
-      <code>./plom context.json model.json --link -o link.json</code>
+      <code>plom create theta context.json process.json link.json --link -o theta.json</code>
     </p>
 
   </div>
@@ -1114,8 +1157,9 @@ write(toJSON(m, collapse=''), file="model.json")
       We have created/templated 3 files:
       <ul>
         <li>context.json</li>
-        <li>model.json</li>
+        <li>process.json</li>
         <li>link.json</li>
+        <li>theta.json</li>
       </ul>
 
       We are now ready to <strong>implement</strong> our model.
@@ -1133,14 +1177,14 @@ write(toJSON(m, collapse=''), file="model.json")
 
 
 <pre class="prettyprint">
-plom context.json model.json link.json -o my_model
+plom install context.json process.json link.json -o my_model
 </pre>
 
     <p>
-      See these nerdy outputs on the terminal?  Yes, that's it, you
-      have just <strong>coded your model in C</strong> using the
-      blazing fast <a href="http://www.zeromq.org/">ØMQ</a> library
-      for your parallel computing needs and the rock
+      Yes, that's it, you have just <strong>coded your model in
+      C</strong> using the blazing
+      fast <a href="http://www.zeromq.org/">ØMQ</a> library for your
+      parallel computing needs and the rock
       stable <a href="http://www.gnu.org/software/gsl/">GSL</a> for
       the science. It is also <strong>compiled</strong>, so it seems
       that you are all set to
