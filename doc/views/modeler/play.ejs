@@ -9,13 +9,16 @@
   <div class="span12">
 
     <p>
-      <strong>One pattern: </strong><code class="sfr-pattern">sfi [options] | ./algorithm command [options]</code>
+      <code class="sfr-pattern">fit &#60;command&#62; [options] | ./algorithm &#60;command&#62; [options]</code>
       <ul>
         <li>
           invoked from the command line
         </li>
         <li>
           or from the programming languages you love.
+        </li>
+        <li>
+          designed to <strong>chain</strong> inference methods
         </li>
       </ul>      
     </p>
@@ -38,8 +41,8 @@
         <li>
           doesn't have environmental stochasticity or diffusions
           <ul>
-            <li>You care about demograpic stochasticity: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>sto</strong> [options]</code></li>
-            <li>You don't: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>deter</strong> [options]</code></li>
+            <li>You care about demograpic stochasticity: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>sto</strong> [options]</code></li>
+            <li>You don't: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>deter</strong> [options]</code></li>
           </ul>
         </li>
 
@@ -47,8 +50,8 @@
         <li>
           contains <strong>environmental stochasticity</strong>:
           <ul>
-            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>sto</strong> [options]</code></li>
-            <li>You don't: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>deter</strong> [options]</code></li>
+            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>sto</strong> [options]</code></li>
+            <li>You don't: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>deter</strong> [options]</code></li>
           </ul>
         </li>
 
@@ -56,8 +59,8 @@
         <li>
           contains some <strong>diffusions</strong>:
           <ul>
-            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>sto</strong> [options]</code></li>
-            <li>You don't: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>deter</strong> [options]</code></li>
+            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>sto</strong> [options]</code></li>
+            <li>You don't: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>deter</strong> [options]</code></li>
           </ul>
         </li>
 
@@ -65,8 +68,8 @@
         <li>
           contains some diffusions <strong>and</strong> environmental stochasticity :
           <ul>
-            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>sto</strong> [options]</code></li>
-            <li>You don't: <code class="sfr-pattern">sfi [options] | ./algorithm <strong>deter</strong> [options]</code></li>
+            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>sto</strong> [options]</code></li>
+            <li>You don't: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>deter</strong> [options]</code></li>
           </ul>
         </li>
 
@@ -78,11 +81,11 @@
       <ul>
         <li>
           Quickly turn off environmental stochasticity: 
-          <code class="sfr-pattern">sfi <strong>--no_env</strong> [options] | ./algorithm command [options]</code>
+          <code class="sfr-pattern">fit theta <strong>--no_env</strong> [options] | ./algorithm &#60;command&#62; [options]</code>
         </li>
         <li>
           Quickly turn off the diffusions: 
-          <code class="sfr-pattern">sfi <strong>--no_drift</strong> [options] | ./algorithm command [options]</code>
+          <code class="sfr-pattern">fit theta <strong>--no_drift</strong> [options] | ./algorithm &#60;command&#62; [options]</code>
         </li>
       </ul>
     </p>
@@ -109,13 +112,13 @@
       neglecting <strong>demographic stochasticity</strong>:</p>
 
     <pre class="prettyprint">
-sfi | ./simul deter -J 100 --traj
+fit theta | ./simul deter -J 100 --traj
 </pre>
 
     <p>The same, but <strong>with</strong> demographic stochasticity:</p>
 
     <pre class="prettyprint">
-sfi | ./simul sto -J 100 --traj --no_filter
+fit theta | ./simul sto -J 100 --traj --no_filter
 </pre>
 
     <p><i class="icon-eye-open"></i> Plot:
@@ -132,7 +135,7 @@ sfi | ./simul sto -J 100 --traj --no_filter
       particles:</p>
 
     <pre class="prettyprint">
-sfi | ./smc sto -J 100 --traj
+fit theta | ./smc sto -J 100 --traj
 </pre>
 
 
@@ -152,7 +155,7 @@ sfi | ./smc sto -J 100 --traj
     </p>
 
 <pre class="prettyprint">
-sfi | ./kalman sto --traj
+fit theta | ./kalman sto --traj
 </pre>
 
     <p>
@@ -195,13 +198,13 @@ sfi | ./kalman sto --traj
     iterations.</p>
 
     <pre class="prettyprint">
-sfi | ./simplex -M 10000 --least_square
+fit theta | ./simplex -M 10000 --least_square
 </pre>
 
     <p>OK, observation noise might matter:</p>
 
     <pre class="prettyprint">
-sfi | ./simplex -M 10000
+fit theta | ./simplex -M 10000
 </pre>
 
 
@@ -219,13 +222,13 @@ sfi | ./simplex -M 10000
     to keep it fast?</p>
 
     <pre class="prettyprint">
-sfi | ./ksimplex sto
+fit theta | ./ksimplex sto
 </pre>
 
     <p>You neglect demographic stochasticity?</p>
 
     <pre class="prettyprint">
-sfi | ./ksimplex deter
+fit theta | ./ksimplex deter
 </pre>
 
     <p><i class="icon-eye-open"></i> Plot:
@@ -241,20 +244,20 @@ sfi | ./ksimplex deter
     <p>
       Want to check out the results? Tell PLoM to use the
       previous results as initial conditions of your new algorithm using
-      the <code>-B</code> option of <code>sfi</code>:
+      the <code>-B</code> option of <code>fit</code>:
     </p>
 
     <ul>
       <li>
         Start with a simplex:
 <pre class="prettyprint">
-sfi | ./simplex -M 1000
+fit theta | ./simplex -M 1000
 </pre>
       </li>
 <li>
       Use the result for a SMC:
 <pre class="prettyprint">
-sfi -B | ./smc sto -J 100 --traj
+fit theta -B | ./smc sto -J 100 --traj
 </pre>
 </li>
       
@@ -274,7 +277,7 @@ sfi -B | ./smc sto -J 100 --traj
 <div class="span12">
   Yes, you can <strong>chain</strong> PLoM methods without
   having to edit any scripts or configuration files. Learn more about PLoM
-  pipes with <code>sfi --help</code>.
+  pipes with <code>fit --help</code>.
 </div>
 </div>
 
@@ -283,7 +286,7 @@ sfi -B | ./smc sto -J 100 --traj
 
 
 <div class="page-header">
-  <h1>No more approximations <small>Because sometimes noise matters</small></h1>
+  <h1>No more approximations <small>Because often noise matters</small></h1>
 </div>
 
 <div class="row">
@@ -296,7 +299,7 @@ sfi -B | ./smc sto -J 100 --traj
         Iterated filtering</em> (MIF):</p>
 
     <pre class="prettyprint">
-sfi | ./mif sto -J 1000 -M 100 -a 0.95 -b 3
+fit theta | ./mif sto -J 1000 -M 100 -a 0.95 -b 3
 </pre>
 
     <p>Lost with the options (<code>-a</code>, <code>-M</code>, ...)? Ask for
@@ -317,7 +320,7 @@ sfi | ./mif sto -J 1000 -M 100 -a 0.95 -b 3
         Monte Carlo Markov chain</em> (pMCMC):</p>
 
     <pre class="prettyprint">
-sfi | ./pmcmc sto -J 1000 -M 10000
+fit theta | ./pmcmc sto -J 1000 -M 10000
 </pre>
 
 
@@ -336,26 +339,26 @@ sfi | ./pmcmc sto -J 1000 -M 10000
     <ul>
     <li>Start with a simplex:
 <pre class="prettyprint">
-sfi | ./simplex -M 1000
+fit theta | ./simplex -M 1000
 </pre>
     </li>
 
     <li>Refine it with a ksimplex:
 <pre class="prettyprint">
-sfi -B | ./ksimplex sto -M 1000
+fit theta -B | ./ksimplex sto -M 1000
 </pre>
     </li>
 
 
     <li>Refine it with a MIF:
 <pre class="prettyprint">
-sfi -B | ./mif sto -J 1000 -M 100 -a 0.95 -b 3
+fit theta -B | ./mif sto -J 1000 -M 100 -a 0.95 -b 3
 </pre>
     </li>
 
     <li>Terminate with a pMCMC:
 <pre class="prettyprint">
-sfi -B | ./pmcmc sto -J 1000 -M 100000
+fit theta -B | ./pmcmc sto -J 1000 -M 100000
 </pre>
 </li>
     </ul>
@@ -400,30 +403,30 @@ sfi -B | ./pmcmc sto -J 1000 -M 100000
 
     <pre class="prettyprint">
 {
- "id": "lhs",
- "comment": "LHS design",
+ "name": "lhs",
+ "description": "LHS design",
 
  "action": {"id": "lhs",
             "H": 100,
-            "seed": 12334216564},
+            "seed": "a string"},
 
  "cmd": [["D",  "", "simplex -M 100", 1]],
 
- "cluster": {"type": PBS,
+ "cluster": {"type": "PBS",
              "walltime": "01:20:00"}
 }
 </pre>
 
     <p>Or be lazy and <strong>template</strong> it:</p>
     <pre class="prettyprint">
-plom --lhs simplex -M 100 --cluster PBS -H 100 -o design.json
+fit lhs theta.json "simplex -M 100" 100 --queue PBS
 </pre>
 
 
     <p>Run it on the <strong>cloud</strong>:</p>
 
     <pre class="prettyprint">
-sfi --bootstrap design.json && ./design.sh
+fit bootstrap theta.json design.json && ./run_designs.sh
 </pre>
 
     <p><i class="icon-eye-open"></i> Plot:
@@ -440,29 +443,29 @@ sfi --bootstrap design.json && ./design.sh
     
     <pre class="prettyprint">
 {
- "id": "lhs_mif",
- "comment": "LHS mif design",
+ "name": "lhs_mif",
+ "description": "LHS mif design",
 
  "action": {"id": "lhs",
             "H": 100,
-            "seed": 12334216564},
+            "seed": "a string"},
 
  "cmd": [["D",  "", "mif sto -M 100 -J 1000", 1]],
 
- "cluster": {"type": SGE,
+ "cluster": {"type": "SGE",
              "walltime": "01:20:00"}
 }
 </pre>
 
     <p>Or template it:</p>
     <pre class="prettyprint">
-plom --lhs mif --sto -M 100 -J 1000 -H 100 --cluster SGE -o lhs_mif.json
+fit lhs theta.json "mif --sto -M 100 -J 1000" 100 --queue SGE
 </pre>
 
     <p>Run it on the cloud:</p>
 
     <pre class="prettyprint">
-sfi --bootstrap lhs_mif.json && ./lhs_mif.sh
+fit bootstrap theta.json design.json && ./run_designs.sh
 </pre>
 
     <p><i class="icon-eye-open"></i> Plot:
@@ -488,18 +491,18 @@ sfi --bootstrap lhs_mif.json && ./lhs_mif.sh
     </ul>
 <pre class="prettyprint">
 {
- "id": "lhss",
- "comment": "LHS on steroids",
+ "name": "lhss",
+ "description": "LHS on steroids",
 
  "action": {"id": "lhs",
             "H": 100,
-            "seed": 12334216564},
+            "seed": "a string"},
 
  "cmd": [["D","","simul deter -T 1000", 1],
          ["DX","-I", "simplex -s -M 20000", 1],
          ["B","", "mif sto -J 4000 -M 100", 1]],
 
- "cluster": {"type": SGE,
+ "cluster": {"type": "SGE",
              "walltime": "01:20:00"}
 }
 </pre>
@@ -512,8 +515,8 @@ sfi --bootstrap lhs_mif.json && ./lhs_mif.sh
   <div class="span12">
     <p>
       No magic, PLoM uses a very simple
-      API: <code>lhs.sh</code> <code>all_profiles.sh</code> are just
-      successions of <code>sfi</code> invocations (and some goodies to
+      API: The scripts called by <code>run_designs.sh</code> are just
+      successions of <code>fit</code> invocations (and some goodies to
       save you the hassle of specifying path and cluster specific
       options.
     </p>
@@ -549,11 +552,11 @@ sfi --bootstrap lhs_mif.json && ./lhs_mif.sh
 {
  "action": {"id": "lhs",
             "H": 100,
-            "seed": 12334216564},
+            "seed": "a string"},
 
  "cmd": [["D", "", "ksimplex deter -M 10000 --prior"]],
 
- "cluster": {"type": SGE,
+ "cluster": {"type": "SGE",
              "walltime": "01:20:00"}
 }
 </pre>
@@ -569,7 +572,7 @@ sfi --bootstrap lhs_mif.json && ./lhs_mif.sh
         It will be specifically helpful when your parameters have intricate roles in the model, but it's also a bit more adventurous. Put all luck on your side by first getting a feel of the target's shape!
     </p>
      <pre class="prettyprint">
-sfi -B | ./pmcmc sto --full -M 10000
+fit theta -B | ./pmcmc sto --full -M 10000
 </pre>
 
   </div>
@@ -588,11 +591,11 @@ sfi -B | ./pmcmc sto --full -M 10000
     </p>
     Start with:
         <pre class="prettyprint">
-sfi -B | ./kmcmc sto --full -M 10000
+fit theta -B | ./kmcmc sto --full -M 10000
 </pre>
     And carry on with the pMCMC:
         <pre class="prettyprint">
-sfi -B -C | ./pmcmc sto --cov --full -M 10000
+fit theta -B -C | ./pmcmc sto --cov --full -M 10000
 </pre>
 
   </div>
@@ -623,7 +626,7 @@ sfi -B -C | ./pmcmc sto --cov --full -M 10000
 
 
 <pre class="prettyprint">
-sfi -B -b ../results/lhs/best_68.output > mle.json
+fit theta -B results/lhs/best_68.output > mle.json
 </pre>
 
 
@@ -639,17 +642,17 @@ sfi -B -b ../results/lhs/best_68.output > mle.json
 
     <p>Template a design: <code><i class="icon-file"></i>slice.json</code></p>
 <pre class="prettyprint">
-plom --slice smc --sto -J 1000 -H 20 -o slice.json
+fit --slice mle.json "smc --sto -J 1000" 20
 </pre>
 
     <p>Run it:</p>
 
 <pre class="prettyprint">
-sfi -s mle.json --bootstrap slice.json && ./slice.sh
+./run_designs.sh
 </pre>
 
     <p><i class="icon-eye-open"></i> Plot:
-      <code>plot.all_slices()</code></code>
+      <code>plot.slices()</code></code>
     </p>
     
   </div>
@@ -662,18 +665,18 @@ sfi -s mle.json --bootstrap slice.json && ./slice.sh
 
     <p>Template a design: <code><i class="icon-file"></i>profile.json</code></p>
 <pre class="prettyprint">
-plom --profile mif --sto -J 1000 -M 100 -H 20 --cluster SGE -o profile.json
+fit --profile "mif --sto -J 1000 -M 100" 20 --queue SGE
 </pre>
 
     <p>Run it:</p>
 
 <pre class="prettyprint">
-sfi -s mle.json --bootstrap profile.json && ./profile.sh
+./run_designs.sh
 </pre>
 
 
     <p><i class="icon-eye-open"></i> Plot:
-      <code>plot.all_profiles()</code>
+      <code>plot.profiles()</code>
     </p>
         
   </div>
@@ -691,7 +694,7 @@ sfi -s mle.json --bootstrap profile.json && ./profile.sh
     </p>
 
     <pre class="prettyprint">
-sfi -s mle.json | ./pmcmc sto -J 1000 -M 10000
+fit theta mle.json | ./pmcmc sto -J 1000 -M 10000
 </pre>
 
 
@@ -704,6 +707,7 @@ sfi -s mle.json | ./pmcmc sto -J 1000 -M 10000
 </div>
 
 
+<!--
 <div class="page-header">
   <h1>Inference with style <small>Expand your knowledge</small></h1>
 </div>
@@ -717,7 +721,7 @@ sfi -s mle.json | ./pmcmc sto -J 1000 -M 10000
   </div>
 
 </div>
-
+-->
 
 
 
