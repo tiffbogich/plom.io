@@ -13,11 +13,20 @@
 
  </div>
 
+
+
+
+<div class="page-header">
+  <h1>Define your context, process, link and theta</h1>
+</div>
+
+
+
 <div class="row">
 
 
   <div class="span6">
-    <h3>Context</h3>
+    <h2>Context  <small> incidence data, London </small></h2>
  </div>
 </div>
 
@@ -59,12 +68,7 @@
 <div class="row">
 
   <div class="span12">
-    <h3>in JSON</h3>
-
-    <p>
-      Let's get a blank context: <code>./plom --context -o context.json</code>
-      and fill it for H1N1:
-    </p>
+    
 
     <div class="accordion" id="link-json">
       <div class="accordion-group">
@@ -78,30 +82,29 @@
 
 <pre class="prettyprint">
 {
- "population": [{"id": "London__all",
-                 "size_t0": 1e5,
-                 "comment": "London, all age classes"}],
+  "name": "Flu 2009 London - HPA",
+  "description": "2009 influenza pandemic in London - HPA data",
 
- "time_series": [{"id": "London__HPA__inc",
-                 "population_id": ["London__all"]}],
+  "population": [{"id": "London__all",
+                  "size_t0": 1e5,
+                  "comment": "London, all age classes"}],
 
- "frequency": "W",
+  "disease": ["Influenza"],
 
- "data": [{"id": "data",
-           "source": "data/data.csv",
-           "comment": "weekly estimate of H1N1 cases recorded by GPs (per 100000 inhabitants)"},
-          
-          {"id": "N",
-          "source": "data/N.csv",
-          "comment": "population size"},
-          
-          {"id": "prop",
-          "source": "data/prop.csv",
-          "comment": "proportion of the population under surveillance (100%)"}],
+  "time_series": [{"id": "London__HPA__inc",
+                   "population_id": ["London"],
+                   "comment": ""}],
 
- "model": {"space": {},
-           "age": {}}
- }
+  "frequency": "W",
+
+  "data": [{"id": "data",
+            "source": "data/data.csv",
+            "comment": "weekly estimate of H1N1 cases recorded by GPs (per 100000 inhabitants)"},
+
+           {"id": "prop",
+            "source": "data/prop.csv",
+            "comment": "proportion of the population under surveillance"}]
+}
 </pre>
 
           </div>
@@ -116,17 +119,16 @@
 </div>
  
 
-<div class="page-header">
-  <h1>Process model</h1>
-</div>
-
-
 <div class="row">
 
-  <div class="span12">
-    <h3>Simple model, diffusing parameter</h3>
-  </div>
+
+  <div class="span6">
+    <h2>Process <small> simple model, diffusing parameter</small></h2>
+ </div>
 </div>
+
+
+
 
 <div class="row">
   <div class="span6">
@@ -158,26 +160,30 @@
 
     <p>
       We can get a blank model template by running:
-      <code>./plom --process -o process.json</code>
+      <code>plom create process context.json -o process.json</code>
     </p>
 
 
 <pre class="prettyprint">
 {
- "state": [{"id": "S", "comment": "Susceptibles"},
-           {"id": "E", "comment": "Individuals in latent phase"},
-           {"id": "I", "comment": "Infectious"}],
+  "name": "SEIR beta_t",
+  "description": "SEIR model with diffusion over time-varying effective contact rate beta_t",
 
- "parameter": [{"id": "beta",   "comment": "effective contact rate"},
+  "state": [{"id": "S", "comment": "Susceptible"},
+            {"id": "E", "comment": "Exposed"},
+            {"id": "I", "comment": "Infectious"}],
+
+  "parameter": [{"id": "beta",   "comment": "effective contact rate"},
                {"id": "k",    "comment": "latent phase leaving rate"},
                {"id": "v",    "comment": "recovery rate"},
                {"id": "vol",  "comment": "volatility of beta"}],
 
- "model": [{"from": "S", "to": "E",  "rate": "drift(beta, vol) * I/N", "tag":[{"id": "transmission", "by":["I"]}], "comment":"infection"},
+  "model": [{"from": "S", "to": "E",  "rate": "drift(beta, vol) * I/N", "tag":[{"id": "transmission", "by":["I"]}], "comment":"infection"},
            {"from": "E", "to": "I" , "rate": "k", "comment":"leaving latent phase"},
            {"from": "I", "to": "DU", "rate": "v", "comment":"recovery"}],
 
- "pop_size_eq_sum_sv": false
+
+  "pop_size_eq_sum_sv": false
 }
 </pre>
 
@@ -192,59 +198,30 @@
 
 </div>
 
-
-
-<div class="page-header">
-  <h1>Linking<small> and building</small></h1>
-</div>
-
 <div class="row">
 
-  <div class="span12">
-    <h3>Link template</h3>
 
-    <p>
-      To be sure not to forget any parameters we fill in a template
-      generated with:<br/>
-      <code>./plom context.json process.json --link -o link.json
-      link.json</code>
-    </p>
-    <br/>
-    <p>
-       A few remarks:
-    </p>
-
-  </div>    
-</div>
-
-
-<div class="row">
   <div class="span6">
+    <h2>Link</h2>
+ </div>
+</div>
+
+<div class="row">
+
+  <div class="span6">
+    
     <p>
       <ul>
-        <li>
-          the whole beta trajectory will follow the same transformation specified here: <code>log</code> to preserve positivity or <code>logit</code> to impose boundaries.
-        </li>
-        <li>
-          beware of units: here, for example, the effective contact rate can be given in days or in weeks.
-        </li>
-        
-       </ul>
-    </p>
-   </div>
-        
-   <div class="span6">
-    <p>
-      <ul>
-        <li>
-          you can impose strict boundaries setting <code>uniform</code> priors, or bring information while remaining flexible with <code>normal</code> priors. By default, <code>uniform</code> priors are used.
-        </li>
+
+        <li>Incidence data corresponds to individuals leaving the latent phase and starting to develop symptoms: this is the "E" to "I" flow.</li>
       </ul>
+
     </p>
-
-
+ 
   </div>    
 </div>
+
+
 
 
 <div class="row">
@@ -263,55 +240,20 @@
 
 <pre class="prettyprint">
 {
- "id": "my_id",
- "comment": "my comment",
+  "name": "my_link",
+  "description": "multiplicative noise",
 
- "observed": [{"id": "inc", "comment":"incidence",
-               "definition": [{"from":"E", "to":"I"}],
-               "time_series_id": ["London__HPA__inc"]}],
+  "observed": [
+               {"id": "inc",
+                "comment": "incidence",
+                "definition": [{"from": "E", "to": "I"}],
+                "time_series_id": ["London__HPA__inc"]}],
 
- "parameter": [{"id": "phi",  "comment": "observation noise"}],
+  "parameter": [{"id": "phi",  "comment": "observation noise"}],
 
- "model": {"distribution": "discretized_normal",
-           "mean": "prop*x",
-           "var": "(prop*phi*x)**2"},
-
- "partition": {"data_stream": {"group": [{"id": "HPA",    "time_series_id": ["London__HPA__inc"]}],
-        "comment": "default"}},
-
- "value": {"S": {"partition_id": "identical_population", "transformation": "logit",
-                  "min":   0.7,
-                  "guess": 0.85,
-                  "max":   0.99,
-                  "sd_transf":  0.02,
-                    "prior": "normal" },
-            "E": {"partition_id": "identical_population", "transformation":"logit",
-                    "min": 0, "guess": 1e-04, "max": 1,
-                "sd_transf": 3e-6,
-                "prior": "uniform"},
-            "I": {"partition_id": "identical_population", "transformation":"logit",
-                  "min": 0, "guess": 1e-04, "max": 1,
-                "sd_transf": 3e-6,
-                "prior": "uniform"},
-            "beta": {"partition_id": "identical_population", "transformation": "log", "unit": "D",
-                   "min": 0, "guess": 1.4, "max": 3.0,
-                "sd_transf": 0.02,
-                "prior": "uniform"},
-            "k": {"partition_id": "identical_population", "transformation": "log", "unit": "D", "type": "rate_as_duration",
-                    "min": 1.55, "guess": 1.6, "max": 1.63,
-                "sd_transf": 0.02,
-                "prior": "normal"},
-            "v": {"partition_id": "identical_population", "transformation": "log", "unit": "D", "type": "rate_as_duration",
-                  "min": 0.93, "guess": 1, "max": 1.23,
-                "sd_transf": 0.02,
-                "prior": "normal"},
-            "vol": {"partition_id": "identical_population", "transformation": "log",
-                    "min": 0, "guess": 0.1, "max": 0.25,
-                "sd_transf": 0.02,
-                "prior": "uniform"},
-            "phi": {"partition_id": "identical_time_series", "transformation": "logit",
-                    "min": 0.01, "guess":0.1, "max": 0.9,
-                    "sd_transf": 0.0}}
+  "model": {"distribution": "discretized_normal",
+            "mean": "prop*x",
+            "var": "(phi*prop*x)**2"}
 }
 </pre>
 
@@ -337,6 +279,7 @@
 
   </div>  
 
+</div>  
 
 
 
@@ -344,10 +287,46 @@
 
 
 
- 
 
 
 
+
+
+
+
+
+
+
+<div class="row">
+
+
+  <div class="span6">
+    <h2>Theta</h2>
+ </div>
+</div>
+
+<div class="row">
+
+  <div class="span6">
+    
+    <p>
+      
+      <ul>
+
+        <li>Set min and max to reflect your previous knowledge if you want to be Bayesian</li>
+      </ul>
+    </p>
+  </div>
+
+ <div class="span6">
+    <p>
+      
+      <ul>
+
+        <li>Assign wide uniform priors to refloct your ignorance on the other parameters</li>
+      </ul>
+    </p>
+  </div>    
 </div>
 
 
@@ -355,40 +334,81 @@
 
 <div class="row">
 
-  <div class="span6">
-    <h3>Coding the State Space Model</h3>
+<div class="span12">
+
+    <div class="accordion" id="theta-json">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#link-json" href="#collapseLink">
+            theta.json
+          </a>
+        </div>
+        <div id="collapseLink" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+{
+ "Name":"my_theta",
+  "description":"latent and infectious period Period from Baguelin et al. 2010",
+
+ "value":{
+  "S":{"guess":{"all":0.8},"transformation":"logit","min":{"all":0.7},"max":{"all":1},"sd_transf":{"all":0.2},"prior":"normal","partition_id":"identical_population"},
+  "E":{"guess":{"all":1e-05},"transformation":"logit","min":{"all":0},"max":{"all":1},"sd_transf":{"all":0.2},"prior":"uniform","partition_id":"identical_population"},
+  "I":{"guess":{"all":1e-05},"transformation":"logit","min":{"all":0},"max":{"all":1},"sd_transf":{"all":0.2},"prior":"uniform","partition_id":"identical_population"},
+  "beta":{"guess":{"all":1},"transformation":"log","min":{"all":0},"max":{"all":100},"sd_transf":{"all":0.2},"unit":"D","prior":"uniform","partition_id":"identical_population"},
+  "k":{"guess":{"all":1.6},"transformation":"log","min":{"all":1.55},"max":{"all":1.63},"sd_transf":{"all":0.2},"type": "rate_as_duration","unit":"D","prior":"normal","partition_id":"identical_population"},
+  "v":{"guess":{"all":1.1},"transformation":"log","min":{"all":0.93},"max":{"all":1.23},"sd_transf":{"all":0.2},"type": "rate_as_duration","unit":"D","prior":"normal","partition_id":"identical_population"},	
+  "vol":{"guess":{"all":0},"transformation":"log","min":{"all":0},"max":{"all":100},"sd_transf":{"all":0.2},"prior":"uniform","partition_id":"identical_population"},	    "phi":{"guess":{"all":0.1},"transformation":"log","min":{"all":0.1},"max":{"all":0.1},"sd_transf":{"all":0},"prior":"uniform","partition_id":"identical_time_series"}
+  },
+
+ "partition":{
+  "variable_population":{"group":[{"id":"London__all","population_id":["London__all"]}]},
+  "variable_time_series":{"group":[{"id":"London__HPA__inc","time_series_id":["London__HPA__inc"]}]},
+  "identical_population":{"group":[{"id":"all","population_id":["London__all"]}]},
+  "identical_time_series":{"group":[{"id":"all","time_series_id":["London__HPA__inc"]}]}
+ }
+}
+</pre>
 
 
-    <p>
-      <i class="icon-play"></i> Run: <pre class="prettyprint">./plom context.json process.json link.json -o h1n1</pre>
-    </p>
+<p>Note:
+  <ul>
+    <li><code>constraint</code> for <code>par_sv_values</code> default to <code>box_0_1</code></li>
+    <li><code>constraint</code> for <code>par_proc_values</code> default to <code>positive</code></li>
+    <li><code>grouping</code> default to <code>identical</code></li>
+    <li><code>prior</code> default to <code>uniform</code></li>
+  </ul>
 
-      <a href="#" class="btn btn-primary">See it in action from your browser!</a>   
+</p>
 
-  </div>
-
-  <div class="span6">
-    <h3>Getting prepared</h3>
-
-    <p>We have generated a <code><i class="icon-folder-open"></i> h1n1/</code> <strong>directory.</strong>
-      <ul>
-        <li>The source code of our model are available in <code><i class="icon-folder-open"></i> h1n1/src/C/</code>.</li>
-        <li>Commands have to be run in <code><i class="icon-folder-open"></i> h1n1/bin/</code>.</li>
-        <li>Results will be written in <code><i class="icon-folder-open"></i> h1n1/src/results/</code>.</li>
-        <li>Plots will be generated from <a href="http://www.r-project.org/">R</a> using the package <code>plom</code>.</li>
-      </ul>
-    </p>
-  </div>
+          </div>
+        </div>
+      </div>
 
 
-</div>
+    </div>
+
+
+
+  </div>  
+
+</div>  
+
+
+
+
+
+
+
+
+
 
 
 
 
 
 <div class="page-header">
-  <h1>Exploring the posterior density<small> three simple steps</small></h1>
+  <h1>Explore the posterior density<small> three simple steps</small></h1>
 </div>
 
 
@@ -408,7 +428,7 @@
             <strong>Get close to the mode</strong>
             <p>
             The ksimplex algorithm relies on an approximation of you model that is both quick and able to capture the stochasticity of your diffusing parameter. It should get you close to the mode in a few seconds:
-            <pre class="prettyprint">./ksimplex deter --prior -M 1000 <../settings/settings.json</pre>
+            <pre class="prettyprint">fit theta | ./ksimplex deter --prior -M 1000</pre>
 
         </li>
 
@@ -416,14 +436,14 @@
           <strong>Take a quick walk around</strong>
             <p>
             The kmcmc algorithm explores a posterior density that is close to the one we are targetting, and it does it quickly:
-            <pre class="prettyprint">sfi -B | ./kmcmc deter -M 10000 --full</pre>
+            <pre class="prettyprint">fit theta -B | ./kmcmc deter -M 10000 --full</pre>
         </li>
 
         <li>
           <strong>Launch a well-prepared pMCMC</strong>
             <p>
             a pMCMC that is initialized close to the mode, with a good covariance matrix, can run very smoothly provided you give it enough particles:
-            <pre class="prettyprint">sfi -B -C | ./pmcmc deter -M 10000 -J 10000 --full</pre>
+            <pre class="prettyprint">fit theta -B -C | ./pmcmc deter -M 10000 -J 10000 --full</pre>
         </li>
 
 
