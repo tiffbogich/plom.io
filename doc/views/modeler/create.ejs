@@ -691,7 +691,18 @@ write(toJSON(m, collapse=''), file="process.json")
             <li>
               <code>source</code>: <a href="http://en.wikipedia.org/wiki/Comma-separated_values">CSV</a>
               file containing the data. The first column has to be the
-              dates in format <code>"YYYY/MM/DD"</code>; the other columns refer either to values applied to populations (in the same order as the list of <code>population</code>) or time series (in the same order as the list of <code>time_series</code>).
+              dates in format <code>"YYYY/MM/DD"</code> (note the
+              double quote); the other columns refer either to values
+              applied to populations (in the same order as the list
+              of <code>population</code>) or time series (in the same
+              order as the list of <code>time_series</code>). Missing
+              values have to be specified as <code>null</code>. Each
+              CSV file must have a header (<code>"date"</code> and
+              the <code>id</code> of <code>population</code>
+              or <code>time series</code>). When data contain rates
+              (e.g birth and death rates) these rates must be
+              expressed <em>per capita</em> and in the unit specified
+              by <code>frequency</code>.
             </li>
           </ul>
         </li>
@@ -732,6 +743,8 @@ write(toJSON(m, collapse=''), file="process.json")
  "model": {"space": {"type": ["external"]},
            "age": {}},
  
+
+
 
  "frequency": "W",
  
