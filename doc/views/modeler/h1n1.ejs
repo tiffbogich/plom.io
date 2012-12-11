@@ -158,11 +158,7 @@
         <div id="collapseJson" class="accordion-body collapse">
           <div class="accordion-inner">
 
-    <p>
-      We can get a blank model template by running:
-      <code>plom create process context.json -o process.json</code>
-    </p>
-
+    
 
 <pre class="prettyprint">
 {
@@ -186,6 +182,8 @@
   "pop_size_eq_sum_sv": false
 }
 </pre>
+
+<p>Note: the diffusion over <code>beta</code> is simply introduced through <code>drift(beta, vol)</code> </p>
 
           </div>
         </div>
@@ -243,8 +241,7 @@
   "name": "my_link",
   "description": "multiplicative noise",
 
-  "observed": [
-               {"id": "inc",
+  "observed": [{"id": "inc",
                 "comment": "incidence",
                 "definition": [{"from": "E", "to": "I"}],
                 "time_series_id": ["London__HPA__inc"]}],
@@ -258,15 +255,6 @@
 </pre>
 
 
-<p>Note:
-  <ul>
-    <li><code>constraint</code> for <code>par_sv_values</code> default to <code>box_0_1</code></li>
-    <li><code>constraint</code> for <code>par_proc_values</code> default to <code>positive</code></li>
-    <li><code>grouping</code> default to <code>identical</code></li>
-    <li><code>prior</code> default to <code>uniform</code></li>
-  </ul>
-
-</p>
 
           </div>
         </div>
@@ -339,43 +327,48 @@
     <div class="accordion" id="theta-json">
       <div class="accordion-group">
         <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#link-json" href="#collapseLink">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#theta-json" href="#collapsetheta">
             theta.json
           </a>
         </div>
-        <div id="collapseLink" class="accordion-body collapse">
+        <div id="collapsetheta" class="accordion-body collapse">
           <div class="accordion-inner">
 
 <pre class="prettyprint">
 {
- "Name":"my_theta",
+  "Name":"my_theta",
   "description":"latent and infectious period Period from Baguelin et al. 2010",
 
- "value":{
-  "S":{"guess":{"all":0.8},"transformation":"logit","min":{"all":0.7},"max":{"all":1},"sd_transf":{"all":0.2},"prior":"normal","partition_id":"identical_population"},
-  "E":{"guess":{"all":1e-05},"transformation":"logit","min":{"all":0},"max":{"all":1},"sd_transf":{"all":0.2},"prior":"uniform","partition_id":"identical_population"},
-  "I":{"guess":{"all":1e-05},"transformation":"logit","min":{"all":0},"max":{"all":1},"sd_transf":{"all":0.2},"prior":"uniform","partition_id":"identical_population"},
-  "beta":{"guess":{"all":1},"transformation":"log","min":{"all":0},"max":{"all":100},"sd_transf":{"all":0.2},"unit":"D","prior":"uniform","partition_id":"identical_population"},
-  "k":{"guess":{"all":1.6},"transformation":"log","min":{"all":1.55},"max":{"all":1.63},"sd_transf":{"all":0.2},"type": "rate_as_duration","unit":"D","prior":"normal","partition_id":"identical_population"},
-  "v":{"guess":{"all":1.1},"transformation":"log","min":{"all":0.93},"max":{"all":1.23},"sd_transf":{"all":0.2},"type": "rate_as_duration","unit":"D","prior":"normal","partition_id":"identical_population"},	
-  "vol":{"guess":{"all":0},"transformation":"log","min":{"all":0},"max":{"all":100},"sd_transf":{"all":0.2},"prior":"uniform","partition_id":"identical_population"},	    "phi":{"guess":{"all":0.1},"transformation":"log","min":{"all":0.1},"max":{"all":0.1},"sd_transf":{"all":0},"prior":"uniform","partition_id":"identical_time_series"}
-  },
+  "value":{
+  
+        "S":{"guess":{"all":0.8},"transformation":"logit","min":{"all":0.7},"max":{"all":1},"sd_transf":{"all":0.2},"prior":"normal","partition_id":"identical_population"},
+        
+        "E":{"guess":{"all":1e-05},"transformation":"logit","min":{"all":0},"max":{"all":1},"sd_transf":{"all":0.2},"prior":"uniform","partition_id":"identical_population"},
+        
+        "I":{"guess":{"all":1e-05},"transformation":"logit","min":{"all":0},"max":{"all":1},"sd_transf":{"all":0.2},"prior":"uniform","partition_id":"identical_population"},
+        
+        "beta":{"guess":{"all":1},"transformation":"log","min":{"all":0},"max":{"all":100},"sd_transf":{"all":0.2},"unit":"D","prior":"uniform","partition_id":"identical_population"},
+        
+        "k":{"guess":{"all":1.6},"transformation":"log","min":{"all":1.55},"max":{"all":1.63},"sd_transf":{"all":0.2},"type": "rate_as_duration","unit":"D","prior":"normal","partition_id":"identical_population"},
+        
+        "v":{"guess":{"all":1.1},"transformation":"log","min":{"all":0.93},"max":{"all":1.23},"sd_transf":{"all":0.2},"type": "rate_as_duration","unit":"D","prior":"normal","partition_id":"identical_population"},
+        
+        "vol":{"guess":{"all":0},"transformation":"log","min":{"all":0},"max":{"all":100},"sd_transf":{"all":0.2},"prior":"uniform","partition_id":"identical_population"},
+           
+        "phi":{"guess":{"all":0.1},"transformation":"log","min":{"all":0.1},"max":{"all":0.1},"sd_transf":{"all":0},"prior":"uniform","partition_id":"identical_time_series"}},
 
- "partition":{
-  "variable_population":{"group":[{"id":"London__all","population_id":["London__all"]}]},
-  "variable_time_series":{"group":[{"id":"London__HPA__inc","time_series_id":["London__HPA__inc"]}]},
-  "identical_population":{"group":[{"id":"all","population_id":["London__all"]}]},
-  "identical_time_series":{"group":[{"id":"all","time_series_id":["London__HPA__inc"]}]}
- }
+ "partition":{"variable_population":{"group":[{"id":"London__all","population_id":["London__all"]}]},
+            "variable_time_series":{"group":[{"id":"London__HPA__inc","time_series_id":["London__HPA__inc"]}]},
+            "identical_population":{"group":[{"id":"all","population_id":["London__all"]}]},
+            "identical_time_series":{"group":[{"id":"all","time_series_id":["London__HPA__inc"]}]}}
 }
 </pre>
 
 
 <p>Note:
   <ul>
-    <li><code>constraint</code> for <code>par_sv_values</code> default to <code>box_0_1</code></li>
-    <li><code>constraint</code> for <code>par_proc_values</code> default to <code>positive</code></li>
-    <li><code>grouping</code> default to <code>identical</code></li>
+    <li><code>transformation</code> for state variables default to <code>logit</code></li>
+    <li><code>transformation</code> for process parameters default to <code>log</code></li>
     <li><code>prior</code> default to <code>uniform</code></li>
   </ul>
 
