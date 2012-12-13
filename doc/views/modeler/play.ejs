@@ -389,7 +389,7 @@ fit theta -B | ./pmcmc sto -J 1000 -M 100000
 
 <div class="row">
 
-  <div class="span4">
+  <div class="span6">
     <h3>LHS simplex</h3>
 
     <p>
@@ -406,14 +406,21 @@ fit theta -B | ./pmcmc sto -J 1000 -M 100000
  "name": "lhs",
  "description": "LHS design",
 
- "action": {"id": "lhs",
-            "H": 100,
-            "seed": "a string"},
+ "action": {
+   "id": "lhs",
+   "H": 100,
+   "seed": "any string you like"
+  },
 
- "cmd": [["D",  "", "simplex -M 100", 1]],
+ "cmd": [
+   {"fit": "-D",
+    "algorithm": "simplex -M 100"}
+  ],
 
- "cluster": {"type": "PBS",
-             "walltime": "01:20:00"}
+ "cluster": {
+    "type": "PBS",
+    "walltime": "01:20:00"
+  }
 }
 </pre>
 
@@ -435,7 +442,7 @@ fit bootstrap theta.json design.json && ./run_designs.sh
 
   </div>
 
-  <div class="span4">
+  <div class="span6">
     <h3>LHS MIF</h3>
 
     <p>The same, with a MIF but this time using an SGE cluster.</p>
@@ -446,14 +453,21 @@ fit bootstrap theta.json design.json && ./run_designs.sh
  "name": "lhs_mif",
  "description": "LHS mif design",
 
- "action": {"id": "lhs",
-            "H": 100,
-            "seed": "a string"},
+ "action": {
+   "id": "lhs",
+   "H": 100,
+   "seed": "any string you like"
+  },
 
- "cmd": [["D",  "", "mif sto -M 100 -J 1000", 1]],
+ "cmd": [
+   {"fit": "-D",
+    "algorithm": "mif sto -M 100 -J 1000"}
+  ],
 
- "cluster": {"type": "SGE",
-             "walltime": "01:20:00"}
+ "cluster": {
+    "type": "SGE",
+    "walltime": "01:20:00"
+  }
 }
 </pre>
 
@@ -473,53 +487,80 @@ fit bootstrap theta.json design.json && ./run_designs.sh
     </p>
   </div>
 
-  <div class="span4">
+</div>
+
+<div class="row">
+  <div class="span11">
     <h3>Chaining methods</h3>
     
     <p>
-      Wonder why <code>cmd</code> is a list of lists? Well, here too you can
-      chain methods... Here is a <code><i class="icon-file"></i>design.json</code> that, for
-      each sample of an LHS:
+      Wonder why <code>cmd</code> is a list? Well, here too you can
+      chain methods as shown by this <code><i class="icon-file"></i>design.json</code>.
     </p>
 
-    <ul>
-      <li>Gets the state variables initial conditions by skipping a
-      transiant of 1000 time steps.</li>
-      <li>Refines the estimate of these values <strong>only</strong>
-        using a simplex (least-squares).</li>
-      <li>Concludes with a MIF that is now happily initialized.</li>
-    </ul>
 <pre class="prettyprint">
 {
  "name": "lhss",
  "description": "LHS on steroids",
 
- "action": {"id": "lhs",
-            "H": 100,
-            "seed": "a string"},
+ "action": {
+   "id": "lhs",
+   "H": 100,
+   "correlate": {
+     "y": "r0:city2__all",
+     "x": "r0:city1__all",
+     "range": [-1, 1],
+   },
+   "seed": "any string you like"
+  },
 
- "cmd": [["D","","simul deter -T 1000", 1],
-         ["DX","-I", "simplex -s -M 20000", 1],
-         ["B","", "mif sto -J 4000 -M 100", 1]],
+ "cmd": [
+   {
+    "comment": "Get the initial conditions by skipping 1000 time steps",
+    "fit": "-D",
+    "algorithm": "simul deter -T 1000"
+   },
+   {
+    "comment": "Refines the estimate of these (-X) values only (-I) using a simplex (least-squares)",
+    "fit": "-D -X -I",
+    "algorithm": "simplex --least_square -M 20000"
+   },
+   {
+    "comment": "Concludes with a MIF that is now happily initialized and repeat that 3 times (chaining)",
+    "fit": "-B",
+    "algorithm": "mif sto -J 4000 -M 100",
+    "repeat": 3
+   }
+  ],
 
- "cluster": {"type": "SGE",
-             "walltime": "01:20:00"}
+ "cluster": {
+    "type": "SGE",
+    "walltime": "01:20:00"
+  }
 }
 </pre>
 
-  </div>
-
-</div>
-
-<div class="row">
-  <div class="span12">
     <p>
-      No magic, PLoM uses a very simple
-      API: The scripts called by <code>run_designs.sh</code> are just
-      successions of <code>fit</code> invocations (and some goodies to
-      save you the hassle of specifying path and cluster specific
-      options.
+      Note that we improved our LHS design by constraining some
+      parameters to be a function of some other (here <code>r0</code>
+      in the population <code>city2_all</code> is constrained to take
+      the value of <code>r0</code> of the
+      population <code>city1_all</code> plus some random noise draw
+      from the interval specified by <code>range</code>).
     </p>
+
+
+
+    <p>
+      Keep in mind that there is no magic involved. PLoM inference
+      tools use a very simple API: The scripts called
+      by <code>run_designs.sh</code> are just successions
+      of <code>fit</code> invocations with all the path automatically
+      resolved. Remember there is only <strong>one</strong>
+      pattern: <code class="sfr-pattern">fit &#60;command&#62;
+      [options] | ./algorithm &#60;command&#62; [options]</code>.
+    </p>
+
   </div>
 </div>
 
@@ -550,17 +591,24 @@ fit bootstrap theta.json design.json && ./run_designs.sh
 
     <pre class="prettyprint">
 {
- "action": {"id": "lhs",
-            "H": 100,
-            "seed": "a string"},
+ "action": {
+   "id": "lhs",
+   "H": 100,
+   "seed": "any string you like"
+  },
 
- "cmd": [["D", "", "ksimplex deter -M 10000 --prior"]],
+ "cmd": [
+   {"fit": "-D",
+    "algorithm": "mif sto -M 100 -J 1000"}
+  ],
 
- "cluster": {"type": "SGE",
-             "walltime": "01:20:00"}
+ "cluster": {
+    "type": "SGE",
+    "walltime": "01:20:00"
+  }
 }
 </pre>
-</div>
+  </div>
 
   <div class="span4">
     <h3>All together?</h3>
@@ -599,7 +647,7 @@ fit theta -B -C | ./pmcmc sto --cov --full -M 10000
 </pre>
 
   </div>
-
+</div>
 
 
 

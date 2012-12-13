@@ -371,19 +371,22 @@ as JSON.
 <pre class="prettyprint">
 var fs = require('fs');
 
-var m = {state: ["S", "I"].map(function(X){return {id:X}}),
-         parameter: ["r0", "v", "sto", "mu_b", "mu_d"].map(function(X){return {id:X}}),
-         model: [{"from": "U", "to": "S",  "rate": "mu_b*N"},
-                 {"from": "S", "to": "I",  "rate": "noise__trans(sto)*r0/N*v*I", "tag":[{"id": "transmission", "by":["I"]}]},
-                 {"from": "I", "to": "DU", "rate": "v"},
-                 {"from": "I", "to": "I",  "rate": "v", "tag":[{"id": "erlang", "shape":2}]}]}
+var m = {
+  state: ["S", "I"].map(function(X){return {id:X}}),
+  parameter: ["r0", "v", "sto", "mu_b", "mu_d"].map(function(X){return {id:X}}),
+  model: [
+    {"from": "U", "to": "S", "rate": "mu_b*N"},
+    {"from": "S", "to": "I", "rate": "noise__trans(sto)*r0/N*v*I", "tag":[{"id": "transmission", "by":["I"]}]},
+    {"from": "I", "to": "DU", "rate": "v"},
+    {"from": "I", "to": "I", "rate": "v", "tag":[{"id": "erlang", "shape":2}]}
+  ],
+  pop_size_eq_sum_sv: false
+};
 
 //add death reactions
 m.state.forEach(function(X){
-                m.model.push({"from": X.id, "to": "U", "rate": "mu_d"});
-                           });
-
-m.pop_size_eq_sum_sv = false;
+  m.model.push({"from": X.id, "to": "U", "rate": "mu_d"});
+});
 
 //write the json file:
 fs.writeFileSync('process.json', JSON.stringify(m));

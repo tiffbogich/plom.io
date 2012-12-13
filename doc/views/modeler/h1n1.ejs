@@ -7,11 +7,11 @@
 
 <div class="row">
 
- <div class="span4 offset4">
+  <div class="span4 offset4">
     <img src="/images/H1N1data.png" alt="H1N1 data" class="sfr-img-center">
- </div>
+  </div>
 
- </div>
+</div>
 
 
 
@@ -23,11 +23,9 @@
 
 
 <div class="row">
-
-
   <div class="span6">
     <h2>Context  <small> incidence data, London </small></h2>
- </div>
+  </div>
 </div>
 
 
@@ -92,7 +90,7 @@
   "disease": ["Influenza"],
 
   "time_series": [{"id": "London__HPA__inc",
-                   "population_id": ["London"],
+                   "population_id": ["London_all"],
                    "comment": ""}],
 
   "frequency": "W",
@@ -139,12 +137,9 @@
   </div>    
   <div class="span6">
       <ul>
-
         <li>To capture how nature and frequency of contacts evolve, the effective contact rate parameter fis allowed to diffuse, with unknown volatility. </li>
       </ul>
-
   </div>    
-
 </div>
 
 <div class="row">
@@ -191,17 +186,13 @@
 
 
   </div>    
-
-   
-
 </div>
 
+
 <div class="row">
-
-
   <div class="span6">
     <h2>Link</h2>
- </div>
+  </div>
 </div>
 
 <div class="row">
@@ -210,10 +201,8 @@
     
     <p>
       <ul>
-
         <li>Incidence data corresponds to individuals leaving the latent phase and starting to develop symptoms: this is the "E" to "I" flow.</li>
       </ul>
-
     </p>
  
   </div>    
@@ -322,7 +311,7 @@
 
 <div class="row">
 
-<div class="span12">
+  <div class="span12">
 
     <div class="accordion" id="theta-json">
       <div class="accordion-group">
@@ -333,6 +322,7 @@
         </div>
         <div id="collapsetheta" class="accordion-body collapse">
           <div class="accordion-inner">
+
 
 <pre class="prettyprint">
 {
@@ -365,14 +355,15 @@
 </pre>
 
 
-<p>Note:
-  <ul>
-    <li><code>transformation</code> for state variables default to <code>logit</code></li>
-    <li><code>transformation</code> for process parameters default to <code>log</code></li>
-    <li><code>prior</code> default to <code>uniform</code></li>
-  </ul>
 
-</p>
+            <p>Note:
+              <ul>
+                <li><code>transformation</code> for state variables default to <code>logit</code></li>
+                <li><code>transformation</code> for process parameters default to <code>log</code></li>
+                <li><code>prior</code> default to <code>uniform</code></li>
+              </ul>
+
+            </p>
 
           </div>
         </div>
@@ -380,8 +371,6 @@
 
 
     </div>
-
-
 
   </div>  
 
@@ -415,57 +404,53 @@
     </p>
 
 
-      <ul>
+    <ul>
 
-        <li>
-            <strong>Get close to the mode</strong>
-            <p>
-            The ksimplex algorithm relies on an approximation of you model that is both quick and able to capture the stochasticity of your diffusing parameter. It should get you close to the mode in a few seconds:
-            <pre class="prettyprint">fit theta | ./ksimplex deter --prior -M 1000</pre>
+      <li>
+        <strong>Get close to the mode</strong>
+        <p>
+          The ksimplex algorithm relies on an approximation of you model that is both quick and able to capture the stochasticity of your diffusing parameter. It should get you close to the mode in a few seconds:
+          <pre class="prettyprint">fit theta | ./ksimplex deter --prior -M 1000</pre>
+        </p>
+      </li>
 
-        </li>
+      <li>
+        <strong>Take a quick walk around</strong>
+        <p>
+          The kmcmc algorithm explores a posterior density that is close to the one we are targetting, and it does it quickly:
+          <pre class="prettyprint">fit theta -B | ./kmcmc deter -M 10000 --full</pre>
+        </p>
+      </li>
 
-        <li>
-          <strong>Take a quick walk around</strong>
-            <p>
-            The kmcmc algorithm explores a posterior density that is close to the one we are targetting, and it does it quickly:
-            <pre class="prettyprint">fit theta -B | ./kmcmc deter -M 10000 --full</pre>
-        </li>
+      <li>
+        <strong>Launch a well-prepared pMCMC</strong>
+        <p>
+          a pMCMC that is initialized close to the mode, with a good covariance matrix, can run very smoothly provided you give it enough particles:
+          <pre class="prettyprint">fit theta -B -C | ./pmcmc deter -M 10000 -J 10000 --full</pre>
+        </p>
+      </li>
 
-        <li>
-          <strong>Launch a well-prepared pMCMC</strong>
-            <p>
-            a pMCMC that is initialized close to the mode, with a good covariance matrix, can run very smoothly provided you give it enough particles:
-            <pre class="prettyprint">fit theta -B -C | ./pmcmc deter -M 10000 -J 10000 --full</pre>
-        </li>
-
-
-      </ul>
-    </p>
-
+    </ul>
 
   </div>
-
+  
 </div>
 
 <div class="row">
 
-
-
   <div class="span12">
- <h3>Results</h3>
- </div>
-
- <div class="span10 offset1">
- <img src="/images/H1N1trajest_all.png" alt="beta trajectory estimate" class="sfr-img-center">
-
-<p style="vertical-align:middle">
-    In a few minutes, the epidemic data can be fitted and translated it into an estimated underlying trajectory of how the contacts among Londoneers have evolved during the pandemic.
-    
+    <h3>Results</h3>
   </div>
 
+  <div class="span10 offset1">
+    <img src="/images/H1N1trajest_all.png" alt="beta trajectory estimate" class="sfr-img-center">
 
-   
+    <p style="vertical-align:middle">
+      In a few minutes, the epidemic data can be fitted and translated it into an estimated underlying trajectory of how the contacts among Londoneers have evolved during the pandemic.
+    </p>
+
+  </div>
+  
 </div>
 
 
@@ -564,15 +549,8 @@
 <div class="row">
   <div class="span2 offset10">
     <a class="btn" href="http://arxiv.org/abs/1203.5950">More details?</a>
+  </div>
 </div>
-</div>
-
-
-<script src="twitter-bootstrap-v2/docs/assets/js/jquery.js"></script>  
-    <script src="twitter-bootstrap-v2/docs/assets/js/bootstrap-carousel.js"></script> 
-
-
-
 
 
 <% include ../footer %>
