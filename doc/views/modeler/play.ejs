@@ -405,22 +405,13 @@ fit theta -B | ./pmcmc sto -J 1000 -M 100000
 {
  "name": "lhs",
  "description": "LHS design",
-
- "action": {
-   "id": "lhs",
-   "H": 100,
-   "seed": "any string you like"
-  },
-
+ "id": "lhs",
+ "H": 100,
+ "seed": "any string you like",
  "cmd": [
    {"fit": "-D",
     "algorithm": "simplex -M 100"}
-  ],
-
- "cluster": {
-    "type": "PBS",
-    "walltime": "01:20:00"
-  }
+  ]
 }
 </pre>
 
@@ -433,7 +424,7 @@ fit lhs theta.json "simplex -M 100" 100 --queue PBS
     <p>Run it on the <strong>cloud</strong>:</p>
 
     <pre class="prettyprint">
-fit bootstrap theta.json design.json && ./run_designs.sh
+fit bootstrap theta.json design.json --queue PBS && ./run_designs.sh 
 </pre>
 
     <p><i class="icon-eye-open"></i> Plot:
@@ -452,22 +443,13 @@ fit bootstrap theta.json design.json && ./run_designs.sh
 {
  "name": "lhs_mif",
  "description": "LHS mif design",
-
- "action": {
-   "id": "lhs",
-   "H": 100,
-   "seed": "any string you like"
-  },
-
+ "id": "lhs",
+ "H": 100,
+ "seed": "any string you like",
  "cmd": [
    {"fit": "-D",
     "algorithm": "mif sto -M 100 -J 1000"}
-  ],
-
- "cluster": {
-    "type": "SGE",
-    "walltime": "01:20:00"
-  }
+  ]
 }
 </pre>
 
@@ -479,7 +461,7 @@ fit lhs theta.json "mif --sto -M 100 -J 1000" 100 --queue SGE
     <p>Run it on the cloud:</p>
 
     <pre class="prettyprint">
-fit bootstrap theta.json design.json && ./run_designs.sh
+fit bootstrap theta.json design.json --queue SGE && ./run_designs.sh
 </pre>
 
     <p><i class="icon-eye-open"></i> Plot:
@@ -503,17 +485,14 @@ fit bootstrap theta.json design.json && ./run_designs.sh
  "name": "lhss",
  "description": "LHS on steroids",
 
- "action": {
-   "id": "lhs",
-   "H": 100,
-   "correlate": {
-     "y": "r0:city2__all",
-     "x": "r0:city1__all",
-     "range": [-1, 1],
-   },
-   "seed": "any string you like"
-  },
-
+ "id": "lhs",
+ "H": 100,
+ "correlate": {
+   "y": "r0:city2__all",
+   "x": "r0:city1__all",
+   "range": [-1, 1],
+ },
+ "seed": "any string you like",
  "cmd": [
    {
     "comment": "Get the initial conditions by skipping 1000 time steps",
@@ -531,12 +510,7 @@ fit bootstrap theta.json design.json && ./run_designs.sh
     "algorithm": "mif sto -J 4000 -M 100",
     "repeat": 3
    }
-  ],
-
- "cluster": {
-    "type": "SGE",
-    "walltime": "01:20:00"
-  }
+  ]
 }
 </pre>
 
@@ -548,7 +522,6 @@ fit bootstrap theta.json design.json && ./run_designs.sh
       population <code>city1_all</code> plus some random noise draw
       from the interval specified by <code>range</code>).
     </p>
-
 
 
     <p>
@@ -563,9 +536,6 @@ fit bootstrap theta.json design.json && ./run_designs.sh
 
   </div>
 </div>
-
-
-
 
 
 
@@ -586,35 +556,18 @@ fit bootstrap theta.json design.json && ./run_designs.sh
       option.
     </p>
 
-
-    <p>Here would be a <code><i class="icon-file"></i>design.json</code> example:</p>
+    <p>Here would be a templated <code><i class="icon-file"></i>design.json</code> example:</p>
 
     <pre class="prettyprint">
-{
- "action": {
-   "id": "lhs",
-   "H": 100,
-   "seed": "any string you like"
-  },
+fit lhs theta.json "ksimplex sto -M 10000 --prior" 100</pre>
 
- "cmd": [
-   {"fit": "-D",
-    "algorithm": "mif sto -M 100 -J 1000"}
-  ],
-
- "cluster": {
-    "type": "SGE",
-    "walltime": "01:20:00"
-  }
-}
-</pre>
   </div>
 
   <div class="span4">
     <h3>All together?</h3>
 
      <p>
-        If you have many parameters to estimate, having the pMCMC update them one by one can be long... Try the <code>-- full</code> command to allow updating the whole vector at once! 
+        If you have many parameters to estimate, having the pMCMC update them one by one can be long... Try the <code>--full</code> option to allow updating the whole vector at once! 
      <p>
     </p>
         It will be specifically helpful when your parameters have intricate roles in the model, but it's also a bit more adventurous. Put all luck on your side by first getting a feel of the target's shape!
@@ -713,7 +666,7 @@ fit --slice mle.json "smc --sto -J 1000" 20
 
     <p>Template a design: <code><i class="icon-file"></i>profile.json</code></p>
 <pre class="prettyprint">
-fit --profile "mif --sto -J 1000 -M 100" 20 --queue SGE
+fit --profile mle.json "mif --sto -J 1000 -M 100" 20 --queue SGE
 </pre>
 
     <p>Run it:</p>
