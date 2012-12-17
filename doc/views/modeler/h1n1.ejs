@@ -233,13 +233,17 @@
   "observed": [{"id": "inc",
                 "comment": "incidence",
                 "definition": [{"from": "E", "to": "I"}],
-                "time_series_id": ["London__HPA__inc"]}],
+                "time_series_id": ["London__HPA__inc"],
+                "model_id": "common"}],
 
   "parameter": [{"id": "phi",  "comment": "observation noise"}],
 
-  "model": {"distribution": "discretized_normal",
-            "mean": "prop*x",
-            "var": "(phi*prop*x)**2"}
+  "model": {
+    "common": {
+      "distribution": "discretized_normal",
+      "mean": "prop*rep*x",
+      "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"
+  }}
 }
 </pre>
 

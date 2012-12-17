@@ -846,6 +846,10 @@ write(toJSON(m, collapse=''), file="process.json")
         <li>
           <code>time_series_id</code>: The <strong>list</strong> of times series being observed by the observed variable
         </li>
+        <li>
+          <code>model_id</code>: The <code>id</code> of the
+          observation model used to observe this time-series.
+        </li>
 
       </ul>
 
@@ -860,7 +864,10 @@ write(toJSON(m, collapse=''), file="process.json")
         </li>
 
         <li>
-          <code>model</code>: The observation process. <code>x</code> is used to <strong>refer</strong> to an observed variable.
+          <code>model</code>: An object containing the observation
+          processes refered by the times-series <code>model_id</code>
+          properties. <code>x</code> is used to <strong>refer</strong>
+          to an observed variable.
 
           Here, we specify an over-dispersed binomial distribution
           defined as a discretized normal random variable with:
@@ -882,28 +889,32 @@ write(toJSON(m, collapse=''), file="process.json")
  "id": "SIR+my_fake_context",
  "comment": "hopefully this can be templated",
 
-"observed": [
+ "observed": [
     {"id": "prev", "comment":"prevalence",
      "definition": ["I"],
-     "time_series_id": ["city1__CDC__prev"]},
+     "time_series_id": ["city1__CDC__prev"],
+     "model_id": "common"}
 
     {"id": "inc_out", "comment":"incidence measured at recovery time",
      "definition": [{"from":"I", "to":"DU"}, {"from":"I", "to":"U"}],
-     "time_series_id": ["all__CDC__inc", "all__google__inc"]},
+     "time_series_id": ["all__CDC__inc", "all__google__inc"],
+     "model_id": "common"},
 
     {"id": "inc_in", "comment":"incidence measured at infection time",
      "definition": [{"from":"S", "to":"I"}],
-     "time_series_id": ["city2__CDC__inc"]}],
+     "time_series_id": ["city2__CDC__inc"],
+     "model_id": "common"}],
 
-
-
-"parameter": [
+ "parameter": [
          {"id": "rep", "comment": "reporting rate"},
          {"id": "phi", "comment": "over-dispertion of the reporting rate"}],
 
-"model": {"distribution": "discretized_normal",
-          "mean": "prop*rep*x",
-          "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"}
+ "model": {
+   "common": {
+     "distribution": "discretized_normal",
+     "mean": "prop*rep*x",
+     "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"
+   }}
 }
 </pre>
 
