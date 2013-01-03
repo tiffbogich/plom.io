@@ -23,7 +23,7 @@ body {
 	padding: 0;
 	float: none !important;
 	overflow: visible;
-	background-image: none;
+	background-image: none !important;
 }
 
 html {
@@ -85,6 +85,7 @@ ul, ol, div, p {
 	left: auto;
 	top: auto;
 	margin-left: auto;
+	margin-right: auto;
 	margin-top: auto;
 	padding: auto;
 

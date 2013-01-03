@@ -1,11 +1,11 @@
 .node circle {
-  stroke: white;
+  stroke: black;
   stroke-width: 1.5px;
 }
 
 .node {
   font: 16px sans-serif;
-  fill: white;
+  fill: black;
 }
 
 .link {

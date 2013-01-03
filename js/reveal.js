@@ -1,5 +1,5 @@
 /*!
- * reveal.js 2.2 r45
+ * reveal.js
  * http://lab.hakim.se/reveal-js
  * MIT licensed
  *
@@ -36,13 +36,16 @@ var Reveal = (function(){
 			// Loop the presentation
 			loop: false,
 
+			// Change the presentation direction to be RTL
+			rtl: false,
+
 			// Number of milliseconds between automatically proceeding to the
 			// next slide, disabled when set to 0, this value can be overwritten
 			// by using a data-autoslide attribute on your slides
 			autoSlide: 0,
 
 			// Enable slide navigation via mouse wheel
-			mouseWheel: true,
+			mouseWheel: false,
 
 			// Apply a 3D roll to links on hover
 			rollingLinks: true,
@@ -99,6 +102,9 @@ var Reveal = (function(){
 		// Delays updates to the URL due to a Chrome thumbnailer bug
 		writeURLTimeout = 0,
 
+		// A delay used to ativate the overview mode
+		activateOverviewTimeout = 0,
+
 		// Holds information about the currently ongoing touch input
 		touch = {
 			startX: 0,
@@ -121,6 +127,9 @@ var Reveal = (function(){
 			return;
 		}
 
+		// Force a layout when the whole page, incl fonts, has loaded
+		window.addEventListener( 'load', layout, false );
+
 		// Copy options over to our config object
 		extend( config, options );
 
@@ -141,6 +150,7 @@ var Reveal = (function(){
 		// Cache references to key DOM elements
 		dom.theme = document.querySelector( '#theme' );
 		dom.wrapper = document.querySelector( '.reveal' );
+		dom.slides = document.querySelector( '.reveal .slides' );
 
 		// Progress bar
 		if( !dom.wrapper.querySelector( '.progress' ) && config.progress ) {
@@ -196,7 +206,7 @@ var Reveal = (function(){
 	 * Hides the address bar if we're on a mobile device.
 	 */
 	function hideAddressBar() {
-		if( navigator.userAgent.match( /(iphone|ipod|android)/i ) ) {
+		if( navigator.userAgent.match( /(iphone|ipod)/i ) ) {
 			// Give the page some scrollable overflow
 			document.documentElement.style.overflow = 'scroll';
 			document.body.style.height = '120%';
@@ -232,7 +242,7 @@ var Reveal = (function(){
 
 				// Extension may contain callback functions
 				if( typeof s.callback === 'function' ) {
-					head.ready( s.src.match( /([\w\d_\-]*)\.?js|[^\\\/]*$/i )[0], s.callback );
+					head.ready( s.src.match( /([\w\d_\-]*)\.?js$|[^\\\/]*$/i )[0], s.callback );
 				}
 			}
 		}
@@ -313,6 +323,10 @@ var Reveal = (function(){
 			dom.wrapper.classList.add( config.transition );
 		}
 
+		if( config.rtl ) {
+			dom.wrapper.classList.add( 'rtl' );
+		}
+
 		if( config.center ) {
 			dom.wrapper.classList.add( 'center' );
 		}
@@ -359,12 +373,13 @@ var Reveal = (function(){
 		}
 
 		if ( config.controls && dom.controls ) {
-			dom.controlsLeft.forEach( function( el ) { 		el.addEventListener( 'click', preventAndForward( navigateLeft ), false ); 		} );
-			dom.controlsRight.forEach( function( el ) { 	el.addEventListener( 'click', preventAndForward( navigateRight ), false ); 		} );
-			dom.controlsUp.forEach( function( el ) { 		el.addEventListener( 'click', preventAndForward( navigateUp ), false ); 		} );
-			dom.controlsDown.forEach( function( el ) { 		el.addEventListener( 'click', preventAndForward( navigateDown ), false ); 		} );
-			dom.controlsPrev.forEach( function( el ) { 		el.addEventListener( 'click', preventAndForward( navigatePrev ), false ); 		} );
-			dom.controlsNext.forEach( function( el ) { 		el.addEventListener( 'click', preventAndForward( navigateNext ), false ); 		} );
+			var actionEvent = 'ontouchstart' in window ? 'touchstart' : 'click';
+			dom.controlsLeft.forEach( function( el ) { el.addEventListener( actionEvent, preventAndForward( navigateLeft ), false ); } );
+			dom.controlsRight.forEach( function( el ) { el.addEventListener( actionEvent, preventAndForward( navigateRight ), false ); } );
+			dom.controlsUp.forEach( function( el ) { el.addEventListener( actionEvent, preventAndForward( navigateUp ), false ); } );
+			dom.controlsDown.forEach( function( el ) { el.addEventListener( actionEvent, preventAndForward( navigateDown ), false ); } );
+			dom.controlsPrev.forEach( function( el ) { el.addEventListener( actionEvent, preventAndForward( navigatePrev ), false ); } );
+			dom.controlsNext.forEach( function( el ) { el.addEventListener( actionEvent, preventAndForward( navigateNext ), false ); } );
 		}
 	}
 
@@ -384,12 +399,13 @@ var Reveal = (function(){
 		}
 
 		if ( config.controls && dom.controls ) {
-			dom.controlsLeft.forEach( function( el ) { 		el.removeEventListener( 'click', preventAndForward( navigateLeft ), false ); 		} );
-			dom.controlsRight.forEach( function( el ) { 	el.removeEventListener( 'click', preventAndForward( navigateRight ), false ); 		} );
-			dom.controlsUp.forEach( function( el ) { 		el.removeEventListener( 'click', preventAndForward( navigateUp ), false ); 			} );
-			dom.controlsDown.forEach( function( el ) { 		el.removeEventListener( 'click', preventAndForward( navigateDown ), false ); 		} );
-			dom.controlsPrev.forEach( function( el ) { 		el.removeEventListener( 'click', preventAndForward( navigatePrev ), false ); 		} );
-			dom.controlsNext.forEach( function( el ) { 		el.removeEventListener( 'click', preventAndForward( navigateNext ), false ); 		} );
+			var actionEvent = 'ontouchstart' in window ? 'touchstart' : 'click';
+			dom.controlsLeft.forEach( function( el ) { el.removeEventListener( actionEvent, preventAndForward( navigateLeft ), false ); } );
+			dom.controlsRight.forEach( function( el ) { el.removeEventListener( actionEvent, preventAndForward( navigateRight ), false ); } );
+			dom.controlsUp.forEach( function( el ) { el.removeEventListener( actionEvent, preventAndForward( navigateUp ), false ); } );
+			dom.controlsDown.forEach( function( el ) { el.removeEventListener( actionEvent, preventAndForward( navigateDown ), false ); } );
+			dom.controlsPrev.forEach( function( el ) { el.removeEventListener( actionEvent, preventAndForward( navigatePrev ), false ); } );
+			dom.controlsNext.forEach( function( el ) { el.removeEventListener( actionEvent, preventAndForward( navigateNext ), false ); } );
 		}
 	}
 
@@ -542,7 +558,7 @@ var Reveal = (function(){
 	 */
 	function getPreviousVerticalIndex( stack ) {
 		if( stack && stack.classList.contains( 'stack' ) ) {
-			return parseInt( stack.getAttribute( 'data-previous-indexv' ) || 0 );
+			return parseInt( stack.getAttribute( 'data-previous-indexv' ) || 0, 10 );
 		}
 
 		return 0;
@@ -562,53 +578,62 @@ var Reveal = (function(){
 
 			dom.wrapper.classList.add( 'overview' );
 
-			var horizontalSlides = document.querySelectorAll( HORIZONTAL_SLIDES_SELECTOR );
+			clearTimeout( activateOverviewTimeout );
 
-			for( var i = 0, len1 = horizontalSlides.length; i < len1; i++ ) {
-				var hslide = horizontalSlides[i],
-					htransform = 'translateZ(-2500px) translate(' + ( ( i - indexh ) * 105 ) + '%, 0%)';
+			// Not the pretties solution, but need to let the overview 
+			// class apply first so that slides are measured accurately 
+			// before we can positon them
+			activateOverviewTimeout = setTimeout( function(){
 
-				hslide.setAttribute( 'data-index-h', i );
-				hslide.style.display = 'block';
-				hslide.style.WebkitTransform = htransform;
-				hslide.style.MozTransform = htransform;
-				hslide.style.msTransform = htransform;
-				hslide.style.OTransform = htransform;
-				hslide.style.transform = htransform;
+				var horizontalSlides = document.querySelectorAll( HORIZONTAL_SLIDES_SELECTOR );
 
-				if( hslide.classList.contains( 'stack' ) ) {
+				for( var i = 0, len1 = horizontalSlides.length; i < len1; i++ ) {
+					var hslide = horizontalSlides[i],
+						htransform = 'translateZ(-2500px) translate(' + ( ( i - indexh ) * 105 ) + '%, 0%)';
 
-					var verticalSlides = hslide.querySelectorAll( 'section' );
+					hslide.setAttribute( 'data-index-h', i );
+					hslide.style.display = 'block';
+					hslide.style.WebkitTransform = htransform;
+					hslide.style.MozTransform = htransform;
+					hslide.style.msTransform = htransform;
+					hslide.style.OTransform = htransform;
+					hslide.style.transform = htransform;
 
-					for( var j = 0, len2 = verticalSlides.length; j < len2; j++ ) {
-						var verticalIndex = i === indexh ? indexv : getPreviousVerticalIndex( hslide );
+					if( hslide.classList.contains( 'stack' ) ) {
 
-						var vslide = verticalSlides[j],
-							vtransform = 'translate(0%, ' + ( ( j - verticalIndex ) * 105 ) + '%)';
+						var verticalSlides = hslide.querySelectorAll( 'section' );
 
-						vslide.setAttribute( 'data-index-h', i );
-						vslide.setAttribute( 'data-index-v', j );
-						vslide.style.display = 'block';
-						vslide.style.WebkitTransform = vtransform;
-						vslide.style.MozTransform = vtransform;
-						vslide.style.msTransform = vtransform;
-						vslide.style.OTransform = vtransform;
-						vslide.style.transform = vtransform;
+						for( var j = 0, len2 = verticalSlides.length; j < len2; j++ ) {
+							var verticalIndex = i === indexh ? indexv : getPreviousVerticalIndex( hslide );
+
+							var vslide = verticalSlides[j],
+								vtransform = 'translate(0%, ' + ( ( j - verticalIndex ) * 105 ) + '%)';
+
+							vslide.setAttribute( 'data-index-h', i );
+							vslide.setAttribute( 'data-index-v', j );
+							vslide.style.display = 'block';
+							vslide.style.WebkitTransform = vtransform;
+							vslide.style.MozTransform = vtransform;
+							vslide.style.msTransform = vtransform;
+							vslide.style.OTransform = vtransform;
+							vslide.style.transform = vtransform;
+
+							// Navigate to this slide on click
+							vslide.addEventListener( 'click', onOverviewSlideClicked, true );
+						}
+
+					}
+					else {
 
 						// Navigate to this slide on click
-						vslide.addEventListener( 'click', onOverviewSlideClicked, true );
+						hslide.addEventListener( 'click', onOverviewSlideClicked, true );
+
 					}
-					
 				}
-				else {
 
-					// Navigate to this slide on click
-					hslide.addEventListener( 'click', onOverviewSlideClicked, true );
+				layout();
 
-				}
-			}
-
-			layout();
+			}, 10 );
 
 		}
 
@@ -623,6 +648,8 @@ var Reveal = (function(){
 		// Only proceed if enabled in config
 		if( config.overview ) {
 
+			clearTimeout( activateOverviewTimeout );
+
 			dom.wrapper.classList.remove( 'overview' );
 
 			// Select all slides
@@ -631,6 +658,8 @@ var Reveal = (function(){
 			for( var i = 0, len = slides.length; i < len; i++ ) {
 				var element = slides[i];
 
+				element.style.display = '';
+
 				// Resets all transforms to use the external styles
 				element.style.WebkitTransform = '';
 				element.style.MozTransform = '';
@@ -638,7 +667,7 @@ var Reveal = (function(){
 				element.style.OTransform = '';
 				element.style.transform = '';
 
-				element.removeEventListener( 'click', onOverviewSlideClicked );
+				element.removeEventListener( 'click', onOverviewSlideClicked, true );
 			}
 
 			slide( indexh, indexv );
@@ -733,14 +762,16 @@ var Reveal = (function(){
 	 *
 	 * @param {int} h Horizontal index of the target slide
 	 * @param {int} v Vertical index of the target slide
+	 * @param {int} f Optional index of a fragment within the 
+	 * target slide to activate
 	 */
-	function slide( h, v ) {
+	function slide( h, v, f ) {
 		// Remember where we were at before
 		previousSlide = currentSlide;
 
 		// Query all horizontal slides in the deck
 		var horizontalSlides = document.querySelectorAll( HORIZONTAL_SLIDES_SELECTOR );
-		
+
 		// If no vertical index is specified and the upcoming slide is a 
 		// stack, resume at its previous vertical index
 		if( v === undefined ) {
@@ -749,7 +780,7 @@ var Reveal = (function(){
 
 		// If we were on a vertical stack, remember what vertical index 
 		// it was on so we can resume at the same position when returning
-		if( previousSlide && previousSlide.parentNode.classList.contains( 'stack' ) ) {
+		if( previousSlide && previousSlide.parentNode && previousSlide.parentNode.classList.contains( 'stack' ) ) {
 			setPreviousVerticalIndex( previousSlide.parentNode, indexv );
 		}
 
@@ -771,7 +802,7 @@ var Reveal = (function(){
 		// Apply the new state
 		stateLoop: for( var i = 0, len = state.length; i < len; i++ ) {
 			// Check if this state existed on the previous slide. If it
-			// did, we will avoid adding it repeatedly.
+			// did, we will avoid adding it repeatedly
 			for( var j = 0; j < stateBefore.length; j++ ) {
 				if( stateBefore[j] === state[i] ) {
 					stateBefore.splice( j, 1 );
@@ -797,8 +828,7 @@ var Reveal = (function(){
 
 		// Update the URL hash after a delay since updating it mid-transition
 		// is likely to cause visual lag
-		clearTimeout( writeURLTimeout );
-		writeURLTimeout = setTimeout( writeURL, 1500 );
+		writeURL( 1500 );
 
 		// Find the current horizontal slide and any possible vertical slides
 		// within it
@@ -807,6 +837,21 @@ var Reveal = (function(){
 
 		// Store references to the previous and current slides
 		currentSlide = currentVerticalSlides[ indexv ] || currentHorizontalSlide;
+
+
+		// Show fragment, if specified
+		if( ( indexh !== indexhBefore || indexv !== indexvBefore ) && f ) {
+			var fragments = currentSlide.querySelectorAll( '.fragment' );
+
+			toArray( fragments ).forEach( function( fragment, indexf ) {
+				if( indexf < f ) {
+					fragment.classList.add( 'visible' );
+				}
+				else {
+					fragment.classList.remove( 'visible' );
+				}
+			} );
+		}
 
 		// Dispatch an event if the slide changed
 		if( indexh !== indexhBefore || indexv !== indexvBefore ) {
@@ -912,9 +957,10 @@ var Reveal = (function(){
 			// autoSlide value otherwise use the global configured time
 			var slideAutoSlide = slides[index].getAttribute( 'data-autoslide' );
 			if( slideAutoSlide ) {
-				autoSlide = parseInt( slideAutoSlide );
-			} else {
-				autoSlide = config.autoSlide
+				autoSlide = parseInt( slideAutoSlide, 10 );
+			} 
+			else {
+				autoSlide = config.autoSlide;
 			}
 
 		}
@@ -950,17 +996,23 @@ var Reveal = (function(){
 				for( var j = 0; j < verticalSlides.length; j++ ) {
 
 					// Stop as soon as we arrive at the present
-					if( verticalSlides[j].classList.contains( 'present' ) ) break mainLoop;
+					if( verticalSlides[j].classList.contains( 'present' ) ) {
+						break mainLoop;
+					}
 
-					pastCount++
+					pastCount++;
 
 				}
 
 				// Stop as soon as we arrive at the present
-				if( horizontalSlide.classList.contains( 'present' ) ) break;
+				if( horizontalSlide.classList.contains( 'present' ) ) {
+					break;
+				}
 
 				// Don't count the wrapping section for vertical slides
-				if( horizontalSlide.classList.contains( 'stack' ) === false ) pastCount++;
+				if( horizontalSlide.classList.contains( 'stack' ) === false ) {
+					pastCount++;
+				}
 
 			}
 
@@ -987,14 +1039,14 @@ var Reveal = (function(){
 			} );
 
 			// Add the 'enabled' class to the available routes
-			if( routes.left ) dom.controlsLeft.forEach( function( el ) { 	el.classList.add( 'enabled' );		} );
-			if( routes.right ) dom.controlsRight.forEach( function( el ) { 	el.classList.add( 'enabled' );		} );
-			if( routes.up ) dom.controlsUp.forEach( function( el ) { 		el.classList.add( 'enabled' );		} );
-			if( routes.down ) dom.controlsDown.forEach( function( el ) { 	el.classList.add( 'enabled' );		} );
+			if( routes.left ) dom.controlsLeft.forEach( function( el ) { el.classList.add( 'enabled' );	} );
+			if( routes.right ) dom.controlsRight.forEach( function( el ) { el.classList.add( 'enabled' ); } );
+			if( routes.up ) dom.controlsUp.forEach( function( el ) { el.classList.add( 'enabled' );	} );
+			if( routes.down ) dom.controlsDown.forEach( function( el ) { el.classList.add( 'enabled' ); } );
 
 			// Prev/next buttons
-			if( routes.left || routes.up ) dom.controlsPrev.forEach( function( el ) { 		el.classList.add( 'enabled' );		} );
-			if( routes.right || routes.down ) dom.controlsNext.forEach( function( el ) { 	el.classList.add( 'enabled' );		} );
+			if( routes.left || routes.up ) dom.controlsPrev.forEach( function( el ) { el.classList.add( 'enabled' ); } );
+			if( routes.right || routes.down ) dom.controlsNext.forEach( function( el ) { el.classList.add( 'enabled' ); } );
 
 		}
 	}
@@ -1054,22 +1106,35 @@ var Reveal = (function(){
 	/**
 	 * Updates the page URL (hash) to reflect the current
 	 * state.
+	 *
+	 * @param {Number} delay The time in ms to wait before 
+	 * writing the hash
 	 */
-	function writeURL() {
+	function writeURL( delay ) {
 		if( config.history ) {
-			var url = '/';
 
-			// If the current slide has an ID, use that as a named link
-			if( currentSlide && typeof currentSlide.getAttribute( 'id' ) === 'string' ) {
-				url = '/' + currentSlide.getAttribute( 'id' );
+			// Make sure there's never more than one timeout running
+			clearTimeout( writeURLTimeout );
+
+			// If a delay is specified, timeout this call
+			if( typeof delay === 'number' ) {
+				writeURLTimeout = setTimeout( writeURL, delay );
 			}
-			// Otherwise use the /h/v index
 			else {
-				if( indexh > 0 || indexv > 0 ) url += indexh;
-				if( indexv > 0 ) url += '/' + indexv;
-			}
+				var url = '/';
 
-			window.location.hash = url;
+				// If the current slide has an ID, use that as a named link
+				if( currentSlide && typeof currentSlide.getAttribute( 'id' ) === 'string' ) {
+					url = '/' + currentSlide.getAttribute( 'id' );
+				}
+				// Otherwise use the /h/v index
+				else {
+					if( indexh > 0 || indexv > 0 ) url += indexh;
+					if( indexv > 0 ) url += '/' + indexv;
+				}
+
+				window.location.hash = url;
+			}
 		}
 	}
 
@@ -1101,7 +1166,7 @@ var Reveal = (function(){
 
 			// If this is a vertical slide, grab the vertical index
 			if( isVertical ) {
-				v = Math.max( toArray( slide.parentNode.children ).indexOf( slide ), 0 );
+				v = Math.max( toArray( slide.parentNode.querySelectorAll( 'section' ) ).indexOf( slide ), 0 );
 			}
 		}
 
@@ -1268,7 +1333,7 @@ var Reveal = (function(){
 		// Check if there's a focused element that could be using 
 		// the keyboard
 		var activeElement = document.activeElement;
-    	var hasFocus = !!( document.activeElement && ( document.activeElement.type || document.activeElement.href || document.activeElement.contentEditable !== 'inherit' ) );
+		var hasFocus = !!( document.activeElement && ( document.activeElement.type || document.activeElement.href || document.activeElement.contentEditable !== 'inherit' ) );
 
 		// Disregard the event if there's a focused element or a 
 		// keyboard modifier key is present
@@ -1479,7 +1544,18 @@ var Reveal = (function(){
 
 			deactivateOverview();
 
-			slide( parseInt( this.getAttribute( 'data-index-h' ) ), parseInt( this.getAttribute( 'data-index-v' ) ) );
+			var element = event.target;
+
+			while( element && !element.nodeName.match( /section/gi ) ) {
+				element = element.parentNode;
+			}
+
+			if( element.nodeName.match( /section/gi ) ) {
+				var h = parseInt( element.getAttribute( 'data-index-h' ), 10 ),
+					v = parseInt( element.getAttribute( 'data-index-v' ), 10 );
+
+				slide( h, v );
+			}
 		}
 	}
 

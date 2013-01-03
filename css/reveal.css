@@ -78,6 +78,20 @@ body {
  * HEADERS
  *********************************************/
 
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 {
+	-webkit-hyphens: auto;
+	   -moz-hyphens: auto;
+	        hyphens: auto;
+
+	word-break: break-all;
+	word-break: break-word;
+}
+
 .reveal h1 { font-size: 3.77em; }
 .reveal h2 { font-size: 2.11em;	}
 .reveal h3 { font-size: 1.55em;	}
@@ -176,7 +190,8 @@ body {
 }
 
 /* Preserve aspect ratio and scale image so it's bound within the section */
-.reveal img {
+.reveal img,
+.reveal iframe {
 	max-width: 100%;
 	max-height: 100%;
 }
@@ -592,8 +607,9 @@ body {
 }
 
 .reveal.center,
-.reveal.center .slides {
-	min-height: auto;
+.reveal.center .slides,
+.reveal.center .slides section {
+	min-height: auto !important;
 }
 
 
@@ -873,9 +889,9 @@ body {
 
 .reveal.page .slides {
 	-webkit-perspective-origin: 0% 50%;
- 	   -moz-perspective-origin: 0% 50%;
- 	    -ms-perspective-origin: 0% 50%;
- 	        perspective-origin: 0% 50%;
+	   -moz-perspective-origin: 0% 50%;
+	    -ms-perspective-origin: 0% 50%;
+	        perspective-origin: 0% 50%;
 
 	-webkit-perspective: 3000px;
 	   -moz-perspective: 3000px;
@@ -885,6 +901,7 @@ body {
 
 .reveal.page .slides section {
 	padding: 30px;
+	min-height: 600px;
 
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
@@ -1054,6 +1071,11 @@ body {
  *********************************************/
 
 .reveal.overview .slides {
+	-webkit-perspective-origin: 0% 0%;
+	   -moz-perspective-origin: 0% 0%;
+	    -ms-perspective-origin: 0% 0%;
+	        perspective-origin: 0% 0%;
+
 	-webkit-perspective: 700px;
 	   -moz-perspective: 700px;
 	    -ms-perspective: 700px;
@@ -1187,6 +1209,32 @@ body {
 }
 .blackout .reveal .state-background {
 	background: rgba( 0, 0, 0, 0.6 );
+}
+
+
+/*********************************************
+ * RTL SUPPORT
+ *********************************************/
+
+.reveal.rtl .slides,
+.reveal.rtl .slides h1,
+.reveal.rtl .slides h2,
+.reveal.rtl .slides h3,
+.reveal.rtl .slides h4,
+.reveal.rtl .slides h5,
+.reveal.rtl .slides h6 {
+	direction: rtl;
+	font-family: sans-serif;
+}
+
+.reveal.rtl pre,
+.reveal.rtl code {
+	direction: ltr;
+}
+
+.reveal.rtl ol,
+.reveal.rtl ul {
+	text-align: right;
 }
 
 
