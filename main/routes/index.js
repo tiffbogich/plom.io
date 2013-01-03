@@ -100,7 +100,7 @@ exports.build = function(req, res, next){
             if(err) return next(err);
 
 
-            var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '--web', '-o', path_rendered]);
+            var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '-o', path_rendered]);
 
             pmbuilder.stdin.write(JSON.stringify({context: cDoc, process: pDoc, link: lDoc})+'\n', encoding="utf8");
             //echo
