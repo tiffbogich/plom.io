@@ -15,15 +15,16 @@ model. One could argue that this should be a relatively easy
 task. However if you take a modeling paper (even if the source code is
 available) and try to add these new features to the model, you will
 soon realize that this is indeed a time consuming and error prone
-effort. The main reason is that the _semantic_ of the model, its very
-definition that you wanted to alter, is hidden behind its
+effort. The main reason is that the
+[semantics](http://en.wikipedia.org/wiki/Semantics) of the model, its
+very definition that you wanted to alter, is hidden behind its
 _implementation_.  Indeed most of the time, to "extend" previous
 results modelers find it easier to re-implement everything using their
 toolkit and programming language of choice. In this context, decision
 makers and citizens have no recourse other than to turn back to the
 modeler with their questions.
 
-PloM.io aims to make modeling _social_:
+PloM.io aims to make modeling _social_ by:
 
 1. allowing users to **share** models' **semantics** (as opposed to
    implemented models).
@@ -40,14 +41,13 @@ PloM.io aims to make modeling _social_:
    [likelihood based criteria](http://en.wikipedia.org/wiki/Likelihood)
    when data are available.
 
-
 A few years ago, such an approach would have been mostly
 irrelevant. The main reason was that very few statistical methods for
-complex mechanistic models were generic (i.e. could be applied to _any_
-models). On the contrary, modelers had to rely on model-specific
+complex mechanistic models were generic (i.e. could be applied to
+_any_ models). On the contrary, modelers had to rely on model-specific
 features to be able to implement relevant statistical methods. The
 recent development of _plug-and-play_ statistical methods, e.g.
-[MIF](http://www.pnas.org/content/103/49/18438.abstract)] and
+[MIF](http://www.pnas.org/content/103/49/18438.abstract) and
 [pMCMC](http://onlinelibrary.wiley.com/doi/10.1111/j.1467-9868.2009.00736.x/abstract),
 finally offers the perspective of generic inference tools for
 arbitrary complex mechanistic models (as opposed to linear models).
@@ -56,12 +56,12 @@ For the first time most scientific questions related to mechanistic
 modeling of complex systems (prospective modeling, dynamical system
 analysis, or inference) can be tackled by using algorithms that rely
 on a **black box representation** of the model that can be produced
-from a simple definition of the model semantic.
+from a simple definition of the model semantics.
 
 PLoM.io is the first open source initiative to coordinate the
 development of:
 
-1. domain-specific **layered formal grammars** for model semantic
+1. domain-specific **layered formal grammars** for model semantics
    definitions (allowing to define models as data).
 
 2. efficient (adapted to multi-core architecture and distributed
@@ -72,8 +72,8 @@ development of:
    browser.
 
 
-Model semantic as domain specific **layered formal grammars**
-=============================================================
+Model semantics as domain specific **layered formal grammars**
+==============================================================
 
 We want to lower the barrier of entry to modeling by letting users
 compose models by simply describing the underlying processes using
@@ -90,7 +90,7 @@ can be assembled from its atomic components.
 
 A user should be able to simply pick up and compose a model from
 existing components cataloged in a fully searchable library of
-_semantic models_.
+_semantics models_.
 
 These domain specific layered formal grammars should be as simple as
 possible (ideally described as a simple short README file) and expressed
