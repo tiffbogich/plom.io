@@ -150,30 +150,30 @@ Leveraging the real-time web
 
 By making modeling _social_ and letting users build on top of each
 other work we generate data offering a real time representation of the
-dynamic of research. By browsing http://plom.io users can see a trees
-of knowledge, updated in real-time, mapping the genealogy of ideas
-(how models are forked from each other, how intervention strategies
-are being implemented on top of model validated to data, how
-parameters values are being refined, ...)  This tree is an invitation
-for user to explore the underlying model and create their own branch
-to refine knowledge, provide alternative hypothesis or add their
-scenario. 
+dynamic of research. By browsing http://plom.io users can see trees of
+knowledge, updated in real-time, mapping the genealogy of ideas (how
+models are forked from each other, how intervention strategies are
+being implemented on top of model validated to data, how parameters
+values are being refined, ...).  These trees are an invitation for
+user to explore the underlying models and create their own branch to
+refine knowledge, provide alternative hypothesis or add their
+custom intervention scenario.
 
 PLoM leverage its JSON APIs, advances in HTML5 and JavaScript and the
 scalibility of cloud computing to make this process as smooth as
 possible. To ensure that everyone can reproduce the results and easily
 gain insights from the exposed model, we give users a full access to
 all the methods developed under PLoM right from their web browser
-(available from any connected device).  We also offer a simple web
-interface to quickly fork JSON documents without having to hand-write
-those (making model creation as simple (and safe) as possible).  Last,
-the computational cost of many methods are simply too high to be used
+(from any connected device).  We also offer a simple web interface to
+quickly fork JSON documents without having to hand-write those (making
+model creation as simple (and safe) as possible). Last, the
+computational cost of many methods are simply too high to be used
 comfortably without using an high performance computing environment
 (computer cluster). PLoM provide an extremely convenient way to run
 these large computation in the cloud. As methods developed under PLoM
 are adapted to distributed computing, we can reduce computational time
 by adding instances to clusters spawned on demand on the cloud giving
-user the ability to match their deadline.
+user the ability to match their deadlines.
 
 Example
 =======
