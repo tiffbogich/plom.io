@@ -1,18 +1,18 @@
 PLoM.io: Toward Social Modeling
 ===============================
 
-In a hurry: check the [presentation](http://plom.github.com/plom.io)
+For a quick summary, check the [presentation](http://plom.github.com/plom.io)
 
-Presenting the results of a modeling work to other modelers,
-data-providers, decision makers, or citizens often leads to the same
+Presenting the results of a model to other modelers,
+data-providers, decision-makers, or citizens often leads to the same
 reaction: a lot of questions about how the results would
 have differed if some of the hypotheses were
 altered. For instance, in epidemiology some people might wonder what
 the results would have been had the modelers included an exposed
-class to their models, or whether a control policy would have been more
+class in their models, or whether a control policy would have been more
 efficient if a treatment was used instead of a vaccine.
 
-All these questions can be answered by customizing the original
+All of these questions can be answered by customizing the original
 model. One could argue that this should be a relatively easy
 task. However if you take a modeling paper (even if the source code is
 available) and try to add these new features to the model, you will
@@ -28,17 +28,17 @@ modeler with their questions.
 
 PloM.io aims to make modeling _social_ by:
 
-1. allowing users to **share** models' **semantics** (as opposed to
+1. Allowing users to **share** models' **semantics** (as opposed to
    implemented models).
 
-2. allowing users to _easily_ **customize** and **re-use** existing
+2. Allowing users to _easily_ **customize** and **re-use** existing
    models' **semantics**.
 
-3. supporting the development of vibrant **heterogeneous communities**
+3. Supporting the development of vibrant **heterogeneous communities**
    using modeling as a common language to collaboratively generate and
    test hypotheses.
 
-4. offering the tools necessary to rate models. Rating relies on users
+4. Offering the tools necessary to rate models. Rating relies on users
    votes but also on the use of
    [likelihood based criteria](http://en.wikipedia.org/wiki/Likelihood)
    when data are available.
@@ -46,7 +46,7 @@ PloM.io aims to make modeling _social_ by:
 A few years ago, such an approach would have been mostly
 irrelevant. The main reason was that very few statistical methods for
 complex mechanistic models were generic (i.e. could be applied to
-_any_ models). On the contrary, modelers had to rely on model-specific
+_any_ model). On the contrary, modelers had to rely on model-specific
 features to be able to implement relevant statistical methods. The
 recent development of _plug-and-play_ statistical methods, e.g.
 [MIF](http://www.pnas.org/content/103/49/18438.abstract) and
@@ -54,7 +54,7 @@ recent development of _plug-and-play_ statistical methods, e.g.
 finally offers the perspective of generic inference tools for
 arbitrary complex mechanistic models (as opposed to linear models).
 
-For the first time most scientific questions related to mechanistic
+For the first time, most scientific questions related to mechanistic
 modeling of complex systems (prospective modeling, dynamical system
 analysis, or inference) can be tackled by using algorithms that rely
 on a **black box representation** of the model that can be produced
@@ -63,13 +63,13 @@ from a simple definition of the model semantics.
 PLoM.io is the first open source initiative to coordinate the
 development of:
 
-1. domain-specific **layered formal grammars** for model semantics
+1. Domain-specific **layered formal grammars** for model semantics
    definitions (allowing to define models as data).
 
-2. efficient (adapted to multi-core architecture and distributed
+2. Efficient (adapted to multi-core architecture and distributed
    computing) methods to implement and use these models.
 
-3. a modern web platform to support social modeling and facilitate the
+3. A modern web platform to support social modeling and facilitate the
    interaction with models running the cloud from any device with a web
    browser.
 
@@ -98,32 +98,32 @@ These domain specific layered formal grammars should be as simple as
 possible (ideally described as a simple short README file) and expressed
 in [JSON](http://json.org).
 
-JSON:
+JSON is ideal because it:
 
-- is easy for humans to read and write.
+- Is easy for humans to read and write.
 
-- maps directly to data structures (array and hash table) that are
+- Maps directly to data structures (array and hash table) that are
   suitable to **automate** model generation using the user programming
   language of choice (JSON parsers for virtually any programming
   language exist). This ease of use allows the development of
   third-party _domain specific languages_ to automate the mass
   generation of complex models or related model _families_.
 
-- fits naturally with most NoSQL databases allowing users to perform queries
+- Fits naturally with most NoSQL databases allowing users to perform queries
   on the model definition itself. Taking epidemiology as an example, a
   user can therefore query all the models containing a transition from
   an exposed state to an infectious state.
 
-- doesn't allow comments. We see that as a main strength for our
+- Doesn't allow comments. We see that as a main strength for our
   goals. The grammar has to specify mandatory (or optional) _comment_
   (or _description_) properties. This allows model definitions to have
   a consistent style, and it gives us an incentive to enforce ideas--
   similar to _literate programming_.
 
-- makes [diff](http://en.wikipedia.org/wiki/Diff) between two
+- Makes [diff](http://en.wikipedia.org/wiki/Diff) between two
   documents easy to understand.
 
-- provides great API endpoints both for web services and for the
+- Provides great API endpoints both for web services and for the
   implementation of low-level simulation and inference methods.
 
 
@@ -149,31 +149,31 @@ Leveraging the real-time web
 ============================
 
 By making modeling _social_ and letting users build on top of each
-other work we generate data offering a real time representation of the
-dynamic of research. By browsing http://plom.io users can see trees of
+others' work, we generate data offering a real time representation of the
+dynamics of research. By browsing http://plom.io users can see trees of
 knowledge, updated in real-time, mapping the genealogy of ideas (how
 models are forked from each other, how intervention strategies are
-being implemented on top of model validated to data, how parameters
+being implemented on top of a model validated against data, how parameters
 values are being refined, ...).  These trees are an invitation for
-user to explore the underlying models and create their own branch to
-refine knowledge, provide alternative hypothesis or add their
-custom intervention scenario.
+users to explore the underlying models and create their own branch to
+refine knowledge, provide alternative hypotheses or add their
+custom intervention scenarios.
 
-PLoM leverage its JSON APIs, advances in HTML5 and JavaScript and the
+PLoM leverages its JSON APIs, advances in HTML5 and JavaScript and the
 scalibility of cloud computing to make this process as smooth as
 possible. To ensure that everyone can reproduce the results and easily
-gain insights from the exposed model, we give users a full access to
+gain insights from the exposed model, we give users full access to
 all the methods developed under PLoM right from their web browser
 (from any connected device).  We also offer a simple web interface to
 quickly fork JSON documents without having to hand-write those (making
 model creation as simple (and safe) as possible). Last, the
 computational cost of many methods are simply too high to be used
-comfortably without using an high performance computing environment
-(computer cluster). PLoM provide an extremely convenient way to run
-these large computation in the cloud. As methods developed under PLoM
+comfortably without using them on a high performance computing environment
+(computer cluster). PLoM provides an extremely convenient way to run
+these large computations on the cloud. As methods developed under PLoM
 are adapted to distributed computing, we can reduce computational time
 by adding instances to clusters spawned on demand on the cloud giving
-user the ability to match their deadlines.
+users the ability to match their deadlines.
 
 Example
 =======
