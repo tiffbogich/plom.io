@@ -1,6 +1,8 @@
 PLoM.io: Toward Social Modeling
 ===============================
 
+In a hurry: check the [presentation](http://plom.github.com/plom.io)
+
 Presenting the results of a modeling work to other modelers,
 data-providers, decision makers, or citizens often leads to the same
 reaction: a lot of questions about how the results would
@@ -103,8 +105,9 @@ JSON:
 - maps directly to data structures (array and hash table) that are
   suitable to **automate** model generation using the user programming
   language of choice (JSON parsers for virtually any programming
-  language exist). This ease of use allows the development of third-party _domain specific languages_ to automate the mass generation
-  of complex models or related model _families_.
+  language exist). This ease of use allows the development of
+  third-party _domain specific languages_ to automate the mass
+  generation of complex models or related model _families_.
 
 - fits naturally with most NoSQL databases allowing users to perform queries
   on the model definition itself. Taking epidemiology as an example, a
@@ -130,8 +133,8 @@ Model implementation and tooling following the UNIX philosophy
 We want to catalyze an ecosystem of **generic** methods (working with
 _any_ models) that can interact with each other leveraging simple
 _universal_ API for inputs and outputs (in JSON). Using an API for
-inputs and outputs allows users to combine these tools (that can be written
-in different programming languages) using their programming
+inputs and outputs allows users to combine these tools (that can be
+written in different programming languages) using their programming
 language of choice.
 
 Most plug-and-play statistical methods are computationally intensive
@@ -145,14 +148,39 @@ development of plug-and-play inference algorithms.
 Leveraging the real-time web
 ============================
 
+By making modeling _social_ and letting users build on top of each
+other work we generate data offering a real time representation of the
+dynamic of research. By browsing http://plom.io users can see a trees
+of knowledge, updated in real-time, mapping the genealogy of ideas
+(how models are forked from each other, how intervention strategies
+are being implemented on top of model validated to data, how
+parameters values are being refined, ...)  This tree is an invitation
+for user to explore the underlying model and create their own branch
+to refine knowledge, provide alternative hypothesis or add their
+scenario. 
 
-
+PLoM leverage its JSON APIs, advances in HTML5 and JavaScript and the
+scalibility of cloud computing to make this process as smooth as
+possible. To ensure that everyone can reproduce the results and easily
+gain insights from the exposed model, we give users a full access to
+all the methods developed under PLoM right from their web browser
+(available from any connected device).  We also offer a simple web
+interface to quickly fork JSON documents without having to hand-write
+those (making model creation as simple (and safe) as possible).  Last,
+the computational cost of many methods are simply too high to be used
+comfortably without using an high performance computing environment
+(computer cluster). PLoM provide an extremely convenient way to run
+these large computation in the cloud. As methods developed under PLoM
+are adapted to distributed computing, we can reduce computational time
+by adding instances to clusters spawned on demand on the cloud giving
+user the ability to match their deadline.
 
 Example
 =======
 
-[PLoM.io](https://github.com/plom) provides a full proof of principle
+[PLoM.io](http://plom.io) provides a full proof of principle
 of these ideas for the field of Epidemiology.
+
 
 License
 =======
