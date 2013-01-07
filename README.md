@@ -2,7 +2,7 @@ PLoM.io: Toward Social Modeling
 ===============================
 
 Presenting the results of a modeling work to other modelers,
-data-providers, decision makers or citizens often leads to the same
+data-providers, decision makers, or citizens often leads to the same
 reaction: a lot of questions about how the results would
 have differed if some of the hypotheses were
 altered. For instance, in epidemiology some people might wonder what
@@ -25,7 +25,7 @@ modeler with their questions.
 
 PloM.io aims to make modeling _social_:
 
-1. allowing users to **share** models **semantic** (as opposed to
+1. allowing users to **share** models' **semantics** (as opposed to
    implemented models).
 
 2. allowing users to _easily_ **customize** and **re-use** existing
@@ -33,7 +33,7 @@ PloM.io aims to make modeling _social_:
 
 3. supporting the development of vibrant **heterogeneous communities**
    using modeling as a common language to collaboratively generate and
-   test hypothesis.
+   test hypotheses.
 
 4. offering the tools necessary to rate models. Rating relies on users
    votes but also on the use of
@@ -43,10 +43,10 @@ PloM.io aims to make modeling _social_:
 
 A few years ago, such an approach would have been mostly
 irrelevant. The main reason was that very few statistical methods for
-complex mechanistic models were generic (i.e could be applied to _any_
+complex mechanistic models were generic (i.e. could be applied to _any_
 models). On the contrary, modelers had to rely on model-specific
 features to be able to implement relevant statistical methods. The
-recent development of _plug-and-play_ statistical methods, e.g
+recent development of _plug-and-play_ statistical methods, e.g.
 [MIF](http://www.pnas.org/content/103/49/18438.abstract)] and
 [pMCMC](http://onlinelibrary.wiley.com/doi/10.1111/j.1467-9868.2009.00736.x/abstract),
 finally offers the perspective of generic inference tools for
@@ -62,9 +62,9 @@ PLoM.io is the first open source initiative to coordinate the
 development of:
 
 1. domain-specific **layered formal grammars** for model semantic
-   definitions.
+   definitions (allowing to define models as data).
 
-2. efficient (adapted to mutli-core architecture and distributed
+2. efficient (adapted to multi-core architecture and distributed
    computing) methods to implement and use these models.
 
 3. a modern web platform to support social modeling and facilitate the
@@ -86,30 +86,29 @@ primary focus: For instance in epidemiology, a model of an infection
 process should be separated from a model describing spatial migration
 of individuals. By keeping each layer separate, each component can be
 re-used. It is the role of the grammar to ensure that a final model
-can be assembled from it's atomic components.
+can be assembled from its atomic components.
 
 A user should be able to simply pick up and compose a model from
 existing components cataloged in a fully searchable library of
-_ semantic models_.
+_semantic models_.
 
 These domain specific layered formal grammars should be as simple as
-possible (ideally described as simple short README file) and expressed
+possible (ideally described as a simple short README file) and expressed
 in [JSON](http://json.org).
 
 JSON:
 
-- is easy for human to read and write.
+- is easy for humans to read and write.
 
 - maps directly to data structures (array and hash table) that are
   suitable to **automate** model generation using the user programming
   language of choice (JSON parsers for virtually any programming
-  language exists). This ease of use allows the development of third
-  parties _domain specific languages_ to automate the mass generation
+  language exist). This ease of use allows the development of third-party _domain specific languages_ to automate the mass generation
   of complex models or related model _families_.
 
-- fits naturally with most NoSQL databases allowing to perform queries
+- fits naturally with most NoSQL databases allowing users to perform queries
   on the model definition itself. Taking epidemiology as an example, a
-  user can therefore query all the models containing a transition for
+  user can therefore query all the models containing a transition from
   an exposed state to an infectious state.
 
 - doesn't allow comments. We see that as a main strength for our
@@ -131,17 +130,17 @@ Model implementation and tooling following the UNIX philosophy
 We want to catalyze an ecosystem of **generic** methods (working with
 _any_ models) that can interact with each other leveraging simple
 _universal_ API for inputs and outputs (in JSON). Using an API for
-inputs and outputs allows to combine these tools (that can be written
-in different programming languages) using the user programming
+inputs and outputs allows users to combine these tools (that can be written
+in different programming languages) using their programming
 language of choice.
 
 Most plug-and-play statistical methods are computationally intensive
 and require significant development time. Given the lack of universal
-API for model generations, we believe that there was very few
-incentives for the development of carefully optimized algorithm
+API for model generation, we believe that there were very few
+incentives for the development of carefully optimized algorithms
 adapted to distributed computing. It is our hope that PLoM.io will
 change this situation and create the incentive for collaborative
-development of plug-and-play inference algorithm.
+development of plug-and-play inference algorithms.
 
 Leveraging the real-time web
 ============================
