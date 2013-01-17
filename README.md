@@ -69,7 +69,7 @@ development of:
 2. Efficient (adapted to multi-core architecture and distributed
    computing) methods to implement and use these models.
 
-3. A modern web platform to support social modeling and facilitate the
+3. A modern web platform to support _social modeling_ and facilitate the
    interaction with models running the cloud from any device with a web
    browser.
 
@@ -175,14 +175,62 @@ are adapted to distributed computing, we can reduce computational time
 by adding instances to clusters spawned on demand on the cloud giving
 users the ability to match their deadlines.
 
+Taking advantage of every contributions
+=======================================
+
+As compared to traditional scientific journals, we want to make
+science visible _while it is made_ and rely on the community (and
+likelihood based criteria) to _filter_ the tremendous amount of
+generated content. Such an approach allows us to take advantage of the
+famous power law distribution observed in social sharing platforms. We
+want to catalyze the collaborative (and exhaustive) exploration of the
+diversity of models that could potentially explain a given situation now _and_
+in the future.
+
+Most modeling work never gets published, either because the models were
+intermediate steps leading to another model, or
+because the authors never found their work relevant enough or were not
+interested enough to write a full paper publishable in a scientific
+journal (think most students or non-academic modelers).
+
+By making models easily *re-usable* we consider that as many models as
+possible should be able to reach PLoM. What was not relevant _now_ or
+in a _given_ situation might be relevant _tomorrow_ or in _another_
+context.  Therefore, as compared to restrictive classical
+peer-reviewing processes, we want to let users publish a model as _fast_
+and _freely_ as possible (for instance by simply running ```plom
+publish model.json``` if you like
+[CLI](http://en.wikipedia.org/wiki/Command-line_interface)).
+
+It is our hope that this level of transparency will curate communities
+able to work together as efficiently as possible when critical
+situations happen (pandemics, fishing quotas, financial crisis,
+...).
+
+
 Example
 =======
 
 [PLoM.io](http://plom.io) provides a full proof of principle
 of these ideas for the field of Epidemiology.
 
-
 License
 =======
 
 GPL version 3 or any later version.
+
+Acknowledgements
+================
+
+We want to thank:
+
+- Professor
+  [Bryan Grenfell](http://www.princeton.edu/eeb/people/display_person.xml?netid=grenfell)
+  for his continuous support and mentorship of PLoM, Sebastien
+  Ballesteros, and Tiffany Bogich.
+
+- Professor
+  [Bernard Cazelles](http://www.biologie.ens.fr/~cazelles/bernard/Welcome.html)
+  for his inspirational role in our early curriculum and his
+  continuous support of Joseph Dureau.
+
