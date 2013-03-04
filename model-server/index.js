@@ -5,9 +5,9 @@ var express = require('express')
   , mongodb = require('mongodb')
   , ObjectID = require('mongodb').ObjectID
   , path = require('path')
-  , PlomTrees = require('../db').PlomTrees
   , async = require('async')
   , Grid = require('gridfs-stream')
+  , dbUtil = require('../db-utils')
   , spawn = require('child_process').spawn;
 
 var app = express();
@@ -209,6 +209,7 @@ app.post('/publish', function(req, res){
       var to_be_published = [];
       for(var key in published){
         if(!published[key]){
+          m[key]._keywords = dbUtil.addKeywords(m[key]);
           to_be_published.push(m[key]);
         }
       }
