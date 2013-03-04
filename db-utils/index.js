@@ -10,7 +10,7 @@ exports.querify = function(searchString){
   var qstemmed = natural.PorterStemmer.tokenizeAndStem(searchString);
 
   //mongo query object
-  return {$or: [{name: searchString}, {name: {$in: qstemmed } }, {_keywords: {$in: qstemmed } }]};
+  return {$or: [{name: searchString}, {_keywords: {$in: qstemmed } }], type: 'link'};
 }
 
 

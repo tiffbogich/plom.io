@@ -15,6 +15,7 @@
     "mongodb": "~1.2.13",
     "express": "~3.1.0",
     "async": "~0.2.5",
-    "gridfs-stream": "~0.3.2"
+    "gridfs-stream": "~0.3.2",
+    "underscore": "~1.4.4"
   }
 }

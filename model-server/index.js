@@ -8,6 +8,7 @@ var express = require('express')
   , async = require('async')
   , Grid = require('gridfs-stream')
   , dbUtil = require('../db-utils')
+  , _ = require('underscore')
   , spawn = require('child_process').spawn;
 
 var app = express();
@@ -73,30 +74,14 @@ app.post('/search', function(req, res){
 
   var q = req.body.q; //query
 
-  var trees = req.app.get('trees')
-    , components = req.app.get('components');
+  var components = req.app.get('components');
 
-  var ptrees =  new PlomTrees(components, trees);
-
-  res.set('Content-Type', 'text/plain');
-
-  ptrees.findComponents(q, function(err, cursor){
-    cursor.each(function(err, doc){
-      if(doc){
-        res.send(util.format('\033[94m%s\033[0m: _id: %s, name: %s, description: %s\n', doc.type, doc._id, doc.name, doc.description));
-      } else{
-        ptrees.search(q, function(err, cursor2){
-          cursor2.each(function(err, doc){
-            if(doc){
-              res.send(util.format('\033[94m%s\033[0m: _id: %s, diseases: %s', 'tree\n', doc._id, doc.disease.join(' ; ')));
-            } else {
-              res.send('\033[91mFAIL\033[0m: could not find the resource\n');
-            }
-          });
-        });
-      }
-    });
+  components.find(dbUtil.querify(q), {context_name:1, process_name:1, name:1}).toArray(function(err, docs){
+    if (err) return next(err);
+    res.json(docs);   
   });
+
+
 });
 
 
@@ -178,20 +163,17 @@ app.post('/publish', function(req, res){
         link: undefined
       };
 
-      var retrieved_link
-        , retrieved_theta;
+      var retrieved_theta;
 
       docs.forEach(function(doc){
-        published[doc.type] = doc._id;
-        if(doc.type === 'link'){
-          retrieved_link = doc;
-        } else if(doc.type === 'theta'){
+        published[doc.type] = doc;
+        if(doc.type === 'theta'){
           retrieved_theta = doc;
         }
       });
 
-      if(retrieved_link){
-        m.link = retrieved_link;
+      if(published.link){
+        m.link = published.link;
       }
 
       if( retrieved_theta || ( ('theta' in m) && ('review' in m.link) && m.link.review.map(function(x){return x.semantic_id;}).indexOf(m.theta.semantic_id) !== -1) ){
@@ -220,13 +202,19 @@ app.post('/publish', function(req, res){
           if(err) return next(err);
           
           records.forEach(function(record){
-            published[record.type] = record._id;
+            published[record.type] = record;
           });
          
-          m.link.context_id = published.context;
-          m.link.process_id = published.process;
+          m.link.context_id = published.context._id;
+          m.link.context_name = published.context.name;
 
-          collection.update({_id:published.link},
+          m.link.process_id = published.process._id;
+          m.link.process_name = published.process.name;
+
+          console.log(published.context._keywords, published.process._keywords);
+          m.link._keywords = _.unique(m.link._keywords.concat(published.context._keywords, published.process._keywords));
+
+          collection.update({_id:published.link._id},
                             m.link, 
                             {safe:true},
                             function(err, cnt){
@@ -244,7 +232,7 @@ app.post('/publish', function(req, res){
       } else if ('theta' in m) {
         //update link
 
-        collection.update({_id:published.link},
+        collection.update({_id:published.link._id},
                           m.link, 
                           {safe:true},
                           function(err, cnt){
