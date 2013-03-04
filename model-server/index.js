@@ -6,6 +6,8 @@ var express = require('express')
   , ObjectID = require('mongodb').ObjectID
   , path = require('path')
   , PlomTrees = require('../db').PlomTrees
+  , async = require('async')
+  , Grid = require('gridfs-stream')
   , spawn = require('child_process').spawn;
 
 var app = express();
@@ -127,57 +129,153 @@ app.post('/fetch', function(req, res){
 
 
 /**
- * Publish
+ * store results in GridFs and respond with file object
  **/
-app.post('/publish', function(req, res){
+app.post('/results/:sha', function(req, res){
 
-  var component = req.body.component
-    , tree_idString = req.body.tree_idString
-    , parent_idString = req.body.parent_idString;
+  var gfs = Grid(req.app.get('db'), mongodb);
 
-  var trees = req.app.get('trees')
-    , components = req.app.get('components');
+  gfs.files.find({ filename: req.params.sha }).toArray(function (err, files) {
+    if (err) return next(err);
 
-  var ptrees =  new PlomTrees(components, trees);
-
-  res.set('Content-Type', 'text/plain');
-
-  if(typeof tree_idString === 'undefined' &&  typeof parent_idString === 'undefined'){
-
-    if(component.type === 'context' || component.type === 'process'){
-      //insert component (not in a tree)
-      ptrees.insertComponent(component, function(err, doc){
-        res.send(util.format('\033[92m' + 'SUCCESS' + '\033[0m' + ':  %s has been successfully published under the _id: %s\n', doc.name, doc._id));
-      });
+    if (files.length){ //file  already exists
+      res.json(files[0]);
     } else {
-      res.send('\033[91m' + 'FAIL' + '\033[0m' + ': link and theta objects cannot be published without being attached to a tree.\n');
-    }
-
-  }else if(tree_idString && parent_idString){
-
-    ptrees.insertComponentAt(component, tree_idString, parent_idString, function(err, doc){
-      res.send(util.format('\033[92m' + 'SUCCESS' + '\033[0m' + ':  %s has been successfully published in the tree under the _id: %s\n', doc.name, doc._id));
-    });
-
-  }
+      var writestream = gfs.createWriteStream(req.params.sha);
+      req.pipe(writestream);
+      writestream.on('close', function (file) {
+        res.json(file);
+      });
+    }      
+  });
 
 });
 
 
+/**
+ * Publish
+ **/
+app.post('/publish', function(req, res){
 
+  var m = req.body
+    , collection = req.app.get('components');
+
+  res.set('Content-Type', 'text/plain');
+
+  var my_semantic_ids = [m.context.semantic_id, m.process.semantic_id, m.link.semantic_id];
+  if('theta' in m){
+    my_semantic_ids.push(m.theta.semantic_id);
+  }
+
+  collection
+    .find({semantic_id: {$in: my_semantic_ids}})
+    .toArray(function(err, docs){
+      if(err) return next(err);
+
+      var published = {
+        context: undefined,
+        process: undefined,
+        link: undefined
+      };
+
+      var retrieved_link
+        , retrieved_theta;
+
+      docs.forEach(function(doc){
+        published[doc.type] = doc._id;
+        if(doc.type === 'link'){
+          retrieved_link = doc;
+        } else if(doc.type === 'theta'){
+          retrieved_theta = doc;
+        }
+      });
+
+      if(retrieved_link){
+        m.link = retrieved_link;
+      }
+
+      if( retrieved_theta || ( ('theta' in m) && ('review' in m.link) && m.link.review.map(function(x){return x.semantic_id;}).indexOf(m.theta.semantic_id) !== -1) ){
+        return res.send('\033[91mFAIL\033[0m: the design has already been published\n');
+      } else if ('theta' in m) {
+
+        //add theta to be reviewed
+        if(!('review' in m.link)){
+          m.link.review = [m.theta];
+        } else {
+          m.link.review.push(m.theta);
+        }
+      }
+
+      var to_be_published = [];
+      for(var key in published){
+        if(!published[key]){
+          to_be_published.push(m[key]);
+        }
+      }
+
+      if(to_be_published.length){        
+
+        collection.insert(to_be_published, {safe: true}, function(err, records){
+          if(err) return next(err);
+          
+          records.forEach(function(record){
+            published[record.type] = record._id;
+          });
+         
+          m.link.context_id = published.context;
+          m.link.process_id = published.process;
+
+          collection.update({_id:published.link},
+                            m.link, 
+                            {safe:true},
+                            function(err, cnt){
+                              if(err) return next(err);
+
+                              if ('theta' in m) {                              
+                                res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
+                              }else {
+                                res.send('\033[92mSUCCESS\033[0m: your model has been published.\n');
+                              }
+                            });         
+
+        });
+
+      } else if ('theta' in m) {
+        //update link
+
+        collection.update({_id:published.link},
+                          m.link, 
+                          {safe:true},
+                          function(err, cnt){
+                            if(err) return next(err);
+                            
+                            res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
+                          });         
+
+    
+      } else {
+        res.send('\033[91mFAIL\033[0m: everything has already been published\n');
+      }
+
+    });
+
+});
 
 
 var server = http.createServer(app);
-var db = new mongodb.Db('plom', new mongodb.Server("127.0.0.1", 27017), {safe:true});
-db.open(function (err, client) {
+
+var MongoClient = mongodb.MongoClient;
+
+MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
 
   if (err) throw err;
   console.log("Connected to mongodb");
 
-  //store ref to the collections so that it is easily accessible (app is accessible in req and res!)
-  app.set('users',  new mongodb.Collection(client, 'users'));
-  app.set('trees',  new mongodb.Collection(client, 'trees'));
-  app.set('components',  new mongodb.Collection(client, 'components'));
+  //store ref to db and the collections so that it is easily accessible (app is accessible in req and res!)
+  app.set('db', db);
+  app.set('users',  new mongodb.Collection(db, 'users'));
+  app.set('components',  new mongodb.Collection(db, 'components'));
+
 
   //TODO ensureIndex
 

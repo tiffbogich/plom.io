@@ -1,7 +1,7 @@
 var mongodb = require('mongodb')
-, _ = require('underscore')
-, natural = require('natural')
-, ObjectID = require('mongodb').ObjectID;
+  , _ = require('underscore')
+  , natural = require('natural')
+  , ObjectID = require('mongodb').ObjectID;
 
 
 exports.PlomComponents = PlomComponents;
@@ -34,6 +34,7 @@ PlomComponents.prototype.findComponents = function(q, options){
 
   return cursor;
 }
+
 
 /**
  * Adds /replace  doc._keywords array in place .

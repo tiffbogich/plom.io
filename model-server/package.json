@@ -11,7 +11,10 @@
   "license": "GPLv3",
   "dependencies": {
     "csv2array": "0.0.1",
-    "mongodb": "~1.2.2",
-    "express": "~3.0.4"
+    "request": "~2.14.0",
+    "mongodb": "~1.2.13",
+    "express": "~3.1.0",
+    "async": "~0.2.5",
+    "gridfs-stream": "~0.3.2"
   }
 }
