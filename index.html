@@ -4,21 +4,57 @@
   <head>
     <meta charset="utf-8">
 
-    <title>PLoM - The Public Library of Models</title>
+    <title>plom.io</title>
 
-    <meta name="description" content="Introducing plom.io the The Public Library of Models">
+    <meta name="description" content="Introducing plom.io The Public Library of Models">
     <meta name="author" content="Sebastien Ballesteros">
 
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <link rel="stylesheet" href="css/reveal.min.css">
     <link rel="stylesheet" href="css/theme/sky.css" id="theme">
 
-    <link rel="stylesheet" href="lib/css/explore.css">
+
+    <style type="text/css">
+      .bio{
+      float:left;
+      width: 33%;
+      }
+      .adv{
+      float:left;
+      width: 50%;
+      }
+
+
+      .bio p{
+      font-size:12pt;
+      }
+
+      div.biz{
+      float:left;
+      width: 31%;
+      background:AliceBlue; 
+      height:400px; 
+      margin-right: 15px; 
+      border-radius: 1em/1em; 
+      box-shadow: 0 0 1em black;
+      }
+
+      div.biz:hover{
+      box-shadow: 0 0 1em green;
+      }
+    </style>
 
     <!-- For syntax highlighting -->
     <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <link rel="stylesheet" href="lib/css/explore.css">
+
+
+
 
     <!-- If the query includes 'print-pdf', use the PDF print sheet -->
     <script>
@@ -44,7 +80,7 @@
 	  <img style="border-style: none; box-shadow: none;" src="lib/pict/logo-large.png" alt="process">
 
 	  <p>
-	    <small>Created
+	    <small>Founded
 	      by <a href="mailto:sebastien@plom.io">Sebastien
 	        Ballesteros</a>, <a href="mailto:tbogich@princeton.edu">Tiffany
 	        Bogich</a> and <a href="mailto:joseph@plom.io">Joseph Dureau</a></small>
@@ -53,25 +89,24 @@
 
 
         <section>
-          <h3>Scientific journals (1665)</h3>
+          <h3>Scientific journals foundational goals (1665)</h3>
 
           <div style="float:left; width:50%;">
             <img src="lib/pict/sci_journal.png">
           </div>
-          <div style="float: right; width:50%;">
-            
+
+          <div style="float:right; width:50%;">            
             <ul>
-              <li>Invented to allow <strong>fast</strong> delivery of
-              science (printing press was the right medium, but books were too slow).</li>
-              <li>Provide a norm ensuring <strong>reproducibility</strong> of results.</li>
-              <li><strong>Synchronizes</strong> the argument across the community of natural scientists.</li>
+              <li style="margin-top: 3em;"><strong>Fast</strong> delivery of science</li>
+              <li style="margin-top: 0.5em;"><strong>Reproducible</strong> results</li>
+              <li style="margin-top: 0.5em;"><strong>Communities</strong> of natural scientists</li>
             </ul>
           </div>
 
         </section>
 
         <section data-state="alert">
-<h3>For modeling papers, Scientific journals' foundational goals are no longer fulfilled</h3>
+          <h3>Modeling papers present a new challenge</h3>
 
           <div style="float:left; width:50%; font-size:12pt;">
             <blockquote cite="http://www.nature.com/nature/journal/v482/n7386/full/nature10836.html">
@@ -88,154 +123,223 @@
           <div style="float: right; width:50%;">
 
             <ul>
-              <li><span style="text-decoration:
-              line-through;">Reproducibility</span>: Lack of source
-              code, lack of formal grammar for model definition,  build and runtime issues.</li>
+              <li><span style="text-decoration:line-through;">Reproducible</span>: Lack of source
+                code,  build and runtime issues.</li>
               <li>
-              <span style="text-decoration:
-              line-through;">Fast</span>: Reimplementing from scratch
-              is time consuming and keeps models from spreading and being used.</li>
-              <li><span style="text-decoration:
-              line-through;">Social</span>: Models are not shared.</li>
+                <span style="text-decoration:line-through;">Fast</span>: Reimplementing from scratch
+                is time consuming.</li>
+              <li><span style="text-decoration:line-through;">Social</span>: Models are not shared.</li>
             </ul>            
 
           </div>
 
         </section>
 
-
         <section>
-          <h3>Exponentially Increasing number of modeling papers published</h3>
-          <div>
-            <img src="lib/pict/num_pubs_plos.png">
-            <p> (PLoS journals and  epidemiological models only) </p>
-          </div>
-        </section>
 
-	<section>
-	  <h3>Modeling work is the cornerstone of modern decision making processes</h3>
-
-          <ul>
-            <li><u>Swine flu</u>: distribution of tamiflu for treatment and outbreak control.</li>
-            <li><u>HIV</u>: treatment regimes to maximize patient lifespan and minimize transmission.</li>
-            <li><u>Foot and Mouth Disease</u>: livestock culling strategy to minimize outbreak spread.</li>
-          </ul>
-
-	</section>
-
-
-	<section data-state="alert">
-          <h3>Communication gap between funding and policy</h3>
-          <div>
-            <img src="lib/pict/Lostchain.png">
-          </div>
-        </section>
-
-
-        <section>
           <section>
             <h3><strong>The solution</strong>: not a competitor in the old
               ecosystem, <strong>a new ecosystem</strong></h3>
 
-            <p>
-              <ul>
-                <li>
-                  PLoM.io: A trusted <em>Public Library of Models</em>.
-                </li>
-                <li>
-                  <strong>Models as data</strong> in <a href="http://www.json.org/">JSON</a> (expressed using formal layered
-                  domain-specific <strong>grammars</strong>).
-                </li>
-                <li>
-                  Models ready to be simulated (on the cloud) from any connected
-                  device.
-                </li>
-              </ul>
-            </p>
+            <a href="http://plom.io"><img height="50%" src="lib/pict/home.png"></a>
+
+            <div style="font-size:16pt;" class="fragment">
+
+              <h3>Fully embrace the web</h3>
+            <ul>
+              <li>
+                <strong>Real time</strong> web and scalable cloud computing allow
+                interactions with models.
+              </li>
+
+              <li>
+                Web approach to <strong>peer review</strong>: reproducibility, scalability,
+                automation and rating.
+              </li>
+            </ul>
+            </div>
           </section>
+
 
           <section>
-            <h3>Made possible by leveraging new technological and scientific developments</h3>
-              <ul>
-                <li>The ubiquity and low cost of scalable <em>cloud computing</em>.</li>
-                <li>HTML5 and JavaScript allow <em>real time interactions</em>
-                  with models running on the cloud from any device.</li>
-                <li>The recent developments of statistical <em>plug-and-play
-                  methods</em> make generic inference possible for
-                  arbitrary complex models.</li>
-              </ul>
+            <h2>Modeling made social</h2>
+
+            <p>
+              Curate a <strong>community</strong> to work
+              collaboratively in real time.
+            </p>
+
+
+            <div id="sfr-tree-graph"></div>
+
+            <select name="select">
+              <option value="value1">Likelihood</option> 
+              <option value="value2">Information Criteria (AIC, AICc, DIC)</option>
+              <option value="value3">Expert Ratings</option>
+            </select>
 
           </section>
-        </section>
-
-        <section>
-          <h2>Modeling made social</h2>
-
-
-          <ul>
-            <li>Models can now be <strong>shared</strong>
-            and <strong>forked</strong>.</li>
-            <li>Curate a <strong>community</strong> of modelers, data
-            providers, and decision makers having access to a real-time
-            representation of the dynamic of research.</li>
-            <li>Web approach: publish <em>then</em> filter (using ratings and
-            likelihood based criteria).</li>
-          </ul>
-
-          <div id="sfr-tree-graph"></div>
-
-          <p>
-            <a href="http://plom.io">Explore the library: http://plom.io</a>
-          </p>
-
 
         </section>
 
         <section>
-          <h2>Plom.io Business Model</h2>
 
-          <div style="font-size:12pt;">
-            <div style="float:left; width: 33%;">
+          <h2>Unifying the Market</h2>
+
+
+            <div style="float:left; width: 45%;">
+
+              <h4>Scientists</h4>
+
+              <p>
+                <strong>One paper per tweet</strong> at twitter on an average day in
+                2010 just in biotechnology <a href="http://www.ncbi.nlm.nih.gov/">(NCBI)</a>.
+              </p>
+              
+              <p style="margin-top:50px; background:AliceBlue;
+                border-radius: 1em/1em; box-shadow: 0 0 1em grey;" class="fragment">
+                <a href="http://www.nlm.nih.gov/bsd/medline_cit_counts_yr_pub.html">679,858</a>
+                papers published per year
+              </p>
+
+            </div>
+
+
+            <div style="float:right; width: 45%;">
+
+              <h4>Decision makers</h4>
+
+              <p>
+                With each batch of new data, modeling results
+                become <strong >outdated</strong>.
+              </p>
+
+              <p style="margin-top:60px; background:AliceBlue;
+                border-radius: 1em/1em; box-shadow: 0 0 1em grey;" class="fragment">
+                The <a href="http://www.nih.gov/about/budget.htm">NIH</a> invests over $30.9 billion annually in medical research for the American people.
+              </p>
+
+            </div>
+
+
+
+        </section>
+
+
+        <section>
+          <h2 style="margin-bottom:50px;">Plom.io Business Model</h2>
+
+
+          <div style="font-size:16pt;">
+
+            
+            <div class="biz">
               <h2>Publication fees</h2>
 
               <p>Open access model.</p>              
               <p>Guarantee of full reproducibility.</p>
-              <p>Models are available from any connected device.</p>
+              <p>Transparent machine-assisted peer reviewed in minutes.</p>
+              <p>Models available from any connected device.</p>
               <p>Industry standard: PLoS Journals $2900/publication.</p>
 
             </div>
 
-            <div style="float:left; width: 33%;">
+            <div class="biz">
+              <h2>Suscription Model</h2>
+
+              <p>
+                Results remain relevant with automatic updates as new
+                data become available.
+              </p>
+
+              <p>
+                Update frequency and length dictated by suscription
+                level.
+              </p>
+
+            </div>
+
+
+            <div class="biz">
               <h2>Platform as a service</h2>
-              <p>Provide integrated modeling tools to institutions
-                lacking hardware facilities.</p>
+
+              <p>Run arbitrarily complex models for institutions
+                lacking hardware facilities or facing sharp deadlines.</p>
               <p>Leverage our cloud computing platform for maximal
                 cost efficacy.</p>
             </div>
 
-            <div style="float:right; width: 33%;">
-              <h2>News industry</h2>
-              <p>Provide data-vizualization through embeddable
-              HTML5 widgets whose states  can be shared.</p>
-              <p>Citizens can share the result of their exploration of
-              science-backed simulation tools.</p>              
-            </div>
 
           </div>
           <!--
-          <div>
-            <img src="lib/pict/businessmodel.png">
-            <br>
-          </div>-->
+              <div>
+                <img src="lib/pict/businessmodel.png">
+                <br>
+              </div>-->
         </section>
 
 
         <section>
-          <h2>Get involved</h2>
+          
+          <h3>Founders</h3>          
 
-          <a href="https://github.com/plom">https://github.com/plom</a>
+          <div class="bio">
+            <h4>Sebastien <br/> Ballesteros</h4>
 
-          <p>Thank you!</p>
+            <a href="mailto:sebastien@plom.io"><img src="lib/pict/SB.jpg" height="125px"></a>
+
+            <p>Engineer, Ph.D epidemiology</p>
+
+            <!--
+            <p>Engineer, Ph.D, self-trained programmer, wanting to
+            bring the github revolution into science.</p>-->
+
+
+
+          </div>
+
+          <div class="bio">
+            <h4>Tiffany <br/> Bogich</h4>
+
+            <a href="mailto:tiff@plom.io"><img src="lib/pict/TLB.jpg" height="125px"></a>
+
+            <p>Public Health, Ph.D mathematics</p>
+          </div>
+          
+          <div class="bio">
+            <h4>Joseph <br/> Dureau</h4>
+
+            <a href="mailto:joseph@plom.io"><img src="lib/pict/JD.jpg" height="125px"></a>
+
+            <p>Engineer, Ph.D statistics</p>
+          </div>
+
+
+          <div style="float:left; width: 100%;">
+
+            <hr>
+
+            <h3>Scientific Advisors</h3>
+
+            <div class="bio adv">
+              <h4>Bryan Grenfell</h4>
+
+              <a href="mailto:bgrenfell@princeton.edu"><img src="lib/pict/BG.png" height="125px"></a>
+              
+              <p>Professor, Princeton University</p>
+            </div>
+            
+            <div class="bio adv">
+              <h4>Bernard Cazelles</h4>
+
+              <a href="mailto:cazelles@biologie.ens.fr"><img src="lib/pict/BC.jpg" height="125px"></a>
+
+              <p>Professor UPMC, Paris, France</p>
+            </div>
+
+
+          </div>
+
         </section>
 
       </div>
@@ -248,7 +352,6 @@
     <script src="lib/js/d3.v2.min.js"></script>
     <script src="lib/js/tree.js"></script>
 
-
     <script>
 
       // Full list of configuration options available here:
@@ -260,7 +363,7 @@
       center: true,
 
       theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
-      transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/none
+      transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
 
       // Optional libraries used to extend on reveal.js
       dependencies: [
