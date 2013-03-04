@@ -23,7 +23,7 @@ exports.addKeywords = function(component){
   var keywords = natural.PorterStemmer.tokenizeAndStem(component.name);
 
   if('disease' in component && component.disease.length){
-    keywords = _.unique(keywords.concat(component.disease));
+    keywords = _.unique(keywords.concat(_.flatten(component.disease.map(natural.PorterStemmer.tokenizeAndStem))));
   }
 
   if('description' in component && component.description){

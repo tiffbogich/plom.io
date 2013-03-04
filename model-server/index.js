@@ -76,9 +76,9 @@ app.post('/search', function(req, res){
 
   var components = req.app.get('components');
 
-  components.find(dbUtil.querify(q), {context_name:1, process_name:1, name:1}).toArray(function(err, docs){
+  components.find(dbUtil.querify(q), {context_disease:1, context_name:1, process_name:1, name:1}).toArray(function(err, docs){
     if (err) return next(err);
-    res.json(docs);   
+    res.json(docs);
   });
 
 
@@ -206,12 +206,12 @@ app.post('/publish', function(req, res){
           });
          
           m.link.context_id = published.context._id;
+          m.link.context_disease = published.context.disease;
           m.link.context_name = published.context.name;
 
           m.link.process_id = published.process._id;
           m.link.process_name = published.process.name;
 
-          console.log(published.context._keywords, published.process._keywords);
           m.link._keywords = _.unique(m.link._keywords.concat(published.context._keywords, published.process._keywords));
 
           collection.update({_id:published.link._id},
