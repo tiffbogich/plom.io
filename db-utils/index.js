@@ -18,8 +18,8 @@ exports.querify = function(searchString, diseaseList){
     type: 'link'
   };
 
-  if(diseaseList){
-    qobj['context_disease'] = {$all: diseaseList};
+  if(diseaseList && diseaseList.length){
+    qobj['context_disease'] = {$all: diseaseList, $size: diseaseList.length};
   }
 
   return qobj;
@@ -44,4 +44,3 @@ exports.addKeywords = function(component){
 
   return keywords
 }
-

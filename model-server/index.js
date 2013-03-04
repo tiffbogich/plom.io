@@ -32,6 +32,22 @@ app.configure('production', function(){
 
 // Routes
 
+
+/**
+ * get components
+ **/
+app.get('/get/:_id', function(req, res, next){
+
+  var components = req.app.get('components');
+  components
+    .findOne({_id: new ObjectID(req.params._id)}, function(err, doc){
+      if (err) return next(err);
+      res.json(doc);
+    });
+
+});
+
+
 /**
  * install
  **/
@@ -70,13 +86,11 @@ app.post('/install', function(req, res){
  * search
  **/
 
-app.post('/search', function(req, res){
-
-  var q = req.body.q; //query
+app.post('/search', function(req, res, next){
 
   var components = req.app.get('components');
 
-  components.find(dbUtil.querify(q), {context_disease:1, context_name:1, process_name:1, name:1}).toArray(function(err, docs){
+  components.find(dbUtil.querify(req.body.q, req.body.disease), {context_disease:1, context_name:1, process_name:1, name:1}).toArray(function(err, docs){
     if (err) return next(err);
     res.json(docs);
   });
@@ -89,34 +103,25 @@ app.post('/search', function(req, res){
 /**
  * fetch
  **/
-app.post('/fetch', function(req, res){
+app.post('/fetch', function(req, res, next){
 
-  var _idString = req.body._idString;
+  var components = req.app.get('components');
 
-  var trees = req.app.get('trees')
-    , components = req.app.get('components');
+  components
+    .find(dbUtil.querify(req.body.q, req.body.disease),
+         {_id:1, context_id:1, process_id:1, context_disease:1, context_name:1, process_name:1, name:1})
+    .toArray(function(err, docs){
+      if (err) return next(err);
+      res.json(docs);
+    });
 
-  components.findOne({_id: new ObjectID(_idString)}, function(err, doc){
-    if (doc){
-      res.json(doc);
-    } else {
-      trees.findOne({_id: new ObjectID(_idString)}, function(err, doc){
-        if(doc){
-          res.json(doc);
-        }else {
-          res.set('Content-Type', 'text/plain');
-          res.send('\033[91mFAIL\033[0m: could not find the resource');
-        }
-      });
-    }
-  });
 });
 
 
 /**
  * store results in GridFs and respond with file object
  **/
-app.post('/results/:sha', function(req, res){
+app.post('/results/:sha', function(req, res, next){
 
   var gfs = Grid(req.app.get('db'), mongodb);
 
@@ -131,7 +136,7 @@ app.post('/results/:sha', function(req, res){
       writestream.on('close', function (file) {
         res.json(file);
       });
-    }      
+    }
   });
 
 });
@@ -140,7 +145,7 @@ app.post('/results/:sha', function(req, res){
 /**
  * Publish
  **/
-app.post('/publish', function(req, res){
+app.post('/publish', function(req, res, next){
 
   var m = req.body
     , collection = req.app.get('components');
@@ -196,15 +201,15 @@ app.post('/publish', function(req, res){
         }
       }
 
-      if(to_be_published.length){        
+      if(to_be_published.length){
 
         collection.insert(to_be_published, {safe: true}, function(err, records){
           if(err) return next(err);
-          
+
           records.forEach(function(record){
             published[record.type] = record;
           });
-         
+
           m.link.context_id = published.context._id;
           m.link.context_disease = published.context.disease;
           m.link.context_name = published.context.name;
@@ -215,17 +220,17 @@ app.post('/publish', function(req, res){
           m.link._keywords = _.unique(m.link._keywords.concat(published.context._keywords, published.process._keywords));
 
           collection.update({_id:published.link._id},
-                            m.link, 
+                            m.link,
                             {safe:true},
                             function(err, cnt){
                               if(err) return next(err);
 
-                              if ('theta' in m) {                              
+                              if ('theta' in m) {
                                 res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
                               }else {
                                 res.send('\033[92mSUCCESS\033[0m: your model has been published.\n');
                               }
-                            });         
+                            });
 
         });
 
@@ -233,15 +238,15 @@ app.post('/publish', function(req, res){
         //update link
 
         collection.update({_id:published.link._id},
-                          m.link, 
+                          m.link,
                           {safe:true},
                           function(err, cnt){
                             if(err) return next(err);
-                            
-                            res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
-                          });         
 
-    
+                            res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
+                          });
+
+
       } else {
         res.send('\033[91mFAIL\033[0m: everything has already been published\n');
       }
