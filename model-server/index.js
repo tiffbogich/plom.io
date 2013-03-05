@@ -23,6 +23,8 @@ app.configure(function(){
     parse(req, res, next);
   });
 
+//  app.use(express.bodyParser({uploadDir:'./uploads'}));
+
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(app.router);
@@ -47,14 +49,15 @@ app.get('/get/:_id', function(req, res, next){
 
   var components = req.app.get('components');
   components
-    .findOne({_id: new ObjectID(req.params._id)}, 
-             {context_disease:-1,
-              context_name:-1, 
-              process_name:-1, 
-              username:-1, 
-              _id:-1, 
-              review:-1, 
-              semantic_id:-1},
+    .findOne({_id: new ObjectID(req.params._id)},
+             {context_disease:0,
+              context_name:0,
+              process_name:0,
+              username:0,
+              _id:0,
+              _keywords:0,
+              review:0,
+              semantic_id:0},
              function(err, doc){
                if (err) return next(err);
                res.json(doc);
@@ -108,7 +111,7 @@ app.post('/traces/:sha', function(req, res, next){
   var filename = req.params.sha;
   var writestream = gfs.createWriteStream(filename);
   req.pipe(writestream);
-  
+
   writestream.on('close', function (file) {
     res.json(file);
   });
@@ -123,8 +126,6 @@ app.post('/publish', function(req, res, next){
 
   var m = req.body
     , collection = req.app.get('components');
-
-  res.set('Content-Type', 'text/plain');
 
   var my_semantic_ids = [m.context.semantic_id, m.process.semantic_id, m.link.semantic_id];
   if('theta' in m){
@@ -157,7 +158,7 @@ app.post('/publish', function(req, res, next){
 
       if( retrieved_theta || ( ('theta' in m) && ('review' in m.link) && m.link.review.map(function(x){return x.semantic_id;}).indexOf(m.theta.semantic_id) !== -1) ){
 
-        return res.send('\033[91mFAIL\033[0m: the design has already been published\n');
+        return res.json({'success': false, 'msg': 'the design has already been published'});
 
       } else{
 
@@ -201,30 +202,29 @@ app.post('/publish', function(req, res, next){
                                 if(err) return next(err);
 
                                 if ('theta' in m) {
-                                  res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
+                                  res.json({'success': true, 'msg': 'your results are being reviewed'});
                                 }else {
-                                  res.send('\033[92mSUCCESS\033[0m: your model has been published.\n');
+                                  res.json({'success': true, 'msg': 'your model has been published'});
                                 }
                               });
 
           });
 
         } else if ('theta' in m) {
-          
+
           //update link
           collection.update({_id:published.link._id},
                             {$push: {review: m.theta}},
                             {safe:true},
                             function(err, cnt){
                               if(err) return next(err);
-                              res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
+                              res.json({'success': true, 'msg': 'your results are being reviewed'});
                             });
 
         } else {
-          res.send('\033[91mFAIL\033[0m: everything has already been published\n');
+          return res.json({'success': false, 'msg': 'everything has already been published'});
         }
       }
-
     });
 });
 

@@ -28,7 +28,7 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
     var theta = doc.review[0];
 
     //if kmcmc or pmcmc
-    if('trace_file_id' in theta){
+    if('trace_checksum' in theta){
 
       //build unique directory for the diagnostic
       mkdirp(theta.semantic_id, function(err){
@@ -36,29 +36,34 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
         //stream tar.gz
         var gfs = Grid(db, mongodb);
 
+        gfs.files.findOne({ filename: theta.trace_checksum }, function (err, file) {
 
-        var readstream = gfs.createReadStream(theta.trace_file_id)
-          , targz = fs.createWriteStream('x.tar.gz'); //path.join(theta.semantic_id, theta.trace_hash));
+          var readstream = gfs.createReadStream(file._id)
+            , targz = fs.createWriteStream(path.join(theta.semantic_id, theta.trace_checksum));
 
-        readstream.pipe(targz);
+          readstream.pipe(targz);
 
-        targz.on('close', function(){
+          targz.on('close', function(){
 
-          console.log('done');
-          //run diagnostic script
+            console.log('done');
+            //run diagnostic script
 
-          //add pngs to mongo
+            //add pngs to mongo
 
-          //delete directory
+            //delete directory
+
+            db.close();
+
+          });
 
 
-          db.close();
 
         });
-        
-      });      
+
+
+      });
     }
-    
+
     db.close();
 
   });
