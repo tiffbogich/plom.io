@@ -15,7 +15,14 @@ var app = express();
 
 // Configuration
 app.configure(function(){
-  app.use(express.bodyParser());
+
+  //do not use bodyParser for requests that need to be streamed
+  var parse = express.bodyParser();
+  app.use(function(req, res, next){
+    if (0 == req.url.indexOf('/traces')) return next();
+    parse(req, res, next);
+  });
+
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(app.router);
@@ -59,7 +66,6 @@ app.get('/get/:_id', function(req, res, next){
 /**
  * search
  **/
-
 app.post('/search', function(req, res, next){
 
   var components = req.app.get('components');
@@ -95,22 +101,16 @@ app.post('/fetch', function(req, res, next){
 /**
  * store results in GridFs and respond with file object
  **/
-app.post('/results/:sha', function(req, res, next){
+app.post('/traces/:sha', function(req, res, next){
 
   var gfs = Grid(req.app.get('db'), mongodb);
 
-  gfs.files.find({ filename: req.params.sha }).toArray(function (err, files) {
-    if (err) return next(err);
-
-    if (files.length){ //file  already exists
-      res.json(files[0]);
-    } else {
-      var writestream = gfs.createWriteStream(req.params.sha);
-      req.pipe(writestream);
-      writestream.on('close', function (file) {
-        res.json(file);
-      });
-    }
+  var filename = req.params.sha;
+  var writestream = gfs.createWriteStream(filename);
+  req.pipe(writestream);
+  
+  writestream.on('close', function (file) {
+    res.json(file);
   });
 
 });
@@ -210,7 +210,7 @@ app.post('/publish', function(req, res, next){
           });
 
         } else if ('theta' in m) {
-
+          
           //update link
           collection.update({_id:published.link._id},
                             {$push: {review: m.theta}},
