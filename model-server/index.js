@@ -40,10 +40,18 @@ app.get('/get/:_id', function(req, res, next){
 
   var components = req.app.get('components');
   components
-    .findOne({_id: new ObjectID(req.params._id)}, function(err, doc){
-      if (err) return next(err);
-      res.json(doc);
-    });
+    .findOne({_id: new ObjectID(req.params._id)}, 
+             {context_disease:-1,
+              context_name:-1, 
+              process_name:-1, 
+              username:-1, 
+              _id:-1, 
+              review:-1, 
+              semantic_id:-1},
+             function(err, doc){
+               if (err) return next(err);
+               res.json(doc);
+             });
 
 });
 
@@ -148,77 +156,76 @@ app.post('/publish', function(req, res, next){
       }
 
       if( retrieved_theta || ( ('theta' in m) && ('review' in m.link) && m.link.review.map(function(x){return x.semantic_id;}).indexOf(m.theta.semantic_id) !== -1) ){
+
         return res.send('\033[91mFAIL\033[0m: the design has already been published\n');
-      } else if ('theta' in m) {
 
-        //add theta to be reviewed
-        if(!('review' in m.link)){
-          m.link.review = [m.theta];
-        } else {
-          m.link.review.push(m.theta);
+      } else{
+
+        var to_be_published = [];
+        for(var key in published){
+          if(!published[key]){
+            m[key]._keywords = dbUtil.addKeywords(m[key]);
+            to_be_published.push(m[key]);
+          }
         }
-      }
 
-      var to_be_published = [];
-      for(var key in published){
-        if(!published[key]){
-          m[key]._keywords = dbUtil.addKeywords(m[key]);
-          to_be_published.push(m[key]);
-        }
-      }
+        if(to_be_published.length){
 
-      if(to_be_published.length){
+          collection.insert(to_be_published, {safe: true}, function(err, records){
+            if(err) return next(err);
 
-        collection.insert(to_be_published, {safe: true}, function(err, records){
-          if(err) return next(err);
+            records.forEach(function(record){
+              published[record.type] = record;
+            });
 
-          records.forEach(function(record){
-            published[record.type] = record;
+            //update link:
+            var update = {
+              $set: {
+                context_id: published.context._id,
+                context_disease: published.context.disease,
+                context_name: published.context.name,
+                process_id: published.process._id,
+                process_name: published.process.name
+              },
+              $addToSet: {_keywords: {$each :published.context._keywords.concat(published.process._keywords)}}
+            };
+
+            if ('theta' in m) {
+              update['$push'] = {review: m.theta};
+            }
+
+            collection.update({_id:published.link._id},
+                              update,
+                              {safe:true},
+                              function(err, cnt){
+                                if(err) return next(err);
+
+                                if ('theta' in m) {
+                                  res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
+                                }else {
+                                  res.send('\033[92mSUCCESS\033[0m: your model has been published.\n');
+                                }
+                              });
+
           });
 
-          m.link.context_id = published.context._id;
-          m.link.context_disease = published.context.disease;
-          m.link.context_name = published.context.name;
+        } else if ('theta' in m) {
 
-          m.link.process_id = published.process._id;
-          m.link.process_name = published.process.name;
-
-          m.link._keywords = _.unique(m.link._keywords.concat(published.context._keywords, published.process._keywords));
-
+          //update link
           collection.update({_id:published.link._id},
-                            m.link,
+                            {$push: {review: m.theta}},
                             {safe:true},
                             function(err, cnt){
                               if(err) return next(err);
-
-                              if ('theta' in m) {
-                                res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
-                              }else {
-                                res.send('\033[92mSUCCESS\033[0m: your model has been published.\n');
-                              }
+                              res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
                             });
 
-        });
-
-      } else if ('theta' in m) {
-        //update link
-
-        collection.update({_id:published.link._id},
-                          m.link,
-                          {safe:true},
-                          function(err, cnt){
-                            if(err) return next(err);
-
-                            res.send('\033[92mSUCCESS\033[0m: your results are being reviewed.\n');
-                          });
-
-
-      } else {
-        res.send('\033[91mFAIL\033[0m: everything has already been published\n');
+        } else {
+          res.send('\033[91mFAIL\033[0m: everything has already been published\n');
+        }
       }
 
     });
-
 });
 
 
