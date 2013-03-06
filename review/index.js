@@ -18,10 +18,11 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   if (err) throw err;
   console.log("Connected to mongodb");
 
-  var components = new mongodb.Collection(db, 'components');
+  var components = new mongodb.Collection(db, 'components')
+    , diag = new mongodb.Collection(db, 'diag');
 
   //mark element that is going to be processed
-//  components.findAndModify({_id: _id}, {}, {$set:{'review.0.processed':true}}, function(err, doc){
+  //  components.findAndModify({_id: _id}, {}, {$set:{'review.0.processed':true}}, function(err, doc){
   components.findOne({type: 'link'}, function(err, doc){
     if(err) throw err;
 
@@ -35,7 +36,6 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
 
         //stream tar.gz
         var gfs = Grid(db, mongodb);
-
         gfs.files.findOne({ filename: theta.trace_checksum }, function (err, file) {
 
           var readstream = gfs.createReadStream(file._id)
@@ -51,13 +51,8 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
             //add pngs to mongo
 
             //delete directory
-
             db.close();
-
           });
-
-
-
         });
 
 

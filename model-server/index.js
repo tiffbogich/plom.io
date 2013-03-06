@@ -17,13 +17,13 @@ var app = express();
 app.configure(function(){
 
   //do not use bodyParser for requests that need to be streamed
-  var parse = express.bodyParser();
-  app.use(function(req, res, next){
-    if (0 == req.url.indexOf('/traces')) return next();
-    parse(req, res, next);
-  });
+//  var parse = express.bodyParser();
+//  app.use(function(req, res, next){
+//    if (0 == req.url.indexOf('/traces')) return next();
+//    parse(req, res, next);
+//  });
 
-//  app.use(express.bodyParser({uploadDir:'./uploads'}));
+  app.use(express.bodyParser({uploadDir:'./uploads'}));
 
   app.use(express.methodOverride());
   app.use(express.cookieParser());
@@ -40,6 +40,20 @@ app.configure('production', function(){
 
 
 // Routes
+
+
+/**
+ * test
+ **/
+app.post('/test', function(req, res, next){
+
+  console.log(req.files);
+  console.log(req.body);
+
+  res.json({success:true});
+
+});
+
 
 
 /**
@@ -104,31 +118,18 @@ app.post('/fetch', function(req, res, next){
 
 
 /**
- * store results in GridFs and respond with file object
- **/
-app.post('/traces/:sha', function(req, res, next){
-
-  var gfs = Grid(req.app.get('db'), mongodb);
-
-  var filename = req.params.sha;
-  var writestream = gfs.createWriteStream(filename);
-  req.pipe(writestream);
-
-  writestream.on('close', function (file) {
-    res.json(file);
-  });
-
-
-});
-
-
-/**
  * Publish
  **/
 app.post('/publish', function(req, res, next){
 
-  var m = req.body
-    , collection = req.app.get('components');
+  var m;
+  if(req.body.model){
+    m = JSON.parse(req.body.model);
+  } else {
+    m = req.body;
+  }
+
+  var collection = req.app.get('components');
 
   var my_semantic_ids = [m.context.semantic_id, m.process.semantic_id, m.link.semantic_id];
   if('theta' in m){
@@ -143,93 +144,108 @@ app.post('/publish', function(req, res, next){
       var published = {
         context: undefined,
         process: undefined,
-        link: undefined
+        link: undefined,
+        theta: undefined
       };
-
-      var retrieved_theta;
 
       docs.forEach(function(doc){
         published[doc.type] = doc;
-        if(doc.type === 'theta'){
-          retrieved_theta = doc;
-        }
       });
 
-      if(published.link){
-        m.link = published.link;
+      if(published.theta){
+        return res.json({'success': false, 'msg': 'the design has already been published'});
       }
 
-      if( retrieved_theta || ( ('theta' in m) && ('review' in m.link) && m.link.review.map(function(x){return x.semantic_id;}).indexOf(m.theta.semantic_id) !== -1) ){
-
-        return res.json({'success': false, 'msg': 'the design has already been published'});
-
-      } else{
-
-        var to_be_published = [];
-        for(var key in published){
-          if(!published[key]){
-            m[key]._keywords = dbUtil.addKeywords(m[key]);
-            to_be_published.push(m[key]);
-          }
+      var to_be_published = [];
+      for(var key in published){
+        if(!published[key] && m[key]){
+          m[key]._keywords = dbUtil.addKeywords(m[key]);
+          to_be_published.push(m[key]);
         }
+      }
 
-        if(to_be_published.length){
+      if(to_be_published.length){
 
-          collection.insert(to_be_published, {safe: true}, function(err, records){
-            if(err) return next(err);
+        collection.insert(to_be_published, {safe: true}, function(err, records){
+          if(err) return next(err);
 
-            records.forEach(function(record){
-              published[record.type] = record;
-            });
+          var is_new_theta = (! published.theta) && ('theta' in m);
 
-            //update link:
-            var update = {
-              $set: {
-                context_id: published.context._id,
-                context_disease: published.context.disease,
-                context_name: published.context.name,
-                process_id: published.process._id,
-                process_name: published.process.name
-              },
-              $addToSet: {_keywords: {$each :published.context._keywords.concat(published.process._keywords)}}
-            };
-
-            if ('theta' in m) {
-              update['$push'] = {review: m.theta};
-            }
-
-            collection.update({_id:published.link._id},
-                              update,
-                              {safe:true},
-                              function(err, cnt){
-                                if(err) return next(err);
-
-                                if ('theta' in m) {
-                                  res.json({'success': true, 'msg': 'your results are being reviewed'});
-                                }else {
-                                  res.json({'success': true, 'msg': 'your model has been published'});
-                                }
-                              });
-
+          records.forEach(function(record){
+            published[record.type] = record;
           });
 
-        } else if ('theta' in m) {
+          //update link:
+          var update = {
+            $set: {
+              context_id: published.context._id,
+              context_disease: published.context.disease,
+              context_name: published.context.name,
+              process_id: published.process._id,
+              process_name: published.process.name
+            },
+            $addToSet: {_keywords: {$each :published.context._keywords.concat(published.process._keywords)}}
+          };
 
-          //update link
+          if (is_new_theta) {
+            update['$push'] = {theta_id: published.theta._id};
+          }
+
           collection.update({_id:published.link._id},
-                            {$push: {review: m.theta}},
+                            update,
                             {safe:true},
                             function(err, cnt){
                               if(err) return next(err);
-                              res.json({'success': true, 'msg': 'your results are being reviewed'});
+
+                              if (is_new_theta) {
+
+                                if(req.files){
+
+                                  var gfs = Grid(req.app.get('db'), mongodb);
+                                  var writestream = gfs.createWriteStream(req.body.trace_checksum)
+                                    , readstream = fs.createReadStream(req.files.traces.path);
+
+                                  readstream.pipe(writestream);
+
+                                  writestream.on('close', function (file) {
+
+                                    //TODO replace unlink by tiff diagnostics
+                                    fs.unlink(req.files.traces.path, function(err){
+                                      res.json(file);
+                                    });
+
+                                  });
+
+                                } else {
+                                  res.json({'success': true, 'msg': 'your results are being reviewed'});
+                                }
+
+                              } else {
+                                res.json({'success': true, 'msg': 'your model has been published'});
+                              }
                             });
 
-        } else {
-          return res.json({'success': false, 'msg': 'everything has already been published'});
-        }
+        });
+
+      } else {
+        return res.json({'success': false, 'msg': 'everything has already been published'});
       }
+
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 var server = http.createServer(app);
