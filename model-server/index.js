@@ -55,6 +55,8 @@ app.get('/get/:_id', function(req, res, next){
               process_name:0,
               username:0,
               _id:0,
+              process_id:0,
+              context_id:0,
               _keywords:0,
               review:0,
               semantic_id:0},
@@ -115,6 +117,7 @@ app.post('/traces/:sha', function(req, res, next){
   writestream.on('close', function (file) {
     res.json(file);
   });
+
 
 });
 
