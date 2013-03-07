@@ -15,16 +15,7 @@ var app = express();
 
 // Configuration
 app.configure(function(){
-
-  //do not use bodyParser for requests that need to be streamed
-//  var parse = express.bodyParser();
-//  app.use(function(req, res, next){
-//    if (0 == req.url.indexOf('/traces')) return next();
-//    parse(req, res, next);
-//  });
-
   app.use(express.bodyParser({uploadDir:'./uploads'}));
-
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(app.router);
@@ -40,21 +31,6 @@ app.configure('production', function(){
 
 
 // Routes
-
-
-/**
- * test
- **/
-app.post('/test', function(req, res, next){
-
-  console.log(req.files);
-  console.log(req.body);
-
-  res.json({success:true});
-
-});
-
-
 
 /**
  * get components
@@ -129,14 +105,14 @@ app.post('/publish', function(req, res, next){
     m = req.body;
   }
 
-  var collection = req.app.get('components');
+  var components = req.app.get('components');
 
   var my_semantic_ids = [m.context.semantic_id, m.process.semantic_id, m.link.semantic_id];
   if('theta' in m){
     my_semantic_ids.push(m.theta.semantic_id);
   }
 
-  collection
+  components
     .find({semantic_id: {$in: my_semantic_ids}})
     .toArray(function(err, docs){
       if(err) return next(err);
@@ -166,7 +142,7 @@ app.post('/publish', function(req, res, next){
 
       if(to_be_published.length){
 
-        collection.insert(to_be_published, {safe: true}, function(err, records){
+        components.insert(to_be_published, {safe: true}, function(err, records){
           if(err) return next(err);
 
           var is_new_theta = (! published.theta) && ('theta' in m);
@@ -191,46 +167,69 @@ app.post('/publish', function(req, res, next){
             update['$push'] = {theta_id: published.theta._id};
           }
 
-          collection.update({_id:published.link._id},
-                            update,
-                            {safe:true},
-                            function(err, cnt){
-                              if(err) return next(err);
+          //update link
+          components.update({_id: published.link._id}, update, {safe:true}, function(err, cnt){
+            if(err) return next(err);
 
-                              if (is_new_theta) {
+            if(! is_new_theta){
+              res.json({'success': true, 'msg': 'your model has been published'});
+            }
+          });
 
-                                if(req.files){
 
-                                  var gfs = Grid(req.app.get('db'), mongodb);
-                                  var writestream = gfs.createWriteStream(req.body.trace_checksum)
-                                    , readstream = fs.createReadStream(req.files.traces.path);
+          //store traces in mongo and update theta
+          if (is_new_theta) {
+            if(req.files){
+              var gfs = Grid(req.app.get('db'), mongodb);
+              var writestream = gfs.createWriteStream(req.body.trace_checksum)
+                , readstream = fs.createReadStream(req.files.traces.path);
 
-                                  readstream.pipe(writestream);
+              readstream.pipe(writestream);
 
-                                  writestream.on('close', function (file) {
+              writestream.on('close', function (file) {
+                //note: we wait that the tarball has been uploaded to mongo before running the R script as we need to avoid race condition on deletion
 
-                                    //TODO replace unlink by tiff diagnostics
-                                    fs.unlink(req.files.traces.path, function(err){
-                                      res.json(file);
-                                    });
+                var r = spawn('R', ['CMD', 'BATCH', 'test.R']);
+                r.on('exit', function (code) {
+                  if(code === 0){
+                    fs.readdir('pict', function(err, files){
+                      files = files
+                        .filter(function(x) {return (path.extname(x) === '.png');})
+                        .map(function(x){return path.join('pict', x);});
 
-                                  });
+                      async.map(files, fs.readFile, function(err, data){
+                        if(err) return next(err);
 
-                                } else {
-                                  res.json({'success': true, 'msg': 'your results are being reviewed'});
-                                }
+                        data = data.map(function(x){return {'content-type':'image/png', data: x};});
+                        var diag = req.app.get('diag');
+                        diag.insert(data, function(err, docs){
+                          if (err) return next(err);
 
-                              } else {
-                                res.json({'success': true, 'msg': 'your model has been published'});
-                              }
+                          components.update({_id: published.theta._id}, {$pushAll: {pict_id: docs.map(function(x){return x._id;})}}, {safe:true}, function(err, cnt){
+                            if (err) return next(err);
+
+                            fs.unlink(req.files.traces.path, function(err){
+                              if (err) return next(err);
+
+                              res.json({'success': true, 'msg': 'your results are being reviewed'});
                             });
 
+                          });                                               
+                        });
+                      });
+                    })
+                  }
+                });                
+              });
+            } else {
+              res.json({'success': true, 'msg': 'your results are being reviewed'});
+            }
+          }
         });
-
+        
       } else {
         return res.json({'success': false, 'msg': 'everything has already been published'});
       }
-
     });
 });
 
@@ -261,7 +260,7 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   app.set('db', db);
   app.set('users',  new mongodb.Collection(db, 'users'));
   app.set('components',  new mongodb.Collection(db, 'components'));
-
+  app.set('diag',  new mongodb.Collection(db, 'diag'));
 
   //TODO ensureIndex
 
