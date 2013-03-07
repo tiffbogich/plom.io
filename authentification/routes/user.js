@@ -11,6 +11,30 @@ Validator.prototype.getErrors = function () {
 }
 
 
+
+exports.authenticate = function(collection, username, password, callback){
+
+  collection.findOne({_id: username}, function(err, doc){
+
+    if (err) callback(err, false);
+
+    if(doc) {
+
+      bcrypt.compare(password, doc.hash, function(err, is_identical) {
+        if (err) callback(err, false);
+        callback(null, is_identical);
+      });
+
+    } else {
+      callback(null, false);
+    }
+
+  });
+  
+}
+
+
+
 exports.login = function(req, res) {
   console.log(req.query.next);
 

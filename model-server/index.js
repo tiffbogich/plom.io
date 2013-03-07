@@ -9,6 +9,7 @@ var express = require('express')
   , Grid = require('gridfs-stream')
   , dbUtil = require('../db-utils')
   , _ = require('underscore')
+  , authenticate = require('../authentification/routes/user').authenticate
   , spawn = require('child_process').spawn;
 
 var app = express();
@@ -18,6 +19,11 @@ app.configure(function(){
   app.use(express.bodyParser({uploadDir:'./uploads'}));
   app.use(express.methodOverride());
   app.use(express.cookieParser());
+
+  app.use(express.basicAuth(function(username, password, callback){
+    authenticate(app.get('users'), username, password, callback);
+  }));
+
   app.use(app.router);
 });
 
@@ -31,6 +37,12 @@ app.configure('production', function(){
 
 
 // Routes
+
+app.get('/', function(req, res, next){
+  res.json({success:true});
+});
+
+
 
 /**
  * get components
@@ -69,7 +81,6 @@ app.post('/search', function(req, res, next){
     if (err) return next(err);
     res.json(docs);
   });
-
 
 });
 

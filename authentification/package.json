@@ -9,7 +9,7 @@
     "express": "3.0.1",
     "jade": "*",
     "mongodb": "~1.1.11",
-    "bcrypt": "~0.7.3",
-    "validator": "~0.4.13"
+    "validator": "~0.4.13",
+    "bcrypt": "~0.7.4"
   }
 }
