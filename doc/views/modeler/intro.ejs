@@ -3,15 +3,7 @@
 <div class="row">
 
   <div class="span7">
-    <h1>Enjoy the workflow</h1>
-
-
-        <img style="height:40px", src="/images/cities_small.png">
-        <img style="height:45px", src="/images/sneeze_big.png">
-        <img style="height:40px", src="/images/observation_small.png">
-        <img style="height:40px", src="/images/theta_small.png">
-
-
+    <h1>Modeling made Social</h1>
 
     <p>Let's say that you are interested in Measles:</p>
     
@@ -21,7 +13,7 @@
         <pre class="prettyprint">plom search tutorial -d measles</pre>
         <aside>The <code>-d --disease</code> option restrict your
         search to the specified disease. Run <code>plom --help</code>
-        to see all the available options</aside>
+        to see all the available options.</aside>
       </li>
 
       <li>
@@ -44,7 +36,7 @@
             </li>
 
             <li>
-              <a href="/doc/modeler/create#theta">theta.json</a>: the parameter values
+              <a href="/doc/modeler/create#theta">theta.json</a>: the parameter values, reflecting the current consensus within the PLoM community.
             </li>
           </ul>
         </aside>
@@ -52,29 +44,42 @@
       </li>
 
       <li>
-        Let's <strong>build</strong> the model in a directory
-        called <code>model</code>. Within our new fetched directory
-        run:
-        <pre class="prettyprint">plom build -o model</pre>        
+        Let's <strong>build</strong> the model.
+        <pre class="prettyprint">plom build</pre>        
+        We now have a model/ directory containing plug-and-play infererence methods plugged to our model.
       </li>
 
       
       <li>
-        Fit theta <a href="/doc/modeler/play">chaining</a> inference methods
+        <strong>Fit</strong> theta <a href="/doc/modeler/play">chaining</a> the built inference methods:
         <pre class="prettyprint">fit theta | ./simplex -M 10000
-fit theta -B | ./smc deter --traj</pre>
+fit theta -B | ./pmcmc ode -M 1000000</pre>
       </li>
 
-
       <li>
-        Get serious (latin hyper square sampling on the cloud)
-        <pre class="prettyprint">fit lhs theta.json "simplex -M 10000" 100 --queue SGE,01:00:00</pre>
-      </li>
+        <strong>Publish</strong> to the library.
+        <ul>
+          <li>
+            Create a design.json ensuring reproducibility of your results:
+            <pre class="prettyprint">fit replicate theta.json "pmcmc ode -M 1000000" 4 --run</pre>
+          </li>
 
+          <li>
+            Submit it.
+            <pre class="prettyprint">plom publish design.json</pre>
+          </li>
 
-      <li>
-        Publish to the library
-        <pre class="prettyprint">plom publish</pre>
+        </ul>
+
+          <li>
+            Go <strong>social</strong>.  Point your browser to the
+            echoed link to see the results of PLoM automatic peer
+            review and follow the community reaction to your findings.
+          </li>
+
+      
+        </ul>
+
       </li>
 
 
