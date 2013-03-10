@@ -9,6 +9,9 @@ var express = require('express')
   , Grid = require('gridfs-stream')
   , dbUtil = require('../db-utils')
   , _ = require('underscore')
+  , fstream = require("fstream")
+  , tar = require("tar")
+  , zlib = require("zlib")
   , authenticate = require('../authentification/routes/user').authenticate
   , spawn = require('child_process').spawn;
 
@@ -101,6 +104,59 @@ app.post('/fetch', function(req, res, next){
       res.json(docs);
     });
 
+});
+
+
+/**
+ * build
+ **/
+app.post('/build', function(req, res, next){
+
+  var buildPath = path.join('builds', req.body.link.semantic_id, 'model');
+
+  var model = JSON.stringify(req.body);
+
+  function streamModel (res){
+    res.statusCode = 200;
+    fstream.Reader({path: buildPath, type: "Directory"})
+      .pipe(tar.Pack())
+      .pipe(zlib.createGzip())
+      .pipe(res);
+  };
+  
+  fs.exists(buildPath, function(exists){
+
+    if (exists) {
+      //TODO: check that bin also exists and send temporary unavailable if not (=> ongoing compilation)
+      streamModel(res);
+      
+    } else {
+      
+      var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '-o', buildPath]);
+      pmbuilder.stdin.write(model+'\n', encoding="utf8");
+      
+      pmbuilder.on('exit', function (code) {
+        if(code === 0) {
+          var make = spawn('make', ['CC=gcc-4.7', 'install'], {cwd:path.join(buildPath, 'C', 'templates')});
+          
+          make.on('exit', function (code) {
+            
+            if(code === 0){
+              streamModel(res);
+            } else {
+              res.status(500).json({success:false});
+            }
+            
+          });
+        } else {
+          res.status(500).json({success:false});
+        }
+      });
+
+    }
+
+  });
+    
 });
 
 

@@ -16,6 +16,8 @@
     "gridfs-stream": "~0.3.2",
     "underscore": "~1.4.4",
     "express": "~3.1.0",
-    "mongodb": "~1.2.13"
+    "mongodb": "~1.2.13",
+    "tar": "~0.1.16",
+    "fstream": "~0.1.22"
   }
 }
