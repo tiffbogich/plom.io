@@ -12,6 +12,7 @@ var express = require('express')
   , fstream = require("fstream")
   , tar = require("tar")
   , zlib = require("zlib")
+  , rimraf = require("rimraf")
   , authenticate = require('../authentification/routes/user').authenticate
   , spawn = require('child_process').spawn;
 
@@ -256,13 +257,15 @@ app.post('/publish', function(req, res, next){
               writestream.on('close', function (file) {
                 //note: we wait that the tarball has been uploaded to mongo before running the R script as we need to avoid race condition on deletion
 
-                var r = spawn('R', ['CMD', 'BATCH', 'test.R']);
+                var r = spawn('Rscript', [path.join(process.env.HOME, 'plom-coda', 'coda_mcmc_diag.R'), req.files.traces.path]);
+
                 r.on('exit', function (code) {
                   if(code === 0){
-                    fs.readdir('pict', function(err, files){
+                    var exDir = req.files.traces.path + '_ex';
+                    fs.readdir(exDir, function(err, files){
                       files = files
                         .filter(function(x) {return (path.extname(x) === '.png');})
-                        .map(function(x){return path.join('pict', x);});
+                        .map(function(x){return path.join(exDir, x);});
 
                       async.map(files, fs.readFile, function(err, data){
                         if(err) return next(err);
@@ -271,17 +274,27 @@ app.post('/publish', function(req, res, next){
                         var diag = req.app.get('diag');
                         diag.insert(data, function(err, docs){
                           if (err) return next(err);
-
-                          components.update({_id: published.theta._id}, {$pushAll: {pict_id: docs.map(function(x){return x._id;})}}, {safe:true}, function(err, cnt){
+                          fs.readFile(path.join(exDir, 'diagnostic.json'), 'utf8', function(err, diagnostic){
                             if (err) return next(err);
 
-                            fs.unlink(req.files.traces.path, function(err){
+                            components.update({_id: published.theta._id}, {$pushAll: {pict_id: docs.map(function(x){return x._id;})}, $set: {diagnostic: JSON.parse(diagnostic)}}, {safe:true}, function(err, cnt){
                               if (err) return next(err);
 
-                              res.json({'success': true, 'msg': 'your results are being reviewed'});
-                            });
+                              //clean up R workink directory
+                              rimraf(exDir, function(err){
+                                if (err) return next(err);
 
-                          });                                               
+                                //upload file
+                                fs.unlink(req.files.traces.path, function(err){
+                                  if (err) return next(err);
+
+                                  res.json({'success': true, 'msg': 'your results are being reviewed'});
+                                });
+                              });
+                            });  
+                            
+                          });
+                 
                         });
                       });
                     })
