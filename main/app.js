@@ -58,6 +58,7 @@ app.configure('production', function(){
 
 app.get('/', routes.index);
 app.get('/play', secure, routes.play);
+app.get('/trace/:_id', routes.trace);
 app.get('/library', secure, routes.library);
 app.get('/tree', secure, routes.trees);
 app.get('/component', secure, routes.components);
@@ -67,16 +68,18 @@ app.post('/component', secure, routes.components_post);
 
 
 var server = http.createServer(app);
-var db = new mongodb.Db('plom', new mongodb.Server("127.0.0.1", 27017), {safe:true});
-db.open(function (err, client) {
+
+var MongoClient = mongodb.MongoClient;
+MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
 
   if (err) throw err;
   console.log("Connected to mongodb");
 
   //store ref to the collections so that it is easily accessible (app is accessible in req and res!)
-  app.set('users',  new mongodb.Collection(client, 'users'));
-  app.set('trees',  new mongodb.Collection(client, 'trees'));
-  app.set('components',  new mongodb.Collection(client, 'components'));
+  app.set('db', db);
+  app.set('users',  new mongodb.Collection(db, 'users'));
+  app.set('components',  new mongodb.Collection(db, 'components'));
+  app.set('diag',  new mongodb.Collection(db, 'diag'));
 
   //TODO ensureIndex
 

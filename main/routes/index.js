@@ -10,6 +10,18 @@ var fs = require('fs')
   , path = require('path');
 
 
+exports.trace = function(req, res, next){ 
+
+  var diag = req.app.get('diag');
+  //_id: new ObjectId(req.params._id)
+
+  diag.findOne({}, function(err, doc){        
+    res.set('Content-Type', doc["content-type"]);
+    res.end(doc.data.buffer);
+  });
+  
+}
+
 
 exports.play = function(req, res, next){
 

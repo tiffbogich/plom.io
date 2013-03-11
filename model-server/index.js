@@ -259,7 +259,8 @@ app.post('/publish', function(req, res, next){
 
                 var r = spawn('Rscript', [path.join(process.env.HOME, 'plom-coda', 'coda_mcmc_diag.R'), req.files.traces.path]);
 
-                r.on('exit', function (code) {
+                r.on('exit', function (code) {                  
+
                   if(code === 0){
                     var exDir = req.files.traces.path + '_ex';
                     fs.readdir(exDir, function(err, files){
@@ -270,7 +271,15 @@ app.post('/publish', function(req, res, next){
                       async.map(files, fs.readFile, function(err, data){
                         if(err) return next(err);
 
-                        data = data.map(function(x){return {'content-type':'image/png', data: x};});
+                        data = data.map(function(x,i){
+                          return {
+                            'content-type':'image/png',
+                            data: new mongodb.Binary(x), 
+                            theta_id: published.theta._id,
+                            filename: files[i]
+                          };
+                        });
+
                         var diag = req.app.get('diag');
                         diag.insert(data, function(err, docs){
                           if (err) return next(err);
@@ -297,9 +306,11 @@ app.post('/publish', function(req, res, next){
                  
                         });
                       });
-                    })
+                    });
+                  } else {
+                    res.json({'success': false, 'msg': 'could not generate a diagnostic'});                    
                   }
-                });                
+                });
               });
             } else {
               res.json({'success': true, 'msg': 'your results are being reviewed'});
