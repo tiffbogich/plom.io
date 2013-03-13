@@ -20,7 +20,7 @@ var app = express();
 
 app.configure(function(){
   app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
+  app.set('view engine', 'ejs');
   app.use(express.bodyParser());
   app.use(express.methodOverride());
 
@@ -41,7 +41,6 @@ app.configure(function(){
 
 });
 
-
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
@@ -57,17 +56,14 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
-app.get('/play', secure, routes.play);
+app.post('/', routes.index);
 app.get('/trace/:_id', routes.trace);
-app.get('/library', secure, routes.library);
-app.get('/tree', secure, routes.trees);
-app.get('/component', secure, routes.components);
+//app.get('/context', secure, routes.context);
 
-app.post('/build', secure, routes.build); //TODO csrf
-app.post('/component', secure, routes.components_post);
 
 
 var server = http.createServer(app);
+
 
 var MongoClient = mongodb.MongoClient;
 MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
@@ -88,7 +84,7 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   });
 
   //attach socket.io
-  sfrWsServer.listen(server);
+//  sfrWsServer.listen(server);
 
 });
 

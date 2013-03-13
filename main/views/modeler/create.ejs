@@ -1,0 +1,1233 @@
+<% include ../layout %>
+
+<div class="page-header">
+  <h1>Challenging the status quo <small>PLoM layered grammar of models</small></h1>
+</div>
+
+
+<div class="row">
+
+  <div class="span6">
+    <h3>Sharing Models</h3>
+
+    <blockquote>
+      <p>
+        Scientific communication relies on evidence that cannot be
+        entirely included in publications, but the rise of computational
+        science has added a new layer of inaccessibility [...]. The
+        vagaries of hardware, software and natural language will always
+        ensure that exact reproducibility remains uncertain.
+      </p>
+      <small><a href="http://www.nature.com/nature/journal/v482/n7386/full/nature10836.html">Nature 482, 485–488</a></small>
+    </blockquote>
+
+    <p>
+      PLoM is our attempt to fix this situation for
+      epidemiological modeling.
+    </p>
+    
+  </div>
+
+  <div class="span6">
+    <h3>A layered grammar</h3>
+
+    <p>
+      So how can we share models and make epidemiological
+      modeling <strong>social</strong>?
+    </p>
+
+    <p> The key here is the word <strong>layered</strong>. With
+      PLoM you create models <em>one layer at the
+      time</em>. You start with the natural history of a disease
+      and make a <strong>model</strong> for it. Then and only then, you apply this model to a set of cities, age classes, or risk groups (the <strong>context</strong> of the model).
+    </p>
+
+    <p>
+      Changing the <strong>context</strong> on which the model is
+      applied does not change the model. In the same way, changing the
+      model doesn't affect the context. By keeping these two things
+      separate, we open a world of possibilities: <strong>any model can
+      be applied to any context, and libraries of models can be
+      created and shared</strong>.
+    </p>
+
+  </div>
+
+</div>
+
+<div class="page-header">
+  <h1 id="process">The process <small>It's about disease, only diseases</small></h1>
+</div>
+
+
+<div class="row">
+
+<img src="/images/sneeze_big.png" class="sfr-img-center" alt="model illustration"/>
+
+  <div class="span4">
+    <h3>The good old SIR model</h3>
+
+    <p>
+      It always starts with the <a href="http://en.wikipedia.org/wiki/Epidemic_model#The_SIR_Model">SIR model</a>.
+    </p>
+
+  </div>
+
+
+  <div class="span4">
+    <h3>With Extra features</h3>
+
+    <p>
+      To depart a bit from Kermack and McKendrick's 1927 legacy,
+      let's add birth and death processes, Erlang distributed duration
+      of infection, and some noise on the transmission term.
+    </p>
+
+  </div>
+
+  <div class="span4">
+    <h3>In JSON</h3>
+
+    <p>
+      In PLoM, your model is represented
+      as a <a href="http://www.json.org/">JSON</a>
+      document. JSON is easy for
+      humans to read and write, easy for machines to parse and
+      generate, and lightweight. It is an ideal data-interchange
+      language, which is great as we want to <strong>share</strong>
+      models!
+    </p>
+
+    <p>
+      Pretty much every programming language has a JSON encoder and
+      decoder, which allows PLoM to remain <strong>programming-language-agnostic</strong>. In PLoM, you get to develop your
+      model with the tools you like.
+    </p>
+
+  </div>
+
+
+</div>
+
+
+<div class="row">
+
+  <div class="span8">
+    <h3>What does it look like in JSON: process.json?</h3>
+
+
+<pre class="prettyprint">
+{
+ "name": "SIR",
+ "description": "SIR process model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term",
+
+ "state": [{"id": "S", "comment": "Susceptible"},
+           {"id": "I", "comment": "Infectious"}],
+
+ "parameter": [{"id": "r0",   "comment": "basic reproduction number"},
+               {"id": "v",    "comment": "recovery rate"},
+               {"id": "sto",  "comment": "noise intensity"},
+               {"id": "mu_b", "comment": "birth rate"},
+               {"id": "mu_d", "comment": "death rate"}],
+
+ "model": [
+   {"comment":"birth",
+    "from": "U", "to": "S", "rate": "mu_b*N"},
+
+   {"comment":"infection with noise on r0", 
+    "from": "S", "to": "I", "rate": "noise__trans(sto)*r0/N*v*I",
+    "tag":[{"id": "transmission", "by":["I"]}]},
+
+   {"comment":"recovery",
+    "from": "I", "to": "DU", "rate": "v"},
+   {"comment":"erlang waiting time using the method of stages"
+    "from": "I", "to": "I",  "rate": "v", 
+    "tag": [{"id": "erlang", "shape":2}]},
+
+   {"comment":"death", 
+    "from": "S", "to": "U",  "rate": "mu_d"},
+   {"comment":"death",
+    "from": "I", "to": "U",  "rate": "mu_d"}],
+
+ "pop_size_eq_sum_sv": false
+}
+</pre>
+
+
+  </div>
+
+
+  <div class="span4">
+    <h3>In text</h3>
+
+    <p>The model definition contains:</p>
+
+    <h4>Meta information</h4>
+    <ul>
+      <li>
+        <code>name</code>: The name of the process model (optional).
+      </li>
+      <li>
+        <code>description</code>: A description.
+      </li>
+    </ul>
+
+    <h4>State variable and parameters</h4>
+    <ul>
+      <li>
+        <code>state</code>: A list of the state variables.
+      </li>
+      <li>
+        <code>parameter</code>: A list of the process model parameters.
+      </li>
+    </ul>
+
+
+    <h4>Process model definition</h4>
+    <ul>
+      <li>
+        <code>model</code>: The process model defined by
+        a list of <em>reactions</em>, each reaction specifying:
+        <ul>
+          <li>a transition <code>from</code> one state <code>to</code> another.</li>
+          <li><code>rate</code>: the rate of transition.</li>
+          <li><code>tag</code>: an optional list of <strong>tags.</strong></li>
+        </ul>
+      </li>
+      <li>
+        <code>pop_size_eq_sum_sv</code>: A boolean variable indicating
+        if, at any time, the sum of the state variables equals the
+        population size.
+      </li>
+
+    </ul>
+
+    <p>Note: All the <code>comment</code> properties are optional.</p>
+  </div>
+
+
+</div>
+
+<div class="row">
+  <div class="span4">
+
+    <h3>N, U, DU?</h3>
+
+    <p>
+      As you can see, there are "states" involved in some reactions
+      of <code>model</code> that were not defined in the list
+      of <code>state</code> (<code>N</code>, <code>U</code> and <code>DU</code>).
+
+      <ul>
+        <li>
+          <code>N</code> is the population size.
+        </li>
+        <li>
+          <code>U</code> is the Universe. The Universe is where birth
+          comes from and death goes to.
+        </li>
+        <li>
+          <code>DU</code> is the <em>Disease</em> Universe. The Disease
+          Universe is where things that we don't want to bookmark end
+          up. In our case, we use an SIR model. As we know the population
+          size at any time (<code>N</code>), we do not need to keep track
+          of the recovered individuals (S + I + R = N).
+        </li>
+      </ul>
+    </p>
+
+  </div>
+
+  <div class="span4">
+    <h3>noise__?</h3>
+
+    <p>
+      In order to balance model oversimplifications, PLoM allows us
+      to add all sorts of noise to the model skeleton. For instance, here
+      we add noise on the transmission term by implementing the
+      function <code>noise__trans(sto)</code>, using the following
+      semantical structure:
+      <ul>
+        <li>
+          <code>noise__</code> A reserved keyword that will trigger
+          a random noise. A double-underscore follows "noise"
+        </li>
+        <li>
+          <code>trans</code> The name that you're giving to uniquely
+          identify the function (any name you choose!) </li>
+        <li>
+          <code>sto</code> The argument, one of the elements/parameters of
+          the list <code>parameter</code> specifying the intensity of the
+          noise.
+        </li>
+      </ul>
+    </p>
+    
+
+  </div>
+  <div class="span4">
+    <h3>rates?</h3>
+
+    <p>
+      Reactions starting with <code>U</code> or <code>DU</code> have
+      to contain rates <strong>multiplied</strong> by an associated
+      number of individuals.
+    </p>
+
+    <p>
+      For instance, in our example, note the difference between birth
+      and death reactions: the death reactions only contain the death
+      rate (<code>mu_d</code>), whereas the birth reactions contain
+      the birth rate <em>mulitplied</em> by the population size
+      (<code>mu_b*N</code>).
+    </p>
+
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="span8">
+    <h3>tag?</h3>
+
+    <p>
+      Reactions leading to transmission events <em>have to</em> be
+      tagged. This is achieved by adding <code>{"id":"transmission",
+      "by": ["I"]}</code> to the <em>list</em> of tags for the
+      transmission reaction. The <code>by</code> property specifies
+      the list of state variables that transmit the infection. This
+      tag will be used by PLoM to bind a context to the model.
+    </p>
+
+    <p>
+      The Erlang distributed duration of infection specified with the
+      tag :<code>{"id":"erlang", "shape":2}</code>. Erlang distributed
+      waiting time are implemented using the method of stages
+      (i.e. multiplying the number of compartments by the shape of the
+      Erlang distribution).
+    </p>
+
+  </div>
+
+  <div class="span4">
+    <h3>Get a template</h3>
+
+    <p>      
+      You can use <code>plom</code> to get a process.json: <br/>
+      <code>plom create process -o process.json</code>
+    </p>
+
+    <p> If you remember this, you will never have to read this
+    documentation again.
+    </p>
+  </div>
+
+</div>
+
+
+
+<div class="row">
+  <div class="span12">
+    <h3>Need more power: program your model definition</h3>
+
+    <p> Before jumping to the context, remember that you can
+actually <em>program</em> your model definition using <strong>your
+favorite programming language</strong>. Just export the final object
+as JSON.
+    </p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span4">
+    <h3>Why?</h3>
+    
+    <ul>
+      <li>
+        Programming your model definition let's you <strong>abstract boring
+          repetitive tasks</strong> (think for instance of adding death reactions to
+        every state variable).
+      </li>
+      <li>
+        You can smoothly build complex models such as <strong>multi-strains models</strong>.
+      </li>
+    </p>
+    
+  </div>
+
+  <div class="span8">
+    <h3>Examples</h3>
+
+    <div class="accordion" id="examples-prog">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#examples-prog" href="#collapseJs">
+            Model definition in Javascript (Node.js)
+          </a>
+        </div>
+        <div id="collapseJs" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+var fs = require('fs');
+
+var m = {
+  state: ["S", "I"].map(function(X){return {id:X}}),
+  parameter: ["r0", "v", "sto", "mu_b", "mu_d"].map(function(X){return {id:X}}),
+  model: [
+    {"from": "U", "to": "S", "rate": "mu_b*N"},
+    {"from": "S", "to": "I", "rate": "noise__trans(sto)*r0/N*v*I", "tag":[{"id": "transmission", "by":["I"]}]},
+    {"from": "I", "to": "DU", "rate": "v"},
+    {"from": "I", "to": "I", "rate": "v", "tag":[{"id": "erlang", "shape":2}]}
+  ],
+  pop_size_eq_sum_sv: false
+};
+
+//add death reactions
+m.state.forEach(function(X){
+  m.model.push({"from": X.id, "to": "U", "rate": "mu_d"});
+});
+
+//write the json file:
+fs.writeFileSync('process.json', JSON.stringify(m));
+</pre>
+
+
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#examples-prog" href="#collapsePy">
+            Model definition in Python
+          </a>
+        </div>
+        <div id="collapsePy" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+import json
+
+m = {}
+
+m["state"] = [{"id": X} for X in ["S", "I"]]
+m["parameter"] = [{"id": x} for x in ["r0", "v", "sto", "mu_b", "mu_d"]] 
+m["model"]= [{"from": "U", "to": "S",  "rate": "mu_b*N"},
+             {"from": "S", "to": "I",  "rate": "noise__trans(sto)*r0/N*v*I", "tag":[{"id": "transmission", "by":["I"]}]},
+             {"from": "I", "to": "DU", "rate": "v"},
+             {"from": "I", "to": "I",  "rate": "v", "tag":[{"id": "erlang", "shape":2}]}]
+
+
+#add death reactions
+for X in m["state"]:
+    m["model"].append({"from": X["id"], "to": "U", "rate": "mu_d"})
+
+m["pop_size_eq_sum_sv"] = false
+
+#write the json file:
+json.dump(m, open('process.json', 'w'))
+</pre>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#examples-prog" href="#collapseR">
+            Model definition in R
+          </a>
+        </div>
+        <div id="collapseR" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+require('RJSONIO')
+
+m <- list()
+
+m$state <- lapply(c("S", "I"), function(x){return(list(id=x))})
+m$parameter <- lapply(c("r0", "v", "sto", "mu_b", "mu_d"), function(x){return(list(id=x))})
+
+m$model <- list(list("from"="U", "to"="S", "rate"="mu_b*N"),
+                list("from"="S", "to"="I", "rate"="noise__trans(sto)*r0/N*v*I", list("tag"="transmission", "by"=list("I"))),
+                list("from"="I", "to"="DU", "rate"="v"),
+                list("from"="I", "to"="I", "rate"="v", list("tag"="Erlang", "shape"=2)) )
+
+##add death reactions
+for(X in m$state){
+    m$model <- c(m$model, list(list("from"=X$id, "to"="U", "rate"="mu_d")))
+}
+
+m$pop_size_eq_sum_sv <- FALSE
+
+##write the json file:
+write(toJSON(m, collapse=''), file="process.json")
+</pre>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+    
+  </div>
+
+</div>
+
+
+<div class="page-header">
+  <h1 id="context">The context <small>Define your world smoothly (real and virtual)</small></h1>
+</div>
+
+<div class="row">
+
+  <img src="/images/cities_small.png" class="sfr-img-center"  alt="context illustration"/>
+
+  
+  <div class="span4">
+    <h3>Reality</h3>
+    <p>
+      It turns out that reality is often complex. The good old times
+      of fitting one time series are almost over, and with the
+      emergence of social networks and modern transportations, modeler
+      often have to deal with <strong>multiple time series</strong>
+      coming from various places and data streams. Thankfully,
+      PLoM has you covered by giving you the
+      proper <strong>semantics</strong> to encode arbitrarily complex
+      context.
+    </p>
+  </div>
+
+  <div class="span8">
+    <h3>An example with the CDC and google</h3>
+
+    <p>
+      Let's consider that our epidemic takes place in 2 cities
+      (named <em>city1</em> and <em>city2</em>) and that Google and
+      the CDC collected <em>weekly</em> observations of the
+      epidemiological process (the famous <strong>data</strong>)
+      through 4 time series.
+    </p>
+
+  </div>
+</div>
+
+
+<div class="row">
+
+  <div class="span4">
+    <h3>Data</h3>
+
+    <p>
+      4 time series with <em>weekly</em> values:
+      <ul>
+        <li>
+          <strong>Aggregated incidence</strong> observed in the 2 cities by the CDC
+          reported when the individuals recover.
+        </li>
+        <li>
+          <strong>Prevalence</strong> observed in city1 by the CDC.
+        </li>
+        <li>
+          <strong>Incidence</strong> observed in city2 by the CDC, reported when the
+          individuals are just infected.
+        </li>
+        <li>
+          <strong>Aggregated incidence</strong> observed in the 2
+          cities, as reported by the number of searches for the disease
+          symptoms terms collected by Google.
+        </li>
+      </ul>
+    </p>
+
+  </div>
+
+  <div class="span4">
+    <h3>Meta Data</h3>
+
+    <p>
+      <ul>
+        <li>On the <strong>populations</strong>:
+          <ul>  
+            <li>Population sizes</li>
+            <li>Birth rates</li>
+            <li>Death rates</li>
+          </ul>
+        </li>
+        <li>On the <strong>surveillance systems</strong>:
+          <ul>
+            <li>Proportion of the population under surveillance for each
+              time series</li>
+          </ul>
+        </li>
+      </ul>
+    </p>
+
+  </div>
+
+  <div class="span4">
+    <h3>Structure</h3>
+
+    <p>
+      We also <strong>know</strong> that these 2 cities:
+      <ul>
+        <li>
+          contain populations whose contact pattern is not affected by age
+          classes.
+        </li>
+        <li>
+          receive frequent infections from international travelers
+          temporarily visiting the cities.
+        </li>
+      </ul>
+    </p>
+
+
+    <p>
+      We therefore <strong>decided</strong> to:
+      <ul>
+        <li>
+          Neglect <strong>age</strong> structure (so we
+          consider <em>all</em> the age classes together).
+        </li>
+        <li>
+          Use a simple <strong>spatial model</strong> consisting of
+          random external introduction of the diseases occuring at a
+          constant rate.
+        </li>
+      </ul>
+ 
+    </p>
+
+
+
+
+  </div>
+
+</div>
+
+
+<div class="row">
+
+  <div class="span4">
+    <h3>Encoding the context</h3>
+
+    <p>
+      A context is defined by:
+    </p>
+
+      <h4>Diseases</h4>
+      <ul>
+        <li>
+          <code>disease</code>: A list of diseases involved.
+        </li>
+      </ul>      
+
+      <h4>Where it takes place</h4>
+
+      <ul>
+        <li>
+          <code>population</code>: a list of populations (cities, age
+          classes, ...) where the epidemiological process model takes
+          place.
+          <ul>
+            <li><code>id</code>: A unique id for the population named
+              with the convention: <code>cityName<strong>__</strong>ageClassName</code></li>
+            <li><code>size_t0</code>: The initial population size</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h4>The aggregation level of the data</h4>
+      <ul>
+        <li>
+          <code>time_series</code>: The observed time series:
+          <ul>
+            <li><code>id</code>: A unique id for the time series named with the convention:
+              <code>timeSeriesName<strong>__</strong>dataStream<strong>__</strong>type</code>
+              where type is incidence (<code>inc</code>) or prevalence
+              (<code>prev</code>)
+            </li>
+            <li>
+              <code>population_id</code>: A list of population <code>id</code> detailing
+              the population(s) observed by the time series
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <h4>Model</h4>
+
+      <ul>
+        <li>
+          <code>model</code>:
+          <ul>
+            <li>
+              <code>space</code>: A list of models for the spatial structure and dynamic
+            </li>
+            <li>
+              <code>age</code>: A list of models for demographic dynamic and heterogenous contacts
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+
+      <h4>Data</h4>
+
+      <ul>
+        <li>
+          <code>frequency</code>: highest frequency of data collection
+        </li>
+
+
+        <li>
+          <code>data</code>: A list of data
+          <ul>
+            <li>
+              <code>id</code>: An unique id defining the data
+            </li>
+            <li>
+              <code>source</code>: <a href="http://en.wikipedia.org/wiki/Comma-separated_values">CSV</a>
+              file containing the data. The first column has to be the
+              dates in format <code>"YYYY/MM/DD"</code> (note the
+              double quote); the other columns refer either to values
+              applied to populations (in the same order as the list
+              of <code>population</code>) or time series (in the same
+              order as the list of <code>time_series</code>). Missing
+              values have to be specified as <code>null</code>. Each
+              CSV file must have a header (<code>"date"</code> and
+              the <code>id</code> of <code>population</code>
+              or <code>time series</code>). When data contain rates
+              (e.g birth and death rates) these rates must be
+              expressed <em>per capita</em> and in the unit specified
+              by <code>frequency</code>.
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+  </div>
+
+  <div class="span8">
+    <h3>context.json</h3>
+
+<pre class="prettyprint">
+{
+ "name": "An explicit name",
+ "description": "An explicit description",
+ "disease": ["measles"],
+ 
+ "population": [{"id": "city1__all",
+                 "size_t0": 1e6,
+                 "comment": "city 1, all age classes"},
+                {"id": "city2__all",
+                 "size_t0": 1e5,
+                 "comment": "city 2, all age classes"}],
+ 
+ "time_series": [{"id": "all__CDC__inc",
+                  "population_id": ["city1__all", "city2__all"],
+                  "comment": ""},
+                 {"id": "city1__CDC__prev",
+                  "population_id": ["city1__all"],
+                  "comment": ""},
+                 {"id": "city2__CDC__inc",
+                  "population_id": ["city2__all"],
+                  "comment": ""},
+                 {"id": "all__google__inc",
+                  "population_id": ["city1__all", "city2__all"],
+                  "comment": ""}],
+
+ 
+ "model": {"space": {"type": ["external"]},
+           "age": {}},
+ 
+
+
+
+ "frequency": "W",
+ 
+ "data": [{"id": "data",
+           "source": "data/data.csv",
+           "comment": "my data"},
+ 
+          {"id": "prop",
+           "source": "data/prop.csv",
+           "comment": "proportion of the population under surveillance"},
+          
+          {"id": "N",
+           "source": "data/N.csv",
+           "comment": "population size"},
+          {"id": "mu_b",
+           "source": "data/mu_b.csv",
+           "comment": "birth rates"},
+          {"id": "mu_d",
+           "source": "data/mu_d.csv",
+           "comment": "death rates"}]
+}
+</pre>
+
+
+  </div>
+</div>
+
+<div class="row">
+
+  <div class="span8">
+    <h3>Forcing the epidemiological model</h3>
+
+    <p>
+      Data whose <code>id</code> are similar
+      to <code>parameter</code> <code>id</code> will be used
+      to <strong>force</strong> the model. In our example, we use
+      demographic data to inform the values of the birth rate, death
+      rate, and population sizes (<code>mu_b</code>, <code>mu_d</code>
+      and <code>N</code>).
+    </p>
+
+  </div>
+
+  <div class="span4">
+    <h3>Get a template</h3>
+
+    <p>Here again, don't struggle to remember the details, simply run:</p>
+    <p>
+    <code>plom create context -o context.json</code>
+    </p>
+    <p>to get a context.json</p>
+
+  </div>
+
+</div>
+
+
+<div class="page-header">
+  <h1 id="link">The link <small>Connecting the context and the process</small></h1>
+</div>
+
+
+<div class="row">
+  <img src="/images/observation_small.png" class="sfr-img-center"  alt="link illustration"/>
+</div>
+
+<div class="row">
+
+    <div class="span4">
+      <h3>Anatomy of a link</h3>
+
+      <h4>Observed Variables</h4>
+
+      <ul>
+        <li>
+          <code>observed</code>: The observed quantities. Either:
+
+          <ul>
+            <li><strong>Incidences</strong> (number of new cases during some time period)</li>
+            <li><strong>Prevalences</strong> (number of cases)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <p>Each observed quantities has:</p>
+      <ul>        
+        <li>
+          <code>id</code>: A unique id
+        </li>
+        
+        <li>
+          <code>definition</code>: A list of definition of the
+          observed variables. The list element will
+          be <em>summed-up</em>.
+        </li>
+        <li>
+          <code>time_series_id</code>: The <strong>list</strong> of times series being observed by the observed variable
+        </li>
+        <li>
+          <code>model_id</code>: The <code>id</code> of the
+          observation model used to observe this time-series.
+        </li>
+
+      </ul>
+
+      <h4>Observation Model</h4>
+
+      <ul>
+        <li>
+          <code>parameter</code>: The parameter of the observation
+          model. Here again, parameters whose <code>id</code> are
+          present in the property <code>data</code> of
+          the <em>context</em> will be <strong>forced</strong>.
+        </li>
+
+        <li>
+          <code>model</code>: An object containing the observation
+          processes refered by the times-series <code>model_id</code>
+          properties. <code>x</code> is used to <strong>refer</strong>
+          to an observed variable.
+
+          Here, we specify an over-dispersed binomial distribution
+          defined as a discretized normal random variable with:
+          <ul>
+            <li>mean = rep2 * rep1 * x</li>
+            <li>variance = rep2 * (1.0-rep2) * rep1 * x + (rep2 * phi * rep1 * x) * * 2</li>
+          </ul>
+
+        </li>
+      </ul>
+
+  </div>
+
+  <div class="span8">
+    <h3>link.json</h3>
+
+<pre class="prettyprint">
+{
+ "id": "SIR+my_fake_context",
+ "comment": "hopefully this can be templated",
+
+ "observed": [
+    {"id": "prev", "comment":"prevalence",
+     "definition": ["I"],
+     "time_series_id": ["city1__CDC__prev"],
+     "model_id": "common"}
+
+    {"id": "inc_out", "comment":"incidence measured at recovery time",
+     "definition": [{"from":"I", "to":"DU"}, {"from":"I", "to":"U"}],
+     "time_series_id": ["all__CDC__inc", "all__google__inc"],
+     "model_id": "common"},
+
+    {"id": "inc_in", "comment":"incidence measured at infection time",
+     "definition": [{"from":"S", "to":"I"}],
+     "time_series_id": ["city2__CDC__inc"],
+     "model_id": "common"}],
+
+ "parameter": [
+         {"id": "rep", "comment": "reporting rate"},
+         {"id": "phi", "comment": "over-dispertion of the reporting rate"}],
+
+ "model": {
+   "common": {
+     "distribution": "discretized_normal",
+     "mean": "prop*rep*x",
+     "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"
+   }}
+}
+</pre>
+
+  </div>
+</div>
+
+<div class="row">
+
+  <div class="span8">
+    <h3>Get a template</h3>
+
+    <p>As usual, don't struggle to remember the details, simply run:</p>
+    <p>
+    <code>plom create link context.json process.json -o link.json</code>
+    </p>
+    <p>to get a link.json</p>
+
+  </div>
+</div>
+
+
+<div class="page-header">
+  <h1 id="theta">The parameters <small>what will be inferred</small></h1>
+</div>
+
+
+
+
+<div class="row">
+
+  <img src="/images/theta_large.png" class="sfr-img-center" alt="theta"/>
+
+    <div class="span4">
+
+      <h4>Properties</h4>
+        <ul>
+          <li>
+            <code>transformation</code>: Some parameters have to
+            stay <strong>positive</strong>
+            or <strong>bounded</strong>. Specifying a transformation
+            function is an easy way to ensure these constraints.
+          </li>
+          <li>
+            <code>unit</code>, <code>type</code>: If a parameter is a rate,
+            its unit has to be specified using the <code>unit</code>
+            property. For user convenience, rates can be parametrized as
+            duration (i.e. providing values for 1/rate instead of rate) by
+            setting the property <code>type</code> to the
+            value <em>'rate_as_duration'</em>. In our case, <em>v</em> is
+            the recovery rate, but we decided to parametrize it as a duration
+            with a guess value of 11 days.
+          </li>
+          <li>
+            <code>min</code>, <code>max</code>,<code>guess</code>,<code>sd_transf</code>:
+            Specify the values of the parameters
+          </li>
+        </ul>
+
+    </div>
+
+    <div class="span8">
+      <h4>theta.json</h4>
+
+<pre class="prettyprint">{
+"name": "an explicit name",
+"description": "an explicit description",
+
+"value": {
+  "S":   {"transformation": "logit",
+          "min":0.01, "guess": 0.07, "max": 0.1, "sd_transf": 0.0},
+  "I":   {"transformation":"logit",
+          "min": 7e-7, "guess": 1e-05, "max": 1e-3, "sd_transf": 3e-6},
+  
+  "r0":  {"transformation": "log",
+          "min": 10.0, "guess": 20.0, "max": 30.0, "sd_transf": 0.02},
+  "v":   {"transformation": "log", "unit": "D", "type": "rate_as_duration",
+          "min": 5, "guess": 11, "max": 20, "sd_transf": 0.5},
+  "sto": {"transformation": "log",
+          "min": 0.05, "guess": 0.1, "max": 0.2, "sd_transf": 0.0},
+  
+  "rep": {"transformation": "logit",
+          "min": 0.2, "guess":0.6, "max": 0.9, "sd_transf": 0.0},
+  "phi": {"transformation":"log",
+          "min": 0.1, "guess": 0.1, "max": 0.3, "sd_transf": 0.02}
+ }
+</pre>
+
+    </div>
+
+</div>
+
+
+<div class="row">
+
+  <div class="span6">
+    <h3>Let's (un)group parameters</h3>
+
+    <p>
+      By default, PLoM assumes that parameters
+      are <strong>identical</strong> across <em>populations</em>
+      or <em>time series</em>.
+    </p>
+
+    <p>
+      You can change this behavior by attaching
+      a <code>partition_id</code> to your parameters.
+      4 built-in partitions can be specified:
+        <ul>
+          <li>
+            <code>variable_population</code>: Different values per
+            populations
+          </li>
+          <li>
+            <code>identical_population</code>: Same value for every
+            population
+          </li>
+          <li>
+            <code>variable_time_series</code>: Different values per
+            time series
+          </li>
+          <li>
+            <code>identical_time_series</code>: Same value for every
+            time series
+          </li>
+        </ul>
+    </p>
+
+    <p>
+      Also keep in mind that PLoM will expand values for
+      you. For instance, if you have 52 cities with different
+      unknown <code>r0</code>, just give one value and it will be
+      replicated according to it's <code>partition_id</code>.
+    </p>
+
+  </div>
+
+  <div class="span6">
+    <h3>Custom groups with partitions</h3>
+
+    <p>
+      Sometimes parameter grouping have to be more precise.
+      PLoM allows complete control over your groups.
+      A <code>partition</code> defines a list of groups.
+      Each <code>group</code> has:
+      <ul>
+        <li><code>id</code>: A unique id <code>partition_id</code>that will be refered to in the value property </li>
+        <li><code>times_series_id</code> or <code>population_id</code>: A list of time series or populations defining the groups</li>
+      </ul>
+    </p>
+
+  </div>
+
+</div>
+
+
+<div class="row">
+
+  <div class="span12">
+
+    <div class="accordion" id="link">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#link" href="#simple-link">
+            theta.json with custom partitions and values
+          </a>
+        </div>
+        <div id="simple-link" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+{
+"name": "an explicit name",
+"description": "an explicit description",
+
+"partition": {
+   "data_stream": {
+      "group": [
+         {"id": "CDC",    "time_series_id": ["all__CDC__inc", "city1__CDC__prev", "city2__CDC__inc"]},
+         {"id": "google", "time_series_id": ["all__google__inc"]}],
+      "comment": "group by data stream (CDC and google)"}},
+
+"value": {
+  "S":   {"partition_id": "variable_population", "transformation": "logit",
+          "min":   {"city1__all": 0.01, "city2__all": 0.01},
+          "guess": {"city1__all": 0.06, "city2__all": 0.07},
+          "max":   {"city1__all": 0.1,  "city2__all": 0.1},
+          "sd_transf":   {"city1__all": 0.0,  "city2__all": 0.0}},
+  "I":   {"partition_id": "identical_population", "transformation":"logit",
+          "min": 7e-7, "guess": 1e-05, "max": 1e-3,
+          "sd_transf": 3e-6},
+ 
+  "r0":  {"partition_id": "variable_population", "transformation": "log",
+          "min": 10.0, "guess": 20.0, "max": 30.0,
+          "sd_transf": 0.02},
+  "v":   {"partition_id": "identical_population", "transformation": "log", "unit": "D", "type": "rate_as_duration",
+          "min": 5, "guess": 11, "max": 20,
+          "sd_transf": 0.5},
+  "sto": {"partition_id": "identical_population", "transformation": "log",
+          "min": 0.05, "guess": 0.1, "max": 0.2,
+          "sd_transf": 0.0},
+ 
+  "rep": {"partition_id":"identical_time_series", "transformation": "logit",
+          "min": 0.2, "guess":0.6, "max": 0.9,
+          "sd_transf": 0.0},
+  "phi": {"partition_id": "data_stream", "transformation":"log",
+           "min":   {"CDC": 0.1, "google": 0.1},
+           "guess": {"CDC": 0.1, "google": 0.2},
+           "max":   {"CDC": 0.3, "google": 0.3},
+           "sd_transf": {"CDC": 0.02, "google": 0.02}}
+ }
+
+</pre>
+
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+
+  <div class="span8">
+    <h3>Be efficient</h3>
+
+    <p>
+      Templates really shine for theta.json
+      <ul>
+        <li>No risk to forgot variables added during model expansion</li>
+        <li>Way less boilerplate code...</li>
+      </ul>
+    </p>
+
+    <p>      
+      Want one?<br/>
+      <code>plom create theta context.json process.json link.json --link -o theta.json</code>
+    </p>
+
+  </div>
+
+
+  <div class="span4">
+    <h3>Stay Flexible</h3>
+
+    <p>
+      The semantic
+      of <code>min</code>, <code>max</code>, <code>guess</code>,
+      and <code>sd_transf</code> will vary depending the program that
+      is used. For instance, in bifurcation analysis, <code>min</code>
+      and <code>max</code> will be used to specify the range of the
+      bifurcation parameter, whereas in Bayesian analysis they can be
+      used to define uniform priors on the parameters.
+    </p>
+
+  </div>
+
+
+</div>
+
+
+
+<div class="page-header">
+  <h1>Next <small>A bit of sorcery</small></h1>
+</div>
+
+<div class="row">
+  <div class="span4">
+    
+    <h3>Wrapping up</h3>
+
+    <p>
+      We have created/templated 3 files:
+      <ul>
+        <li>context.json</li>
+        <li>process.json</li>
+        <li>link.json</li>
+        <li>theta.json</li>
+      </ul>
+
+      We are now ready to <strong>implement</strong> our model.
+    </p>
+
+  </div>
+
+  <div class="span8">
+    
+    <h3>The invocation</h3>
+
+    <p>
+      Take a deep breath and invoke:
+    </p>
+
+
+<pre class="prettyprint">
+plom install context.json process.json link.json -o my_model
+</pre>
+
+    <p>
+      Yes, that's it, you have just <strong>coded your model in
+      C</strong> using the blazing
+      fast <a href="http://www.zeromq.org/">ØMQ</a> library for your
+      parallel computing needs and the rock
+      stable <a href="http://www.gnu.org/software/gsl/">GSL</a> for
+      the science. It is also <strong>compiled</strong>, so it seems
+      that you are all set to
+      <a href="/doc/modeler/play" class="btn btn-primary">play with it!</a> 
+    </p>
+
+  </div>
+</div>
+
+
+<% include ../footer %>

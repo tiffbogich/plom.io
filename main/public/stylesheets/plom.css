@@ -1,0 +1,93 @@
+.context-box{
+  display: inline-block;
+  width:300px;
+  height:220px;
+}
+
+.context-graph{
+  width:200px;
+  height:100px;
+}
+
+
+.dygraph-axis-label-x {
+  font-size: 10px;
+  color: grey;
+}
+
+
+.horizontal-scroll
+{
+  width:100%;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.model-box{
+  width:300px;
+  display:table-cell; 
+  padding-right:20px;
+}
+
+
+.parameter-box{
+//  width:300px;
+  height:200px;
+  overflow-y: auto;
+}
+
+path.link {
+  fill: none;
+  stroke-width: 1.5px;
+}
+
+marker#transmission {
+  fill: #f15b22;
+}
+
+path.link.transmission {
+  stroke: #f15b22;
+}
+
+marker#basic {
+  fill: #ccc;
+}
+
+path.link.basic {
+  stroke: #ccc;
+}
+
+circle {
+  fill: #ccc;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+
+circle.infector {
+  fill: #f15b22;
+}
+
+circle.source {
+  fill: #6ba5c5;
+}
+
+circle.DU {
+  fill: white;
+}
+
+
+text {
+  font: 10px sans-serif;
+  pointer-events: none;
+}
+
+text.shadow {
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-opacity: .2;
+}
+
+
+.hidden {
+  display:none;
+}

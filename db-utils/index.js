@@ -1,5 +1,5 @@
 var _ = require('underscore')
-   , natural = require('natural');
+  , natural = require('natural');
 
 /**
  * returns a mongo query object efficient to match the user search string searchString

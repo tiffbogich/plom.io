@@ -28,19 +28,16 @@ function plomGraphModel(process, graphId) {
                      target: states.indexOf(r.to),
                      type: 'basic'};
 
-      if (r.tag && (r.tag[0].id === 'transmission')) {
+      if (r.tag && ('transmission' in r.tag)) {
         myLink.type = 'transmission'
 
-        r.tag[0].by.forEach(function(x){
+        r.tag.transmission.by.forEach(function(x){
           var ind = states.indexOf(x);
           graph.nodes[ind].type = 'infector';
         });
 
-      } else if (r.tag && (r.tag[0].id === 'erlang')) {
-        var ind = states.indexOf(r.from);
-        graph.nodes[ind].type = 'erlang';
       }
-
+ 
       graph.links.push(myLink);
 
     } else if (r.from === 'U' && r.to !== 'U') {
@@ -53,8 +50,8 @@ function plomGraphModel(process, graphId) {
     graph.nodes.pop();
   }
 
-  var width = 300
-  , height = 300;
+  var width = 250
+    , height = 200;
 
 
   var svg = d3.select(graphId).append("svg:svg")
@@ -97,7 +94,6 @@ function plomGraphModel(process, graphId) {
     .enter().append("path")
     .attr("class", function(d) { return "link " + d.type; })
     .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
-
 
   var circle = svg.append("g").selectAll("circle")
     .data(graph.nodes)

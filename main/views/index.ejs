@@ -1,0 +1,93 @@
+<% include layout %>
+
+<a href="https://github.com/plom"><img style="position:absolute; top:42px; right:0;  border: 0;" src="images/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+
+<div class="row">
+
+  <div class="span5" style="background:url(images/logo-large.png) no-repeat right center; background-size: auto 80px;">
+    <h1>PLoM.io</h1>
+    <p class="sfr-brand"> Public Library of Models</p>
+  </div>
+
+</div>
+
+
+
+<section>
+
+
+  <form>
+    <div class="input-append">
+      <input type="text" name="q" class="input-xlarge"/>
+      <button type="submit" class="btn">Search</button>
+    </div>
+  </form>
+
+
+
+  <div class="app-folders-container"> 
+    <% for(var i =0; i< 5; i++){ %>
+
+    <% if ( (i%3) === 0 ){ %>
+    <div class="jaf-row jaf-container">
+    <% } %>
+      <div class="folder context-box" id="f<%= i %>">
+        <a href="#">Measles Paris London</a>
+        <ul>
+          <li>10 models</li>
+          <li>5 contributors</li>
+        </ul>
+        <div id="graphdiv<%= i %>" class="context-graph"></div>
+        <select>
+          <option>CDC</option>
+          <option>Google</option>
+        </select>
+      </div>
+
+    <% if (((i+1) %3) === 0  || i === 4){ %>
+    </div>
+    <% } %>
+    <% } %>
+
+    <% for (var i = 0; i< 5 ; i++) { %>          
+       <div class="folderContent f<%= i %>">
+         <div class="jaf-container">        
+
+           <p>Content for folder f<%= i %>.</p>        
+
+           <div class="horizontal-scroll">
+             <% for (var j = 0; j< 10 ; j++) { %>
+                <div class="model-box">
+
+                  <% if(i===0){ %>
+                  <div id="pgraph<%= j %>" style="width:300px; height:200px;"></div>
+                  <% }else{ %>
+                  <img src="http://placehold.it/250x200" />              
+                  <% } %>
+
+                  <div class="parameter-box">
+                    <ul>
+                      <% for (var k = 0; k< (j+1) ; k++) { %>
+                         <li>r0: 3</li>
+                         <li>v: 3</li>
+                         <li>e: 5</li>
+                         <li>r0: 3</li>
+                         <li>v: 3</li>
+                         <li>e: 5</li>
+                         <% } %>
+                    </ul>
+                  </div>
+                </div>
+                <% } %>
+           </div>
+         </div>
+         <% } %>
+       </div>
+  </div>
+
+
+</section class="clear">
+
+
+
+<% include footer %>

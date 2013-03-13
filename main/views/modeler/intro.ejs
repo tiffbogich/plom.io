@@ -1,0 +1,127 @@
+<% include ../layout %>
+
+<div class="row">
+
+  <div class="span7">
+    <h1>Modeling made Social</h1>
+
+    <p>Let's say that you are interested in Measles:</p>
+    
+    <ol>
+      <li>
+        <strong>Search</strong> the library for a tutorial
+        <pre class="prettyprint">plom search tutorial -d measles</pre>
+        <aside>The <code>-d --disease</code> option restrict your
+        search to the specified disease. Run <code>plom --help</code>
+        to see all the available options.</aside>
+      </li>
+
+      <li>
+        Let's <strong>fetch</strong> the tutorial from the library, still restricting our scope to measles.
+        <pre class="prettyprint">plom fetch tutorial -d measles</pre>
+
+        <aside>
+          We get a new directory containing 4 files:
+          <ul>
+            <li>
+              <a href="/doc/modeler/create#context">context.json</a>: the context of your model (the data, the spatial and age structure if any...)
+            </li>
+
+            <li>
+              <a href="/doc/modeler/create#process">process.json</a>: the semantic of the process model
+            </li>
+
+            <li>
+              <a href="/doc/modeler/create#link">link.json</a>: the semantic of the observation model
+            </li>
+
+            <li>
+              <a href="/doc/modeler/create#theta">theta.json</a>: the parameter values, reflecting the current consensus within the PLoM community.
+            </li>
+          </ul>
+        </aside>
+
+      </li>
+
+      <li>
+        Let's <strong>build</strong> the model.
+        <pre class="prettyprint">plom build</pre>        
+        We now have a model/ directory containing plug-and-play infererence methods plugged to our model.
+      </li>
+
+      
+      <li>
+        <strong>Fit</strong> theta <a href="/doc/modeler/play">chaining</a> the built inference methods:
+        <pre class="prettyprint">fit theta | ./simplex -M 10000
+fit theta -B | ./pmcmc ode -M 1000000</pre>
+      </li>
+
+      <li>
+        <strong>Publish</strong> to the library.
+        <ul>
+          <li>
+            Create a design.json ensuring reproducibility of your results:
+            <pre class="prettyprint">fit replicate theta.json "pmcmc ode -M 1000000" 4 --run</pre>
+          </li>
+
+          <li>
+            Submit it.
+            <pre class="prettyprint">plom publish design.json</pre>
+          </li>
+
+        </ul>
+
+          <li>
+            Go <strong>social</strong>.  Point your browser to the
+            echoed link to see the results of PLoM automatic peer
+            review and follow the community reaction to your findings.
+          </li>
+
+      
+        </ul>
+
+      </li>
+
+
+
+    </ol>
+
+
+  </div>
+
+
+  <div class="span5">
+    <h1>Learn the concepts</h1>
+
+    <ol>
+      <li><a href="/doc/modeler/create">A layered grammar for epidemiological models</a></li>
+      <li><a href="/doc/modeler/play">Inference methods with a taste of Unix philosophy</a></li>
+      <!--<li><a href="/doc/modeler/hfmd">Integrated inference strategy</a></li>-->
+      <li><a href="/doc/modeler/h1n1">Capturing unknown variations of key parameters</a></li>
+      <li><a href="/doc/modeler/refs">References</a></li>
+    </ol>
+
+    <h1>Install the packages</h1>
+
+    <p>First make sure that you have installed <a href="http://nodejs.org">Node.js</a></p> 
+
+    <p>
+      <ul>
+        <li>
+          Install plom command line interface<br/>
+          <code>npm install plom-cli -g</code>
+        </li>
+        <li>
+          Install plom command line inference tools<br/>
+          <code>npm install plom-fit -g</code>
+        </li>
+      </ul>
+    </p>
+
+  </div>
+
+
+
+</div>
+
+<% include ../footer %>

@@ -1,0 +1,909 @@
+<% include ../layout %>
+
+<div class="page-header">
+  <h1>HFMD in Japan<small> (Hand, foot, and mouth disease)</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span4">
+    <h3>Context</h3>
+
+    <p><strong>Data</strong>:
+      <ul>
+        <li>Time series of weekly lab-confirmed cases from Japan for
+        the 2 main virological agents of HFMD:
+          <ul>
+            <li>Enterovirus 71 (EV71)</li>
+            <li>Coxsackievirus A16 (CA16)</li>
+          </ul>
+        </li>
+        <li>Proportion of the population under surveillance</li>
+      </ul>      
+    </p>
+
+    <p><strong>Meta-data</strong>:
+      <ul>
+        <li>Population size</li>
+        <li>Birth rates</li>
+        <li>Death rates</li>
+      </ul>      
+    </p>
+
+    <p><strong>Structure</strong>:
+      <ul>
+        <li>Japan as a whole connected to the outside world with a constant rate of introduction of the diseases</li>
+      </ul>      
+    </p>
+
+
+  </div>    
+
+  <div class="span8">
+    <h3>In JSON</h3>
+
+    <p>
+      Let's get a blank context: <code>plom --context -o context.json</code>
+      and fill it for HFMD:
+    </p>
+
+    <div class="accordion" id="link-json">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#link-json" href="#collapseContext">
+            context.json
+          </a>
+        </div>
+        <div id="collapseContext" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+{
+ "population": [{"id": "Japan__all",
+                 "size_t0": 126444881}], 
+ 
+ "time_series": [{"id": "EV71_JAP__IASR__inc",
+                  "population_id": ["Japan__all"]},
+                 {"id": "CA16_JAP__IASR__inc",
+                  "population_id": ["Japan__all"]}],
+ 
+ "frequency": "W",
+ 
+ "data": [
+   {"id": "data",
+    "description": "HFMD data Japan (IASR) for EV71 and CA16",
+    "source": "data/data.csv"},
+ 
+   {"id": "prop",
+    "description": "proportion of the population under surveillance",
+    "source": "data/prop.csv"},
+ 
+   {"id": "N",
+     "description": "population size",
+     "source": "data/N.csv"},
+   {"id": "mu_b",
+    "description": "birth rates",
+    "source": "data/mu_b.csv"},
+   {"id": "mu_d",
+    "description": "death rates",
+    "source": "data/mu_d.csv"}],
+ 
+ "model": {"space": {"type": ["external"]},
+           "age": {}}
+}
+</pre>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+  </div>    
+
+
+</div>
+ 
+
+<div class="page-header">
+  <h1>Process model<small> (Skeleton and noise)</small></h1>
+</div>
+
+
+<div class="row">
+
+  <div class="span4">
+    <h3>Multi-strain model</h3>
+
+    <p>History-based model with:
+      <ul>
+        <li>Reduced susceptibility</li>
+        <li>Lack of co-infection</li>
+      </ul>
+    </p>
+
+
+  </div>    
+
+  <div class="span4">
+    <h3>External forcing</h3>
+
+    <ul>
+      <li>
+        <strong>Seasonal forcing</strong>
+        <p>
+          Implemented with a <strong>cosine</strong> function with shared
+          amplitude <code>e</code> and dephasing <code>d</code> between the EV71 and CA16.
+        </p>
+
+      </li>
+
+      <li>
+        <strong>Demographic forcing</strong>
+        <p>
+          Population size <code>N</code>, birth rates <code>mu_b</code>, and
+          death rates <code>mu_d</code>  forced using the meta-data
+          of <code>context.json</code>.
+        </p>
+      </li>
+    </ul>
+
+  </div>    
+
+  <div class="span4">
+    <h3>Over-dispersion</h3>
+
+    <p>
+      Multiplicative non-correlated <strong>Gamma noise</strong> to
+      compensate:
+      <ul>
+        <li>Rigidity of the forcing function</li>
+        <li>Lack of explicit age structure</li>
+      </ul>
+    </p>
+
+    <p>
+      <strong>Independant</strong> realisations of the gamma noise
+      (each sharing the same intensity [<code>sto</code>)] for:
+      <ul>
+        <li>
+          Primary and secondary infection to take advantage of
+          the <strong>implicit age structure</strong> of the model
+        </li>
+
+        <li>
+          EV71 and CA16 to reflect a potential differential effect of
+          seasonal forcing
+        </li>       
+      </ul>
+    </p>
+
+  </div>    
+
+</div>
+
+
+<div class="row">
+
+  <div class="span12">
+    <div class="accordion" id="examples-prog">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#examples-prog" href="#collapsePy">
+            Model definition Python
+          </a>
+        </div>
+        <div id="collapsePy" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+import json
+
+#process model
+state = ['SS', 'IS', 'SI', 'RS', 'SR', 'IR', 'RI']
+parameter = ['r0_1', 'r0_2', 'v', 'e', 'd', 'sigma', 'sto', 'mu_b', 'mu_d']
+
+I1 = ['IS', 'IR']
+I2 = ['SI', 'RI']
+inf1 = 'r0_{0}/N*v*sinusoidal_forcing(e,d)*({1})'.format(1,'+'.join(I1))
+inf2 = 'r0_{0}/N*v*sinusoidal_forcing(e,d)*({1})'.format(2,'+'.join(I2))
+
+#we use a custom non verbose syntax
+model = [['U', 'SS', 'mu_b*N'], #birth
+         #infection
+         ['SS', 'IS', 'noise__trans1(sto)*{0}'.format(inf1), [{'id': 'transmission', 'by': I1}]],
+         ['SS', 'SI', 'noise__trans2(sto)*{0}'.format(inf2), [{'id': 'transmission', 'by': I2}]],
+         ['SR', 'IR', 'noise__trans3(sto)*sigma*{0}'.format(inf1), [{'id': 'transmission', 'by': I1}]],
+         ['RS', 'RI', 'noise__trans4(sto)*sigma*{0}'.format(inf2), [{'id': 'transmission', 'by': I2}]],
+         ##recovery
+         ['IS', 'RS', 'correct_rate(v)'],
+         ['SI', 'SR', 'correct_rate(v)'],
+         ['IR', 'DU', 'correct_rate(v)'],
+         ['RI', 'DU', 'correct_rate(v)']]
+
+##add death:
+for X in state:
+    model.append([X, 'U', 'mu_d'])
+
+
+##export to JSON
+m = {}
+m['pop_size_eq_sum_sv'] = False
+
+#convert to verbose format
+m['state'] = [{'id':x} for x in state]
+m['parameter'] = [{'id':x} for x in parameter]
+m['model']= [dict(zip(['from', 'to', 'rate', 'tag'][:len(x)], x)) for x in model]
+
+json.dump(m, open('model.json', 'w'))
+</pre>
+
+
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#examples-prog" href="#collapseJson">
+            model.json
+          </a>
+        </div>
+        <div id="collapseJson" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+    <p>
+      Remember, a blank model template can be obtained by running:
+      <code>plom --model -o model.json</code>
+    </p>
+
+
+<pre class="prettyprint">
+{
+ "state": [{"id":"SS"}, {"id":"IS"}, {"id":"SI"}, {"id":"RS"}, {"id":"SR"}, {"id":"IR"}, {"id":"RI"}],
+
+ "parameter": [{"id":"r0_1"}, {"id":"r0_2"}, {"id":"v"}, {"id":"e"}, {"id":"d"}, {"id":"sigma"}, {"id":"sto"}, {"id":"mu_b"}, {"id":"mu_d"}],
+
+ "model": [
+     {"from": "U", "to": "SS", "rate": "mu_b*N"},
+
+     {"from": "SS", "to": "IS", "rate": "noise__trans1(sto)*r0_1/N*v*sinusoidal_forcing(e,d)*(IS+IR)",
+      "tag": [{"id": "transmission", "by": ["IS", "IR"]}] },
+
+     {"from": "SS", "to": "SI", "rate": "noise__trans2(sto)*r0_2/N*v*sinusoidal_forcing(e,d)*(SI+RI)",
+      "tag": [{"id": "transmission", "by": ["SI", "RI"]}]},
+
+     {"from": "SR", "to": "IR", "rate": "noise__trans3(sto)*sigma*r0_1/N*v*sinusoidal_forcing(e,d)*(IS+IR)",
+      "tag": [{"id": "transmission", "by": ["IS", "IR"]}]}, 
+
+     {"from": "RS", "to": "RI", "rate": "noise__trans4(sto)*sigma*r0_2/N*v*sinusoidal_forcing(e,d)*(SI+RI)",
+      "tag": [{"id": "transmission", "by": ["SI", "RI"]}]}, 
+
+     {"from": "IS", "to": "RS", "rate": "correct_rate(v)"},
+     {"from": "SI", "to": "SR", "rate": "correct_rate(v)"}, 
+     {"from": "IR", "to": "DU", "rate": "correct_rate(v)"}, 
+     {"from": "RI", "to": "DU", "rate": "correct_rate(v)"}, 
+
+     {"from": "SS", "to": "U", "rate": "mu_d"},
+     {"from": "IS", "to": "U", "rate": "mu_d"}, 
+     {"from": "SI", "to": "U", "rate": "mu_d"}, 
+     {"from": "SR", "to": "U", "rate": "mu_d"}, 
+     {"from": "RS", "to": "U", "rate": "mu_d"}, 
+     {"from": "IR", "to": "U", "rate": "mu_d"}, 
+     {"from": "RI", "to": "U", "rate": "mu_d"}],
+
+ "pop_size_eq_sum_sv": false
+}
+</pre>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+
+<div class="page-header">
+  <h1>Linking<small> and building</small></h1>
+</div>
+
+<div class="row">
+
+  <div class="span6">
+    <h3>Link template</h3>
+
+    <p>
+      To be sure not to forget any parameters, we fill in a template
+      generated with:<br/>
+      <code>plom context.json model.json --link -o link.json
+      link.json</code>
+    </p>
+
+    <p>
+      Note that the <code>plom</code> will generate outputs
+      detailing:
+      <ul>
+        <li>
+          The expansion performed
+          while <strong>contextualizing</strong> the model (in our
+          case adding external infection)
+        </li>
+        <li>
+          The extra-parameters resulting from this expansion
+          (here <code>iota_0</code> and <code>iota_1</code>)
+        </li>
+        <li>
+          The orders in which groups have to be specified if we
+          set the <code>grouping</code> property with a list
+        </li>
+      </ul>
+    </p>
+
+
+  </div>    
+
+
+
+  <div class="span6">
+    <h3>Observation Process</h3>
+
+    <p>
+      <strong>Overdispersed binomial distribution</strong> defined as
+      a discretized normal random variable.
+    </p>
+
+    <p>
+      By allowing over-dispertion for both the process and the
+      observation model, we hope to be able to tease apart the
+      different sources of stochasticity.
+    </p>
+
+
+  </div>    
+
+
+
+</div>
+
+<div class="row">
+
+  <div class="span12">
+
+    <div class="accordion" id="link-json">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#link-json" href="#collapseLink">
+            link.json
+          </a>
+        </div>
+        <div id="collapseLink" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+{
+ "observed": [{"id": "Inc_EV", 
+               "definition": [{"from": "SS", "to": "IS"}, {"from" : "SR", "to": "IR"}],
+               "time_series_id": ["EV71_JAP__IASR__inc"]},
+              {"id": "Inc_CA", 
+               "definition": [{"from": "SS", "to": "SI"}, {"from" : "RS", "to": "RI"}],
+               "time_series_id": ["CA16_JAP__IASR__inc"]}],
+
+ "parameter": [{"id": "rep", "comment": "reporting rate"},
+               {"id": "phi", "comment": "over-dispertion of the reporting rate"}],
+ 
+ "model": {"distribution": "discretized_normal",
+           "mean": "prop*rep*x",
+           "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"},
+ 
+ "value": {
+    "SS": {"min": 0.0, "guess": 0.04,  "max": 0.15,   "sd_transf": 0.2},
+    "IS": {"min": 0.0, "guess": 1e-4,  "max": 0.0001, "sd_transf": 0.2},
+    "SI": {"min": 0.0, "guess": 1e-4,  "max": 0.0001, "sd_transf": 0.2},
+    "RS": {"min": 0.0, "guess": 0.001, "max": 0.15,   "sd_transf": 0.2},
+    "SR": {"min": 0.0, "guess": 0.001, "max": 0.15,   "sd_transf": 0.2},
+    "IR": {"min": 0.0, "guess": 0.0,   "max": 0.0001, "sd_transf": 0.2},
+    "RI": {"min": 0.0, "guess": 0.0,   "max": 0.0001, "sd_transf": 0.2},
+
+    "r0_1":   {"min": 6.0,  "guess": 22,    "max": 35.0,   "sd_transf": 0.03},
+    "r0_2":   {"min": 6.0,  "guess": 22,    "max": 35.0,   "sd_transf": 0.03},
+    "v":      {"min": 5.0,  "guess": 11,    "max": 16.0,   "sd_transf": 0.03, "unit": "D", "type": "rate_as_duration"},
+    "e":      {"min": 0.01, "guess": 0.2,   "max": 0.3,    "sd_transf": 0.1, "transformation": "logit"},
+    "d":      {"min": 0.7,  "guess": 0.8,   "max": 0.95,   "sd_transf": 0.03},
+    "sigma":  {"min": 0.2,  "guess": 0.5,   "max": 0.95,   "sd_transf": 0.1, "transformation": "logit"},
+    "sto":    {"min": 0.35, "guess": 0.4,   "max": 0.8,    "sd_transf": 0.03},
+    "iota_0": {"min": 0.0,  "guess": 200.0, "max": 1000.0, "sd_transf": 0.03},
+    "iota_1": {"min": 0.0,  "guess": 200.0, "max": 1000.0, "sd_transf": 0.03},
+
+    "rep": {"min": 0.01, "guess": 0.08, "max": 0.2, "sd_transf": 0.1,  "partition_id": "variable_time_series", "transformation": "logit"},
+    "phi": {"min": 0.0,  "guess": 0.1,  "max": 0.3, "sd_transf": 0.03,  "partition_id": "variable_time_series", "transformation": "log"}}
+}
+</pre>
+
+
+<p>Note:
+  <ul>
+    <li><code>transformation</code> for <code>par_sv_values</code> default to <code>logit</code></li>
+    <li><code>transformation</code> for <code>par_proc_values</code> default to <code>log</code></li>
+    <li><code>partition_id</code> default to <code>identical_population</code> <code>identical_time_series</code></li>
+    <li><code>prior</code> default to <code>uniform</code></li>
+  </ul>
+</p>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+
+
+<div class="row">
+
+  <div class="span6">
+    <h3>Coding the State Space Model</h3>
+
+    <p>
+      <i class="icon-play"></i> Run: <pre class="prettyprint">plom context.json model.json link.json -o hfmd</pre>
+    </p>
+
+      <a href="#" class="btn btn-primary">See it in action from your browser!</a>   
+
+  </div>
+
+  <div class="span6">
+    <h3>Getting prepared</h3>
+
+    <p>We have generated a <code><i class="icon-folder-open"></i> hfmd/</code> <strong>directory.</strong>
+      <ul>
+        <li>The source code of our models are available in <code><i class="icon-folder-open"></i> hfmd/src/C/</code>.</li>
+        <li>Commands have to be run in <code><i class="icon-folder-open"></i> hfmd/bin/</code>.</li>
+        <li>Results will be written in <code><i class="icon-folder-open"></i> hfmd/src/results/</code>.</li>
+        <li>Plots will be generated from <a href="http://www.r-project.org/">R</a> using the package <code>plom</code>.</li>
+      </ul>
+    </p>
+
+  </div>
+
+</div>
+
+
+
+
+
+<div class="page-header">
+  <h1>Climbing the likelihood landscape<small> A frequentist approach</small></h1>
+</div>
+
+
+<div class="row">
+
+  <div class="span6">
+    <h3>General strategy</h3>
+
+    <p>
+      We start by <strong>discarding</strong> all sources of noises
+      except for the binomial component of the observation process.
+    </p>
+
+    <p>
+      We sample the parameter space with a <strong>latin hypercube sampling
+      design</strong>. For each parameter set:
+
+      <ul>
+
+        <li>
+          We get reasonable initial conditions by turning off the
+          seasonal forcing (set <code>e</code> to 0)
+          and <strong>skipping a transiant</strong> of 100000 weeks.
+        </li>
+
+        <li>
+          We use these initial conditions to start a <strong>simplex</strong>
+          algorithm after having:
+          <ul>
+            <li>turned off the noise (setting <code>sto</code> and <code>phi</code> to 0);</li>
+            <li>rescaled the reporting rate (<code>rep2</code>) so that
+            the average of the data match the average of the model
+            simulation.</li>
+          </ul>          
+        </li>
+
+        <li>
+          We <strong>chain</strong> 29 simplex algorithms (each time turning off
+          the noise) to try to avoid getting trapped in local maxima.
+        </li>
+
+      </ul>
+    </p>
+
+
+  </div>
+  <div class="span6">
+    <h3>Refinements</h3>
+
+    <p>
+      We alter the LHS sampling in order to take into account that
+      EV71 and CA16 should have relatively similar:
+      <ul>
+        <li> basic reproduction number (<code>r0_1</code>, <code>r0_2</code>);</li>
+        <li> external cases (<code>iota_0</code>, <code>iota_1</code>);</li>
+        <li> observation uncertainty (<code>phi</code>).</li>
+      </ul>
+    </p>
+
+    <p>
+      This is achieved by setting:
+      <ul>
+        <li> (<code>r0_2:all</code> = <code>r0_1:all</code> + <em>x</em>) with <em>x</em> in [-1, 1]</li>
+        <li> (<code>iota_1:all</code> = <code>iota_0:all</code> + <em>x</em>) with <em>x</em> in [-50, 50]</li>
+        <li> (<code>phi:CA16_JAP__IASR__inc</code> = <code>phi:EV71_JAP__IASR__inc</code> + <em>x</em>) with <em>x</em> in [-0.05, 0.05]</li>
+      </ul>
+
+    </p>
+
+  </div>
+
+</div>
+
+
+<div class="row">
+
+  <div class="span12">
+
+
+
+    <div class="accordion" id="lhs-simplex-json">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#lhs-simplex-json" href="#collapseLhs-Simplex">
+            Implementing the design: lhs_simplex.json
+          </a>
+        </div>
+        <div id="collapseLhs-Simplex" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+<pre class="prettyprint">
+{ 
+ "id": "lhs_simplex",
+
+ "action": {"id": "lhs",
+            "H": 120,
+            "seed": 12334216564,
+            "f": [{"y": "r0_2:all",                "x": "r0_1:all",                "range": [-1, 1]},
+                  {"y": "phi:CA16_JAP__IASR__inc", "x": "phi:EV71_JAP__IASR__inc", "range": [-0.05, 0.05]},
+                  {"y": "iota_1:all",              "x": "iota_0:all",              "range": [-50, 50]}]}
+
+ "cmd": [["D",  "-S e:guess:all:0.0", "simul deter -T 100000 -D 1", 1],
+         ["DX", "-r rep --no_env_sto -S phi:sd_transf:all:0.0 -S phi:guess:all:0.0", "simplex -M 10000", 1],
+         ["B",  "--no_env_sto -S phi:sd_transf:all:0.0 -S phi:guess:all:0.0", "simplex -M 10000", 29]],
+
+ "cluster": {"type": "SGE",
+             "walltime": "01:20:00"},
+}
+</pre>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="row">
+
+  <div class="span6">
+    <h3>The global landscape</h3>
+
+    <p>
+      <i class="icon-play"></i> Run: <pre class="prettyprint">sfi --bootstrap lhs_simplex.json && ./lhs_simplex.sh</pre>
+    </p>
+
+    <p>
+      <i class="icon-eye-open"></i> Plot:
+      <code>plot.convergence()</code> and <code>plot.prs()</code>
+    </p>
+
+    <p>
+      <i class="icon-ok"></i> Store the MLE: <pre class="prettyprint">sfi -B -b ../results/lhs_simplex/best_xx.output > mle.json</pre>
+    </p>
+
+  </div>
+
+
+  <div class="span6">
+    <h3>Around the maximum: slices</h3>
+
+    <p>Template a design: <code><i class="icon-file"></i>slice_deter.json</code></p>
+<pre class="prettyprint">
+plom --slice smc -J 1 -H 100 --cluster SGE -o slice_deter.json
+</pre>
+
+    <p>
+      <i class="icon-play"></i> Run: <pre class="prettyprint">sfi -s mle.json --bootstrap slice_deter.json && ./slice_deter.sh</pre>
+    </p>
+
+    <p>
+      <i class="icon-eye-open"></i> Plot:
+      <code>plot.all_slices()</code>
+    </p>
+
+    <p>
+      <i class="icon-repeat"></i> Iterate: The range of the slice are
+      set by the properties <code>min</code> and <code>max</code> of
+      the parameter values. Be sure to edit these fields if your
+      slices are not well positioned.
+    </p>
+
+  </div>
+
+</div>
+
+
+<div class="page-header">
+  <h1>Another ascension<small> (with noise)</small></h1>
+</div>
+
+
+<div class="row">
+
+  <div class="span4">
+    <h3>Design</h3>
+
+    <p>
+      We now fit the full model with <strong>demographic,
+        extra-demographic, and over-dispersed observation
+        noise</strong> using the <strong>MIF</strong> algorithm.
+    </p>
+        
+    <p>
+      For comparison purposes, we use the same <strong>LHS</strong> as
+      before (by setting the same <code>seed</code>). However, we use a
+      different sequence of commands in order to get <strong>good
+      starting values for the MIF</strong> for each of the parameter
+      sets of the LHS and help the convergence:
+      <ul>
+
+        <li>
+          We get reasonable initial conditions by turning off the
+          seasonal forcing (set <code>e</code> to 0)
+          and <strong>skipping a transiant</strong> of 100000 weeks.
+        </li>
+
+        <li>
+          We fit <strong>only</strong> the initial conditions, the reporting rate
+          (<code>rep2</code>), and the dephasing
+          (<code>d</code>), starting from the
+          steady state previously found with
+          a <strong>simplex</strong> algorithm and
+          the <strong>least-squares</strong> option. Note that before
+          starting the simplex, we rescaled the reporting rate
+          (<code>rep2</code>) so that the average of the data matched
+          the average of the model simulation.
+        </li>
+
+        <li>
+          We finally run a <strong>MIF</strong> starting from the
+          previous results.
+        </li>
+      </ul>
+    </p>
+
+  </div>
+
+  <div class="span8">
+    <h3>Implementation</h3>
+
+    <div class="accordion" id="lhs-mif-json">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#lhs-mif-json" href="#collapseLhs-Mif">
+            Implementing the design: lhs_mif.json
+          </a>
+        </div>
+        <div id="collapseLhs-Mif" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <p>We do it in Python, importing the previous design and
+              only editing the field that differ (<code>name</code>, <code>cmd</code>, <code>cpu</code>):</p>
+
+<pre class="prettyprint">
+import json
+d = json.load(open('lhs_simplex.json'))
+
+d['id'] = 'lhs_mif'
+
+d['cmd'] = [['D', '-S e:guess:all:0.0', 'simul deter -T 100000'],
+            ['DX',
+             ' '.join(['-r rep2',
+                       '-I',
+                       '-S rep2:sd_transf:all:0.1',
+                       '-S d:sd_transf:all:0.03']),
+             'simplex -s -M 20000'],
+            ['B', '', 'mif sto -J 4000 -M 100 -b 4.0']]
+
+d['cluster']['cpu'] = 12
+
+json.dump(open('lhs_mif.json'))
+</pre>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      <i class="icon-play"></i> Run: <pre class="prettyprint">sfi --bootstrap lhs_mif.json && ./lhs_mif.sh</pre>
+    </p>
+
+    <p>
+      <i class="icon-eye-open"></i> Plot:
+      <code>plot.convergence()</code> and <code>plot.prs()</code>
+    </p>
+
+
+    <p>
+      <i class="icon-ok"></i> Store the MLE: <pre class="prettyprint">sfi -B -b ../results/lhs_mif/best_xx.output > mle.json</pre>
+    </p>
+
+  </div>
+</div>
+
+
+
+<div class="page-header">
+  <h2>Frequentist results</h2>
+</div>
+
+<div class="row">
+  <div class="span6">
+    <h3>Replication</h3>
+
+    <p>Having a candidate for the MLE, we assess the Monte Carlo
+    variability by running several replicas of the MIF algorithm
+      <strong>differing only by the seed of the random number
+    generator</strong> used.</p>
+
+
+    <p>Template a design: <code><i class="icon-file"></i>replicate.json</code></p>
+<pre class="prettyprint">
+plom --replicate mif --sto -J 4000 -b 4 -H 10 --cluster SGE -o replicate.json
+</pre>
+
+    <p>
+      <i class="icon-play"></i>  Run: <pre class="prettyprint">sfi -s mle.json --bootstrap replicate.json &&
+qsub replicate.sh</pre>
+    </p>
+
+    <p>
+      <i class="icon-eye-open"></i> Plot:
+      <code>plot.convergence()</code>
+    </p>
+
+    <p>
+      <i class="icon-ok"></i> Store the refined MLE: <pre class="prettyprint">sfi -B -b ../results/replicate/best_xx.output > mle.json</pre>
+    </p>
+
+  </div>
+
+  <div class="span6">
+    <h3>Slices</h3>
+
+
+    <p>Template a design: <code><i class="icon-file"></i>slice.json</code></p>
+<pre class="prettyprint">
+plom --slice smc --sto -J 4000 -H 40 --cluster SGE -o slice.json
+</pre>
+
+    <p>
+      <i class="icon-play"></i> Run: <pre class="prettyprint">sfi -s mle.json --bootstrap slice.json && ./slice.sh</pre>
+    </p>
+
+    <p>
+      <i class="icon-eye-open"></i> Plot:
+      <code>plot.all_slices</code>
+    </p>
+
+
+    <p>
+      <i class="icon-repeat"></i> Iterate: It is likely that the
+      parameters <code>min</code> and <code>max</code> properties were
+      not ideal to obtain satisfying slices. Just edit these fieds
+      and re-run your slices. Hopefully slices are fast to compute.
+    </p>
+
+
+  </div>
+</div>
+
+  <div class="row">
+  <div class="span6">
+    <h3>Profiles</h3>
+
+
+    <p>Template a design: <code><i class="icon-file"></i>profile.json</code></p>
+<pre class="prettyprint">
+plom --profile mif --sto -J 4000 -b 4 -H 20 --cluster SGE -o profile.json
+</pre>
+
+    <p>
+     <i class="icon-play"></i> Run: <pre class="prettyprint">sfi -s mle.json --bootstrap profile.json && ./all_profiles.sh</pre>
+    </p>
+
+    <p>
+      <i class="icon-eye-open"></i> Plot:
+      <code>plot.all_profiles</code>
+    </p>
+
+    <p>
+      <i class="icon-repeat"></i> Iterate: The <code>min</code>
+      and <code>max</code> values that were used to get nice slices
+      might not be your ideal profiles. Start with a few points to get
+      an idea, and then fill in the gaps with more points.
+    </p>
+
+  </div>
+</div>
+
+
+<div class="page-header">
+  <h1>Sampling the likelihood space<small> (the Bayesian way)</small></h1>
+</div>
+
+<div class="row">
+  <div class="span6">
+    <h3>Pragmatic initialization</h3>
+
+    <p>
+      We <strong>start from the frequentist results</strong> and
+      generate some samples using sequential updates to get an
+      estimation of the variance-covariance matrix.
+    </p>
+
+    <p>
+      <i class="icon-play"></i> Run: <pre class="prettyprint">sfi -s mle.json | ./pmcmc sto -J 1000 -M 50000 -P 12</pre>
+    </p>
+
+    <p>
+      <i class="icon-eye-open"></i> Plot:
+      <code>plot.best()</code> and <code>plot.corr()</code>
+    </p>
+
+
+  </div>
+
+  <div class="span6">
+    <h3>Efficient sampling</h3>
+
+    <p>
+      We use the computed empirical variance-covariance matrix.
+    </p>
+    
+    <p>
+      <i class="icon-play"></i> Run: <pre class="prettyprint">sfi -B -C | ./pmcmc sto --full --cov -J 1000 -M 50000 -P 12</pre>
+    </p>
+
+    <p>
+      <i class="icon-eye-open"></i> Plot:
+      <code>plot.best()</code> and <code>plot.posteriors()</code>
+    </p>
+
+  </div>
+
+</div>
+
+
+<% include ../footer %>
