@@ -53,17 +53,20 @@
        <div class="folderContent f<%= i %>">
          <div class="jaf-container">        
 
-           <p>Content for folder f<%= i %>.</p>        
-
            <div class="horizontal-scroll">
              <% for (var j = 0; j< 10 ; j++) { %>
                 <div class="model-box">
+
+                  <a href="#">name</a>
 
                   <% if(i===0){ %>
                   <div id="pgraph<%= j %>" style="width:300px; height:200px;"></div>
                   <% }else{ %>
                   <img src="http://placehold.it/250x200" />              
                   <% } %>
+
+                  
+                  <div>score</div>
 
                   <div class="parameter-box">
                     <ul>

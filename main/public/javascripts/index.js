@@ -9,7 +9,9 @@ $(document).ready(function() {
 
   $.getJSON('/', function(answer) {
 
-    var data = answer.context[0].data;
+    console.log(answer);
+
+    var data = answer[0].data;
     
     data.forEach(function(x, i){
       data[i] = [new Date(x[0]), x[1]];
@@ -32,9 +34,8 @@ $(document).ready(function() {
 
 
 
-    console.log(answer.process[0]);
     for (var i=0; i<10; i++) {
-      plomGraphModel(answer.process[0], "#pgraph"+i);
+      plomGraphModel(answer[0].process[0], "#pgraph"+i);
     }
  
 

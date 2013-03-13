@@ -91,9 +91,9 @@ app.post('/search', function(req, res, next){
 
 
 /**
- * fetch
+ * clone
  **/
-app.post('/fetch', function(req, res, next){
+app.post('/clone', function(req, res, next){
 
   var components = req.app.get('components');
 
