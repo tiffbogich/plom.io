@@ -34,7 +34,7 @@ function plomGraphModel(process, graphId) {
 
         r.tag.transmission.by.forEach(function(x){
           var ind = states.indexOf(x);
-          graph.nodes[ind].type = 'infector';
+          graph.nodes[ind].type = 'infect or';
         });
 
       }
@@ -69,8 +69,9 @@ function plomGraphModel(process, graphId) {
     .nodes(graph.nodes)
     .links(graph.links)
     .size([width, height])
-    .linkDistance(50)
-    .charge(-300)
+    .charge(-400)
+    .gravity(0.3)
+    .linkDistance(30)
     .on("tick", tick)
     .start();
 
@@ -97,7 +98,7 @@ function plomGraphModel(process, graphId) {
   var circle = svg.append("g").selectAll("circle")
     .data(graph.nodes)
     .enter().append("circle")
-    .attr("r", 6)
+    .attr("r", 4)
     .attr("class", function(d){return d.type;})
     .call(force.drag);
 

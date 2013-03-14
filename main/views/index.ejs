@@ -97,6 +97,15 @@
               <% }; %>
             </div>
 
+            Also involved in:
+            <div class="related-box">
+              <ul>
+                <% m.process.related.forEach(function(x){ %>
+                <li><a href="#"><%= x %></a></li>
+                <% }); %>
+              </ul>
+            </div>
+
           </div>
           <% }); %>
         </div>

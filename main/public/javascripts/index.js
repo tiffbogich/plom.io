@@ -6,12 +6,16 @@ $(document).ready(function() {
     e.stopPropagation();
   });
 
+  $('.ts-picker').click(function(e){
+    e.stopPropagation();
+  });
+
 
   $.getJSON('/', function(ctree) {
 
     ctree.forEach(function(c, indc){
 
-      var data = ctree[0].data;
+      var data = c.data;
       
       data.forEach(function(x, i){
         x[0] = new Date(x[0]);

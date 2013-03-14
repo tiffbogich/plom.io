@@ -208,6 +208,8 @@ app.post('/publish', function(req, res, next){
         }
       }
 
+      console.log(to_be_published);
+
       if(to_be_published.length){
 
 

@@ -59,17 +59,42 @@ exports.index = function(req, res){
             callback(null, t);
 
           });
-      }
+      },
+      
+      //all the links related to the process model of the links matching our query
+      related: function(callback){
+        components
+          .find({type: 'link', process_id: {$in: _.uniq(links.map(function(x){return x.process_id;}))}}, {context_disease:1, process_id:1})
+          .toArray(function(err, r){
+            if (err) callback(err);
+            
+            callback(null, r);
+          });
+      },
+
+
     }, 
                    function(err, results) {
                      if (err) return next(err);
 
                      var obj = {};
                      for(var x in results){
-                       results[x].forEach(function(comp){
-                         obj[comp._id] = comp;
-                       });
+                       if(x!=='related'){
+                         results[x].forEach(function(comp){
+                           obj[comp._id] = comp;
+                         });
+                       }
                      }
+                     
+                     //add related content (other diseases where the process model is also used)
+                     results.related.forEach(function(r){
+                       if('related' in obj[r.process_id]) {
+                         //add to set of disease (TODO: optimize)
+                         obj[r.process_id].related = _.unique(obj[r.process_id].related.concat(r.context_disease));
+                       } else {
+                         obj[r.process_id].related = r.context_disease;
+                       }
+                     });
 
                      //make a context tree (ctree)
                      var ctree = results.context;
