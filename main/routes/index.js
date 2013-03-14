@@ -10,101 +10,98 @@ var fs = require('fs')
   , _ = require('underscore')
   , dbUtil = require('../../db-utils');
 
+
 exports.index = function(req, res){
+  
+  var components = req.app.get('components');
 
-  res.format({
-    json: function(){
+  var q = (req.body.q) ? dbUtil.querify(req.body.q, req.body.d) : {type: 'link'};
+
+  components.find(q, {context_id:1, process_id:1, theta_id:1, name:1, model:1, _id:0}).toArray(function(err, links){
+    if (err) return next(err);
+    
+    async.parallel({
+      context: function(callback){
+        components
+          .find({_id: {$in: _.uniq(links.map(function(x){return x.context_id;}))}})
+          .toArray(function(err, c){
+            if (err) callback(err);
+            
+            //keep only the data as opposed to the meta data
+            c.map(function(x, i){
+              var data = x.data.filter(function(d){return d.id ==='data'})[0];
+              x.data = data.source.slice(1);
+            });
+
+            callback(null, c);
+
+          });
+      },
       
-      var components = req.app.get('components');
+      process: function(callback){
+        components
+          .find({_id: {$in: _.uniq(links.map(function(x){return x.process_id;})) }})
+          .toArray(function(err, p){
+            if (err) callback(err);
+            
+            callback(null, p);
 
-      var q = (req.body.q) ? dbUtil.querify(req.body.q, req.body.d) : {type: 'link'};
+          });
+      }, 
+      
+      theta: function(callback){
+        //only fetch the best theta!
+        components
+          .find({_id: {$in: _.uniq(links.map(function(x){return x.theta_id;})) }, status:'best'})
+          .toArray(function(err, t){
+            if (err) callback(err);
+            
+            callback(null, t);
 
-      components.find(q, {context_id:1, process_id:1, theta_id:1, _id:0}).toArray(function(err, links){
-        if (err) return next(err);
-        
-        async.parallel({
-          context: function(callback){
-            components
-              .find({_id: {$in: _.uniq(links.map(function(x){return x.context_id;}))}},
-                    {name:1, description:1, data:1})
-              .toArray(function(err, c){
-                if (err) callback(err);
-                
-                //keep only the data as opposed to the meta data
-                c.map(function(x, i){
-                  var data = x.data.filter(function(d){return d.id ==='data'})[0];
-                  x.data = data.source.slice(1);
-                });
+          });
+      }
+    }, 
+                   function(err, results) {
+                     if (err) return next(err);
 
-                callback(null, c);
-
-              });
-          },
-          
-          process: function(callback){
-            components
-              .find({_id: {$in: _.uniq(links.map(function(x){return x.process_id;})) }})
-              .toArray(function(err, p){
-                if (err) callback(err);
-                
-                callback(null, p);
-
-              });
-          }, 
-          
-          theta: function(callback){
-            //only fetch the best theta!
-            components
-              .find({_id: {$in: _.uniq(links.map(function(x){return x.theta_id;})) }, status:'best'})
-              .toArray(function(err, t){
-                if (err) callback(err);
-                
-                callback(null, t);
-
-              });
-          }
-        }, 
-                       function(err, results) {
-                         if (err) return next(err);
-
-                         //make a context tree (ctree)
-                         var ctree = results.context;
-                         ctree.forEach(function(c, i){
-                           
-                           //attach process
-                           c['process'] = results.process.filter(function(p){
-
-                             var my_process_id = links
-                               .filter(function(x){return x.context_id.equals(c._id)})
-                               .map(function(x){return x.process_id});
-
-                             return my_process_id.some(function(x) {return x.equals(p._id)});
-                           });
-
-                           //attach theta to each process
-                           c['process'].forEach(function(p){
-
-                             var my_theta_id = links
-                               .filter(function(x){return ( (x.context_id === c._id) && (x.process_id = p._id))})
-                               .map(function(x){return x.theta_id});
-
-                             my_theta_id = _.uniq(_.flatten(my_theta_id));
-                             
-                             
-                             p['theta'] = results.theta.filter(function(x){ 
-                               return my_theta_id.some(function(y) {return y.equals(p._id)});
-                             });
-
-                           });
-
-                         });
-                         res.send(ctree);
+                     var obj = {};
+                     for(var x in results){
+                       results[x].forEach(function(comp){
+                         obj[comp._id] = comp;
                        });
-      });
-    },
-    html: function(){
-      res.render('index');
-    }
+                     }
+
+                     //make a context tree (ctree)
+                     var ctree = results.context;
+                     ctree.forEach(function(c, i){
+                       
+                       //attach models
+                       c['model'] = [];
+                       var mylinks = links.filter(function(x){return x.context_id.equals(c._id)});
+
+                       mylinks.forEach(function(link){
+                         var model = {
+                           process: obj[link.process_id],
+                           link: link,
+                           theta: obj[link.theta_id]                           
+                         }
+                         
+                         c.model.push(model);
+                       });
+                       
+                     });
+
+
+                     res.format({
+                       json: function(){
+                         res.send(ctree);
+                       },
+                       html: function(){
+                         res.render('index', {ctree:ctree});
+                       }
+                     });
+
+                   });
   });
 
 };

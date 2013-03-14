@@ -12,7 +12,6 @@
 </div>
 
 
-
 <section>
 
 
@@ -23,73 +22,85 @@
     </div>
   </form>
 
-
-
   <div class="app-folders-container"> 
-    <% for(var i =0; i< 5; i++){ %>
+
+
+    <!-- the contexts -->
+    <% ctree.forEach(function(c, i){ %>
 
     <% if ( (i%3) === 0 ){ %>
     <div class="jaf-row jaf-container">
     <% } %>
-      <div class="folder context-box" id="f<%= i %>">
-        <a href="#">Measles Paris London</a>
-        <ul>
-          <li>10 models</li>
-          <li>5 contributors</li>
-        </ul>
-        <div id="graphdiv<%= i %>" class="context-graph"></div>
-        <select>
-          <option>CDC</option>
-          <option>Google</option>
-        </select>
-      </div>
+
+    <div class="folder context-box" id="<%= c._id %>">
+
+      <a href="#"><%= c.disease.join('; ') + ' / ' + c.name %></a>
+
+      <ul>
+        <li><%= c.model.length %> model<%= (c.model.length > 1) ? 's': '' %></li>
+        <li><%= (c.contributor && c.contributor.length) || 0 %> contributor<%= (c.contributor && (c.contributor.length > 1)) ? 's': '' %></li>
+      </ul>
+
+      <!-- placeholder for timeseries plot -->
+      <div id="graphdiv<%= i %>" class="context-graph"></div>
+
+      <select id="ts-picker-<%= i %>"  class="ts-picker">
+        <option value="-1">All time series</option>
+        <% c.time_series.forEach(function(ts, indts){ %>
+        <option value="<%= indts %>"><%= ts.id.split('__').join('; ') %></option>
+        <% }); %>
+      </select>
+    </div>
 
     <% if (((i+1) %3) === 0  || i === 4){ %>
     </div>
     <% } %>
-    <% } %>
+    <% }); %>
 
-    <% for (var i = 0; i< 5 ; i++) { %>          
-       <div class="folderContent f<%= i %>">
-         <div class="jaf-container">        
+    <!-- the models -->
+    <% ctree.forEach(function(c, i){ %>
+    <div class="folderContent <%= c._id %>">
+      <div class="jaf-container">        
 
-           <div class="horizontal-scroll">
-             <% for (var j = 0; j< 10 ; j++) { %>
-                <div class="model-box">
+        <div class="horizontal-scroll">
+          <% c.model.forEach(function(m, j){ %>
+          <div class="model-box">
+            
+            <a href="#"><%= m.process.name + ' / ' + m.link.name   %></a>
 
-                  <a href="#">name</a>
+            <!-- placeholder for d3 viz of compartmental model -->
+            <div id="pgraph<%= m.process._id %>" class="process-graph"></div>
+            
+            <div>score: <%= m.theta && m.theta.score %></div>
+            
+            <div class="parameter-box">
+                <% if (m.theta && m.theta.values) { %>
+                   <ul>                     
+                     <% for (var par in m.theta.values) { %>
+                     <li>
+                       <%= par %>:
+                       <ul>
+                         <% for (var group in m.theta.values[par]) { %>
+                         <li><%= group %> = <%= m.theta.values[par][group] %> </li>                   
+                         <% }; %>
+                       </ul>
+                     </li>
+                     <% }; %>
+                   </ul>
+                <% }; %>
+            </div>
 
-                  <% if(i===0){ %>
-                  <div id="pgraph<%= j %>" style="width:300px; height:200px;"></div>
-                  <% }else{ %>
-                  <img src="http://placehold.it/250x200" />              
-                  <% } %>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% }); %>
+    </div>
 
-                  
-                  <div>score</div>
-
-                  <div class="parameter-box">
-                    <ul>
-                      <% for (var k = 0; k< (j+1) ; k++) { %>
-                         <li>r0: 3</li>
-                         <li>v: 3</li>
-                         <li>e: 5</li>
-                         <li>r0: 3</li>
-                         <li>v: 3</li>
-                         <li>e: 5</li>
-                         <% } %>
-                    </ul>
-                  </div>
-                </div>
-                <% } %>
-           </div>
-         </div>
-         <% } %>
-       </div>
   </div>
 
 
-</section class="clear">
+</section>
 
 
 

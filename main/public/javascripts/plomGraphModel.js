@@ -1,5 +1,6 @@
 function plomGraphModel(process, graphId) {
-
+  var $el = $(graphId);
+  
   var graph = {nodes:[], links:[]};
 
   process.state.forEach(function(s, i){
@@ -50,14 +51,12 @@ function plomGraphModel(process, graphId) {
     graph.nodes.pop();
   }
 
-  var width = 250
-    , height = 200;
-
+  var width = $el.width()
+    , height = $el.height();
 
   var svg = d3.select(graphId).append("svg:svg")
     .attr("width", width)
     .attr("height", height);
-
 
   var n = graph.nodes.length;
   graph.nodes.forEach(function(d, i) {

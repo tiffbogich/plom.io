@@ -7,38 +7,47 @@ $(document).ready(function() {
   });
 
 
-  $.getJSON('/', function(answer) {
+  $.getJSON('/', function(ctree) {
 
-    console.log(answer);
+    ctree.forEach(function(c, indc){
 
-    var data = answer[0].data;
-    
-    data.forEach(function(x, i){
-      data[i] = [new Date(x[0]), x[1]];
+      var data = ctree[0].data;
+      
+      data.forEach(function(x, i){
+        x[0] = new Date(x[0]);
+      });
+
+      c['graph'] = new Dygraph($("#graphdiv" + indc)[0], data,
+                               {
+                                 drawXGrid: false,
+                                 drawYGrid: false,
+                                 animatedZooms: true,
+                                 axisLineColor:'white',
+                                 drawYAxis:false,
+                                 showLabelsOnHighlight:false,
+                                 highlightSeriesOpts: {
+                                   strokeWidth: 3,
+                                   highlightCircleSize: 5,
+                                 },
+                                 showRoller:false,
+                                 colors:['grey']
+                               });
+      
+      c.model.forEach(function(m){
+        plomGraphModel(m.process, "#pgraph"+m.process._id);
+      });      
+
     });
+    
+    $(".ts-picker").on('change', function(e){
+      var indc = parseInt($(this).attr('id').split('-')[2], 10)
+        , val = parseInt($(this).val(), 10);
+      
+      for(var i=0; i< ctree[indc].data[0].length-1; i++){                
+        ctree[indc].graph.setVisibility(i, (val!==-1 && i!==val) ? false : true);        
+      };
 
-    for (var i=0; i<5; i++) {
-      var g = new Dygraph($("#graphdiv" + i)[0], data,
-                          {
-                            drawXGrid: false,
-                            drawYGrid: false,
-                            animatedZooms: true,
-                            axisLineColor:'white',
-                            drawYAxis:false,
-                            //yAxisLabelWidth:20,
-                            showLabelsOnHighlight:false,
-                            showRoller:false,
-                            colors:['grey']
-                          });
-    };
-
-
-
-    for (var i=0; i<10; i++) {
-      plomGraphModel(answer[0].process[0], "#pgraph"+i);
-    }
- 
-
+    });
 
   });
 
