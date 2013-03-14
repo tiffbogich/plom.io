@@ -74,20 +74,27 @@
             <div>score: <%= m.theta && m.theta.score %></div>
             
             <div class="parameter-box">
-                <% if (m.theta && m.theta.values) { %>
-                   <ul>                     
-                     <% for (var par in m.theta.values) { %>
-                     <li>
-                       <%= par %>:
-                       <ul>
-                         <% for (var group in m.theta.values[par]) { %>
-                         <li><%= group %> = <%= m.theta.values[par][group] %> </li>                   
-                         <% }; %>
-                       </ul>
-                     </li>
-                     <% }; %>
-                   </ul>
+              <% if (m.theta && m.theta.value) { %>
+              <ul>                     
+                <% m.process.parameter.concat(m.process.state, m.link.parameter).forEach(function(par){  %>
+                <% if (par.id in m.theta.value) { %>
+                <li>
+                  <a href="#" class="plom-tooltip" data-placement="left" rel="tooltip" data-original-title="<%= m.theta.value[par.id].comment %>"><%= par.id %></a> :
+                    
+                  <% if(Object.keys(m.theta.value[par.id].guess).length >1 ) {%>
+                  <ul>
+                    <% for (var group in m.theta.value[par.id].guess) { %>
+                    <li><%= group.split('__').join('; ') %> = <%= m.theta.value[par.id].guess[group] %> </li>
+                    <% }; %>
+                  </ul>
+                  <% } else { %>
+                  <%= m.theta.value[par.id].guess[Object.keys(m.theta.value[par.id].guess)[0]] %>
+                  <% }; %>
+                </li>
                 <% }; %>
+                <% }); %>
+              </ul>
+              <% }; %>
             </div>
 
           </div>

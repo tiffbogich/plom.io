@@ -17,7 +17,7 @@ exports.index = function(req, res){
 
   var q = (req.body.q) ? dbUtil.querify(req.body.q, req.body.d) : {type: 'link'};
 
-  components.find(q, {context_id:1, process_id:1, theta_id:1, name:1, model:1, _id:0}).toArray(function(err, links){
+  components.find(q, {context_id:1, process_id:1, theta_id:1, name:1, parameter:1, model:1, _id:0}).toArray(function(err, links){
     if (err) return next(err);
     
     async.parallel({
@@ -52,7 +52,7 @@ exports.index = function(req, res){
       theta: function(callback){
         //only fetch the best theta!
         components
-          .find({_id: {$in: _.uniq(links.map(function(x){return x.theta_id;})) }, status:'best'})
+          .find({_id: {$in: _.uniq(_.flatten(links.map(function(x){return x.theta_id;}))) }}) //TODO restrict to status: 'best'
           .toArray(function(err, t){
             if (err) callback(err);
             
@@ -80,12 +80,15 @@ exports.index = function(req, res){
                        var mylinks = links.filter(function(x){return x.context_id.equals(c._id)});
 
                        mylinks.forEach(function(link){
+
                          var model = {
                            process: obj[link.process_id],
                            link: link,
-                           theta: obj[link.theta_id]                           
+                           theta: obj[link.theta_id.filter(function(x){return x in obj})[0]]
+                         }                         
+                         if(model.theta){
+                           describeTheta(model.theta, model.process, model.link);
                          }
-                         
                          c.model.push(model);
                        });
                        

@@ -2,7 +2,7 @@
  * add a comment property to the value dictionaries of theta.json
  */
 
-module.exports.describeTheta = function (theta, proc, obs) {
+module.exports.describeTheta = function (theta, proc, link) {
 
   var all_comments = {};
   ['state', 'parameter'].forEach(function(el){
@@ -11,7 +11,7 @@ module.exports.describeTheta = function (theta, proc, obs) {
     });
   });
 
-  obs.parameter.forEach(function(par){
+  link.parameter.forEach(function(par){
     all_comments[par.id] = par.comment || '';
   });
 
@@ -26,8 +26,8 @@ module.exports.describeTheta = function (theta, proc, obs) {
     var t = theta['value'][p]['type'] || null;
 
     var unit_string = ''
-    , constraint_string = ''
-    , comment_string = theta['value'][p]['comment'] || all_comments[p] || '';
+      , constraint_string = ''
+      , comment_string = theta['value'][p]['comment'] || all_comments[p] || '';
 
     if(u){
       unit_string = (t === 'rate_as_duration') ? ' in ' : ' per ';

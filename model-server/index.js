@@ -210,6 +210,7 @@ app.post('/publish', function(req, res, next){
 
       if(to_be_published.length){
 
+
         components.insert(to_be_published, {safe: true}, function(err, records){
           if(err) return next(err);
 

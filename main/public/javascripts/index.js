@@ -35,7 +35,7 @@ $(document).ready(function() {
       
       c.model.forEach(function(m){
         plomGraphModel(m.process, "#pgraph"+m.process._id);
-      });      
+      });
 
     });
     
@@ -48,6 +48,8 @@ $(document).ready(function() {
       };
 
     });
+
+    $('.plom-tooltip').tooltip({delay: { show: 100, hide: 100 }});
 
   });
 
