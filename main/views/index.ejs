@@ -36,10 +36,9 @@
 
       <a href="#"><%= c.disease.join('; ') + ' / ' + c.name %></a>
 
-      <ul>
-        <li><%= c.model.length %> model<%= (c.model.length > 1) ? 's': '' %></li>
-        <li><%= (c.contributor && c.contributor.length) || 0 %> contributor<%= (c.contributor && (c.contributor.length > 1)) ? 's': '' %></li>
-      </ul>
+      <p>
+        <%= c.model.length %> model<%= (c.model.length > 1) ? 's': ''%>; <%= (c.contributor && c.contributor.length) || 0 %> contributor<%= (c.contributor && (c.contributor.length > 1)) ? 's': '' %>
+      </p>
 
       <!-- placeholder for timeseries plot -->
       <div id="graphdiv<%= i %>" class="context-graph"></div>
@@ -50,6 +49,11 @@
         <option value="<%= indts %>"><%= ts.id.split('__').join('; ') %></option>
         <% }); %>
       </select>
+
+      <p>
+        <%=: c.description | truncate:30 %>
+      </p>
+
     </div>
 
     <% if (((i+1) %3) === 0  || i === 4){ %>
@@ -97,7 +101,7 @@
               <% }; %>
             </div>
 
-            Also involved in:
+            Involved in:
             <div class="related-box">
               <ul>
                 <% m.process.related.forEach(function(x){ %>

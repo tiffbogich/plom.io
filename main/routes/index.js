@@ -1,6 +1,5 @@
 var fs = require('fs')
   , describeTheta = require('../lib/helper').describeTheta
-  , PlomTrees = require('../../db').PlomTrees
   , check = require('validator').check
   , mongodb = require('mongodb')
   , spawn = require('child_process').spawn
@@ -12,21 +11,21 @@ var fs = require('fs')
 
 
 exports.index = function(req, res){
-  
+
   var components = req.app.get('components');
 
   var q = (req.body.q) ? dbUtil.querify(req.body.q, req.body.d) : {type: 'link'};
 
   components.find(q, {context_id:1, process_id:1, theta_id:1, name:1, parameter:1, model:1, _id:0}).toArray(function(err, links){
     if (err) return next(err);
-    
+
     async.parallel({
       context: function(callback){
         components
           .find({_id: {$in: _.uniq(links.map(function(x){return x.context_id;}))}})
           .toArray(function(err, c){
             if (err) callback(err);
-            
+
             //keep only the data as opposed to the meta data
             c.map(function(x, i){
               var data = x.data.filter(function(d){return d.id ==='data'})[0];
@@ -37,43 +36,43 @@ exports.index = function(req, res){
 
           });
       },
-      
+
       process: function(callback){
         components
           .find({_id: {$in: _.uniq(links.map(function(x){return x.process_id;})) }})
           .toArray(function(err, p){
             if (err) callback(err);
-            
+
             callback(null, p);
 
           });
-      }, 
-      
+      },
+
       theta: function(callback){
         //only fetch the best theta!
         components
           .find({_id: {$in: _.uniq(_.flatten(links.map(function(x){return x.theta_id;}))) }}) //TODO restrict to status: 'best'
           .toArray(function(err, t){
             if (err) callback(err);
-            
+
             callback(null, t);
 
           });
       },
-      
+
       //all the links related to the process model of the links matching our query
       related: function(callback){
         components
           .find({type: 'link', process_id: {$in: _.uniq(links.map(function(x){return x.process_id;}))}}, {context_disease:1, process_id:1})
           .toArray(function(err, r){
             if (err) callback(err);
-            
+
             callback(null, r);
           });
       },
 
 
-    }, 
+    },
                    function(err, results) {
                      if (err) return next(err);
 
@@ -85,7 +84,7 @@ exports.index = function(req, res){
                          });
                        }
                      }
-                     
+
                      //add related content (other diseases where the process model is also used)
                      results.related.forEach(function(r){
                        if('related' in obj[r.process_id]) {
@@ -99,7 +98,7 @@ exports.index = function(req, res){
                      //make a context tree (ctree)
                      var ctree = results.context;
                      ctree.forEach(function(c, i){
-                       
+
                        //attach models
                        c['model'] = [];
                        var mylinks = links.filter(function(x){return x.context_id.equals(c._id)});
@@ -110,13 +109,13 @@ exports.index = function(req, res){
                            process: obj[link.process_id],
                            link: link,
                            theta: obj[link.theta_id.filter(function(x){return x in obj})[0]]
-                         }                         
+                         }
                          if(model.theta){
                            describeTheta(model.theta, model.process, model.link);
                          }
                          c.model.push(model);
                        });
-                       
+
                      });
 
 
@@ -136,18 +135,23 @@ exports.index = function(req, res){
 
 
 
+exports.review = function(req, res){
+  res.render('review');
+}
 
 
-exports.trace = function(req, res, next){ 
+
+
+exports.trace = function(req, res, next){
 
   var diag = req.app.get('diag');
   //_id: new ObjectId(req.params._id)
 
-  diag.findOne({}, function(err, doc){        
+  diag.findOne({}, function(err, doc){
     res.set('Content-Type', doc["content-type"]);
     res.end(doc.data.buffer);
   });
-  
+
 }
 
 

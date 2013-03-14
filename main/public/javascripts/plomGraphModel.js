@@ -1,6 +1,6 @@
 function plomGraphModel(process, graphId) {
   var $el = $(graphId);
-  
+
   var graph = {nodes:[], links:[]};
 
   process.state.forEach(function(s, i){
@@ -38,7 +38,7 @@ function plomGraphModel(process, graphId) {
         });
 
       }
- 
+
       graph.links.push(myLink);
 
     } else if (r.from === 'U' && r.to !== 'U') {

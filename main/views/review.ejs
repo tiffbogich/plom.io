@@ -1,0 +1,189 @@
+<% include layout %>
+
+<div class="row">
+
+  <div class="span9">
+    <ul class="breadcrumb">
+      <li><a href="#">Disease</a> <span class="divider">/</span></li>
+      <li><a href="#">Context</a> <span class="divider">/</span></li>
+      <li class="active">Model</li>
+    </ul>
+  </div>
+
+  <div class="span3">
+    <div class="review-action">
+      <button class="btn" type="button"><i class="icon-eye-open"></i> Follow</button>
+      <button class="btn" type="button"><i class="icon-download"></i> Fork</button>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="row">
+
+  <!-- Plots -->
+  <div class="span7">
+
+    <!-- Trajectories plot -->
+    <div id="graphdivTraj"></div>
+
+    <!-- Diffusion plot (only for Kalman) -->
+    <div class="accordion" id="plotKalman">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plot" href="#plotKalmanContent">Diffusion</a>
+        </div>
+
+        <div id="plotKalmanContent" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <div id="graphdivKalman"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- likelihood and ESS plots -->
+    <div class="accordion" id="plotLike">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plot" href="#plotLikeContent">Likelihood</a>
+        </div>
+        <div id="plotLikeContent" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <div id="graphdivLike"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- Controls -->
+  <div class="span5">
+
+    <div>
+      <button class="btn" type="button"><i class="icon-play"></i> Run</button>
+      <button class="btn" type="button"><i class="icon-remove"></i> Stop</button>
+      <button class="btn" type="button"><i class="icon-file"></i> Attach to comment</button>
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="row">
+  <div class="span12">
+
+    <ul class="nav nav-tabs" id="reviewTab">
+      <li class="active">
+        <a href="#theta" data-toggle="tab">Theta</a>
+      </li>
+      <li>
+        <a href="#model" data-toggle="tab">Model</a>
+      </li>
+    </ul>
+    
+    <div class="tab-content">
+
+      <div class="tab-pane active" id="theta">
+
+        <!-- theta accordion -->
+        <div class="accordion" id="thetaOption">
+
+          <!-- Best parameter set found -->
+          <div class="accordion-group">
+            <div class="accordion-heading">
+              <a class="accordion-toggle" data-toggle="collapse" data-parent="#thetaOption" href="#best">Best</a>
+            </div>
+
+            <div id="best" class="accordion-body collapse in">
+              <div class="accordion-inner">
+
+                <div class="row">
+                  <div class="span5">
+                    <h3>Scores</h3>
+                  </div>
+                  <div class="span6">
+                    <h3>Discussion</h3>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+
+          <!-- Parameters set in review -->
+          <div class="accordion-group">
+            <div class="accordion-heading">
+              <a class="accordion-toggle" data-toggle="collapse" data-parent="#thetaOption" href="#pending">Pending</a>
+            </div>
+
+            <div id="pending" class="accordion-body collapse">
+              <div class="accordion-inner">
+                
+
+                <div class="row">
+                  <div class="span5">
+                    <h3>Pending theta</h3>
+                  </div>
+                  <div class="span6">
+                    <h3>Quality control</h3>
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Previous best parameter values -->
+          <div class="accordion-group">
+            <div class="accordion-heading">
+              <a class="accordion-toggle" data-toggle="collapse" data-parent="#thetaOption" href="#history">History</a>
+            </div>
+
+            <div id="history" class="accordion-body collapse">
+              <div class="accordion-inner">
+                Previous best theta values
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Model review -->
+      <div class="tab-pane" id="model">
+
+        <div class="row">
+
+          <div class="span6">
+
+            <h3>Context</h3>
+
+            <h3>Process Model</h3>
+
+            <h3>Observation Model</h3>
+
+          </div>
+
+          <div class="span6">
+            <h3>Discussion</h3>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<% include footer %>

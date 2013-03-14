@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
   $('.app-folders-container').appFolders();
-  
+
   $('.context-graph').click(function(e){
     e.stopPropagation();
   });
@@ -16,7 +16,7 @@ $(document).ready(function() {
     ctree.forEach(function(c, indc){
 
       var data = c.data;
-      
+
       data.forEach(function(x, i){
         x[0] = new Date(x[0]);
       });
@@ -30,25 +30,24 @@ $(document).ready(function() {
                                  drawYAxis:false,
                                  showLabelsOnHighlight:false,
                                  highlightSeriesOpts: {
-                                   strokeWidth: 3,
-                                   highlightCircleSize: 5,
+                                   strokeWidth: 2
                                  },
                                  showRoller:false,
                                  colors:['grey']
                                });
-      
+
       c.model.forEach(function(m){
         plomGraphModel(m.process, "#pgraph"+m.process._id);
       });
 
     });
-    
+
     $(".ts-picker").on('change', function(e){
       var indc = parseInt($(this).attr('id').split('-')[2], 10)
         , val = parseInt($(this).val(), 10);
-      
-      for(var i=0; i< ctree[indc].data[0].length-1; i++){                
-        ctree[indc].graph.setVisibility(i, (val!==-1 && i!==val) ? false : true);        
+
+      for(var i=0; i< ctree[indc].data[0].length-1; i++){
+        ctree[indc].graph.setVisibility(i, (val!==-1 && i!==val) ? false : true);
       };
 
     });

@@ -1,0 +1,15 @@
+{
+  "name": "ws-server",
+  "version": "0.0.0",
+  "description": "ERROR: No README.md file found!",
+  "main": "plomWsServer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "Sebastien Ballesteros",
+  "license": "GPLv3",
+  "dependencies": {
+    "socket.io": "~0.9.13"
+  }
+}
