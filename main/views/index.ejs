@@ -17,7 +17,7 @@
 
   <form>
     <div class="input-append">
-      <input type="text" name="q" class="input-xlarge"/>
+      <input type="text" name="q" class="input-xlarge" id="plom-search"/>
       <button type="submit" class="btn">Search</button>
     </div>
   </form>
@@ -73,7 +73,7 @@
             <a href="#"><%= m.process.name + ' / ' + m.link.name   %></a>
 
             <!-- placeholder for d3 viz of compartmental model -->
-            <div id="pgraph<%= m.process._id %>" class="process-graph"></div>
+            <div id="pgraph<%= m.link._id %>" class="process-graph"></div>
             
             <div>score: <%= m.theta && m.theta.score %></div>
             

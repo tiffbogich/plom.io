@@ -37,7 +37,7 @@ $(document).ready(function() {
                                });
 
       c.model.forEach(function(m){
-        plomGraphModel(m.process, "#pgraph"+m.process._id);
+        plomGraphModel(m.process, "#pgraph"+m.link._id);
       });
 
     });

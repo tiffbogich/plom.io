@@ -5,7 +5,12 @@
 }
 
 
+
 /* index */
+#plom-search{
+  width:294px;
+}
+
 .folderContent{
   padding: 10px;
   border-radius: 1em;

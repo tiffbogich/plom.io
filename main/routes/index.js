@@ -16,8 +16,9 @@ exports.index = function(req, res){
 
   var q = (req.body.q) ? dbUtil.querify(req.body.q, req.body.d) : {type: 'link'};
 
-  components.find(q, {context_id:1, process_id:1, theta_id:1, name:1, parameter:1, model:1, _id:0}).toArray(function(err, links){
+  components.find(q, {context_id:1, process_id:1, theta_id:1, name:1, parameter:1, model:1}).toArray(function(err, links){
     if (err) return next(err);
+
 
     async.parallel({
       context: function(callback){
@@ -102,7 +103,6 @@ exports.index = function(req, res){
                        //attach models
                        c['model'] = [];
                        var mylinks = links.filter(function(x){return x.context_id.equals(c._id)});
-
                        mylinks.forEach(function(link){
 
                          var model = {
@@ -136,7 +136,35 @@ exports.index = function(req, res){
 
 
 exports.review = function(req, res){
-  res.render('review');
+
+  var components = req.app.get('components');
+  components.findOne({type:'theta'}, function(err, theta){
+    if (err) return next(err);
+
+    res.format({
+      json: function(){
+        //quick and dirty (TODO browserify and compiled templates...)
+        res.json({
+          tpl:{
+            control:fs.readFileSync(path.join(req.app.get('views'),'review_tpl','control.ejs'), 'utf8')
+          }, 
+          theta: theta
+        });
+      },
+      html: function(){
+        res.render('review');
+      }
+    });
+
+
+    
+  });
+
+
+
+
+
+
 }
 
 
