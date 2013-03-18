@@ -1,5 +1,12 @@
 <% include layout %>
 
+<script src="/javascripts/plomGraphModel.js"></script>
+<script src="/javascripts/index.js"></script>
+
+<% include header %>
+
+
+
 <a href="https://github.com/plom"><img style="position:absolute; top:42px; right:0;  border: 0;" src="images/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
 
 <div class="row">
@@ -74,6 +81,13 @@
 
             <!-- placeholder for d3 viz of compartmental model -->
             <div id="pgraph<%= m.link._id %>" class="process-graph"></div>
+
+            <form action="/" method="POST" class="explore">
+              <input type="hidden" name="context" value="<%= c._id %>" />
+              <input type="hidden" name="process" value="<%= m.process._id %>" />
+              <input type="hidden" name="link" value="<%= m.link._id %>" />
+              <input type="submit" value="Explore" />
+            </form>
             
             <div>score: <%= m.theta && m.theta.score %></div>
             
@@ -88,7 +102,7 @@
                   <% if(Object.keys(m.theta.value[par.id].guess).length >1 ) {%>
                   <ul>
                     <% for (var group in m.theta.value[par.id].guess) { %>
-                    <li><%= group.split('__').join('; ') %> = <%= m.theta.value[par.id].guess[group] %> </li>
+                    <li><%= group.split('__').join('; ') %>: <%= m.theta.value[par.id].guess[group] %> </li>
                     <% }; %>
                   </ul>
                   <% } else { %>

@@ -1,0 +1,27 @@
+  </head>
+
+  <body onload="prettyPrint()">
+
+    <div class="navbar">
+      <div class="navbar-inner">
+        <a href="/" class="brand"><img src="/images/logo-small.png"></a>
+        <ul class="nav">
+          <li> <a href="/library">Library</a> </li>
+          <li> <a href="#">Social</a> </li>
+          <li> <a href="/doc">Documentation</a></li>
+        </ul>
+
+        <ul class="nav pull-right">
+          <% if(locals.is_logged_in) { %>
+          <li> <a href="/logout">Logout</a> </li>
+          <% } else { %>
+          <li> <a href="/login">Login</a> </li>
+          <li> <a href="/register">Register</a> </li>
+          <% } %>
+        </ul>
+
+      </div>
+
+    </div>
+
+    <div class="container">

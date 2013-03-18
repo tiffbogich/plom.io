@@ -7,7 +7,7 @@ var express = require('express')
   , fs = require('fs')
   , http = require('http')
   , mongodb = require('mongodb')
-  , sfrWsServer = require('../ws-server/plomWsServer')
+  , plomWsServer = require('../ws-server/plomWsServer')
   , plomAuth = require('../authentification/app')
   , csrf = require('../authentification/lib/middleware').csrf
   , is_logged_in = require('../authentification/lib/middleware').is_logged_in
@@ -56,7 +56,7 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
-app.post('/', routes.index);
+app.post('/', routes.postIndex);
 app.get('/review', routes.review);
 app.get('/trace/:_id', routes.trace);
 //app.get('/context', secure, routes.context);
@@ -85,7 +85,7 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   });
 
   //attach socket.io
-//  sfrWsServer.listen(server);
+  plomWsServer.listen(server);
 
 });
 

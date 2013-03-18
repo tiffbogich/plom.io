@@ -133,39 +133,105 @@ exports.index = function(req, res){
 
 };
 
+/**
+ * POST request: Build model (if needed) and redirect to review 
+ */
+exports.postIndex = function(req, res, next){
 
+  var c = req.session.context = req.body.context
+    , p = req.session.process = req.body.process
+    , l = req.session.link = req.body.link;
+ 
+  var buildPath = path.join('builds', l, 'model');
+  
+  fs.exists(buildPath, function(exists){
 
-exports.review = function(req, res){
+    if (exists) {
+      res.redirect('/review');      
+    } else {
 
-  var components = req.app.get('components');
-  components.findOne({type:'theta'}, function(err, theta){
-    if (err) return next(err);
+      var components = req.app.get('components');
 
-    res.format({
-      json: function(){
-        //quick and dirty (TODO browserify and compiled templates...)
-        res.json({
-          tpl:{
-            control:fs.readFileSync(path.join(req.app.get('views'),'review_tpl','control.ejs'), 'utf8')
-          }, 
-          theta: theta
+      components.find({_id: {$in: [c, p, l].map(function(x){return new ObjectID(x);})}}).toArray(function(err, docs){
+        if (err) return next(err);
+
+        var model = {};
+        docs.forEach(function(x){
+          model[x.type] = x;          
         });
-      },
-      html: function(){
-        res.render('review');
-      }
-    });
+       
+        var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '-o', buildPath]);
+        pmbuilder.stdin.write(JSON.stringify(model)+'\n', encoding="utf8");
 
+        pmbuilder.on('exit', function (code_pmbuilder) {
+          if(code_pmbuilder === 0) {
+            var make = spawn('make', ['CC=gcc-4.7', 'install'], {cwd:path.join(buildPath, 'C', 'templates')});
+            
+            make.on('exit', function (code_make) {            
+              if(code_make === 0){
+                res.redirect('/review');      
+              } else {
+                return next(new Error('make error ' + code_make));
+              }            
+            });
+          } else {
+            return next(new Error('pmbuilder error ' + code_pmbuilder));
+          }
+        });
 
-    
+      });
+    }
   });
 
+};
 
 
+exports.review = function(req, res, next){
 
+  var c = req.session.context
+    , p = req.session.process
+    , l = req.session.link;
 
+  //TODO check session exists
 
-}
+  res.format({
+    html: function(){
+      res.render('review');
+    },
+
+    json: function(){
+
+      var components = req.app.get('components');
+
+      components.find({_id: {$in: [c, p, l].map(function(x){return new ObjectID(x);})}}).toArray(function(err, docs){
+        if (err) return next(err);
+
+        var comps = {};
+        docs.forEach(function(x){
+          comps[x.type] = x;          
+        });
+        
+        components
+          .find({_id: {$in: comps.link.theta_id}})
+          .toArray(function(err, thetas){
+            if (err) next(err);
+
+            comps.thetas = thetas;
+            res.json({
+              tpl:{
+                control:fs.readFileSync(path.join(req.app.get('views'),'review_tpl','control.ejs'), 'utf8')
+              }, 
+              comps: comps
+            });
+
+          });
+        
+      });
+
+    },
+  });
+
+};
 
 
 

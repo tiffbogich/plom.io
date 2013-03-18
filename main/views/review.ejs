@@ -1,5 +1,11 @@
 <% include layout %>
 
+<script src="/javascripts/PlomTs.js"></script>
+<script src="/javascripts/review.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<% include header %>
+
 <div class="row">
 
   <div class="span9">
@@ -26,18 +32,18 @@
   <div class="span7">
 
     <!-- Trajectories plot -->
-    <div id="graphdivTraj"></div>
+    <div id="graphTraj"></div>
 
-    <!-- Diffusion plot (only for Kalman) -->
+    <!-- Diffusion plot -->
     <div class="accordion" id="plotKalman">
       <div class="accordion-group">
         <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plot" href="#plotKalmanContent">Diffusion</a>
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotDiffusion" href="#plotDiffusionContent">Diffusion</a>
         </div>
 
-        <div id="plotKalmanContent" class="accordion-body collapse">
+        <div id="plotDiffusionContent" class="accordion-body collapse">
           <div class="accordion-inner">
-            <div id="graphdivKalman"></div>
+            <div id="graphDiffusion"></div>
           </div>
         </div>
       </div>
@@ -47,16 +53,15 @@
     <div class="accordion" id="plotLike">
       <div class="accordion-group">
         <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plot" href="#plotLikeContent">Likelihood</a>
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotLike" href="#plotLikeContent">Likelihood</a>
         </div>
         <div id="plotLikeContent" class="accordion-body collapse">
           <div class="accordion-inner">
-            <div id="graphdivLike"></div>
+            <div id="graphLike"></div>
           </div>
         </div>
       </div>
     </div>
-
 
   </div>
 
@@ -64,17 +69,18 @@
   <div class="span5">
 
     <div>
-      <button class="btn" type="button"><i class="icon-play"></i> Run</button>
-      <button class="btn" type="button"><i class="icon-remove"></i> Stop</button>
+      <button id="run" class="btn" type="button"><i class="icon-play"></i> Run</button>
+      <button id="stop" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
       <button class="btn" type="button"><i class="icon-file"></i> Attach to comment</button>
     </div>
 
-    <div id="control">
-    </div>
+    <div id="control"></div>
 
   </div>
 
 </div>
+
+
 
 
 <div class="row">
@@ -82,7 +88,7 @@
 
     <ul class="nav nav-tabs" id="reviewTab">
       <li class="active">
-        <a href="#theta" data-toggle="tab">Theta</a>
+        <a href="#theta" data-toggle="tab">Parameters</a>
       </li>
       <li>
         <a href="#model" data-toggle="tab">Model</a>
@@ -133,10 +139,11 @@
                     <h3>Pending theta</h3>
                   </div>
                   <div class="span6">
-                    <h3>Quality control</h3>
+                    <h3>Feedback</h3>
+
+                    <h3>Discussion</h3>
                   </div>
                 </div>
-
 
               </div>
             </div>
@@ -150,12 +157,23 @@
 
             <div id="history" class="accordion-body collapse">
               <div class="accordion-inner">
-                Previous best theta values
+
+                <div class="row">
+                  <div class="span5">
+                    <h3>Scores</h3>
+                  </div>
+                  <div class="span6">
+                    <h3>Discussion</h3>
+                  </div>
+                </div>
+
+
               </div>
             </div>
           </div>
 
         </div>
+
       </div>
 
       <!-- Model review -->
