@@ -1,0 +1,116 @@
+[
+ {
+ "Publisher": "NATURE PUBLISHING GROUP",
+"Journal": "NATUREREVIEWSMOLECULARCELLBIOLOGY",
+"IF": "39.123",
+"Image": "natrev.jpg" 
+},
+{
+ "Publisher": "CELL PRESS",
+"Journal": "CELL",
+"IF": "32.403",
+"Image": "Cell_Journal.jpg" 
+},
+{
+ "Publisher": "NATURE PUBLISHING GROUP",
+"Journal": "NATUREMEDICINE",
+"IF": "22.462",
+"Image": "nature_med.jpg" 
+},
+{
+ "Publisher": "WILEY-BLACKWELL",
+"Journal": "ECOLOGYLETTERS",
+"IF": "17.557",
+"Image": "ecol_lett.jpg" 
+},
+{
+ "Publisher": "ELSEVIER SCIENCE LONDON",
+"Journal": "LANCETINFECTIOUSDISEASES",
+"IF": "17.391",
+"Image": "lancet_id.jpg" 
+},
+{
+ "Publisher": "ELSEVIER SCIENCE LONDON",
+"Journal": "TRENDSINECOLOGY&EVOLUTION",
+"IF": "15.748",
+"Image": "TREE.jpg" 
+},
+{
+ "Publisher": "CELL PRESS",
+"Journal": "Cellhostandmicrobe",
+"IF": "13.5",
+"Image": "cell_host_microbe.jpg" 
+},
+{
+ "Publisher": "ROYAL SOC",
+"Journal": "PHILOSOPHICALTRANSACTIONSOFTHEROYALSOCIETYB-BIOLOGICALSCIENCES",
+"IF": "6.401",
+"Image": "philtransB.jpg" 
+},
+{
+ "Publisher": "BIOMED CENTRAL LTD",
+"Journal": "BMCBIOLOGY",
+"IF": "5.75",
+"Image": "bmc_bop.jpg" 
+},
+{
+ "Publisher": "CENTERS DISEASE CONTROL",
+"Journal": "EMERGINGINFECTIOUSDISEASES",
+"IF": "6.169",
+"Image": "EID.jpg" 
+},
+{
+ "Publisher": "PUBLIC LIBRARY SCIENCE",
+"Journal": "PLOSBIOLOGY",
+"IF": "11.452",
+"Image": "PLOSbio.jpg" 
+},
+{
+ "Publisher": "CELL PRESS",
+"Journal": "CURRENTBIOLOGY",
+"IF": "9.647",
+"Image": "currbio.jpg" 
+},
+{
+ "Publisher": "ECOLOGICAL SOCIETY OF AMERICA",
+"Journal": "FRONTIERSINECOLOGYANDTHEENVIRONMENT",
+"IF": "9.113",
+"Image": "frontiers.jpg" 
+},
+{
+ "Publisher": "AMER SOC PLANT BIOLOGISTS",
+"Journal": "PLANTCELL",
+"IF": "8.987",
+"Image": "plantcell.jpg" 
+},
+{
+ "Publisher": "ECOLOGICAL SOCIETY OF AMERICA",
+"Journal": "ECOLOGICALMONOGRAPHS",
+"IF": "7.433",
+"Image": "ecomono.jpg" 
+},
+{
+ "Publisher": "WILEY-BLACKWELL",
+"Journal": "GLOBALCHANGEBIOLOGY",
+"IF": "6.862",
+"Image": "gcb.jpg" 
+},
+{
+ "Publisher": "WILEY-BLACKWELL",
+"Journal": "EVOLUTION",
+"IF": "5.146",
+"Image": "evo.jpg" 
+},
+{
+ "Publisher": "WILEY-BLACKWELL",
+"Journal": "JOURNALOFAPPLIEDECOLOGY",
+"IF": "5.025",
+"Image": "jae.jpg" 
+},
+{
+ "Publisher": "ELSEVIER SCIENCE LONDON",
+"Journal": "TRENDSINPLANTSCIENCE",
+"IF": "11.047",
+"Image": "tps.jpg" 
+} 
+]
