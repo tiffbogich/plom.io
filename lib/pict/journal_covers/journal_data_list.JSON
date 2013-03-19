@@ -1,7 +1,7 @@
 [
  {
  "Publisher": "NATURE PUBLISHING GROUP",
-"Journal": "NATUREREVIEWSMOLECULARCELLBIOLOGY",
+"Journal": "NATURE REVIEWS MOLECULAR CELL BIOLOGY",
 "IF": "39.123",
 "Image": "natrev.jpg" 
 },
@@ -13,85 +13,85 @@
 },
 {
  "Publisher": "NATURE PUBLISHING GROUP",
-"Journal": "NATUREMEDICINE",
+"Journal": "NATURE MEDICINE",
 "IF": "22.462",
 "Image": "nature_med.jpg" 
 },
 {
  "Publisher": "WILEY-BLACKWELL",
-"Journal": "ECOLOGYLETTERS",
+"Journal": "ECOLOGY LETTERS",
 "IF": "17.557",
 "Image": "ecol_lett.jpg" 
 },
 {
  "Publisher": "ELSEVIER SCIENCE LONDON",
-"Journal": "LANCETINFECTIOUSDISEASES",
+"Journal": "LANCET INFECTIOUS DISEASES",
 "IF": "17.391",
 "Image": "lancet_id.jpg" 
 },
 {
  "Publisher": "ELSEVIER SCIENCE LONDON",
-"Journal": "TRENDSINECOLOGY&EVOLUTION",
+"Journal": "TRENDS IN ECOLOGY & EVOLUTION",
 "IF": "15.748",
 "Image": "TREE.jpg" 
 },
 {
  "Publisher": "CELL PRESS",
-"Journal": "Cellhostandmicrobe",
+"Journal": "CELL HOST AND MICROBE",
 "IF": "13.5",
 "Image": "cell_host_microbe.jpg" 
 },
 {
  "Publisher": "ROYAL SOC",
-"Journal": "PHILOSOPHICALTRANSACTIONSOFTHEROYALSOCIETYB-BIOLOGICALSCIENCES",
+"Journal": "PHILOSOPHICAL TRANSACTIONS OF THE ROYAL SOCIETY B-BIOLOGICAL SCIENCES",
 "IF": "6.401",
 "Image": "philtransB.jpg" 
 },
 {
  "Publisher": "BIOMED CENTRAL LTD",
-"Journal": "BMCBIOLOGY",
+"Journal": "BMC BIOLOGY",
 "IF": "5.75",
 "Image": "bmc_bop.jpg" 
 },
 {
  "Publisher": "CENTERS DISEASE CONTROL",
-"Journal": "EMERGINGINFECTIOUSDISEASES",
+"Journal": "EMERGING INFECTIOUS DISEASES",
 "IF": "6.169",
 "Image": "EID.jpg" 
 },
 {
  "Publisher": "PUBLIC LIBRARY SCIENCE",
-"Journal": "PLOSBIOLOGY",
+"Journal": "PLOS BIOLOGY",
 "IF": "11.452",
 "Image": "PLOSbio.jpg" 
 },
 {
  "Publisher": "CELL PRESS",
-"Journal": "CURRENTBIOLOGY",
+"Journal": "CURRENT BIOLOGY",
 "IF": "9.647",
 "Image": "currbio.jpg" 
 },
 {
  "Publisher": "ECOLOGICAL SOCIETY OF AMERICA",
-"Journal": "FRONTIERSINECOLOGYANDTHEENVIRONMENT",
+"Journal": "FRONTIERS IN ECOLOGY AND THE ENVIRONMENT",
 "IF": "9.113",
 "Image": "frontiers.jpg" 
 },
 {
  "Publisher": "AMER SOC PLANT BIOLOGISTS",
-"Journal": "PLANTCELL",
+"Journal": "PLANT CELL",
 "IF": "8.987",
 "Image": "plantcell.jpg" 
 },
 {
  "Publisher": "ECOLOGICAL SOCIETY OF AMERICA",
-"Journal": "ECOLOGICALMONOGRAPHS",
+"Journal": "ECOLOGICAL MONOGRAPHS",
 "IF": "7.433",
 "Image": "ecomono.jpg" 
 },
 {
  "Publisher": "WILEY-BLACKWELL",
-"Journal": "GLOBALCHANGEBIOLOGY",
+"Journal": "GLOBAL CHANGE BIOLOGY",
 "IF": "6.862",
 "Image": "gcb.jpg" 
 },
@@ -103,13 +103,13 @@
 },
 {
  "Publisher": "WILEY-BLACKWELL",
-"Journal": "JOURNALOFAPPLIEDECOLOGY",
+"Journal": "JOURNAL OF APPLIED ECOLOGY",
 "IF": "5.025",
 "Image": "jae.jpg" 
 },
 {
  "Publisher": "ELSEVIER SCIENCE LONDON",
-"Journal": "TRENDSINPLANTSCIENCE",
+"Journal": "TRENDS IN PLANT SCIENCE",
 "IF": "11.047",
 "Image": "tps.jpg" 
 } 

@@ -1,4 +1,4 @@
-jcv<-read.csv("~/Dropbox/Tiff Laptop Files/Plom_Files/website/journal_covers/journal_data.csv")
+jcv<-read.csv("~/plom.io/lib/pict/journal_covers/journal_data.csv")
 
 jlist<-list()
 for(i in 1:nrow(jcv)){
@@ -8,5 +8,5 @@ for(i in 1:nrow(jcv)){
 	Image=as.character(jcv[i,4]))
 }
 
-write(toJSON(jlist),"~/Dropbox/Tiff Laptop Files/Plom_Files/website/journal_covers/journal_data_list.JSON")
-write(toJSON(jcv),"~/Dropbox/Tiff Laptop Files/Plom_Files/website/journal_covers/journal_data.JSON")
+write(toJSON(jlist),"~/plom.io/lib/pict/journal_covers/journal_data_list.JSON")
+write(toJSON(jcv),"~/plom.io/lib/pict/journal_covers/journal_data.JSON")
