@@ -75,15 +75,14 @@ function dispatch(data, socket, partMsg, emitFlag){
     //send data (JSON strings) received from the C prog to the websocket.
     //potential difficulties, the data can contain only a partial JSON string or several strings separated by \n
 
-    var mydata = data.toString('utf8');
     var dataArray;
 
     //we concatenate cut messages:
-    if (mydata[mydata.length-1] === '\n'){
-        mydata = partMsg.msg + mydata;
+    if (data[data.length-1] === '\n'){
+        data = partMsg.msg + data;
         partMsg.msg = '';
 
-        dataArray = mydata.split('\n');
+        dataArray = data.split('\n');
 
         for(var i=0; i< dataArray.length ; i++){
             if(dataArray[i]){
@@ -95,7 +94,7 @@ function dispatch(data, socket, partMsg, emitFlag){
         }
     }
     else{ //message is incomplete, we wait for the next part...
-        partMsg.msg = partMsg.msg + mydata;
+        partMsg.msg = partMsg.msg + data;
     }
 
 };
@@ -103,15 +102,14 @@ function dispatch(data, socket, partMsg, emitFlag){
 function handleErrUpd(prog, data, socket, partErr, updateMsg, emitFlag){
     //handles errors and updates
 
-    var mydata = data.toString('utf8');
     var dataArray;
 
     //we concatenate cut messages:
-    if (mydata[mydata.length-1] === '\n'){
-        mydata = partErr.msg + mydata;
+    if (data[data.length-1] === '\n'){
+        data = partErr.msg + data;
         partErr.msg = '';
 
-        dataArray = mydata.split('\n');
+        dataArray = data.split('\n');
         //	console.log(dataArray);
 
         for(var i=0; i< dataArray.length ; i++){
@@ -152,7 +150,7 @@ function handleErrUpd(prog, data, socket, partErr, updateMsg, emitFlag){
         }
     }
     else{ //message is incomplete, we wait for the next part...
-        partErr.msg = partErr.msg + mydata;
+        partErr.msg = partErr.msg + data;
     }
 
 };
@@ -179,21 +177,24 @@ function wsServer(server) {
                        lag: 10}; //we wait at least lag ms in between msg in order not to saturate the client with msgs
 
       if(plomProg.hasOwnProperty(whatToDo.exec.exec)){
-        var path_rendered = path.join(process.env.HOME, 'plom_models', whatToDo.plomModelId.join('/'));
-        var prog = spawn(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: path_rendered});
+        var cwd = path.join(process.env.HOME, 'built_plom_models', whatToDo.plomModelId, 'model');
+        var prog = spawn(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: cwd});
+        prog.stdout.setEncoding('utf8');
+        prog.stderr.setEncoding('utf8');
+
         runningProgs.add(prog);
 
-        console.log(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: path_rendered});
+        console.log(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: cwd});
         console.log(prog.pid);
         prog.stdin.write(JSON.stringify(whatToDo.theta)+'\n', encoding="utf8");
 
         prog.stderr.on('data', function (data) {
-          //                    console.log(data.toString('utf8'));
+          //console.log(data.toString('utf8'));
           handleErrUpd(prog, data, socket, partErr, updateMsg, plomProg[whatToDo.exec.exec]['flag']);
         });
         //
         prog.stdout.on('data', function (data) {
-          //                    console.log(data.toString('utf8'));
+          //console.log(data.toString('utf8'));
           dispatch(data, socket, partMsg, plomProg[whatToDo.exec.exec]['flag']);
         });
 

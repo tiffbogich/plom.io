@@ -11,7 +11,7 @@ $(document).ready(function() {
 
     var compiled = _.template(data.tpl.control);
 
-    $('#control').html(compiled({c:c, p:p, l:l, t:t[0]}));    
+    $('#control').html(compiled({c:c, p:p, l:l, t:t[0]}));
 
     //start with Parameter tab
     $('#reviewTab a[href=#theta]').tab('show');
@@ -21,8 +21,8 @@ $(document).ready(function() {
       process:p,
       link:l,
       theta:t[0],
-      graphTrajId: 'graphTraj', 
-      graphDiffusionId: 'graphDiffusion',
+      graphTrajId: 'graphTraj',
+      graphStateId: 'graphState',
       graphLikeId: "graphLike"
     });
 
@@ -66,10 +66,6 @@ $(document).ready(function() {
           plomTs.processMsg(msg);
         });
 
-        socket.on('simul', function (msg) {
-          plomTs.processMsg(msg);
-        });
-
         socket.on('info', function (msg) {
           console.log(msg.msg);
         });
@@ -82,11 +78,11 @@ $(document).ready(function() {
           }
 
           //be sure that the graph contain all the data (the graph is only updated every x msgs)
-          if(plomTs.graph_drift){
-            plomTs.graph_drift.updateOptions( { 'file': plomTs.data_drift } );
+          if(plomTs.graphState){
+            plomTs.graphState.updateOptions( { 'file': plomTs.dataState } );
           }
-          if(plomTs.data_ts){
-            plomTs.graph_ts.updateOptions( { 'file': plomTs.data_ts } );
+          if(plomTs.dataTraj){
+            plomTs.graphTraj.updateOptions( { 'file': plomTs.dataTraj } );
           }
 
           plomGlobal.canRun = true;
@@ -105,7 +101,7 @@ $(document).ready(function() {
       $("#run").click(function(){
         if(plomGlobal.canRun){
           plomGlobal.canRun = false;
-          run(socket, plomTs);
+          plomTs.run(socket, {method:'simul', implementation: 'psr', J:100});
         }
       });
 

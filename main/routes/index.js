@@ -134,20 +134,20 @@ exports.index = function(req, res){
 };
 
 /**
- * POST request: Build model (if needed) and redirect to review 
+ * POST request: Build model (if needed) and redirect to review
  */
 exports.postIndex = function(req, res, next){
 
   var c = req.session.context = req.body.context
     , p = req.session.process = req.body.process
     , l = req.session.link = req.body.link;
- 
-  var buildPath = path.join('builds', l, 'model');
-  
+
+  var buildPath = path.join(process.env.HOME, 'built_plom_models', l, 'model');
+
   fs.exists(buildPath, function(exists){
 
     if (exists) {
-      res.redirect('/review');      
+      res.redirect('/review');
     } else {
 
       var components = req.app.get('components');
@@ -157,22 +157,22 @@ exports.postIndex = function(req, res, next){
 
         var model = {};
         docs.forEach(function(x){
-          model[x.type] = x;          
+          model[x.type] = x;
         });
-       
+
         var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '-o', buildPath]);
         pmbuilder.stdin.write(JSON.stringify(model)+'\n', encoding="utf8");
 
         pmbuilder.on('exit', function (code_pmbuilder) {
           if(code_pmbuilder === 0) {
             var make = spawn('make', ['CC=gcc-4.7', 'install'], {cwd:path.join(buildPath, 'C', 'templates')});
-            
-            make.on('exit', function (code_make) {            
+
+            make.on('exit', function (code_make) {
               if(code_make === 0){
-                res.redirect('/review');      
+                res.redirect('/review');
               } else {
                 return next(new Error('make error ' + code_make));
-              }            
+              }
             });
           } else {
             return next(new Error('pmbuilder error ' + code_pmbuilder));
@@ -208,9 +208,9 @@ exports.review = function(req, res, next){
 
         var comps = {};
         docs.forEach(function(x){
-          comps[x.type] = x;          
+          comps[x.type] = x;
         });
-        
+
         components
           .find({_id: {$in: comps.link.theta_id}})
           .toArray(function(err, thetas){
@@ -220,12 +220,12 @@ exports.review = function(req, res, next){
             res.json({
               tpl:{
                 control:fs.readFileSync(path.join(req.app.get('views'),'review_tpl','control.ejs'), 'utf8')
-              }, 
+              },
               comps: comps
             });
 
           });
-        
+
       });
 
     },

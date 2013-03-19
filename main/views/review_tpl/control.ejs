@@ -1,96 +1,98 @@
-<div class="accordion" id="methods">
+<ul class="nav nav-tabs" id="controlTab">
+  <li class="active">
+    <a href="#ctr-methods" data-toggle="tab">Methods</a>
+  </li>
+  <li>
+    <a href="#ctr-theta" data-toggle="tab">Theta</a>
+  </li>
+</ul>
 
-  <div class="accordion-group">
-    <div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-parent="#methods" href="#methodsContent">Methods</a></div>
-    <div id="methodsContent" class="accordion-body collapse in">
-      <div class="accordion-inner">
+<div class="tab-content">
 
-
-        <form class="form-horizontal">
-
-          <div class="control-group">
-            <label class="control-label" for="opt-method">Method</label>
-            <div class="controls">
-              <select id="opt-method">
-                <option value="simul">Simulation</option>
-                <option value="smc">Sequential Monte Carlo (SMC)</option>
-                <option value="kalman">Extended Kalman Filter (EKF)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label" for="opt-impl">Implementation</label>
-            <div class="controls">
-              <select id="opt-impl">
-                <option value="ode">Ordinary differential equation</option>
-                <option value="sde">Stochastic differential equation</option>
-                <option value="psr">Poisson process</option>
-              </select>
-            </div>
-          </div>
+  <!-- Methods< -->
+  <div class="tab-pane active" id="ctr-methods">
 
 
-          <div class="control-group">
-            <label class="control-label" for="opt-J">Number of particles/ realisations</label>
-            <div class="controls">
-              <input type="text" id="opt-J" class="input-small">
-            </div>
-          </div>
+    <form class="form-horizontal">
 
-          <div class="control-group">
-            <label class="control-label" for="opt-S">Integration time step</label>
-            <div class="controls">
-              <input type="text" id="opt-S" class="input-small">
-            </div>
-          </div>
-
-        </form>
-
-
-
+      <div class="control-group">
+        <label class="control-label" for="opt-method">Method</label>
+        <div class="controls">
+          <select id="opt-method">
+            <option value="simul">Simulation</option>
+            <option value="smc">Sequential Monte Carlo (SMC)</option>
+            <option value="kalman">Extended Kalman Filter (EKF)</option>
+          </select>
+        </div>
       </div>
-    </div>
+
+      <div class="control-group">
+        <label class="control-label" for="opt-impl">Implementation</label>
+        <div class="controls">
+          <select id="opt-impl">
+            <option value="ode">Ordinary differential equation</option>
+            <option value="sde">Stochastic differential equation</option>
+            <option value="psr">Poisson process</option>
+          </select>
+        </div>
+      </div>
+
+
+      <div class="control-group">
+        <label class="control-label" for="opt-J">Number of particles/ realisations</label>
+        <div class="controls">
+          <input type="text" id="opt-J" class="input-small">
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="opt-S">Integration time step</label>
+        <div class="controls">
+          <input type="text" id="opt-S" class="input-small">
+        </div>
+      </div>
+
+    </form>
+
+
+
   </div>
 
-  <div class="accordion-group">
-    <div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-parent="#methods" href="#methodsParameter">Parameters</a></div>
-    <div id="methodsParameter" class="accordion-body collapse">
-      <div class="accordion-inner">
+  <!-- Parameters -->
+  <div class="tab-pane" id="ctr-theta">
 
 
+    <table>
+      <tr>
+        <th></th>
+        <th>min</th>
+        <th>value</th>
+        <th>max</th>
+        <% if(t.status !== 'best'){ %>
+        <th>diff</th>
+        <% } %>
+      </tr>
 
-        <table>
-          <tr>
-            <th></th>
-            <th>min</th>
-            <th>value</th>
-            <th>max</th>
-            <% if(t.status !== 'best'){ %>
-            <th>diff</th>
-            <% } %>
-          </tr>
+      <% p.parameter.concat(p.state, l.parameter).forEach(function(par){ %>
+      <% if (par.id in t.value) { %>
+      <% for(var group in t.value[par.id].guess){ %>
+      <tr>
+        <td><%= par.id %>: <%= group.split('__').join('; ') %></td>
+        <td><input type="text" name="min___<%= par.id %>___<%= group %>" value="<%= t.value[par.id]['min'][group] %>" class="input-mini" /></td>
+        <td><input type="text" name="guess___<%= par.id %>___<%= group %>" value="<%= t.value[par.id]['guess'][group] %>" class="input-mini" /></td>
+        <td><input type="text" name="max___<%= par.id %>___<%= group %>" value="<%= t.value[par.id]['max'][group] %>" class="input-mini" /></td>
 
-          <% p.parameter.concat(p.state, l.parameter).forEach(function(par){ %>
-          <% if (par.id in t.value) { %>
-          <% for(var group in t.value[par.id].guess){ %>
-          <tr>
-            <td><%= par.id %>: <%= group.split('__').join('; ') %></td>
-            <td><input type="text" name="min___<%= par.id %>___<%= group %>" value="<%= t.value[par.id]['min'][group] %>" class="input-mini" /></td>
-            <td><input type="text" name="guess___<%= par.id %>___<%= group %>" value="<%= t.value[par.id]['guess'][group] %>" class="input-mini" /></td>
-            <td><input type="text" name="max___<%= par.id %>___<%= group %>" value="<%= t.value[par.id]['max'][group] %>" class="input-mini" /></td>
+        <% if(t.status !== 'best'){ %>
+        <td> <i class="icon-arrow-down"></td>
+        <% } %>
 
-            <% if(t.status !== 'best'){ %>
-            <td> <i class="icon-arrow-down"></td>
-            <% } %>
+      </tr>
+      <% } }; });  %>
+    </table>
 
-          </tr>
-          <% } }; });  %>
-        </table>
 
-      </div>
-    </div>
+    
   </div>
-
 
 </div>
+

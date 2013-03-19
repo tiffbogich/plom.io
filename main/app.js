@@ -7,12 +7,11 @@ var express = require('express')
   , fs = require('fs')
   , http = require('http')
   , mongodb = require('mongodb')
-  , plomWsServer = require('../ws-server/plomWsServer')
+  , plomWsServer = require('../ws-server')
   , plomAuth = require('../authentification/app')
   , csrf = require('../authentification/lib/middleware').csrf
   , is_logged_in = require('../authentification/lib/middleware').is_logged_in
   , secure = require('../authentification/lib/middleware').secure;
-
 
 var app = express();
 
