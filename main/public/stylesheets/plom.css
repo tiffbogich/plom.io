@@ -125,3 +125,8 @@ text.shadow {
 .explore{
   float:left;
 }
+
+.activetext{
+  font-weight:bold;
+  fill:red;
+}

@@ -1,7 +1,9 @@
 <% include layout %>
 
 <script src="/javascripts/PlomTs.js"></script>
-<script src="/javascripts/review.js"></script>
+<!--<script src="/javascripts/review.js"></script>-->
+<script src="/javascripts/d3.v3.min.js"></script>
+<script src="/javascripts/parmatrix.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
 <% include header %>
@@ -122,8 +124,29 @@
             <div id="best" class="accordion-body collapse in">
               <div class="accordion-inner">
 
+	      	
+
                 <div class="row">
+
                   <div class="span5">
+
+
+		  <div id="MatLegend" class="hidden">
+		       <span class="diagnostics hidden">
+		       <ol>
+			<li>Gelman: <span id="Gelman" class="diagnostics hidden"></span></li>
+			<li>Geweke: <span id="Geweke" class="diagnostics hidden"></span></li>
+			<li>ESS: <span id="ESS" class="diagnostics hidden"></span></li>
+		       </ol>
+		       </span>
+		  </div>
+
+		  <div id="ActiveMatComp" class="hidden">
+		  </div>		  
+
+		  <div id="vis">
+		  </div>
+
                     <h3>Scores</h3>
                   </div>
                   <div class="span6">
