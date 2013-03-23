@@ -57,9 +57,11 @@
         <% }); %>
       </select>
 
+      <!--
       <p>
         <%=: c.description | truncate:30 %>
       </p>
+      -->
 
     </div>
 
@@ -82,14 +84,22 @@
             <!-- placeholder for d3 viz of compartmental model -->
             <div id="pgraph<%= m.link._id %>" class="process-graph"></div>
 
+            <div>score: <%= m.theta && m.theta.score %></div>
+
+            <form action="/fork" method="POST" class="explore">
+              <input type="hidden" name="context" value="<%= c._id %>" />
+              <input type="hidden" name="process" value="<%= m.process._id %>" />
+              <input type="hidden" name="link" value="<%= m.link._id %>" />
+              <input type="hidden" name="theta" value="<%= m.theta._id %>" />
+              <input type="submit" value="Fork" />
+            </form>
+
             <form action="/" method="POST" class="explore">
               <input type="hidden" name="context" value="<%= c._id %>" />
               <input type="hidden" name="process" value="<%= m.process._id %>" />
               <input type="hidden" name="link" value="<%= m.link._id %>" />
               <input type="submit" value="Explore" />
-            </form>
-            
-            <div>score: <%= m.theta && m.theta.score %></div>
+            </form>            
             
             <div class="parameter-box">
               <% if (m.theta && m.theta.value) { %>

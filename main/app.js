@@ -56,6 +56,7 @@ app.configure('production', function(){
 
 app.get('/', routes.index);
 app.post('/', routes.postIndex);
+app.post('/fork', routes.postFork);
 app.get('/review', routes.review);
 app.get('/trace/:_id', routes.trace);
 //app.get('/context', secure, routes.context);

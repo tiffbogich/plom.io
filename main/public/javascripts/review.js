@@ -26,6 +26,13 @@ $(document).ready(function() {
       graphLikeId: "graphLike"
     });
 
+    console.log(t[0].diagnostic);
+
+//    console.log(t[0].diagnostic[0][0][0].png);
+//    for(var x=0; x<t[0].diagnostic[0].length; x++ ){
+//      $('body').append('<img src="' + '/trace/' + t[0].diagnostic[0][x][x].png.autocor_id + '"/>');
+//    }
+
 
 //    $('input.plottedTs').change(function(){
 //      plomTs.graph_ts.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
@@ -101,7 +108,7 @@ $(document).ready(function() {
       $("#run").click(function(){
         if(plomGlobal.canRun){
           plomGlobal.canRun = false;
-          plomTs.run(socket, {method:'simul', implementation: 'psr', J:100});
+          plomTs.run(socket, {method:'smc', implementation: 'psr', J:100});
         }
       });
 

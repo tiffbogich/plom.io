@@ -120,3 +120,8 @@ text.shadow {
 .hidden {
   display:none;
 }
+
+
+.explore{
+  float:left;
+}

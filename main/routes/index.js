@@ -7,6 +7,9 @@ var fs = require('fs')
   , path = require('path')
   , async = require('async')
   , _ = require('underscore')
+  , fstream = require("fstream")
+  , tar = require("tar")
+  , zlib = require("zlib")
   , dbUtil = require('../../db-utils');
 
 
@@ -186,6 +189,64 @@ exports.postIndex = function(req, res, next){
 };
 
 
+
+/**
+ * POST request: send a model to client
+ */
+exports.postFork = function(req, res, next){
+
+  var c = req.body.context
+    , p = req.body.process
+    , l = req.body.link
+    , t = req.body.theta;
+
+  var downloadPath = path.join(process.env.HOME, 'download_plom_models', l);
+
+  fs.exists(downloadPath+ '.tar.gz', function(exists){
+
+    if (exists) {
+      res.download(downloadPath+ '.tar.gz');
+    } else {
+
+      var components = req.app.get('components');
+
+      components.find({_id: {$in: [c, p, l, t].map(function(x){return new ObjectID(x);})}},
+                      {_id:0, design:0, _keywords:0, semantic_id:0, information_criterion:0, context_name:0, context_id:0, process_id:0, process_name:0, theta_id:0}
+                     ).toArray(function(err, docs){
+        if (err) return next(err);
+
+        fs.mkdir(downloadPath, function(){
+
+          async.each(docs, function(doc, callback){
+            fs.writeFile(path.join(downloadPath, doc.type + '.json'), JSON.stringify(doc, null, 2), function(err){
+              callback(err);
+            });
+          }, function(err){
+
+            if (err) return next(err);
+
+            var writestream = fs.createWriteStream(downloadPath + '.tar.gz');
+            fstream.Reader({path: downloadPath, type: "Directory"})
+              .pipe(tar.Pack())
+              .pipe(zlib.createGzip())
+              .pipe(writestream);
+
+            writestream.on('close', function(){
+              res.download(downloadPath+ '.tar.gz');
+            });
+
+          });
+
+        });
+      });
+    }
+  });
+
+};
+
+
+
+
 exports.review = function(req, res, next){
 
   var c = req.session.context
@@ -234,30 +295,17 @@ exports.review = function(req, res, next){
 };
 
 
-
-
 exports.trace = function(req, res, next){
 
-  var diag = req.app.get('diag');
-  //_id: new ObjectId(req.params._id)
+  var diag = req.app.get('diag')
+    , _id = new ObjectID(req.params._id);
 
-  diag.findOne({}, function(err, doc){
+  diag.findOne({_id: _id}, function(err, doc){
     res.set('Content-Type', doc["content-type"]);
     res.end(doc.data.buffer);
   });
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

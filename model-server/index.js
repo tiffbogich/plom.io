@@ -11,6 +11,7 @@ var express = require('express')
   , _ = require('underscore')
   , fstream = require("fstream")
   , tar = require("tar")
+  , coda = require("./lib/diagnostic")
   , zlib = require("zlib")
   , rimraf = require("rimraf")
   , authenticate = require('../authentification/routes/user').authenticate
@@ -124,30 +125,30 @@ app.post('/build', function(req, res, next){
       .pipe(zlib.createGzip())
       .pipe(res);
   };
-  
+
   fs.exists(buildPath, function(exists){
 
     if (exists) {
       //TODO: check that bin also exists and send temporary unavailable if not (=> ongoing compilation)
       streamModel(res);
-      
+
     } else {
-      
+
       var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '-o', buildPath]);
       pmbuilder.stdin.write(model+'\n', encoding="utf8");
-      
+
       pmbuilder.on('exit', function (code) {
         if(code === 0) {
           var make = spawn('make', ['CC=gcc-4.7', 'install'], {cwd:path.join(buildPath, 'C', 'templates')});
-          
+
           make.on('exit', function (code) {
-            
+
             if(code === 0){
               streamModel(res);
             } else {
               res.status(500).json({success:false});
             }
-            
+
           });
         } else {
           res.status(500).json({success:false});
@@ -157,14 +158,14 @@ app.post('/build', function(req, res, next){
     }
 
   });
-    
+
 });
 
 
 /**
- * Publish
+ * Commit
  **/
-app.post('/publish', function(req, res, next){
+app.post('/commit', function(req, res, next){
 
   var m;
   if(req.body.model){
@@ -208,10 +209,7 @@ app.post('/publish', function(req, res, next){
         }
       }
 
-      console.log(to_be_published);
-
       if(to_be_published.length){
-
 
         components.insert(to_be_published, {safe: true}, function(err, records){
           if(err) return next(err);
@@ -262,7 +260,7 @@ app.post('/publish', function(req, res, next){
 
                 var r = spawn('Rscript', [path.join(process.env.HOME, 'plom-coda', 'coda_mcmc_diag.R'), req.files.traces.path]);
 
-                r.on('exit', function (code) {                  
+                r.on('exit', function (code) {
 
                   if(code === 0){
                     var exDir = req.files.traces.path + '_ex';
@@ -277,9 +275,9 @@ app.post('/publish', function(req, res, next){
                         data = data.map(function(x,i){
                           return {
                             'content-type':'image/png',
-                            data: new mongodb.Binary(x), 
+                            data: new mongodb.Binary(x),
                             theta_id: published.theta._id,
-                            filename: files[i]
+                            filename: path.basename(files[i], '.png')
                           };
                         });
 
@@ -289,10 +287,12 @@ app.post('/publish', function(req, res, next){
                           fs.readFile(path.join(exDir, 'diagnostic.json'), 'utf8', function(err, diagnostic){
                             if (err) return next(err);
 
-                            components.update({_id: published.theta._id}, {$pushAll: {pict_id: docs.map(function(x){return x._id;})}, $set: {diagnostic: JSON.parse(diagnostic)}}, {safe:true}, function(err, cnt){
+                            var diagnostic = coda(JSON.parse(diagnostic), docs.map(function(x){return {'_id': x._id, 'filename': x.filename};}));
+
+                            components.update({_id: published.theta._id}, {$set: {diagnostic: diagnostic}}, {safe:true}, function(err, cnt){
                               if (err) return next(err);
 
-                              //clean up R workink directory
+                              //clean up R working directory
                               rimraf(exDir, function(err){
                                 if (err) return next(err);
 
@@ -303,15 +303,15 @@ app.post('/publish', function(req, res, next){
                                   res.json({'success': true, 'msg': 'your results are being reviewed'});
                                 });
                               });
-                            });  
-                            
+                            });
+
                           });
-                 
+
                         });
                       });
                     });
                   } else {
-                    res.json({'success': false, 'msg': 'could not generate a diagnostic'});                    
+                    res.json({'success': false, 'msg': 'could not generate a diagnostic'});
                   }
                 });
               });
@@ -320,24 +320,12 @@ app.post('/publish', function(req, res, next){
             }
           }
         });
-        
+
       } else {
         return res.json({'success': false, 'msg': 'everything has already been published'});
       }
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
