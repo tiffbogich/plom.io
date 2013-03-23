@@ -120,3 +120,11 @@ text.shadow {
 .hidden {
   display:none;
 }
+
+.activetext{
+        font-weight:bold;
+	fill:red;
+}
+
+
+
