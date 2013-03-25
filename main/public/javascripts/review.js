@@ -27,6 +27,7 @@ $(document).ready(function() {
     });
 
     console.log(t[0].diagnostic);
+      parMatrix(t[0].diagnostic);
 
 //    console.log(t[0].diagnostic[0][0][0].png);
 //    for(var x=0; x<t[0].diagnostic[0].length; x++ ){
