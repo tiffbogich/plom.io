@@ -1,5 +1,6 @@
 var plomGlobal = {canRun: true, intervalId:[]};
 
+
 $(document).ready(function() {
 
   $.getJSON('/review', function(data) {
@@ -26,8 +27,14 @@ $(document).ready(function() {
       graphLikeId: "graphLike"
     });
 
+
     console.log(t[0].diagnostic);
-      parMatrix(t[0].diagnostic);
+    parMatrix(t[0].diagnostic.detail);
+
+    var compiled = _.template(data.tpl.summaryTable);
+    $('#summaryTable').html(compiled(t[0].diagnostic));
+
+
 
 //    console.log(t[0].diagnostic[0][0][0].png);
 //    for(var x=0; x<t[0].diagnostic[0].length; x++ ){

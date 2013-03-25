@@ -1,0 +1,28 @@
+<table class="table table-condensed">
+
+  <thead>
+    <tr>
+      <th>run #</th>
+      <th>Geweke</th>
+      <th>Raftery</th>
+      <th>Heidelberger</th>
+      <th>ESS min</th>
+      <th>DIC</th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+    <% summary.forEach(function(s, h) { %>
+    <tr class="<%= (summary.passed) ? 'success': 'error' %>">
+      <td><a href="#"><%= h %></a></td>
+      <td><%= s.geweke %></td>
+      <td><%= (s.raftery.success) ? 'M: ' + s.raftery.M + ' N: ' + s.raftery.N : s.raftery.success %></td>
+      <td><%= s.heidel %></td>
+      <td><%= s.essMin %></td>
+      <td><%= s.dic %></td>
+    </tr>
+    <% }) %>
+
+  </tbody>
+</table>

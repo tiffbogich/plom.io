@@ -280,7 +280,8 @@ exports.review = function(req, res, next){
             comps.thetas = thetas;
             res.json({
               tpl:{
-                control:fs.readFileSync(path.join(req.app.get('views'),'review_tpl','control.ejs'), 'utf8')
+                control: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','control.ejs'), 'utf8'),
+                summaryTable: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','summary_table.ejs'), 'utf8')
               },
               comps: comps
             });
