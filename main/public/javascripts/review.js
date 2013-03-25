@@ -42,10 +42,7 @@ $(document).ready(function() {
     parMatrix(t[0].diagnostic.detail, updateCorr1, updateCorr2, updateDensity1, updateDensity2);
 
 
-//    console.log(t[0].diagnostic[0][0][0].png);
-//    for(var x=0; x<t[0].diagnostic[0].length; x++ ){
-//      $('body').append('<img src="' + '/trace/' + t[0].diagnostic[0][x][x].png.autocor_id + '"/>');
-//    }
+
 
 
 //    $('input.plottedTs').change(function(){

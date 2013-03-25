@@ -143,3 +143,7 @@ text.shadow {
   fill: grey;
   stroke-width: 1.5px;
 }
+
+.img-diag{
+  width: 200px;
+}

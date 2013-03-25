@@ -1,180 +1,175 @@
-function parMatrix(mat, updateCorr1, updateCorr2, updateDensity1, updateDensity2) {
+function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity2) {
 
-    ////////////////////////
-    // Variables definition
-    ////////////////////////
-    var dataset = [];
-    var rowdataset = [];
-    var color = d3.scale.linear()
-	.domain([-1,0,1])
-	.range(["blue","white","red"]);
-    var nbpars = mat[1].length;
-    var parnames = [];
-    for (var i=0; i<nbpars; i++){
-	parnames.push(mat[1][i][i].par);
-    }
-    for (var i=0; i<nbpars; i++){
-	rowdataset.push(mat[0][i][i]);
-    }
-    for (var i=0; i<nbpars; i++){
-	for (var j=0; j<nbpars; j++){
-	    dataset.push([i,j,mat[0][i][j]]);
-	} 
-    }
-    for (var i=0; i<nbpars; i++){
-	mat[0][i][i].cc=1; // in order to have diagonal terms with maximal correlation
-    }
+  ////////////////////////
+  // Variables definition
+  ////////////////////////
+  var dataset = []
+    , rowdataset = [];
 
-    var maxtextlength = Math.max.apply(Math,parnames.map(function(d,i){return parnames[i].length}));
-    var textfont = 12;
-    var MatTotSize = 450 - maxtextlength * textfont ;
-    var figsSize = MatTotSize;
-    var MatMarginSize = maxtextlength * textfont;
-    var MatSize = MatTotSize - MatMarginSize;
-    var CellSize = MatSize/nbpars;
-    var GrowFact = 1.2;
+  var color = d3.scale.linear()
+    .domain([-1,0,1])
+    .range(["blue","white","red"]);
 
+  var nbpars = data[0].length;
 
-    ///////////////////////////////
-    // main structures definition
-    ///////////////////////////////
-    var MatTot = d3.select("#vis")
-	.append("svg")
-	.attr("width",MatTotSize)
-	.attr("height",MatTotSize)
-	//.style("margin-left", - MatMarginSize + "px")
-	.append("g")
-	.attr("transform", "translate(" + MatMarginSize   + "," + MatMarginSize + ")");
-    var Mat = MatTot.append("svg")
-	.attr("width",MatSize)
-	.attr("height",MatSize)
-	.attr("x",0)
-	.attr("y",0);
-    var Figs = d3.select("#vis")
-	.append("svg")
-	.attr("width",MatTotSize)
-	.attr("height",MatTotSize)
-	.attr("x",1.5*MatTotSize + "px")
-	.attr("y","0px")
-	//.style("margin-left", - MatMarginSize + "px")
-	.append("g")
-    var Trace = Figs.select("img")
-	.data(mat)
-	.enter()
-	.append("div")
-	.attr("width",figsSize)
-	.attr("height",MatTotSize/2)
-	.attr("x","0px")
-	.attr("y", figsSize/2+ "px")
-//	.each(function(d,i){
-//	    var t = d3.select(this);
-//	    t.append("img")
-//		.attr("src",function(d){
-//		    console.log(d[0][0].png.trace_id);
-//		    return 'lib/pict/' + d[0][0].png.trace_id;})
-//	})
+  for (var i=0; i<nbpars; i++){
+    rowdataset.push(data[0][i][i].par + ((data[0][i][i].group) ? ':' + data[0][i][i].group : '') );
 
-    /////////////////////////////////
-    // Static initialisation of svgs
-    /////////////////////////////////
-    MatTot.selectAll("rect")
-	.data(dataset)
-	.enter()
-	.append("rect")
-	.attr({
-	    x: function(d){ return d[0]*CellSize + "px"; },
-	    y: function(d){ return d[1]*CellSize + "px"; }, 
-	    width: CellSize + "px",
-	    height: CellSize + "px",
-	    fill: function(d) {return color(d[2].cc);}
-	});
-    var row = MatTot.selectAll(".row")
-	.data(rowdataset)
-	.enter().append("g")
-	.attr("class", "row")
-    row.append("text")
-	.attr("x",  "-5px")
-	.attr("y", function(d,i){return (i+0.5)*CellSize + textfont/2 + "px";})
-	.attr("text-anchor", "end")
-	.style("font-size",function(){return textfont + "px";})
-	.text(function(d) { return d.par; });
-    var column = MatTot.selectAll(".column")
-	.data(rowdataset)
-	.enter().append("g")
-	.attr("class", "column")
-	.attr("tranform", function(d,i) {return "translate(" + i*CellSize + "px)rotate(-90)";});
-    column.append("text")
-	.attr("x", "5px")
-	.attr("y", function(d,i){ return (i+0.5)*CellSize + textfont/2 + "px" })
-	.attr("text-anchor", "start")
-	.style("font-size",function(){return textfont + "px"})
-	.text(function(d) { return d.par; })
-	.attr("transform", function(d,i) {return  "rotate(-90)";});
-    
-    
-    
-    //////////////////////////////////////
-    // Listeners / interactive components
-    //////////////////////////////////////
-    MatTot.selectAll("rect")
-    	.on("mouseover",function(d){
-	    var pos = $(this).position();
-	    var indi = d[0];
-	    var indj = d[1];
-	    var cc = d[2].cc;
-	    var ess = d[2].ess;
+    data[0][i][i].cc=1; // in order to have diagonal terms with maximal correlation
 
-          if(indi === indj){
-            $('#corr1, #corr2, #density1').addClass('hidden');
-            $('#trace, #autocor, #test').removeClass('hidden');
-          } else {
-            $('#corr1, #corr2, #density1').removeClass('hidden');
-            $('#trace, #autocor, #test').addClass('hidden');
-          }
+    for (var j=0; j<nbpars; j++){
+      dataset.push([i, j, data[0][i][j]]);
+    } 
+  }
 
-	    d3.select("#ActiveMatComp")
-	        .classed('hidden', false)
-		.style("background-color",function(d) {
-		    return color(cc);})
-		.style("width", CellSize*Math.sqrt(GrowFact) + "px")
-		.style("height", CellSize*Math.sqrt(GrowFact) + "px")
-	    	.style("position", "absolute")
-		.style("left", pos.left -CellSize*(Math.sqrt(GrowFact)-1)/2 + "px")
-	    	.style("top", pos.top - CellSize*(Math.sqrt(GrowFact)-1)/2 + "px")
-		.style("z-index", 1);
-//	    console.log($(".mytooltip"));
-	    if (indi == indj){
-		$('a[rel=tooltip]').attr('data-original-title','ess: ' + ess).tooltip('fixTitle');} 
-	    else {
-		$('a[rel=tooltip]').attr('data-original-title','cc: ' + cc).tooltip('fixTitle');
-		}
-	    $('a[rel=tooltip]').tooltip("show");
-	    
-	    mouseov(indi,indj);
+  var maxtextlength = Math.max.apply(Math, rowdataset.map(function(x){return x.length;}))
+    , textfont = 10
+    , matTotSize = 450 - maxtextlength * textfont
+    , figsSize = matTotSize
+    , matMarginSize = maxtextlength/2 * textfont // /2 is completely arbitrary TODO: understand fonts size
+    , matSize = matTotSize - matMarginSize
+    , cellSize = matSize/nbpars
+    , growFact = 1.2;
 
-          updateCorr1(indi, indj);          
-          updateCorr2(indj, indi);
+  ///////////////////////////////
+  // main structures definition
+  ///////////////////////////////
+  var matTot = d3.select("#vis")
+    .append("svg")
+    .attr("width",matTotSize)
+    .attr("height",matTotSize)
+  //.style("margin-left", - matMarginSize + "px")
+    .append("g")
+    .attr("transform", "translate(" + matMarginSize   + "," + matMarginSize + ")");
 
-          updateDensity1(indi);
-          updateDensity2(indj);
+  var mat = matTot.append("svg")
+    .attr("width",matSize)
+    .attr("height",matSize)
+    .attr("x",0)
+    .attr("y",0);
 
-	})
-	.on("mouseout",function(d){
-	    d3.event.stopPropagation();
-	})
-    function mouseov(indi,indj){
-	d3.selectAll(".row text").classed("activetext", function(d,i){
-	    return i == indj;
-	})
-	d3.selectAll(".column text").classed("activetext", function(d,i){
-	    return i == indi;
-	})
-    };
-    Mat.on("mouseout",function(d){
-	    d3.select("#ActiveMatComp").classed('hidden', true);
+  /////////////////////////////////
+  // Static initialisation of svgs
+  /////////////////////////////////
+  matTot.selectAll("rect")
+    .data(dataset)
+    .enter()
+    .append("rect")
+    .attr({
+      x: function(d){ return d[0]*cellSize + "px"; },
+      y: function(d){ return d[1]*cellSize + "px"; }, 
+      width: cellSize + "px",
+      height: cellSize + "px",
+      fill: function(d) {return color(d[2].cc);}
     });
 
-$('a[rel=popover]').popover();
-$('a[rel=tooltip]').tooltip();
+  var row = matTot.selectAll(".row")
+    .data(rowdataset)
+    .enter().append("g")
+    .attr("class", "row");
+
+  row.append("text")
+    .attr("x",  "-5px")
+    .attr("y", function(d,i){return (i+0.5)*cellSize + textfont/2 + "px";})
+    .attr("text-anchor", "end")
+    .style("font-size",function(){return textfont + "px";})
+    .text(function(d) { return d; });
+
+  var column = matTot.selectAll(".column")
+    .data(rowdataset)
+    .enter().append("g")
+    .attr("class", "column")
+    .attr("tranform", function(d,i) {return "translate(" + i*cellSize + "px)rotate(-90)";});
+
+  column.append("text")
+    .attr("x", "5px")
+    .attr("y", function(d,i){ return (i+0.5)*cellSize + textfont/2 + "px" })
+    .attr("text-anchor", "start")
+    .style("font-size",function(){return textfont + "px"})
+    .text(function(d) { return d; })
+    .attr("transform", function(d,i) {return  "rotate(-90)";});
+  
+    
+  //////////////////////////////////////
+  // Listeners / interactive components
+  //////////////////////////////////////
+  matTot.selectAll("rect")
+    .on("mouseover",function(d){
+      var pos = $(this).position();
+      var indi = d[0];
+      var indj = d[1];
+      var cc = d[2].cc;
+      var ess = d[2].ess;
+
+      d3.select("#ActiveMatComp")
+	.classed('hidden', false)
+	.style("background-color",function(d) {
+	  return color(cc);})
+	.style("width", cellSize*Math.sqrt(growFact) + "px")
+	.style("height", cellSize*Math.sqrt(growFact) + "px")
+	.style("position", "absolute")
+	.style("left", pos.left -cellSize*(Math.sqrt(growFact)-1)/2 + "px")
+	.style("top", pos.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px")
+	.style("z-index", 1);
+
+      if (indi == indj){
+	$('a[rel=tooltip]').attr('data-original-title','ess: ' + ess).tooltip('fixTitle');
+      } else {
+	$('a[rel=tooltip]').attr('data-original-title','cc: ' + cc).tooltip('fixTitle');
+      }
+
+      $('a[rel=tooltip]').tooltip("show");
+      
+      mouseov(indi,indj);
+
+    })
+    .on("mouseout",function(d){
+      d3.event.stopPropagation();
+    });
+
+
+
+  function mouseov(indi,indj){
+    d3.selectAll(".row text").classed("activetext", function(d,i){
+      return i == indj;
+    })
+    d3.selectAll(".column text").classed("activetext", function(d,i){
+      return i == indi;
+    })
+
+
+    if(indi === indj){
+      $('#corr1, #corr2, #density1').addClass('hidden');
+      $('#trace, #autocor, #test').removeClass('hidden');
+
+      $('#trace img').attr('src', '/trace/' + data[0][indi][indi].png.trace_id);
+      $('#autocor img').attr('src', '/trace/' + data[0][indi][indi].png.autocor_id);
+
+      $('#geweke').html(data[0][indi][indi].geweke);
+      $('#heidel').html('start: ' + data[0][indi][indi].heidel.start + ' ; pvalue: ' +data[0][indi][indi].heidel.pvalue);
+      $('#ess').html(data[0][indi][indi].ess);
+
+    } else {
+      $('#corr1, #corr2, #density1').removeClass('hidden');
+      $('#trace, #autocor, #test').addClass('hidden');
+    }
+
+
+    updateCorr1(indi, indj);          
+    updateCorr2(indj, indi);
+
+    updateDensity1(indi);
+    updateDensity2(indj);
+
+  };
+
+
+  mat.on("mouseout",function(d){
+    d3.select("#ActiveMatComp").classed('hidden', true);
+  });
+
+
+  $('a[rel=popover]').popover();
+  $('a[rel=tooltip]').tooltip();
 
 };

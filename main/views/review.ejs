@@ -122,132 +122,60 @@
           </div>
         </div>	      	
 
+         <!-- plots -->
+        <div class="row">
 
 
+         <!-- correlation matrix -->
+          <div class="span5">
+	      <div id="ActiveMatComp">  
+		<a href="#"  id="ActiveMatCompHack" rel="tooltip" data-placement="top" title="This is the tooltip!"></a>
+		<a href="#"  rel="popover" data-toggle="popover" data-trigger='hover' data-content="" title="title"></a>
+	      </div>		  
 
+	      <div id="popover_content_wrapper" style="display: none">
+  		<div>This is your div content</div>
+  	      </div>
 
-
-
-        <!-- theta accordion -->
-        <div class="accordion" id="thetaOption">
-
-          <!-- Best parameter set found -->
-          <div class="accordion-group">
-            <div class="accordion-heading">
-              <a class="accordion-toggle" data-toggle="collapse" data-parent="#thetaOption" href="#best">Best</a>
-            </div>
-
-            <div id="best" class="accordion-body collapse in">
-              <div class="accordion-inner">
-
-
-
-
-                <div class="row">
-
-                  <div class="span5">
-
-		  <div id="MatLegend" style="display:none">
-		       <div class="diagnostics">
-		       <ol>
-			<li>Gelman: <span id="Gelman" class="diagnostics hidden"></span></li>
-			<li>Geweke: <span id="Geweke" class="diagnostics hidden"></span></li>
-			<li>ESS: <span id="ESS" class="diagnostics hidden"></span></li>
-		       </ol>
-		       </div>
-		  </div>
-
-		  <div id="ActiveMatComp">  
-		       <a href="#"  id="ActiveMatCompHack" rel="tooltip" data-placement="top" title="This is the tooltip!"></a>
-		       <a href="#"  rel="popover" data-toggle="popover" data-trigger='hover' data-content="" title="title"></a>
-		  </div>		  
-
-		  <div id="popover_content_wrapper" style="display: none">
-  		       <div>This is your div content</div>
-  	       	  </div>
-
-		  <div id="vis">
-		  </div>
-
-                    <h3>Scores</h3>
-                  </div>
-                  <div class="span6">
-                    <h3>Discussion</h3>
-
-                    <!-- Diagnostic plots -->
-
-                    <div class="row">
-                      <div class="span3" id="density2"></div>
-                      <div class="span3" id="corr1"></div>
-                      <div class="span3 hidden" id="trace"><p>trace</p></div>
-                    </div>
-
-                    <div class="row">
-                      <div class="span3" id="corr2"></div>
-                      <div class="span3" id="density1"></div>
-                      <div class="span3 hidden" id="autocor"><p>autocorrelation</p></div>
-                      <div class="span3 hidden" id="autocor"><p>test</p></div>
-                    </div>
-                   
-
-                  </div>
-                </div>
-                
-              </div>
-            </div>
+	      <div id="vis"></div>
           </div>
 
-          <!-- Parameters set in review -->
-          <div class="accordion-group">
-            <div class="accordion-heading">
-              <a class="accordion-toggle" data-toggle="collapse" data-parent="#thetaOption" href="#pending">Pending</a>
-            </div>
 
-            <div id="pending" class="accordion-body collapse">
-              <div class="accordion-inner">
-                
+         <!-- diagnostic plots and test details -->
+          <div class="span6">
 
-                <div class="row">
-                  <div class="span5">
-                    <h3>Pending theta</h3>
-                  </div>
-                  <div class="span6">
-                    <h3>Feedback</h3>
-
-                    <h3>Discussion</h3>
-                  </div>
+              <div class="row">
+                <div class="span3" id="density2"></div>
+                <div class="span3" id="corr1"></div>
+                <div class="span3 hidden" id="trace">
+                  <img class="img-diag" alt="trace plot"/>
                 </div>
-
               </div>
-            </div>
-          </div>
 
-          <!-- Previous best parameter values -->
-          <div class="accordion-group">
-            <div class="accordion-heading">
-              <a class="accordion-toggle" data-toggle="collapse" data-parent="#thetaOption" href="#history">History</a>
-            </div>
-
-            <div id="history" class="accordion-body collapse">
-              <div class="accordion-inner">
-
-                <div class="row">
-                  <div class="span5">
-                    <h3>Scores</h3>
-                  </div>
-                  <div class="span6">
-                    <h3>Discussion</h3>
-                  </div>
+              <div class="row">
+                <div class="span3" id="corr2"></div>
+                <div class="span3" id="density1"></div>
+                <div class="span3 hidden" id="autocor">
+                  <img class="img-diag" alt="autocorrelation plot" />
                 </div>
-
-
+                <div class="span3 hidden" id="autocor">
+		  <ul>
+		    <li>Heidelberger: <span id="heidel" class="diagnostics"></span></li>
+		    <li>Geweke: <span id="geweke" class="diagnostics"></span></li>
+		    <li>ESS: <span id="ess" class="diagnostics"></span></li>
+		  </ul>
+                </div>
               </div>
-            </div>
-          </div>
 
+          </div>
+      
         </div>
 
+        <h3>Feedback</h3>
+
+
       </div>
+
 
       <!-- Model review -->
       <div class="tab-pane" id="model">
