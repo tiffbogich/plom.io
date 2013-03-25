@@ -20,7 +20,7 @@ function coda2plom(diag, picts){
 
       var pargroup = key.split(':')
         , par = pargroup[0]
-        , group = (pargroup[0] !== 'log_like') ? pargroup[1]: pargroup[0];
+        , group = (pargroup[0] !== 'log_like') ? pargroup[1]: '';
 
       //fill the diagonal
       coda[h][i][i] = {
