@@ -3,6 +3,7 @@
 <script src="/javascripts/PlomTs.js"></script>
 <script src="/javascripts/parmatrix.js"></script>
 <script src="/javascripts/corr.js"></script>
+<script src="/javascripts/density.js"></script>
 <script src="/javascripts/review.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
@@ -174,21 +175,20 @@
                     <h3>Discussion</h3>
 
                     <!-- Diagnostic plots -->
+
                     <div class="row">
-                      <div class="span3">
-                      </div>
-                      <div class="span3" id="corr2">
-                      </div>
+                      <div class="span3" id="density2"></div>
+                      <div class="span3" id="corr1"></div>
+                      <div class="span3 hidden" id="trace"><p>trace</p></div>
                     </div>
 
                     <div class="row">
-                      <div class="span3"  id="corr1">
-                      </div>
-                      <div class="span3">
-                      </div>
+                      <div class="span3" id="corr2"></div>
+                      <div class="span3" id="density1"></div>
+                      <div class="span3 hidden" id="autocor"><p>autocorrelation</p></div>
+                      <div class="span3 hidden" id="autocor"><p>test</p></div>
                     </div>
                    
-
 
                   </div>
                 </div>

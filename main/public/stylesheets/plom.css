@@ -138,3 +138,8 @@ text.shadow {
   stroke: #000;
   shape-rendering: crispEdges;
 }
+
+.density {
+  fill: grey;
+  stroke-width: 1.5px;
+}

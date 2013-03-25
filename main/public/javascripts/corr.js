@@ -1,4 +1,4 @@
-function plotCorr(diag, i, j){
+function plotCorr(diag, i, j, ind){
 
   var xlabel = diag[0][i][i].par + ':' + diag[0][i][i].group;
   var ylabel = diag[0][j][j].par + ':' + diag[0][j][j].group;
@@ -21,7 +21,6 @@ function plotCorr(diag, i, j){
     .range([0, width])
     .domain(d3.extent(data, function(d) { return d.x; })).nice();
 
-
   var y = d3.scale.linear()
     .range([height, 0])
     .domain(d3.extent(data, function(d) { return d.y; })).nice();
@@ -41,14 +40,14 @@ function plotCorr(diag, i, j){
     .orient("left")
     .ticks(3);
 
-  var svg = d3.select("#corr1").append("svg")
+  var svg = d3.select("#corr" + ind).append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   svg.append("g")
-    .attr("id", "x-axis")
+    .attr("id", "x-axis" + ind)
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis)
@@ -60,7 +59,7 @@ function plotCorr(diag, i, j){
     .text(xlabel);
 
   svg.append("g")
-    .attr("id", "y-axis")
+    .attr("id", "y-axis" + ind)
     .attr("class", "y axis")
     .call(yAxis)
     .append("text")
@@ -104,16 +103,16 @@ function plotCorr(diag, i, j){
     svg.selectAll(".dot")
       .data(data)
       .transition()
-      .duration(100)
+      .duration(200)
       .attr("cx", function(d) { return x(d.x); })
       .attr("cy", function(d) { return y(d.y); })      
 
-    d3.select("#x-axis")
+    d3.select("#x-axis" + ind)
       .call(xAxis)
       .select('.label')
       .text(xlabel);
   
-    d3.select("#y-axis")
+    d3.select("#y-axis" + ind)
       .call(yAxis)
       .select('.label')
       .text(ylabel);

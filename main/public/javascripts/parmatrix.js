@@ -1,4 +1,4 @@
-function parMatrix(mat, updateCorr) {
+function parMatrix(mat, updateCorr1, updateCorr2, updateDensity1, updateDensity2) {
 
     ////////////////////////
     // Variables definition
@@ -124,6 +124,13 @@ function parMatrix(mat, updateCorr) {
 	    var cc = d[2].cc;
 	    var ess = d[2].ess;
 
+          if(indi === indj){
+            $('#corr1, #corr2, #density1').addClass('hidden');
+            $('#trace, #autocor, #test').removeClass('hidden');
+          } else {
+            $('#corr1, #corr2, #density1').removeClass('hidden');
+            $('#trace, #autocor, #test').addClass('hidden');
+          }
 
 	    d3.select("#ActiveMatComp")
 	        .classed('hidden', false)
@@ -145,7 +152,11 @@ function parMatrix(mat, updateCorr) {
 	    
 	    mouseov(indi,indj);
 
-          updateCorr(indi, indj)
+          updateCorr1(indi, indj);          
+          updateCorr2(indj, indi);
+
+          updateDensity1(indi);
+          updateDensity2(indj);
 
 	})
 	.on("mouseout",function(d){

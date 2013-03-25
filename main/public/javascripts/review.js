@@ -29,12 +29,17 @@ $(document).ready(function() {
 
 
     console.log(t[0].diagnostic);
-    var update = plotCorr(t[0].diagnostic.detail, 0, 1);
-    parMatrix(t[0].diagnostic.detail, update);
-    
+    var updateCorr1 = plotCorr(t[0].diagnostic.detail, 0, 1, 1);
+    var updateCorr2 = plotCorr(t[0].diagnostic.detail, 1, 0, 2);
+
+
     var compiled = _.template(data.tpl.summaryTable);
     $('#summaryTable').html(compiled(t[0].diagnostic));
 
+    var updateDensity1 = plotDensity(t[0].diagnostic.detail, 0, 1);
+    var updateDensity2 = plotDensity(t[0].diagnostic.detail, 1, 2);
+
+    parMatrix(t[0].diagnostic.detail, updateCorr1, updateCorr2, updateDensity1, updateDensity2);
 
 
 //    console.log(t[0].diagnostic[0][0][0].png);
