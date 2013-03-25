@@ -1,8 +1,4 @@
-
-// = require bootstrap
-
-//$(document).ready(function() {
-function parMatrix(mat) {
+function parMatrix(mat, updateCorr) {
 
     ////////////////////////
     // Variables definition
@@ -127,6 +123,8 @@ function parMatrix(mat) {
 	    var indj = d[1];
 	    var cc = d[2].cc;
 	    var ess = d[2].ess;
+
+
 	    d3.select("#ActiveMatComp")
 	        .classed('hidden', false)
 		.style("background-color",function(d) {
@@ -137,7 +135,7 @@ function parMatrix(mat) {
 		.style("left", pos.left -CellSize*(Math.sqrt(GrowFact)-1)/2 + "px")
 	    	.style("top", pos.top - CellSize*(Math.sqrt(GrowFact)-1)/2 + "px")
 		.style("z-index", 1);
-	    console.log($(".mytooltip"));
+//	    console.log($(".mytooltip"));
 	    if (indi == indj){
 		$('a[rel=tooltip]').attr('data-original-title','ess: ' + ess).tooltip('fixTitle');} 
 	    else {
@@ -146,6 +144,9 @@ function parMatrix(mat) {
 	    $('a[rel=tooltip]').tooltip("show");
 	    
 	    mouseov(indi,indj);
+
+          updateCorr(indi, indj)
+
 	})
 	.on("mouseout",function(d){
 	    d3.event.stopPropagation();
@@ -165,5 +166,4 @@ function parMatrix(mat) {
 $('a[rel=popover]').popover();
 $('a[rel=tooltip]').tooltip();
 
-};			  
-			
+};

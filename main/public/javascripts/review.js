@@ -29,8 +29,9 @@ $(document).ready(function() {
 
 
     console.log(t[0].diagnostic);
-    parMatrix(t[0].diagnostic.detail);
-
+    var update = plotCorr(t[0].diagnostic.detail, 0, 1);
+    parMatrix(t[0].diagnostic.detail, update);
+    
     var compiled = _.template(data.tpl.summaryTable);
     $('#summaryTable').html(compiled(t[0].diagnostic));
 
