@@ -145,5 +145,15 @@ text.shadow {
 }
 
 .img-diag{
-  width: 200px;
+  height: 220px;
+}
+
+#diag-plots{
+  height: 480px;
+}
+
+
+#theta-list div{
+  display:table-cell; 
+  padding-right: 40px;
 }

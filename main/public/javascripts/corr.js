@@ -12,10 +12,9 @@ function plotCorr(diag, i, j, ind){
     });
   });
 
-  var margin = {top: 20, right: 20, bottom: 30, left: 40},
-  width = 200 - margin.left - margin.right,
-  height = 200 - margin.top - margin.bottom;
-
+  var margin = {top: 20, right: 20, bottom: 30, left: 40}
+    , width = 220 - margin.left - margin.right
+    , height = 220 - margin.top - margin.bottom;
 
   var x = d3.scale.linear()
     .range([0, width])

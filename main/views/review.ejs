@@ -21,8 +21,8 @@
 
   <div class="span3">
     <div class="review-action">
-      <button class="btn" type="button"><i class="icon-eye-open"></i> Follow</button>
-      <button class="btn" type="button"><i class="icon-download"></i> Fork</button>
+      <button class="btn btn-primary" type="button"><i class="icon-eye-open"></i> Follow</button>
+      <button class="btn btn-danger" type="button"><i class="icon-download"></i> Fork</button>
     </div>
   </div>
 
@@ -114,6 +114,22 @@
       <div class="tab-pane active" id="theta">
 
 
+        <div class="horizontal-scroll"  id="theta-list">
+          <% for(var i = 0 ; i< 100; i++) {%>
+             <div>
+               <ul>
+                 <li>Parameter set</li>
+                 <li>author</li>
+                 <li>
+                   <a href="#">DIC: 4000</a>
+                 </li>
+               </ul>
+
+               <button class="btn" type="button">review</button>
+             </div>
+          <% } %>
+        </div>
+
 
         <!-- Summary table (templated) -->
         <div class="row">
@@ -123,11 +139,11 @@
         </div>	      	
 
          <!-- plots -->
-        <div class="row">
+        <div class="row" id="diag-plots">
 
 
          <!-- correlation matrix -->
-          <div class="span5">
+          <div class="span6">
 	      <div id="ActiveMatComp">  
 		<a href="#"  id="ActiveMatCompHack" rel="tooltip" data-placement="top" title="This is the tooltip!"></a>
 		<a href="#"  rel="popover" data-toggle="popover" data-trigger='hover' data-content="" title="title"></a>
@@ -171,7 +187,31 @@
       
         </div>
 
-        <h3>Feedback</h3>
+        <div class="row">
+          <div class="span6">
+            <h3>Feedback</h3>
+          </div>
+
+          <div class="span6">
+            <h3>Add</h3>
+
+            <form>
+
+              <label for="feedbackMethod">Provide feedback on the method</label>              
+              <textarea id="feedbackMethod" rows="3" class="span6"></textarea>
+
+              <label for="feedbackTheta">Provide feedback on the parameter values</label>
+              <textarea id="feedbackTheta" rows="3" class="span6"></textarea>
+
+              <p>
+                <button class="btn btn-success" type="button">Validate</button>
+                <button class="btn btn-danger" type="button">Need more work</button>
+              </p>
+            </form>
+
+          </div>
+
+        </div>
 
 
       </div>

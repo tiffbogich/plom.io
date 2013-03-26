@@ -24,7 +24,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
   var maxtextlength = Math.max.apply(Math, rowdataset.map(function(x){return x.length;}))
     , textfont = 10
-    , matTotSize = 450 - maxtextlength * textfont
+    , matTotSize = 550 - maxtextlength * textfont
     , figsSize = matTotSize
     , matMarginSize = maxtextlength/2 * textfont // /2 is completely arbitrary TODO: understand fonts size
     , matSize = matTotSize - matMarginSize
