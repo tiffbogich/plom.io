@@ -1,0 +1,10 @@
+<% thetas.forEach(function(theta, i){ %>
+   <div>
+     <ul>
+       <li>username</li>
+       <li>DIC: <%= Math.min.apply(Math, theta.diagnostic.summary.map(function(x){return x.dic;})) %></li>
+     </ul>
+
+     <button class="btn review-theta" type="button" value="<%= i %>">review</button>
+   </div>
+<% }); %>
