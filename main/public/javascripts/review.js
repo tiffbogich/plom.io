@@ -1,6 +1,5 @@
 var plomGlobal = {canRun: true, intervalId:[]};
 
-
 $(document).ready(function() {
 
   $.getJSON('/review', function(data) {
@@ -10,13 +9,49 @@ $(document).ready(function() {
       , l = data.comps.link
       , t = data.comps.thetas;
 
-    var compiled = _.template(data.tpl.control);
+    //compile templates
+    var compiled = {};
+    for(var k in data.tpl){
+      compiled[k] = _.template(data.tpl[k]);
+    }
 
-    $('#control').html(compiled({c:c, p:p, l:l, t:t[0]}));
 
-    //start with Parameter tab
     $('#reviewTab a[href=#theta]').tab('show');
     $('#reviewModelTab a[href=#review-context]').tab('show');
+    $('a[rel=tooltip]').tooltip();
+
+    //start with the first parameter and first trace selected
+    $('#theta-list').html(compiled.parameters(data.comps));
+    $('#summaryTable').html(compiled.summaryTable(t[0].diagnostic));      
+    $('#control').html(compiled.control({c:c, p:p, l:l, t:t[0]}));        
+
+    var updateCorr1 = plotCorr(t[0].diagnostic.detail[0], 0, 1, 1)
+      , updateCorr2 = plotCorr(t[0].diagnostic.detail[0], 1, 0, 2)
+      , updateDensity1 = plotDensity(t[0].diagnostic.detail[0], 0, 1)
+      , updateDensity2 = plotDensity(t[0].diagnostic.detail[0], 1, 2);
+
+    var updateMat = parMatrix(t[0].diagnostic.detail[0], updateCorr1, updateCorr2, updateDensity1, updateDensity2); 
+
+
+    $('.review-theta').on('click', function(e){
+      var i = parseInt($(this).val(), 10);
+
+      $('#summaryTable').html(compiled.summaryTable(t[i].diagnostic));      
+      //force redraw of the correlation matrix as the number of parameters could have changed... TODO: improve update to avoid full redraw
+      updateMat = parMatrix(t[i].diagnostic.detail[0], updateCorr1, updateCorr2, updateDensity1, updateDensity2);
+
+      //when user select a trace:
+      $('.review-trace-id').on('click', function(e){              
+        var h = parseInt($(this).val(), 10);
+        $('#control').html(compiled.control({c:c, p:p, l:l, t:t[i]}));        
+        updateMat(t[i].diagnostic.detail[h]);
+      });
+
+    });
+
+    console.log(t[0].diagnostic.detail);
+
+    $('.review-theta').first().trigger('click');
 
     var plomTs = new PlomTs({
       context:c,
@@ -27,23 +62,6 @@ $(document).ready(function() {
       graphStateId: 'graphState',
       graphLikeId: "graphLike"
     });
-
-
-    console.log(t[0].diagnostic);
-    var updateCorr1 = plotCorr(t[0].diagnostic.detail, 0, 1, 1);
-    var updateCorr2 = plotCorr(t[0].diagnostic.detail, 1, 0, 2);
-
-
-    var compiled = _.template(data.tpl.summaryTable);
-    $('#summaryTable').html(compiled(t[0].diagnostic));
-
-    var updateDensity1 = plotDensity(t[0].diagnostic.detail, 0, 1);
-    var updateDensity2 = plotDensity(t[0].diagnostic.detail, 1, 2);
-
-    parMatrix(t[0].diagnostic.detail, updateCorr1, updateCorr2, updateDensity1, updateDensity2);
-
-
-
 
 
 //    $('input.plottedTs').change(function(){

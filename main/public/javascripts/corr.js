@@ -1,14 +1,14 @@
 function plotCorr(diag, i, j, ind){
 
-  var xlabel = diag[0][i][i].par + ':' + diag[0][i][i].group;
-  var ylabel = diag[0][j][j].par + ':' + diag[0][j][j].group;
+  var xlabel = diag[i][i].par + ':' + diag[i][i].group;
+  var ylabel = diag[j][j].par + ':' + diag[j][j].group;
 
   var data = [];
-  diag[0][i][i].trace.forEach(function(x, k){
+  diag[i][i].trace.forEach(function(x, k){
     data.push({
       x: x, 
-      y: diag[0][j][j].trace[k],
-      like: diag[0][diag[0].length-1][diag[0].length-1].trace[k]
+      y: diag[j][j].trace[k],
+      like: diag[diag.length-1][diag.length-1].trace[k]
     });
   });
 
@@ -79,19 +79,20 @@ function plotCorr(diag, i, j, ind){
     .style("fill", function(d) { return color(d.like); })
     .style("stroke", function(d) { return color(d.like); });
 
-  return function(i, j) {
+  return function(diag, i, j) {
 
     var data = [];
-    var xlabel = diag[0][i][i].par + ':' + diag[0][i][i].group;
-    var ylabel = diag[0][j][j].par + ':' + diag[0][j][j].group;
+    var xlabel = diag[i][i].par + ':' + diag[i][i].group;
+    var ylabel = diag[j][j].par + ':' + diag[j][j].group;
 
-    diag[0][i][i].trace.forEach(function(x, k){
+    diag[i][i].trace.forEach(function(x, k){
       data.push({
         x: x, 
-        y: diag[0][j][j].trace[k],
-        like: diag[0][diag[0].length-1][diag[0].length-1].trace[k]
+        y: diag[j][j].trace[k],
+        like: diag[diag.length-1][diag.length-1].trace[k]
       });
     });
+
 
     x.domain(d3.extent(data, function(d) { return d.x; })).nice();
     y.domain(d3.extent(data, function(d) { return d.y; })).nice();

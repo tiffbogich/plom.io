@@ -45,19 +45,8 @@
 
       <div class="tab-pane active" id="theta">
 
-        <div class="horizontal-scroll"  id="theta-list">
-          <% for(var i = 0 ; i< 100; i++) {%>
-             <div>
-               <ul>
-                 <li>Parameter set</li>
-                 <li>author</li>
-                 <li>DIC: 4000</li>
-               </ul>
-
-               <button class="btn" type="button">review</button>
-             </div>
-          <% } %>
-        </div>
+        <!-- parameter list (templated) -->
+        <div class="horizontal-scroll"  id="theta-list"></div>
 
         <hr/>
 
@@ -129,7 +118,7 @@
         <hr/>
 
         <!-- Filtering -->
-        <div class="row">
+        <div class="row" id="filtering">
 
           <!-- Plots -->
           <div class="span7">
@@ -198,7 +187,7 @@
         <hr/>
 
         <!-- Feedback zone -->
-        <div class="row">
+        <div class="row"  id="rowFeedbackTheta">
           <div class="span7">
             <h3>Feedback</h3>
           </div>

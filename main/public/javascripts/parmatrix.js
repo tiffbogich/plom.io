@@ -1,5 +1,9 @@
 function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity2) {
 
+  //empty first parMatrix is called multiple times...
+  $('#vis svg').remove();
+  d3.select("#ActiveMatComp").classed('hidden', true);
+
   ////////////////////////
   // Variables definition
   ////////////////////////
@@ -10,16 +14,14 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     .domain([-1,0,1])
     .range(["blue","white","red"]);
 
-  var nbpars = data[0].length;
+  var nbpars = data.length;
 
   for (var i=0; i<nbpars; i++){
-    rowdataset.push(data[0][i][i].par + ((data[0][i][i].group) ? ':' + data[0][i][i].group : '') );
-
-    data[0][i][i].cc=1; // in order to have diagonal terms with maximal correlation
-
+    rowdataset.push(data[i][i].par + ((data[i][i].group) ? ':' + data[i][i].group : '') );
+    data[i][i].cc=1; // in order to have diagonal terms with maximal correlation
     for (var j=0; j<nbpars; j++){
-      dataset.push([i, j, data[0][i][j]]);
-    } 
+      dataset.push([i, j, data[i][j]]);
+    }
   }
 
   var maxtextlength = Math.max.apply(Math, rowdataset.map(function(x){return x.length;}))
@@ -141,14 +143,14 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       $('#corr1, #corr2, #density1').addClass('hidden');
       $('#trace, #autocor, #test').removeClass('hidden');
 
-      $('#trace img').attr('src', '/trace/' + data[0][indi][indi].png.trace_id);
-      $('#autocor img').attr('src', '/trace/' + data[0][indi][indi].png.autocor_id);
+      $('#trace img').attr('src', '/trace/' + data[indi][indi].png.trace_id);
+      $('#autocor img').attr('src', '/trace/' + data[indi][indi].png.autocor_id);
 
-      $('#geweke').html(data[0][indi][indi].geweke);
-      $('#heidel-start').html(data[0][indi][indi].heidel.start);
-      $('#heidel-pvalue').html(data[0][indi][indi].heidel.pvalue);
+      $('#geweke').html(data[indi][indi].geweke);
+      $('#heidel-start').html(data[indi][indi].heidel.start);
+      $('#heidel-pvalue').html(data[indi][indi].heidel.pvalue);
 
-      $('#ess').html(data[0][indi][indi].ess);
+      $('#ess').html(data[indi][indi].ess);
 
     } else {
 
@@ -157,20 +159,43 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
     }
 
+    updateCorr1(data, indi, indj);          
+    updateCorr2(data, indj, indi);
 
-    updateCorr1(indi, indj);          
-    updateCorr2(indj, indi);
-
-    updateDensity1(indi);
-    updateDensity2(indj);
+    updateDensity1(data, indi);
+    updateDensity2(data, indj);
 
   };
-
 
   mat.on("mouseout",function(d){
     d3.select("#ActiveMatComp").classed('hidden', true);
   });
 
-  $('a[rel=tooltip]').tooltip();
+  //return update function (assume that only colors change)
+
+  return function(data){
+    var dataset = [];
+
+    for (var i=0; i<data.length; i++){
+      data[i][i].cc=1;
+      for (var j=0; j<data.length; j++){
+        dataset.push([i, j, data[i][j]]);
+      }
+    }
+
+    matTot.selectAll("rect")
+      .data(dataset)
+      .transition()
+      .duration(500)
+      .attr('fill', function(d) {return color(d[2].cc);});  
+
+    d3.select("#ActiveMatComp").classed('hidden', true);
+
+    updateCorr1(data, 0, 1);          
+    updateCorr2(data, 1, 0);
+    updateDensity1(data, 0);
+    updateDensity2(data, 1);
+
+  };
 
 };

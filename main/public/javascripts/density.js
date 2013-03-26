@@ -1,14 +1,14 @@
 function plotDensity(diag, i, ind){
 
   var data = [];
-  diag[0][i][i].posterior.x.forEach(function(x, k){
+  diag[i][i].posterior.x.forEach(function(x, k){
     data.push({
       x: x, 
-      y: diag[0][i][i].posterior.y[k],
+      y: diag[i][i].posterior.y[k],
     });
   });
 
-  var xlabel = diag[0][i][i].par + ':' + diag[0][i][i].group;
+  var xlabel = diag[i][i].par + ':' + diag[i][i].group;
 
   var margin = {top: 20, right: 20, bottom: 30, left: 40}
     , width = 220 - margin.left - margin.right
@@ -65,15 +65,15 @@ function plotDensity(diag, i, ind){
     .attr("d", line);
 
 
-  return function(i){
+  return function(diag, i){
 
     var data = [];
-    var xlabel = diag[0][i][i].par + ':' + diag[0][i][i].group;
+    var xlabel = diag[i][i].par + ':' + diag[i][i].group;
 
-    diag[0][i][i].posterior.x.forEach(function(x, k){
+    diag[i][i].posterior.x.forEach(function(x, k){
       data.push({
         x: x, 
-        y: diag[0][i][i].posterior.y[k],
+        y: diag[i][i].posterior.y[k],
       });
     });
 
