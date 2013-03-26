@@ -160,3 +160,7 @@ text.shadow {
   border-radius: 4px;
   box-shadow: 0 0 15px rgba(230,230,230,0.8);
 }
+
+.dot{
+  opacity:0.4;
+}
