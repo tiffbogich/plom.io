@@ -107,10 +107,8 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 	  return color(cc);})
 	.style("width", cellSize*Math.sqrt(growFact) + "px")
 	.style("height", cellSize*Math.sqrt(growFact) + "px")
-	.style("position", "absolute")
 	.style("left", pos.left -cellSize*(Math.sqrt(growFact)-1)/2 + "px")
-	.style("top", pos.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px")
-	.style("z-index", 1);
+	.style("top", pos.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px");
 
       if (indi == indj){
 	$('a[rel=tooltip]').attr('data-original-title','ess: ' + ess).tooltip('fixTitle');
@@ -139,6 +137,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
 
     if(indi === indj){
+
       $('#corr1, #corr2, #density1').addClass('hidden');
       $('#trace, #autocor, #test').removeClass('hidden');
 
@@ -146,12 +145,16 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       $('#autocor img').attr('src', '/trace/' + data[0][indi][indi].png.autocor_id);
 
       $('#geweke').html(data[0][indi][indi].geweke);
-      $('#heidel').html('start: ' + data[0][indi][indi].heidel.start + ' ; pvalue: ' +data[0][indi][indi].heidel.pvalue);
+      $('#heidel-start').html(data[0][indi][indi].heidel.start);
+      $('#heidel-pvalue').html(data[0][indi][indi].heidel.pvalue);
+
       $('#ess').html(data[0][indi][indi].ess);
 
     } else {
+
       $('#corr1, #corr2, #density1').removeClass('hidden');
       $('#trace, #autocor, #test').addClass('hidden');
+
     }
 
 
@@ -168,8 +171,6 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     d3.select("#ActiveMatComp").classed('hidden', true);
   });
 
-
-  $('a[rel=popover]').popover();
   $('a[rel=tooltip]').tooltip();
 
 };

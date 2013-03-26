@@ -28,74 +28,6 @@
 
 </div>
 
-<div class="row">
-
-  <!-- Plots -->
-  <div class="span7">
-
-    <!-- Trajectories plot -->
-    <div class="accordion" id="plotTraj">
-      <div class="accordion-group">
-        <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotTraj" href="#plotTrajContent">State Variables</a>
-        </div>
-
-        <div id="plotTrajContent" class="accordion-body collapse in">
-          <div class="accordion-inner">
-            <div id="graphTraj"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- States plot and diffusions -->
-    <div class="accordion" id="plotState">
-      <div class="accordion-group">
-        <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotState" href="#plotStateContent">State Variables</a>
-        </div>
-
-        <div id="plotStateContent" class="accordion-body collapse">
-          <div class="accordion-inner">
-            <div id="graphState"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- likelihood and ESS plots -->
-    <div class="accordion" id="plotLike">
-      <div class="accordion-group">
-        <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotLike" href="#plotLikeContent">Likelihood</a>
-        </div>
-        <div id="plotLikeContent" class="accordion-body collapse">
-          <div class="accordion-inner">
-            <div id="graphLike"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Controls -->
-  <div class="span5">
-
-    <div>
-      <button id="run" class="btn" type="button"><i class="icon-play"></i> Run</button>
-      <button id="stop" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
-      <button class="btn" type="button"><i class="icon-file"></i> Attach to comment</button>
-    </div>
-
-    <div id="control"></div>
-
-  </div>
-
-</div>
-
-
-
 
 <div class="row">
   <div class="span12">
@@ -113,16 +45,13 @@
 
       <div class="tab-pane active" id="theta">
 
-
         <div class="horizontal-scroll"  id="theta-list">
           <% for(var i = 0 ; i< 100; i++) {%>
              <div>
                <ul>
                  <li>Parameter set</li>
                  <li>author</li>
-                 <li>
-                   <a href="#">DIC: 4000</a>
-                 </li>
+                 <li>DIC: 4000</li>
                </ul>
 
                <button class="btn" type="button">review</button>
@@ -130,6 +59,7 @@
           <% } %>
         </div>
 
+        <hr/>
 
         <!-- Summary table (templated) -->
         <div class="row">
@@ -138,15 +68,15 @@
           </div>
         </div>	      	
 
+        <hr/>
+
          <!-- plots -->
         <div class="row" id="diag-plots">
-
 
          <!-- correlation matrix -->
           <div class="span6">
 	      <div id="ActiveMatComp">  
-		<a href="#"  id="ActiveMatCompHack" rel="tooltip" data-placement="top" title="This is the tooltip!"></a>
-		<a href="#"  rel="popover" data-toggle="popover" data-trigger='hover' data-content="" title="title"></a>
+		<a href="#" rel="tooltip" data-placement="top" title="This is the tooltip!"></a>
 	      </div>		  
 
 	      <div id="popover_content_wrapper" style="display: none">
@@ -176,7 +106,16 @@
                 </div>
                 <div class="span3 hidden" id="autocor">
 		  <ul>
-		    <li>Heidelberger: <span id="heidel" class="diagnostics"></span></li>
+		    <li>Heidelberger:
+                      <ul>
+                        <li>
+                          start: <span id="heidel-start" class="diagnostics"></span>
+                        </li>
+                        <li>
+                          p-value: <span id="heidel-pvalue" class="diagnostics"></span>
+                        </li>
+                      </ul>
+                    </li>
 		    <li>Geweke: <span id="geweke" class="diagnostics"></span></li>
 		    <li>ESS: <span id="ess" class="diagnostics"></span></li>
 		  </ul>
@@ -187,21 +126,93 @@
       
         </div>
 
+        <hr/>
+
+        <!-- Filtering -->
         <div class="row">
-          <div class="span6">
+
+          <!-- Plots -->
+          <div class="span7">
+
+            <!-- Trajectories plot -->
+            <div class="accordion" id="plotTraj">
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotTraj" href="#plotTrajContent">State Variables</a>
+                </div>
+
+                <div id="plotTrajContent" class="accordion-body collapse in">
+                  <div class="accordion-inner">
+                    <div id="graphTraj"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- States plot and diffusions -->
+            <div class="accordion" id="plotState">
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotState" href="#plotStateContent">State Variables</a>
+                </div>
+
+                <div id="plotStateContent" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <div id="graphState"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- likelihood and ESS plots -->
+            <div class="accordion" id="plotLike">
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotLike" href="#plotLikeContent">Likelihood</a>
+                </div>
+                <div id="plotLikeContent" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <div id="graphLike"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Controls -->
+          <div class="span5">
+
+            <div>
+              <button id="run" class="btn" type="button"><i class="icon-play"></i> Run</button>
+              <button id="stop" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
+              <button class="btn" type="button"><i class="icon-file"></i> Attach to comment</button>
+            </div>
+
+            <div id="control"></div>
+
+          </div>
+
+        </div>
+
+        <hr/>
+
+        <!-- Feedback zone -->
+        <div class="row">
+          <div class="span7">
             <h3>Feedback</h3>
           </div>
 
-          <div class="span6">
+          <div class="span5">
             <h3>Add</h3>
 
             <form>
 
               <label for="feedbackMethod">Provide feedback on the method</label>              
-              <textarea id="feedbackMethod" rows="3" class="span6"></textarea>
+              <textarea id="feedbackMethod" rows="3" class="span5"></textarea>
 
               <label for="feedbackTheta">Provide feedback on the parameter values</label>
-              <textarea id="feedbackTheta" rows="3" class="span6"></textarea>
+              <textarea id="feedbackTheta" rows="3" class="span5"></textarea>
 
               <p>
                 <button class="btn btn-success" type="button">Validate</button>
@@ -214,7 +225,10 @@
         </div>
 
 
+
       </div>
+
+
 
 
       <!-- Model review -->
@@ -222,30 +236,83 @@
 
         <div class="row">
 
-          <div class="span6">
+          <div class="span12">
 
-            <h3>Context</h3>
 
-            <h3>Process Model</h3>
+            <ul class="nav nav-tabs" id="reviewModelTab">
+              <li class="active">
+                <a href="#review-context" data-toggle="tab">Context</a>
+              </li>
+              <li>
+                <a href="#review-process" data-toggle="tab">Process Model</a>
+              </li>
+              <li>
+                <a href="#review-link" data-toggle="tab">Observation Model</a>
+              </li>
+            </ul>
 
-            <h3>Observation Model</h3>
+            <div class="tab-content">
+
+              <!-- context -->
+              <div class="tab-pane active" id="review-context">
+
+                <p>This is the context</p>
+
+              </div>
+
+              <!-- process -->
+              <div class="tab-pane" id="review-process">
+
+                <p>This is the process</p>
+                
+              </div>
+
+              <!-- link -->
+              <div class="tab-pane" id="review-link">
+
+                <p>This is the link</p>
+                
+              </div>
+
+            </div>
 
           </div>
+        </div>
 
-          <div class="span6">
-            <h3>Discussion</h3>
+
+
+        <!-- Feedback zone -->
+        <div class="row">
+          <div class="span7">
+            <h3>Feedback</h3>
+          </div>
+
+          <div class="span5">
+            <h3>Add</h3>
+
+            <form>
+
+              <label for="feedbackModel">Provide feedback on the model and its adequation to the context</label>
+              <textarea id="feedbackModel" rows="3" class="span5"></textarea>
+
+              <p>
+                <button class="btn btn-success" type="button">Validate</button>
+                <button class="btn btn-danger" type="button">Not convincing</button>
+              </p>
+            </form>
+
           </div>
 
         </div>
 
-      </div>
+
+
+
+
 
     </div>
-
   </div>
-
 </div>
-
 
 
 <% include footer %>

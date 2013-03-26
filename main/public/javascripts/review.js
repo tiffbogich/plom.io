@@ -16,6 +16,7 @@ $(document).ready(function() {
 
     //start with Parameter tab
     $('#reviewTab a[href=#theta]').tab('show');
+    $('#reviewModelTab a[href=#review-context]').tab('show');
 
     var plomTs = new PlomTs({
       context:c,
