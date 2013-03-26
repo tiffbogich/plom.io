@@ -140,7 +140,7 @@ text.shadow {
 }
 
 .density {
-  fill: grey;
+  fill: rgba(234,234,234,0.8);
   stroke-width: 1.5px;
 }
 
