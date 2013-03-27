@@ -4,6 +4,7 @@
 <script src="/javascripts/parmatrix.js"></script>
 <script src="/javascripts/corr.js"></script>
 <script src="/javascripts/density.js"></script>
+<script src="/javascripts/view.js"></script>
 <script src="/javascripts/review.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
@@ -127,7 +128,7 @@
             <div class="accordion" id="plotTraj">
               <div class="accordion-group">
                 <div class="accordion-heading">
-                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotTraj" href="#plotTrajContent">State Variables</a>
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotTraj" href="#plotTrajContent">Time series</a>
                 </div>
 
                 <div id="plotTrajContent" class="accordion-body collapse in">
@@ -153,19 +154,35 @@
               </div>
             </div>
 
-            <!-- likelihood and ESS plots -->
-            <div class="accordion" id="plotLike">
+            <!-- prediction residuals -->
+            <div class="accordion" id="plotPredRes">
               <div class="accordion-group">
                 <div class="accordion-heading">
-                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotLike" href="#plotLikeContent">Likelihood</a>
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotLike" href="#plotPredResContent">Prediction residuals</a>
                 </div>
-                <div id="plotLikeContent" class="accordion-body collapse">
+                <div id="plotPredResContent" class="accordion-body collapse">
                   <div class="accordion-inner">
                     <div id="graphLike"></div>
                   </div>
                 </div>
               </div>
             </div>
+
+            <!-- ESS -->
+            <div class="accordion" id="plotEss">
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotLike" href="#plotEssContent">ESS</a>
+                </div>
+                <div id="plotEssContent" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <div id="graphLike"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
 
           </div>
 

@@ -12,16 +12,15 @@
   <!-- Methods< -->
   <div class="tab-pane active" id="ctr-methods">
 
-
     <form class="form-horizontal">
 
       <div class="control-group">
         <label class="control-label" for="opt-method">Method</label>
         <div class="controls">
-          <select id="opt-method">
+          <select id="optAlgo">
             <option value="simul">Simulation</option>
-            <option value="smc">Sequential Monte Carlo (SMC)</option>
-            <option value="kalman">Extended Kalman Filter (EKF)</option>
+            <option value="smc">Sequential Monte Carlo</option>
+            <option value="kalman">Extended Kalman Filter</option>
           </select>
         </div>
       </div>
@@ -29,7 +28,7 @@
       <div class="control-group">
         <label class="control-label" for="opt-impl">Implementation</label>
         <div class="controls">
-          <select id="opt-impl">
+          <select id="optImpl">
             <option value="ode">Ordinary differential equation</option>
             <option value="sde">Stochastic differential equation</option>
             <option value="psr">Poisson process</option>
@@ -41,14 +40,14 @@
       <div class="control-group">
         <label class="control-label" for="opt-J">Number of particles/ realisations</label>
         <div class="controls">
-          <input type="text" id="opt-J" class="input-small">
+          <input type="text" id="optJ" class="input-small">
         </div>
       </div>
 
       <div class="control-group">
         <label class="control-label" for="opt-S">Integration time step</label>
         <div class="controls">
-          <input type="text" id="opt-S" class="input-small">
+          <input type="text" id="optS" class="input-small"> <span>unit</span>
         </div>
       </div>
 

@@ -64,6 +64,9 @@ $(document).ready(function() {
     });
 
 
+    var control = new Control();
+    control.render(c, t[0].design);
+
 //    $('input.plottedTs').change(function(){
 //      plomTs.graph_ts.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
 //      plomTs.graph_ts.setVisibility(plomTs.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked') );
@@ -138,12 +141,11 @@ $(document).ready(function() {
       $("#run").click(function(){
         if(plomGlobal.canRun){
           plomGlobal.canRun = false;
-          plomTs.run(socket, {method:'smc', implementation: 'psr', J:100});
+          plomTs.run(socket, control.get());
         }
       });
 
     } //if socket
-
 
   });
 
