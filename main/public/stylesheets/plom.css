@@ -164,3 +164,19 @@ text.shadow {
 .dot{
   opacity:0.4;
 }
+
+
+#controlTab{
+  margin-top: 10px;
+}
+
+#ctr-methods select{
+  width: 100%;
+}
+
+
+#slider{
+  position:absolute;
+  width:250px;
+  background: none;
+}

@@ -50,9 +50,7 @@ function PlomTs(options) {
   }
   this.driftName = driftName;
 
-  this.offsetX = 2+this.N_PAR_SV*this.N_CAC;
   this.offsetHat = 1+this.N_PAR_SV*this.N_CAC*3;
-  this.offsetDrift = this.offsetX + this.N_TS;
   this.offsetDriftHat = this.offsetHat+ this.N_TS*3;
 
   this.setDataTraj();
@@ -191,11 +189,13 @@ PlomTs.prototype.run = function(socket, options){
   this.setDataState();
 
   if(socket){
-    var exec = {simul:  {exec: 'smc',    opt: [options.implementation, '--traj', '-J ' + options.J, '-t', '-b', '-P 1']},
-                smc:    {exec: 'smc',    opt: [options.implementation, '--traj', '-J ' + options.J, '-b', '-P 1']},
-                kalman: {exec: 'kalman', opt: [options.implementation, '--traj']}};
-
-    socket.emit('start', {'exec': exec[options.method], 'plomModelId': this.link._id, 'theta': this.theta});
+    var exec = {
+      simul:  {exec: 'smc',    opt: [options.impl, '-J ' + options.J, '-t', '-b', '-P 1']},
+      smc:    {exec: 'smc',    opt: [options.impl, '-J ' + options.J, '-b', '-P 1']},
+      kalman: {exec: 'kalman', opt: [options.impl, '-b']}
+    };
+    
+    socket.emit('start', {'exec': exec[options.algo], 'plomModelId': this.link._id, 'theta': this.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
       that.graphTraj.updateOptions( { 'file': that.dataTraj } );
@@ -207,7 +207,6 @@ PlomTs.prototype.run = function(socket, options){
   }
 
 };
-
 
 PlomTs.prototype.processMsg = function(msg, appendLog){
 
@@ -221,66 +220,34 @@ PlomTs.prototype.processMsg = function(msg, appendLog){
     console.error(msg.msg);
     break;
 
-  case 'X':
-    this.processX(msg.msg);
-    break;
-
   case 'hat':
     this.processHat(msg.msg);
     break;
   }
 };
 
+
 /**
  *process an hat message
  */
 PlomTs.prototype.processHat = function(msg){
 
-  for(var t=0, l=msg.length; t<l; t++){
-
-    for(var j=0; j<3; j++){
-
-      //states
-      for(var s=0; s< this.stateName.length; s++){
-        this.dataState[t][1+s][j] = msg[t][1+s*3+j];
-      }
-
-      //drift (if it exists)
-      for(var i=0; i<this.driftName.length; i++){
-        this.dataState[t][1+this.stateName.length+i][j] = msg[t][this.offsetDriftHat+i*3+j];
-      }
-
-      //ts
-      for(var ts=0; ts<this.N_TS; ts++){
-        this.dataTraj[t][this.N_TS+1+ts][j] = msg[t][this.offsetHat+ts*3+j];
-      }
-
-    }
-
-  }
-
-};
-
-
-PlomTs.prototype.processX = function(msg){
-  //take an X msg and fill a hat data
-
-  var n = msg[0][1];
+  var n = msg[0];
 
   for(var j=0; j<3; j++){
     //states
-    for(var s=0; s<this.stateName.length; s++){
-      this.dataState[n-1][1+s][j] = msg[0][1+s];
+    for(var s=0; s< this.stateName.length; s++){
+      this.dataState[n-1][1+s][j] = msg[1+s*3+j];
     }
 
     //drift (if it exists)
     for(var i=0; i<this.driftName.length; i++){
-      this.dataState[n-1][1+this.stateName.length+i][j] = msg[0][this.offsetDrift+i];
+      this.dataState[n-1][1+this.stateName.length+i][j] = msg[this.offsetDriftHat+i*3+j];
     }
 
     //ts
     for(var ts=0; ts<this.N_TS; ts++){
-      this.dataTraj[n-1][this.N_TS+ts+1][j] = msg[0][this.offsetX+ts];
+      this.dataTraj[n-1][this.N_TS+1+ts][j] = msg[this.offsetHat+ts*3+j];
     }
   }
 

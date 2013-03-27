@@ -2,15 +2,17 @@ var io = require('socket.io')
   , path = require('path')
   , spawn = require('child_process').spawn;
 
-var plomProg = {smc:      {bin:'./smc',      flag:'filter'},
-                kalman:   {bin:'./kalman',   flag:'filter'},
-                simul:    {bin:'./simul',    flag:'simul'},
-                ic:       {bin:'./simul',    flag:'ic'},
-                mif:      {bin:'./mif',      flag:'mif'},
-                pmcmc:    {bin:'./pmcmc',    flag:'mcmc'},
-                kmcmc:    {bin:'./kmcmc',    flag:'mcmc'},
-                simplex:  {bin:'./simplex',  flag:'simplex'},
-                ksimplex: {bin:'./ksimplex', flag:'simplex'}};
+var plomProg = {
+  smc:      {bin:'./smc_web',      flag:'filter'},
+  kalman:   {bin:'./kalman_web',   flag:'filter'},
+  simul:    {bin:'./simul_web',    flag:'simul'},
+  ic:       {bin:'./simul_web',    flag:'ic'},
+  mif:      {bin:'./mif_web',      flag:'mif'},
+  pmcmc:    {bin:'./pmcmc_web',    flag:'mcmc'},
+  kmcmc:    {bin:'./kmcmc_web',    flag:'mcmc'},
+  simplex:  {bin:'./simplex_web',  flag:'simplex'},
+  ksimplex: {bin:'./ksimplex_web', flag:'simplex'}
+};
 
 function RunningProgs(){
     this.progs = [];

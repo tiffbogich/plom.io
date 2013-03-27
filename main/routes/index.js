@@ -168,7 +168,7 @@ exports.postIndex = function(req, res, next){
 
         pmbuilder.on('exit', function (code_pmbuilder) {
           if(code_pmbuilder === 0) {
-            var make = spawn('make', ['CC=gcc-4.7', 'install'], {cwd:path.join(buildPath, 'C', 'templates')});
+            var make = spawn('make', ['-f', 'Makefile_web', 'CC=gcc-4.7', 'install'], {cwd:path.join(buildPath, 'C', 'templates')});
 
             make.on('exit', function (code_make) {
               if(code_make === 0){
