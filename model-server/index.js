@@ -329,8 +329,16 @@ app.post('/commit', function(req, res, next){
 
 
 
-var server = http.createServer(app);
 
+//makes sure that necessary directories exist
+if(!fs.existsSync(path.join(__dirname, 'uploads'))){
+  fs.mkdirSync(path.join(__dirname, 'uploads'));
+}
+if(!fs.existsSync(path.join(__dirname, 'builds'))){
+  fs.mkdirSync(path.join(__dirname, 'builds'));
+}
+
+var server = http.createServer(app);
 var MongoClient = mongodb.MongoClient;
 
 MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {

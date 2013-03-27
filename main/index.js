@@ -5,6 +5,7 @@
 var express = require('express')
   , routes = require('./routes')
   , fs = require('fs')
+  , path = require('path')
   , http = require('http')
   , mongodb = require('mongodb')
   , plomWsServer = require('../ws-server')
@@ -63,10 +64,21 @@ app.get('/trace/:_id', routes.trace);
 
 
 
+
+//makes sure that necessary directories exist
+var buildPath = path.join(process.env.HOME, 'built_plom_models')
+  , downloadPath = path.join(process.env.HOME, 'download_plom_models');
+
+if(!fs.existsSync(buildPath)){
+  fs.mkdirSync(buildPath);
+}
+if(!fs.existsSync(downloadPath)){
+  fs.mkdirSync(downloadPath);
+}
+
 var server = http.createServer(app);
-
-
 var MongoClient = mongodb.MongoClient;
+
 MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
 
   if (err) throw err;
