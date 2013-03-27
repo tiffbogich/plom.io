@@ -44,7 +44,7 @@ function coda2plom(diag, picts){
         ar: diag.ar[h][key],
         ess: diag.ess[h][key],
         geweke: diag.geweke[h].z[key], //Z score
-        raftery: (diag.raftery[h].resmatrix[0] !== 'Error') ? diag.raftery[h].resmatrix[i] : 'Error',
+        raftery: (diag.raftery[h].resmatrix[0] !== 'Error') ? diag.raftery[h].resmatrix[i] : {error: true, M: diag.raftery[h].resmatrix[1]},
         heidel: diag.heidel[h][i],
         trace: diag.trace[h][key],
         posterior: diag.posterior[h][key],
@@ -70,15 +70,16 @@ function coda2plom(diag, picts){
 
       //fill summary[h]
       if(detail[h][i][i].ess < summary[h].essMin) {
-        summary[h].essMin = detail[h][i].ess;
+        summary[h].essMin = detail[h][i][i].ess;
       }
 
       if(detail[h][i][i].geweke <= -1.96 || detail[h][i][i].geweke >= 1.96) {
         summary[h].geweke = false;
       }
 
-      if(detail[h][i][i].raftery === "Error") {
+      if('error' in detail[h][i][i].raftery) {
         summary[h].raftery.success = false;
+        summary[h].raftery.M = detail[h][i][i].raftery.M;
       } else {
         if(detail[h][i][i].raftery.M > summary[h].raftery.M) {
           summary[h].raftery.M = detail[h][i][i].raftery.M;
