@@ -3,6 +3,8 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   //empty first parMatrix is called multiple times...
   $('#vis svg').remove();
   d3.select("#ActiveMatComp").classed('hidden', true);
+  d3.select("#lock").classed('hidden', true);
+  d3.select("#ourtooltip").classed('hidden', true);
 
   ////////////////////////
   // Variables definition
@@ -15,6 +17,10 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     .range(["blue","white","red"]);
 
   var nbpars = data.length;
+  var activMatClicked = false;
+  var activeCell = [];
+  var clickedCell = [];
+  var posActCell = [];
 
   for (var i=0; i<nbpars; i++){
     rowdataset.push(data[i][i].par + ((data[i][i].group) ? ':' + data[i][i].group : '') );
@@ -49,6 +55,15 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     .attr("height",matSize)
     .attr("x",0)
     .attr("y",0);
+
+
+  d3.select("#lock").selectAll("img").remove();
+  d3.select("#lock")
+    .append("img")
+    .attr('src','/images/locked.png')
+    .attr("width",cellSize*Math.sqrt(growFact)/2+"px")
+    .attr("height",cellSize*Math.sqrt(growFact)/2+"px")
+
 
   /////////////////////////////////
   // Static initialisation of svgs
@@ -97,11 +112,13 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   //////////////////////////////////////
   matTot.selectAll("rect")
     .on("mouseover",function(d){
-      var pos = $(this).position();
+      posActCell = $(this).position();
       var indi = d[0];
       var indj = d[1];
       var cc = d[2].cc;
       var ess = d[2].ess;
+      
+      activeCell = [d[0],d[1]];
 
       d3.select("#ActiveMatComp")
 	.classed('hidden', false)
@@ -109,27 +126,86 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 	  return color(cc);})
 	.style("width", cellSize*Math.sqrt(growFact) + "px")
 	.style("height", cellSize*Math.sqrt(growFact) + "px")
-	.style("left", pos.left -cellSize*(Math.sqrt(growFact)-1)/2 + "px")
-	.style("top", pos.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px");
+	.style("left", posActCell.left -cellSize*(Math.sqrt(growFact)-1)/2 + "px")
+	.style("top", posActCell.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px");
 
+      
+
+     // d3.select(actCell)
+//	.style("background-color",function(d) {
+//	  return color(cc);})
+//	.style("width", cellSize*Math.sqrt(growFact) + "px")
+//	.style("height", cellSize*Math.sqrt(growFact) + "px")
+
+      d3.select("#ourtooltip")
+	.classed('hidden', false)
+	.style("left", posActCell.left +cellSize/2 + "px")
+	.style("top", posActCell.top + "px");
+      
       if (indi == indj){
-	$('a[rel=tooltip]').attr('data-original-title','ess: ' + ess).tooltip('fixTitle');
+	$('#ourtooltip a[rel=tooltip]').attr('data-original-title','ESS: ' + Math.round(ess*100)/100).tooltip('fixTitle');
       } else {
-	$('a[rel=tooltip]').attr('data-original-title','cc: ' + cc).tooltip('fixTitle');
+	$('#ourtooltip a[rel=tooltip]').attr('data-original-title','Corr: ' + Math.round(cc*100)/100).tooltip('fixTitle');
       }
 
-      $('a[rel=tooltip]').tooltip("show");
+      $('#ourtooltip a[rel=tooltip]').tooltip("show");
       
-      mouseov(indi,indj);
+      console.log(activMatClicked);
+      if(!activMatClicked){
+	mouseov(indi,indj);
+      }
 
     })
     .on("mouseout",function(d){
       d3.event.stopPropagation();
     });
 
+  d3.select("#ActiveMatComp")
+    .on("click",function(){
+      if (activMatClicked){
+	  console.log(clickedCell);
+	  console.log(activeCell);
+	  console.log(clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1])
+	  if (clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1]){
+            activMatClicked = false;
+     	    d3.select("#lock")
+	      .classed('hidden', true)
+	  }
+      } else {
+	console.log(posActCell);
+	activMatClicked = true;
+	clickedCell = activeCell;
+	d3.select("#lock")
+	.classed('hidden', false)
+	.style("left", posActCell.left + cellSize/4 + "px")
+	.style("top", posActCell.top + cellSize*3/16 + "px");
+      };
+    });
 
+  d3.select("#lock")
+    .on("click",function(){
+      if (activMatClicked){
+	  console.log(clickedCell);
+	  console.log(activeCell);
+	  console.log(clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1])
+	  if (clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1]){
+            activMatClicked = false;
+     	    d3.select("#lock")
+	      .classed('hidden', true)
+	  }
+      } else {
+	console.log(posActCell);
+	activMatClicked = true;
+	clickedCell = activeCell;
+	d3.select("#lock")
+	.classed('hidden', false)
+	.style("left", posActCell.left + cellSize/4 + "px")
+	.style("top", posActCell.top + cellSize*3/16 + "px");
+      };
+    });
 
   function mouseov(indi,indj){
+    console.log('youhou');
     d3.selectAll(".row text").classed("activetext", function(d,i){
       return i == indj;
     })

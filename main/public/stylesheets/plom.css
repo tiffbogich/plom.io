@@ -154,6 +154,17 @@ text.shadow {
   padding-right: 40px;
 }
 
+
+#lock{
+  position: absolute;
+  z-index:2;
+}
+
+#ourtooltip{
+  position: absolute;
+  z-index:2;
+}
+
 #ActiveMatComp{
   position: absolute;
   z-index:1;
