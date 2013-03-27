@@ -8,7 +8,7 @@
  * theta  (from theta.json)
  * graphTrajId, an id for the traj plot
  * graphStateId, an id for the state variable plots
- * graphLikeId, an id for the likelihood/ESS plot
+ * graphPredResId, an id for the residuals plot
  */
 
 function PlomTs(options) {
@@ -48,6 +48,9 @@ function PlomTs(options) {
 
   this.setDataState();
   this.graphState = this.makeGraphState();
+
+  this.setDataPredRes();
+  this.graphPredRes = this.makeGraphPredRes();
 
 };
 
@@ -128,6 +131,17 @@ PlomTs.prototype.setDataState = function(){
   }
 };
 
+PlomTs.prototype.setDataPredRes = function(){
+  this.dataPredRes = [];
+  for(var i=0; i<this.data.length; i++){
+    this.dataPredRes.push(new Array(1+this.N_TS));
+    this.dataPredRes[i][0] = this.data[i][0];
+    for(var ts=0; ts<(this.N_TS); ts++){
+      this.dataPredRes[i][ts+1] = null;
+    }
+  }
+};
+
 
 PlomTs.prototype.makeGraphTraj = function(){
 
@@ -160,7 +174,6 @@ PlomTs.prototype.makeGraphTraj = function(){
   }
 
   var g = new Dygraph($('#' +this.graphTrajId)[0], this.dataTraj, options);
-
   //repeat colors so that data and simul have the same colors
   var cols = d3.range(this.N_TS).map(d3.scale.category10());
   g.updateOptions({'colors': cols.concat(cols)});
@@ -195,13 +208,44 @@ PlomTs.prototype.makeGraphState = function(){
   };
 
   var g = new Dygraph($('#' +this.graphStateId)[0], this.dataState, options);
-
-  //repeat colors so that data and simul have the same colors
   var cols = d3.range(fullLabels.length-1).map(d3.scale.category10());
-  g.updateOptions({'colors': cols.concat(cols)});
+  g.updateOptions({'colors': cols});
 
   return g;
 };
+
+
+PlomTs.prototype.makeGraphPredRes = function(){
+
+  var options={
+    rollPeriod: 1,
+    labels: ["time"].concat(this.context.time_series.map(function(x){return 'data ' + x.id.split('__').join(' ')})),
+    yLabelWidth: 50,
+    axisLabelFontSize:8,
+    digitsAfterDecimal:6,
+    animatedZooms: true,
+    //labelsDivStyles:{'fontSize':'8pt', 'backgroundColor': 'transparent'},
+    showLabelsOnHighlight:false,
+    labelsSeparateLines: true,
+    showRoller: false,
+    drawAxesAtZero: true,
+    includeZero: true,
+    drawPoints: true,
+    pointSize: 2,
+    strokeWidth: 0.0,
+    highlightCircleSize: 2,
+    highlightSeriesOpts: {
+      highlightCircleSize: 3,
+    }
+  };
+
+  var g = new Dygraph($('#' +this.graphPredResId)[0], this.dataPredRes, options);
+  var cols = d3.range(this.N_TS).map(d3.scale.category10());
+  g.updateOptions({'colors': cols});
+
+  return g;
+};
+
 
 PlomTs.prototype.updateGraphState = function(){
   this.graphState.updateOptions( { 'file': this.dataState } );
@@ -209,6 +253,10 @@ PlomTs.prototype.updateGraphState = function(){
 
 PlomTs.prototype.updateGraphTraj = function(){
   this.graphTraj.updateOptions( { 'file': this.dataTraj } );
+};
+
+PlomTs.prototype.updateGraphPredRes = function(){
+  this.graphPredRes.updateOptions( { 'file': this.dataPredRes } );
 };
 
 
@@ -222,6 +270,7 @@ PlomTs.prototype.run = function(socket, options){
 
   this.setDataTraj();
   this.setDataState();
+  this.setDataPredRes();
 
   if(socket){
     var exec = {
@@ -233,8 +282,9 @@ PlomTs.prototype.run = function(socket, options){
     socket.emit('start', {'exec': exec[options.algo], 'plomModelId': this.link._id, 'theta': this.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
-      that.graphTraj.updateOptions( { 'file': that.dataTraj } );
-      that.graphState.updateOptions( { 'file': that.dataState } );
+      that.updateGraphState();
+      that.updateGraphTraj();
+      that.updateGraphPredRes();
     }, 100));
 
   } else{
@@ -258,7 +308,13 @@ PlomTs.prototype.processMsg = function(msg, appendLog){
   case 'hat':
     this.processHat(msg.msg);
     break;
+
+  case 'pred_res':
+    this.processPredRes(msg.msg);
+    break;
   }
+
+
 };
 
 
@@ -284,6 +340,20 @@ PlomTs.prototype.processHat = function(msg){
     for(var ts=0; ts<this.N_TS; ts++){
       this.dataTraj[n-1][this.N_TS+1+ts][j] = msg[this.offsetHat+ts*3+j];
     }
+  }
+
+};
+
+
+
+/**
+ *process a pred_res message
+ */
+PlomTs.prototype.processPredRes = function(msg){
+
+  var n = msg[0]-1;
+  for(var ts=0; ts<this.N_TS; ts++){
+    this.dataPredRes[n][1+ts] = msg[2+2*ts];
   }
 
 };

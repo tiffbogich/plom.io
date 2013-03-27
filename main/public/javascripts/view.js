@@ -135,10 +135,15 @@ Control.prototype.theta = function(theta, plomTs){
     })
     .trigger('change');
 
+  $('input.tick_predRes')
+    .on('change', function(){
+      plomTs.graphPredRes.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+    })
+    .trigger('change');
 
   //colors tick boxs:
   var cols = d3.scale.category10();
-  ['input.tick_traj', 'input.tick_state'].forEach(function(el){
+  ['input.tick_traj', 'input.tick_state', 'input.tick_predRes'].forEach(function(el){
     $(el).parent().each(function(i){
       $(this).css('color', cols(i));
     });

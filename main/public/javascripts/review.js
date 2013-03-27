@@ -45,7 +45,8 @@ $(document).ready(function() {
       theta: theta,
       graphTrajId: 'graphTraj',
       graphStateId: 'graphState',
-      graphLikeId: "graphLike"
+      graphLikeId: "graphLike",
+      graphPredResId: "graphPredRes"
     });
 
     $('.review-theta').on('click', function(e){
@@ -68,6 +69,7 @@ $(document).ready(function() {
 
         $('#tickTraj').html(compiled.ticks({'names': plomTs.getTrajNames() , prefix: 'traj'}));
         $('#tickState').html(compiled.ticks({'names': plomTs.getStateNames() , prefix: 'state'}));
+        $('#tickPredRes').html(compiled.ticks({'names': plomTs.getTrajNames() , prefix: 'predRes'}));
 
         control.theta(theta, plomTs);
 
@@ -111,16 +113,11 @@ $(document).ready(function() {
             clearInterval(plomGlobal.intervalId.pop());
           }
 
-          //be sure that the graph contain all the data (the graph is only updated every x msgs)
-          if(plomTs.graphState){
-            plomTs.updateGraphState();
-          }
-          if(plomTs.dataTraj){
-            plomTs.updateGraphTraj();
-          }
+          plomTs.updateGraphState();
+          plomTs.updateGraphTraj();
+          plomTs.updateGraphPredRes();
 
           plomGlobal.canRun = true;
-
         });
 
       });
