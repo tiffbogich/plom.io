@@ -121,16 +121,20 @@ Control.prototype.theta = function(theta, plomTs){
     }
   });
 
-
   //graph visibility
-  $('input.tick_traj').change(function(){
-    plomTs.graphTraj.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
-    plomTs.graphTraj.setVisibility(plomTs.N_TS+parseInt($(this).val(), 10), $(this).is(':checked'));
-  });
+  $('input.tick_traj')
+    .on('change', function(){
+      plomTs.graphTraj.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+      plomTs.graphTraj.setVisibility(plomTs.N_TS+parseInt($(this).val(), 10), $(this).is(':checked'));
+    })
+    .trigger('change');
 
-  $('input.tick_state').change(function(){
-    plomTs.graphState.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
-  });
+  $('input.tick_state')
+    .on('change', function(){
+      plomTs.graphState.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+    })
+    .trigger('change');
+
 
   //colors tick boxs:
   var cols = d3.scale.category10();
