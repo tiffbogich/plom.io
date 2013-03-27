@@ -31,8 +31,7 @@ function PlomTs(options) {
 
   var stateName = [];
   this.process.state.forEach(function(s){
-    var p = options.theta.value[s.id].partition_id;
-    options.theta.partition[p].group.forEach(function(g){
+    options.context.population.forEach(function(g){
       stateName.push(s.id + ':' + g.id);
     });
   });
