@@ -10,6 +10,7 @@
 
 <% include header %>
 
+
 <div class="row">
 
   <div class="span9">
@@ -192,8 +193,9 @@
             <div>
               <button id="run" class="btn" type="button"><i class="icon-play"></i> Run</button>
               <button id="stop" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
-              <button class="btn" type="button"><i class="icon-file"></i> Attach to comment</button>
             </div>
+
+            <div id="slider" class="hidden"></div>
 
             <div id="control"></div>
 
@@ -218,6 +220,7 @@
               <textarea id="feedbackMethod" rows="3" class="span5"></textarea>
 
               <label for="feedbackTheta">Provide feedback on the parameter values</label>
+              <button class="btn" style="float:left;" type="button"><i class="icon-file"></i> Attach run</button>
               <textarea id="feedbackTheta" rows="3" class="span5"></textarea>
 
               <p>

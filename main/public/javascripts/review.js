@@ -85,6 +85,70 @@ $(document).ready(function() {
 
 
 
+
+    $('input.theta').on('change', function() {
+     
+      var myName = $(this).attr('name').split('___')
+        , prop = myName[0]
+        , par = myName[1]
+        , group = myName[2]
+        , newValue = parseFloat($(this).val());
+
+      t[0].value[par][prop][group] = newValue;
+
+      if(prop === 'guess'){
+        $('#run').trigger('click');
+      }
+    });
+
+
+    $('input.guess')
+      .on('click', function() {
+        var myName = $(this).attr('name').split('___')
+        , prop = myName[0]
+        , par = myName[1]
+        , group = myName[2]
+        , guess = parseFloat($(this).val());
+
+        var min = parseFloat($('input.theta[name="' + ['min', par, group].join('___') + '"]').val())
+          , max = parseFloat($('input.theta[name="' + ['max', par, group].join('___') + '"]').val());
+
+        var pos = $(this).position();
+        pos.top -= 15;
+        pos.left -= 80;
+
+        if(min !== max) {
+          $("#slider")
+            .show()
+            .css(pos)
+            .slider("option", { min: min, max: max, value: guess, step: (max-min)/1000 })
+            .data({name: $(this).attr('name')});
+        }
+
+      })
+      .on('focusout', function(){
+        $("#slider")
+          .hide();
+      });
+
+
+
+    $( "#slider" ).slider({
+      slide: function( event, ui ) {
+        $('input.theta[name="' + $(this).data('name') +  '"]').val(ui.value);
+      },
+      stop: function( event, ui ) {
+        $(this).hide(100);
+        $('input.theta[name="' + $(this).data('name') +  '"]')
+          .val(ui.value)
+          .trigger('change');
+      }
+    });
+
+
+
+
+
     ////////////////////////////////////////////////////////////////////////////////////////
     //websocket
     ////////////////////////////////////////////////////////////////////////////////////////
