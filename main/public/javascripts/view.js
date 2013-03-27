@@ -4,7 +4,7 @@ function Control(){
   this.algo2filter = {mif: 'smc', kalman: 'kalman', kmcmc: 'kalman', smc: 'smc', pmcmc: 'smc', simul: 'simul', simplex: 'smc', ksimplex: 'kalman'};
 }
 
-Control.prototype.render = function(context, design){
+Control.prototype.method = function(context, design){
 
     var cmd = _.last(design.cmd);
     var opt = cmd.algorithm.split(' ').filter(function(x) {return (x !== ' ');});
@@ -50,7 +50,7 @@ Control.prototype.render = function(context, design){
 
 };
 
-Control.prototype.get = function(){
+Control.prototype.getMethod = function(){
 
   return {
     impl: $('#optImpl').val(),
@@ -61,4 +61,84 @@ Control.prototype.get = function(){
 
 };
 
+Control.prototype.theta = function(theta, plomTs){
 
+  $('input.theta').on('change', function() {
+    var myName = $(this).attr('name').split('___')
+      , prop = myName[0]
+      , par = myName[1]
+      , group = myName[2]
+      , newValue = parseFloat($(this).val());
+
+    theta.value[par][prop][group] = newValue;
+
+    if(prop === 'guess'){
+      $('#run').trigger('click');
+    }
+  });
+
+  $('input.theta')
+    .on('click', function() {
+      if($(this).hasClass('guess')){
+
+        var myName = $(this).attr('name').split('___')
+        , prop = myName[0]
+        , par = myName[1]
+        , group = myName[2]
+        , guess = parseFloat($(this).val());
+
+        var min = parseFloat($('input.theta[name="' + ['min', par, group].join('___') + '"]').val())
+          , max = parseFloat($('input.theta[name="' + ['max', par, group].join('___') + '"]').val());
+
+        var pos = $(this).position();
+        pos.top -= 15;
+        pos.left -= 80;
+
+        if(min !== max) {
+          $("#slider")
+            .show()
+            .css(pos)
+            .slider("option", { min: min, max: max, value: guess, step: (max-min)/1000 })
+            .data({name: $(this).attr('name')});
+        } else {
+          $("#slider").hide(100);
+        }
+
+      } else {
+        $("#slider").hide(100);
+      }
+    });
+
+  $( "#slider" ).slider({
+    slide: function( event, ui ) {
+      $('input.theta[name="' + $(this).data('name') +  '"]').val(ui.value);
+    },
+    stop: function( event, ui ) {
+      $(this).hide(100);
+      $('input.theta[name="' + $(this).data('name') +  '"]')
+        .val(ui.value)
+        .trigger('change');
+    }
+  });
+
+
+  //graph visibility
+  $('input.tick_traj').change(function(){
+    plomTs.graphTraj.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+    plomTs.graphTraj.setVisibility(plomTs.N_TS+parseInt($(this).val(), 10), $(this).is(':checked'));
+  });
+
+  $('input.tick_state').change(function(){
+    plomTs.graphState.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+  });
+
+  //colors tick boxs:
+  var cols = d3.scale.category10();
+  ['input.tick_traj', 'input.tick_state'].forEach(function(el){
+    $(el).parent().each(function(i){
+      $(this).css('color', cols(i));
+    });
+  });
+
+
+};

@@ -32,6 +32,21 @@ $(document).ready(function() {
 
     var updateMat = parMatrix(t[0].diagnostic.detail[0], updateCorr1, updateCorr2, updateDensity1, updateDensity2); 
 
+    var theta = $.extend(true, {}, t[0]);
+
+    var control = new Control();
+    control.method(c, theta.design);
+    control.theta(theta);
+
+    var plomTs = new PlomTs({
+      context: c,
+      process: p,
+      link: l,
+      theta: theta,
+      graphTrajId: 'graphTraj',
+      graphStateId: 'graphState',
+      graphLikeId: "graphLike"
+    });
 
     $('.review-theta').on('click', function(e){
       var i = parseInt($(this).val(), 10);
@@ -42,112 +57,27 @@ $(document).ready(function() {
 
       //when user select a trace:
       $('.review-trace-id').on('click', function(e){              
+
+        theta = $.extend(true, {}, t[i]);
+
         var h = parseInt($(this).val(), 10);
-        $('#control').html(compiled.control({c:c, p:p, l:l, t:t[i]}));        
-        updateMat(t[i].diagnostic.detail[h]);
+        $('#control').html(compiled.control({c:c, p:p, l:l, t:theta}));        
+        updateMat(theta.diagnostic.detail[h]);
+        control.method(c, theta.design);
+        plomTs.updateTheta(theta);
+
+        $('#tickTraj').html(compiled.ticks({'names': plomTs.getTrajNames() , prefix: 'traj'}));
+        $('#tickState').html(compiled.ticks({'names': plomTs.getStateNames() , prefix: 'state'}));
+
+        control.theta(theta, plomTs);
+
       });
 
-    });
+      $('.review-trace-id').first().trigger('click');
 
-    console.log(t[0].diagnostic.detail);
+    });
 
     $('.review-theta').first().trigger('click');
-
-    var plomTs = new PlomTs({
-      context:c,
-      process:p,
-      link:l,
-      theta:t[0],
-      graphTrajId: 'graphTraj',
-      graphStateId: 'graphState',
-      graphLikeId: "graphLike"
-    });
-
-
-    var control = new Control();
-    control.render(c, t[0].design);
-
-//    $('input.plottedTs').change(function(){
-//      plomTs.graph_ts.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
-//      plomTs.graph_ts.setVisibility(plomTs.N_TS+parseInt($(this).attr('name'), 10), $(this).attr('checked') );
-//    });
-//    $('input.plottedDrift').change(function(){
-//      plomTs.graph_drift.setVisibility(parseInt($(this).attr('name'), 10), $(this).attr('checked'));
-//    });
-//
-//    //colors tick boxs:
-//    var cols = d3.scale.category10();
-//    ['.plom-tick-simul', '.plom-tick-drift'].forEach(function(el){
-//      $(el).each(function(i){
-//        $(this).css('color', cols(i));
-//      });
-//    });
-
-
-
-
-    $('input.theta').on('change', function() {
-     
-      var myName = $(this).attr('name').split('___')
-        , prop = myName[0]
-        , par = myName[1]
-        , group = myName[2]
-        , newValue = parseFloat($(this).val());
-
-      t[0].value[par][prop][group] = newValue;
-
-      if(prop === 'guess'){
-        $('#run').trigger('click');
-      }
-    });
-
-
-    $('input.guess')
-      .on('click', function() {
-        var myName = $(this).attr('name').split('___')
-        , prop = myName[0]
-        , par = myName[1]
-        , group = myName[2]
-        , guess = parseFloat($(this).val());
-
-        var min = parseFloat($('input.theta[name="' + ['min', par, group].join('___') + '"]').val())
-          , max = parseFloat($('input.theta[name="' + ['max', par, group].join('___') + '"]').val());
-
-        var pos = $(this).position();
-        pos.top -= 15;
-        pos.left -= 80;
-
-        if(min !== max) {
-          $("#slider")
-            .show()
-            .css(pos)
-            .slider("option", { min: min, max: max, value: guess, step: (max-min)/1000 })
-            .data({name: $(this).attr('name')});
-        }
-
-      })
-      .on('focusout', function(){
-        $("#slider")
-          .hide();
-      });
-
-
-
-    $( "#slider" ).slider({
-      slide: function( event, ui ) {
-        $('input.theta[name="' + $(this).data('name') +  '"]').val(ui.value);
-      },
-      stop: function( event, ui ) {
-        $(this).hide(100);
-        $('input.theta[name="' + $(this).data('name') +  '"]')
-          .val(ui.value)
-          .trigger('change');
-      }
-    });
-
-
-
-
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //websocket
@@ -183,10 +113,10 @@ $(document).ready(function() {
 
           //be sure that the graph contain all the data (the graph is only updated every x msgs)
           if(plomTs.graphState){
-            plomTs.graphState.updateOptions( { 'file': plomTs.dataState } );
+            plomTs.updateGraphState();
           }
           if(plomTs.dataTraj){
-            plomTs.graphTraj.updateOptions( { 'file': plomTs.dataTraj } );
+            plomTs.updateGraphTraj();
           }
 
           plomGlobal.canRun = true;
@@ -205,7 +135,7 @@ $(document).ready(function() {
       $("#run").click(function(){
         if(plomGlobal.canRun){
           plomGlobal.canRun = false;
-          plomTs.run(socket, control.get());
+          plomTs.run(socket, control.getMethod());
         }
       });
 

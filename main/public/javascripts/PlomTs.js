@@ -39,6 +39,22 @@ function PlomTs(options) {
   this.stateName = stateName;
 
   this.isDrift =  (('diffusion' in this.process) && this.process.diffusion.length);
+  this.setDriftName();
+
+  this.offsetHat = 1+this.N_PAR_SV*this.N_CAC*3;
+  this.offsetDriftHat = this.offsetHat+ this.N_TS*3;
+
+  this.setDataTraj();
+  this.graphTraj = this.makeGraphTraj();
+
+  this.setDataState();
+  this.graphState = this.makeGraphState();
+
+};
+
+
+PlomTs.prototype.setDriftName = function(){
+
   var driftName = [];
   if(this.isDrift){
     this.process.diffusion.forEach(function(d){
@@ -50,15 +66,27 @@ function PlomTs(options) {
   }
   this.driftName = driftName;
 
-  this.offsetHat = 1+this.N_PAR_SV*this.N_CAC*3;
-  this.offsetDriftHat = this.offsetHat+ this.N_TS*3;
+}
+
+PlomTs.prototype.getStateNames = function(){
+  return this.stateName.concat(this.driftName);
+};
+
+PlomTs.prototype.getTrajNames = function(){
+  return this.context.time_series.map(function(x){return x.id});
+};
+
+
+PlomTs.prototype.updateTheta = function(theta){
+  this.theta = theta;
+
+  this.setDriftName();
 
   this.setDataTraj();
-  this.graphTraj = this.makeGraphTraj();
+  this.updateGraphTraj();
 
   this.setDataState();
   this.graphState = this.makeGraphState();
-
 };
 
 
@@ -174,6 +202,14 @@ PlomTs.prototype.makeGraphState = function(){
   g.updateOptions({'colors': cols.concat(cols)});
 
   return g;
+};
+
+PlomTs.prototype.updateGraphState = function(){
+  this.graphState.updateOptions( { 'file': this.dataState } );
+};
+
+PlomTs.prototype.updateGraphTraj = function(){
+  this.graphTraj.updateOptions( { 'file': this.dataTraj } );
 };
 
 

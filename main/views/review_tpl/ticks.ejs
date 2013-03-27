@@ -1,0 +1,9 @@
+<% names.forEach(function(name, i){ %>
+
+<div>
+  <label class="checkbox inline">
+    <input class="tick_<%= prefix %>" value="<%= i %>" type="checkbox" checked="checked"> <%= name %>
+  </label>
+</div>
+
+<% }); %>

@@ -180,3 +180,9 @@ text.shadow {
   width:250px;
   background: none;
 }
+
+
+.tickGraph div{
+  display:table-cell; 
+  padding-right: 20px; 
+}
