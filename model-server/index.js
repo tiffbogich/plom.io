@@ -259,6 +259,8 @@ app.post('/commit', function(req, res, next){
                 //note: we wait that the tarball has been uploaded to mongo before running the R script as we need to avoid race condition on deletion
 
                 var r = spawn('Rscript', [path.join(process.env.HOME, 'plom-coda', 'coda_mcmc_diag.R'), req.files.traces.path]);
+                r.stdout.pipe(process.stdout);
+                r.stderr.pipe(process.stderr);
 
                 r.on('exit', function (code) {
 
