@@ -52,6 +52,10 @@ function PlomTs(options) {
   this.setDataPredRes();
   this.graphPredRes = this.makeGraphPredRes();
 
+  this.setDataEss();
+  this.graphEss = this.makeGraphEss();
+
+
 };
 
 
@@ -141,6 +145,15 @@ PlomTs.prototype.setDataPredRes = function(){
     }
   }
 };
+
+
+PlomTs.prototype.setDataEss = function(){
+  this.dataEss = [];
+  for(var i=0; i<this.data.length; i++){
+    this.dataEss.push([this.data[i][0], null]);
+  }
+};
+
 
 
 PlomTs.prototype.makeGraphTraj = function(){
@@ -247,6 +260,34 @@ PlomTs.prototype.makeGraphPredRes = function(){
 };
 
 
+PlomTs.prototype.makeGraphEss = function(){
+
+  var fullLabels = ["time", "ESS"];
+
+  var options={
+    stepPlot: true,
+    labels: fullLabels,
+    yLabelWidth: 50,
+    axisLabelFontSize:8,
+    animatedZooms: true,
+    showLabelsOnHighlight:false,
+    labelsSeparateLines: true,
+    showRoller: false,
+    highlightCircleSize: 2,
+    highlightSeriesOpts: {
+      strokeWidth: 2,
+      strokeBorderWidth: 1,
+      highlightCircleSize: 3,
+    }
+  };
+
+  return new Dygraph($('#' +this.graphEssId)[0], this.dataEss, options);
+
+};
+
+
+
+
 PlomTs.prototype.updateGraphState = function(){
   this.graphState.updateOptions( { 'file': this.dataState } );
 };
@@ -258,6 +299,11 @@ PlomTs.prototype.updateGraphTraj = function(){
 PlomTs.prototype.updateGraphPredRes = function(){
   this.graphPredRes.updateOptions( { 'file': this.dataPredRes } );
 };
+
+PlomTs.prototype.updateGraphEss = function(){
+  this.graphEss.updateOptions( { 'file': this.dataEss } );
+};
+
 
 
 /**
@@ -271,6 +317,7 @@ PlomTs.prototype.run = function(socket, options){
   this.setDataTraj();
   this.setDataState();
   this.setDataPredRes();
+  this.setDataEss();
 
   if(socket){
     var exec = {
@@ -285,6 +332,7 @@ PlomTs.prototype.run = function(socket, options){
       that.updateGraphState();
       that.updateGraphTraj();
       that.updateGraphPredRes();
+      that.updateGraphEss();
     }, 100));
 
   } else{
@@ -344,16 +392,14 @@ PlomTs.prototype.processHat = function(msg){
 
 };
 
-
-
 /**
  *process a pred_res message
  */
 PlomTs.prototype.processPredRes = function(msg){
-
   var n = msg[0]-1;
   for(var ts=0; ts<this.N_TS; ts++){
     this.dataPredRes[n][1+ts] = msg[2+2*ts];
   }
-
+  //ess (if exists)
+  this.dataEss[n][1] = msg[1+2*this.N_TS];
 };

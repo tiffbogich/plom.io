@@ -46,7 +46,8 @@ $(document).ready(function() {
       graphTrajId: 'graphTraj',
       graphStateId: 'graphState',
       graphLikeId: "graphLike",
-      graphPredResId: "graphPredRes"
+      graphPredResId: "graphPredRes",
+      graphEssId: "graphEss"
     });
 
     $('.review-theta').on('click', function(e){
@@ -116,6 +117,7 @@ $(document).ready(function() {
           plomTs.updateGraphState();
           plomTs.updateGraphTraj();
           plomTs.updateGraphPredRes();
+          plomTs.updateGraphEss();
 
           plomGlobal.canRun = true;
         });
