@@ -118,6 +118,9 @@ exports.index = function(req, res){
                          }
                          c.model.push(model);
                        });
+                       
+                       //TODO sort by DIC first then AICc (Bayesian methods win)
+
 
                      });
 
@@ -250,28 +253,31 @@ exports.postFork = function(req, res, next){
 exports.review = function(req, res, next){
 
   var c = req.session.context
-    , p = req.session.process
-    , l = req.session.link;
+  , p = req.session.process
+  , l = req.session.link;
 
   //TODO check session exists
 
-  res.format({
-    html: function(){
-      res.render('review');
-    },
+  var components = req.app.get('components');
 
-    json: function(){
+  components.find({_id: {$in: [c, p, l].map(function(x){return new ObjectID(x);})}}).toArray(function(err, docs){
+    if (err) return next(err);
 
-      var components = req.app.get('components');
+    var comps = {};
+    docs.forEach(function(x){
+      comps[x.type] = x;
+    });
 
-      components.find({_id: {$in: [c, p, l].map(function(x){return new ObjectID(x);})}}).toArray(function(err, docs){
-        if (err) return next(err);
-
-        var comps = {};
-        docs.forEach(function(x){
-          comps[x.type] = x;
+    res.format({
+      html: function(){
+        res.render('review', {
+          diseaseName: comps.context.disease.join('; '),
+          contextName: comps.context.name,
+          modelName: comps.process.name + ' - ' + comps.link.name,
         });
+      },
 
+      json: function(){
         components
           .find({_id: {$in: comps.link.theta_id}})
           .toArray(function(err, thetas){
@@ -287,14 +293,10 @@ exports.review = function(req, res, next){
               },
               comps: comps
             });
-
           });
-
-      });
-
-    },
+      }
+    });
   });
-
 };
 
 

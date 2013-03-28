@@ -5,8 +5,6 @@
 
 <% include header %>
 
-
-
 <a href="https://github.com/plom"><img style="position:absolute; top:42px; right:0;  border: 0;" src="images/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
 
 <div class="row">
@@ -76,15 +74,25 @@
       <div class="jaf-container">        
 
         <div class="horizontal-scroll">
+
           <% c.model.forEach(function(m, j){ %>
           <div class="model-box">
             
-            <a href="#"><%= m.process.name + ' / ' + m.link.name   %></a>
+            <a href="#"><%= m.process.name + ' - ' + m.link.name %></a>
 
             <!-- placeholder for d3 viz of compartmental model -->
             <div id="pgraph<%= m.link._id %>" class="process-graph"></div>
 
-            <div>score: <%= m.theta && m.theta.score %></div>
+            <!-- score (DIC or AICc or rating) -->
+            <% if (m.theta) { %>
+            <div class="score">
+              <% if ('diagnostic' in m.theta) { %>
+              DIC: <span><%= m.theta.diagnostic.summary.map(function(x){ return x.dic; }).sort(function(a,b){return a-b;})[0] %></span>
+              <% } else { %>
+              AICc: <span><%= m.theta && m.theta.information_criterion.AICc %></span>
+              <% }; %>
+            </div>
+            <% }; %>
 
             <form action="/fork" method="POST" class="explore">
               <input type="hidden" name="context" value="<%= c._id %>" />

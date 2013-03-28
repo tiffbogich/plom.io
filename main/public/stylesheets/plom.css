@@ -39,6 +39,12 @@
 }
 
 
+.score span{
+  color: #f15b22;
+  font-size: 18px;
+  text-shadow: 1px 1px 1px grey;
+}
+
 .horizontal-scroll
 {
   width:100%;
@@ -63,6 +69,8 @@
   height:50px;
   overflow-y: auto;
 }
+
+
 
 
 path.link {

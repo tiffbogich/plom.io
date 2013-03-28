@@ -25,7 +25,7 @@ function coda2plom(diag, picts){
         N: diag.raftery[h].resmatrix[0].N,  //max across parameters  of the required sample size
         I: diag.raftery[h].resmatrix[0].I,   //max across parameters  of the required sample size
         Nmin: diag.raftery[h].resmatrix[0].Nmin   //max across parameters  of the required sample size
-      },
+      }
       heidel: true,
       essMin: diag.ess[h][diag.order[0]],
       dic: diag.dic[h]
