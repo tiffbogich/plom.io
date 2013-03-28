@@ -22,7 +22,9 @@ function coda2plom(diag, picts){
       raftery: {
         success: true,
         M: diag.raftery[h].resmatrix[0].M,  //max across parameters of the parameter specific burnin
-        N: diag.raftery[h].resmatrix[0].N   //max across parameters  of the required sample size
+        N: diag.raftery[h].resmatrix[0].N,  //max across parameters  of the required sample size
+        I: diag.raftery[h].resmatrix[0].I,   //max across parameters  of the required sample size
+        Nmin: diag.raftery[h].resmatrix[0].Nmin   //max across parameters  of the required sample size
       },
       heidel: true,
       essMin: diag.ess[h][diag.order[0]],
@@ -81,12 +83,11 @@ function coda2plom(diag, picts){
         summary[h].raftery.success = false;
         summary[h].raftery.M = detail[h][i][i].raftery.M;
       } else {
-        if(detail[h][i][i].raftery.M > summary[h].raftery.M) {
-          summary[h].raftery.M = detail[h][i][i].raftery.M;
-        }
-        if(detail[h][i][i].raftery.N > summary[h].raftery.N) {
-          summary[h].raftery.N = detail[h][i][i].raftery.N;
-        }
+        ['M', 'N', 'Nmin','I'].forEach(function(x){
+          if(detail[h][i][i].raftery[x] > summary[h].raftery[x]) {
+            summary[h].raftery[x] = detail[h][i][i].raftery[x];
+          }
+        });
       }
 
       //only focus on the stationary test (we also want no burnout)

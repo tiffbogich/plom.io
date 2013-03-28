@@ -226,6 +226,11 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       $('#heidel-start').html(data[indi][indi].heidel.start);
       $('#heidel-pvalue').html(data[indi][indi].heidel.pvalue);
 
+      $('#raftery-M').html(data[indi][indi].raftery.M || 'failed');
+      $('#raftery-N').html(data[indi][indi].raftery.N);
+      $('#raftery-Nmin').html(data[indi][indi].raftery.Nmin || 'failed');
+      $('#raftery-I').html(data[indi][indi].raftery.I || 'failed');
+
       $('#ess').html(data[indi][indi].ess);
 
     } else {

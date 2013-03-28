@@ -19,7 +19,7 @@
     <tr class="<%= (s.passed) ? 'success': 'error' %>">
       <td><%= h %></td>
       <td><%= s.geweke %></td>
-      <td><%= (s.raftery.success) ? 'M: ' + s.raftery.M + ' N: ' + s.raftery.N : 'restart with M > ' + s.raftery.M %></td>
+      <td><%= (s.raftery.success) ? 'M: ' + s.raftery.M + ' N: ' + s.raftery.N + ' Nmin: ' + s.raftery.Nmin + ' I: ' + s.raftery.I : 'restart with M > ' + s.raftery.M %></td>
       <td><%= s.heidel %></td>
       <td><%= s.essMin %></td>
       <td><%= s.dic %></td>
