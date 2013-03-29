@@ -150,7 +150,6 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
       $('#ourtooltip a[rel=tooltip]').tooltip("show");
       
-      console.log(activMatClicked);
       if(!activMatClicked){
 	mouseov(indi,indj);
       }
@@ -163,8 +162,6 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   d3.select("#ActiveMatComp")
     .on("click",function(){
       if (activMatClicked){
-	  console.log(clickedCell);
-	  console.log(activeCell);
 	  console.log(clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1])
 	  if (clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1]){
             activMatClicked = false;
@@ -205,7 +202,6 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     });
 
   function mouseov(indi,indj){
-    console.log('youhou');
     d3.selectAll(".row text").classed("activetext", function(d,i){
       return i == indj;
     })
