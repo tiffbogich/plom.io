@@ -1,6 +1,7 @@
 var express = require('express')
   , fs = require('fs')
   , http = require('http')
+  , net = require('net')
   , util = require('util')
   , mongodb = require('mongodb')
   , ObjectID = require('mongodb').ObjectID
@@ -11,7 +12,6 @@ var express = require('express')
   , _ = require('underscore')
   , fstream = require("fstream")
   , tar = require("tar")
-  , coda = require("./lib/diagnostic")
   , zlib = require("zlib")
   , rimraf = require("rimraf")
   , authenticate = require('../authentification/routes/user').authenticate
@@ -245,7 +245,6 @@ app.post('/commit', function(req, res, next){
             }
           });
 
-
           //store traces in mongo and update theta
           if (is_new_theta) {
             if(req.files){
@@ -256,66 +255,12 @@ app.post('/commit', function(req, res, next){
               readstream.pipe(writestream);
 
               writestream.on('close', function (file) {
-                //note: we wait that the tarball has been uploaded to mongo before running the R script as we need to avoid race condition on deletion
-
-                var r = spawn('Rscript', [path.join(process.env.HOME, 'plom-coda', 'coda_mcmc_diag.R'), req.files.traces.path]);
-                r.stdout.pipe(process.stdout);
-                r.stderr.pipe(process.stderr);
-
-                r.on('exit', function (code) {
-
-                  if(code === 0){
-                    var exDir = req.files.traces.path + '_ex';
-                    fs.readdir(exDir, function(err, files){
-                      files = files
-                        .filter(function(x) {return (path.extname(x) === '.png');})
-                        .map(function(x){return path.join(exDir, x);});
-
-                      async.map(files, fs.readFile, function(err, data){
-                        if(err) return next(err);
-
-                        data = data.map(function(x,i){
-                          return {
-                            'content-type':'image/png',
-                            data: new mongodb.Binary(x),
-                            theta_id: published.theta._id,
-                            filename: path.basename(files[i], '.png')
-                          };
-                        });
-
-                        var diag = req.app.get('diag');
-                        diag.insert(data, function(err, docs){
-                          if (err) return next(err);
-                          fs.readFile(path.join(exDir, 'diagnostic.json'), 'utf8', function(err, diagnostic){
-                            if (err) return next(err);
-
-                            var diagnostic = coda(JSON.parse(diagnostic), docs.map(function(x){return {'_id': x._id, 'filename': x.filename};}));
-
-                            components.update({_id: published.theta._id}, {$set: {diagnostic: diagnostic}}, {safe:true}, function(err, cnt){
-                              if (err) return next(err);
-
-                              //clean up R working directory
-                              rimraf(exDir, function(err){
-                                if (err) return next(err);
-
-                                //upload file
-                                fs.unlink(req.files.traces.path, function(err){
-                                  if (err) return next(err);
-
-                                  res.json({'success': true, 'msg': 'your results are being reviewed'});
-                                });
-                              });
-                            });
-
-                          });
-
-                        });
-                      });
-                    });
-                  } else {
-                    res.json({'success': false, 'msg': 'could not generate a diagnostic'});
-                  }
+                //send the traces to diagnostic
+                var conn = net.createConnection(5000, function(){
+                  conn.end(JSON.stringify({fileId:file._id.toString(), thetaId: published.theta._id}));
+                  res.json({'success': true, 'msg': 'your results are being reviewed'});
                 });
+
               });
             } else {
               res.json({'success': true, 'msg': 'your results are being reviewed'});
