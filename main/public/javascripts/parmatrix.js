@@ -32,7 +32,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
   var maxtextlength = Math.max.apply(Math, rowdataset.map(function(x){return x.length;}))
     , textfont = 10
-    , matTotSize = 550 - maxtextlength * textfont
+    , matTotSize = 500 - maxtextlength * textfont
     , figsSize = matTotSize
     , matMarginSize = maxtextlength/2 * textfont // /2 is completely arbitrary TODO: understand fonts size
     , matSize = matTotSize - matMarginSize
@@ -129,13 +129,6 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 	.style("left", posActCell.left -cellSize*(Math.sqrt(growFact)-1)/2 + "px")
 	.style("top", posActCell.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px");
 
-      
-
-     // d3.select(actCell)
-//	.style("background-color",function(d) {
-//	  return color(cc);})
-//	.style("width", cellSize*Math.sqrt(growFact) + "px")
-//	.style("height", cellSize*Math.sqrt(growFact) + "px")
 
       d3.select("#ourtooltip")
 	.classed('hidden', false)
@@ -222,14 +215,14 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
       $('#geweke').html(data[indi][indi].geweke);
       $('#heidel-start').html(data[indi][indi].heidel.start);
-      $('#heidel-pvalue').html(data[indi][indi].heidel.pvalue);
+      $('#heidel-pvalue').html(Math.round(data[indi][indi].heidel.pvalue*10000)/10000);
 
       $('#raftery-M').html(data[indi][indi].raftery.M || 'failed');
       $('#raftery-N').html(data[indi][indi].raftery.N);
       $('#raftery-Nmin').html(data[indi][indi].raftery.Nmin || 'failed');
       $('#raftery-I').html(data[indi][indi].raftery.I || 'failed');
 
-      $('#ess').html(data[indi][indi].ess);
+      $('#ess').html(Math.round(data[indi][indi].ess*100)/100);
 
     } else {
 
