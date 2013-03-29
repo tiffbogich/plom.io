@@ -74,7 +74,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     .append("rect")
     .attr({
       x: function(d){ return d[0]*cellSize + "px"; },
-      y: function(d){ return d[1]*cellSize + "px"; }, 
+      y: function(d){ return d[1]*cellSize + "px"; },
       width: cellSize + "px",
       height: cellSize + "px",
       fill: function(d) {return color(d[2].cc);}
@@ -105,8 +105,8 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     .style("font-size",function(){return textfont + "px"})
     .text(function(d) { return d; })
     .attr("transform", function(d,i) {return  "rotate(-90)";});
-  
-    
+
+
   //////////////////////////////////////
   // Listeners / interactive components
   //////////////////////////////////////
@@ -117,34 +117,34 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       var indj = d[1];
       var cc = d[2].cc;
       var ess = d[2].ess;
-      
+
       activeCell = [d[0],d[1]];
 
       d3.select("#ActiveMatComp")
-	.classed('hidden', false)
-	.style("background-color",function(d) {
-	  return color(cc);})
-	.style("width", cellSize*Math.sqrt(growFact) + "px")
-	.style("height", cellSize*Math.sqrt(growFact) + "px")
-	.style("left", posActCell.left -cellSize*(Math.sqrt(growFact)-1)/2 + "px")
-	.style("top", posActCell.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px");
+        .classed('hidden', false)
+        .style("background-color",function(d) {
+          return color(cc);})
+        .style("width", cellSize*Math.sqrt(growFact) + "px")
+        .style("height", cellSize*Math.sqrt(growFact) + "px")
+        .style("left", posActCell.left -cellSize*(Math.sqrt(growFact)-1)/2 + "px")
+        .style("top", posActCell.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px");
 
 
       d3.select("#ourtooltip")
-	.classed('hidden', false)
-	.style("left", posActCell.left +cellSize/2 + "px")
-	.style("top", posActCell.top + "px");
-      
+        .classed('hidden', false)
+        .style("left", posActCell.left +cellSize/2 + "px")
+        .style("top", posActCell.top + "px");
+
       if (indi == indj){
-	$('#ourtooltip a[rel=tooltip]').attr('data-original-title','ESS: ' + Math.round(ess*100)/100).tooltip('fixTitle');
+        $('#ourtooltip a[rel=tooltip]').attr('data-original-title','ESS: ' + Math.round(ess*100)/100).tooltip('fixTitle');
       } else {
-	$('#ourtooltip a[rel=tooltip]').attr('data-original-title','Corr: ' + Math.round(cc*100)/100).tooltip('fixTitle');
+        $('#ourtooltip a[rel=tooltip]').attr('data-original-title','Corr: ' + Math.round(cc*100)/100).tooltip('fixTitle');
       }
 
       $('#ourtooltip a[rel=tooltip]').tooltip("show");
-      
+
       if(!activMatClicked){
-	mouseov(indi,indj);
+        mouseov(indi,indj);
       }
 
     })
@@ -155,44 +155,44 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   d3.select("#ActiveMatComp")
     .on("click",function(){
       if (activMatClicked){
-	  if (clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1]){
+          if (clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1]){
             activMatClicked = false;
-     	    d3.select("#lock")
-	      .classed('hidden', true)
-	  } else {
-	    clickedCell = activeCell;
-	    mouseov(clickedCell[0],clickedCell[1]);
-	    d3.select("#lock")
-	      .classed('hidden', false)
-	      .style("left", posActCell.left + cellSize/4 + "px")
-	      .style("top", posActCell.top + cellSize*3/16 + "px");
-	  }
+            d3.select("#lock")
+              .classed('hidden', true)
+          } else {
+            clickedCell = activeCell;
+            mouseov(clickedCell[0],clickedCell[1]);
+            d3.select("#lock")
+              .classed('hidden', false)
+              .style("left", posActCell.left + cellSize/4 + "px")
+              .style("top", posActCell.top + cellSize*3/16 + "px");
+          }
       } else {
-	activMatClicked = true;
-	clickedCell = activeCell;
-	d3.select("#lock")
-	.classed('hidden', false)
-	.style("left", posActCell.left + cellSize/4 + "px")
-	.style("top", posActCell.top + cellSize*3/16 + "px");
+        activMatClicked = true;
+        clickedCell = activeCell;
+        d3.select("#lock")
+        .classed('hidden', false)
+        .style("left", posActCell.left + cellSize/4 + "px")
+        .style("top", posActCell.top + cellSize*3/16 + "px");
       };
     });
 
   d3.select("#lock")
     .on("click",function(){
       if (activMatClicked){
-	  if (clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1]){
+          if (clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1]){
             activMatClicked = false;
-     	    d3.select("#lock")
-	      .classed('hidden', true)
-	  }
+            d3.select("#lock")
+              .classed('hidden', true)
+          }
       } else {
-	console.log(posActCell);
-	activMatClicked = true;
-	clickedCell = activeCell;
-	d3.select("#lock")
-	.classed('hidden', false)
-	.style("left", posActCell.left + cellSize/4 + "px")
-	.style("top", posActCell.top + cellSize*3/16 + "px");
+        console.log(posActCell);
+        activMatClicked = true;
+        clickedCell = activeCell;
+        d3.select("#lock")
+        .classed('hidden', false)
+        .style("left", posActCell.left + cellSize/4 + "px")
+        .style("top", posActCell.top + cellSize*3/16 + "px");
       };
     });
 
@@ -218,7 +218,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       $('#heidel-pvalue').html(Math.round(data[indi][indi].heidel.pvalue*10000)/10000);
 
       $('#raftery-M').html(data[indi][indi].raftery.M || 'failed');
-      $('#raftery-N').html(data[indi][indi].raftery.N);
+      $('#raftery-N').html(data[indi][indi].raftery.N || 'failed');
       $('#raftery-Nmin').html(data[indi][indi].raftery.Nmin || 'failed');
       $('#raftery-I').html(data[indi][indi].raftery.I || 'failed');
 
@@ -231,7 +231,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
     }
 
-    updateCorr1(data, indi, indj);          
+    updateCorr1(data, indi, indj);
     updateCorr2(data, indj, indi);
 
     updateDensity1(data, indi);
@@ -259,11 +259,11 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       .data(dataset)
       .transition()
       .duration(500)
-      .attr('fill', function(d) {return color(d[2].cc);});  
+      .attr('fill', function(d) {return color(d[2].cc);});
 
     d3.select("#ActiveMatComp").classed('hidden', true);
 
-    updateCorr1(data, 0, 1);          
+    updateCorr1(data, 0, 1);
     updateCorr2(data, 1, 0);
     updateDensity1(data, 0);
     updateDensity2(data, 1);
