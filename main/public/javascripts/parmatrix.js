@@ -162,14 +162,19 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   d3.select("#ActiveMatComp")
     .on("click",function(){
       if (activMatClicked){
-	  console.log(clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1])
 	  if (clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1]){
             activMatClicked = false;
      	    d3.select("#lock")
 	      .classed('hidden', true)
+	  } else {
+	    clickedCell = activeCell;
+	    mouseov(clickedCell[0],clickedCell[1]);
+	    d3.select("#lock")
+	      .classed('hidden', false)
+	      .style("left", posActCell.left + cellSize/4 + "px")
+	      .style("top", posActCell.top + cellSize*3/16 + "px");
 	  }
       } else {
-	console.log(posActCell);
 	activMatClicked = true;
 	clickedCell = activeCell;
 	d3.select("#lock")
@@ -182,9 +187,6 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   d3.select("#lock")
     .on("click",function(){
       if (activMatClicked){
-	  console.log(clickedCell);
-	  console.log(activeCell);
-	  console.log(clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1])
 	  if (clickedCell[0] == activeCell[0] && clickedCell[1] == activeCell[1]){
             activMatClicked = false;
      	    d3.select("#lock")
