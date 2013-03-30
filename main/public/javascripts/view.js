@@ -1,73 +1,172 @@
-function Control(){
+function Control(data){
+
+  this.compiled = {};
+  for(var k in data.tpl){
+    this.compiled[k] = _.template(data.tpl[k]);
+  }
+
+  this.context = data.comps.context;
+  this.process = data.comps.process;
+  this.link = data.comps.link;
+  this.thetas = data.comps.thetas;
+  this.theta = this.thetas[0];
+
+  this.plomTs = new PlomTs({
+    context: this.context,
+    process: this.process,
+    link: this.link,
+    theta: this.theta,
+    graphTrajId: 'graphTraj',
+    graphStateId: 'graphState',
+    graphLikeId: "graphLike",
+    graphPredResId: "graphPredRes",
+    graphEssId: "graphEss"
+  });
+
+  //d3 plots
+  this.updateCorr1 = plotCorr(this.theta.diagnostic.detail[0], 0, 1, 1);
+  this.updateCorr2 = plotCorr(this.theta.diagnostic.detail[0], 1, 0, 2);
+  this.updateDensity1 = plotDensity(this.theta.diagnostic.detail[0], 0, 1);
+  this.updateDensity2 = plotDensity(this.theta.diagnostic.detail[0], 1, 2);
+
+  this.updateMat = parMatrix(this.theta.diagnostic.detail[0], this.updateCorr1, this.updateCorr2, this.updateDensity1, this.updateDensity2); 
+
   this.ONE_YEAR_IN_DATA_UNIT = {D:365.0, W:365.0/7.0, M:12.0, Y:1.0 };
   this.fhr = {D: 'days', W: 'weeks', M: 'months', Y: 'years'};
   this.algo2filter = {mif: 'smc', kalman: 'kalman', kmcmc: 'kalman', smc: 'smc', pmcmc: 'smc', simul: 'simul', simplex: 'smc', ksimplex: 'kalman'};
-}
+};
 
-Control.prototype.method = function(context, design){
 
-    var cmd = _.last(design.cmd);
-    var opt = cmd.algorithm.split(' ').filter(function(x) {return (x !== ' ');});
 
-    var optAlgo = this.algo2filter[opt[0]] || 'smc';
-    var optImpl = opt[1];
-    //force SDE for kalman
-    if(optAlgo === 'kalman') optImpl = 'kalman';
+Control.prototype.thetaList = function(){
+  $('#thetaList').html(this.compiled.parameters({thetas: this.thetas}));
 
-    //default value if not specified by design
-    var optJ = 1000, optS = 0.25/365.0 * this.ONE_YEAR_IN_DATA_UNIT[context.frequency];
-    
-    if(opt.indexOf('-J') !== -1){
-      optJ = opt[opt.indexOf('-J') + 1]; 
-    }
-    if(opt.indexOf('-s') !== -1){
-      optS = opt[opt.indexOf('-s') + 1]; 
-    }
-    if(opt.indexOf('-DT') !== -1){
-      optS = opt[opt.indexOf('-DT') + 1]; 
-    }
+  var that = this;
+  $('.review-theta').on('click', function(e){
+    var i = parseInt($(this).val(), 10);
+    that.theta = $.extend(true, {}, that.thetas[i]);
 
-    //render    
-    $('#optAlgo').val(optAlgo);
-    $('#optImpl').val(optImpl);
-    $('#optJ').val(optJ);
-    $('#optS')
-      .val(optS)
-      .next('span').html(this.fhr[context.frequency]);
+    that.summaryTable();
 
-    //kalman can only be used with sde
-    $('#optAlgo').on('change', function(e){
-      if($(this).val() === 'kalman') {
-        $('#optImpl').val('sde');
-      }
-    });
-
-    $('#optImpl').on('change', function(e){
-      if($('#optAlgo').val() === 'kalman' && $(this).val() !== 'sde') {
-        $(this).val('sde');
-      }
-    });
+    //force redraw of the correlation matrix as the number of parameters could have changed... TODO: improve update to avoid full redraw
+    that.updateMat = parMatrix(that.theta.diagnostic.detail[0], that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2);
+  });
 
 };
+
+
+Control.prototype.summaryTable = function(){
+  $('#summaryTable').html(this.compiled.summaryTable(this.theta.diagnostic));
+
+  var that = this;
+  //when user select a trace:
+  $('.review-trace-id').on('click', function(e){
+    var h = parseInt($(this).val(), 10);
+
+    that.updateTheta(that.theta, that.theta.design.cmd);
+    that.updateMat(that.theta.diagnostic.detail[h]);
+
+  });
+
+};
+
+Control.prototype.updateTheta = function(theta, cmd){
+  this.theta = $.extend(true, {}, theta);
+
+  //render    
+  $('#control').html(this.compiled.control({c:this.context, p:this.process, l:this.link, t:this.theta}));
+  $('#tickTraj').html(this.compiled.ticks({'names': this.plomTs.getTrajNames() , prefix: 'traj'}));
+  $('#tickState').html(this.compiled.ticks({'names': this.plomTs.getStateNames() , prefix: 'state'}));
+  $('#tickPredRes').html(this.compiled.ticks({'names': this.plomTs.getTrajNames() , prefix: 'predRes'}));
+
+  //attach listeners
+  this._method(cmd);
+  this._theta();
+
+  //replot simulation and filters
+  this.plomTs.updateTheta(this.theta);
+};
+
 
 Control.prototype.getMethod = function(){
 
   return {
-    impl: $('#optImpl').val(),
-    algo: $('#optAlgo').val(),
-    J: parseInt($('#optJ').val(), 10),
-    s: parseFloat($('#optS').val())
+    impl: $('#impl').val(),
+    algo: $('#algo').val(),
+    J: parseInt($('#J').val(), 10),
+    s: parseFloat($('#S').val())
   };
 
 };
 
-Control.prototype.theta = function(theta, plomTs){
+
+/**
+ * cmd is either an array  (design.cmd) or a method object as returned by this.getMethod()
+ */
+Control.prototype._method = function(cmd){
+
+  var method = {}; 
+  
+  if(_.isArray(cmd)){
+    cmd = _.last(cmd);
+    var opt = cmd.algorithm.split(' ').filter(function(x) {return (x !== ' ');});
+
+    method.algo = this.algo2filter[opt[0]] || 'smc';
+    method.impl = (opt[1].indexOf('-') !== -1) ? opt[1] : 'sde';
+    //force SDE for kalman
+    if(method.algo === 'kalman') method.impl = 'sde';
+
+    //default value if not specified by design
+    method.J = 1000;
+    method.S = 0.25/365.0 * this.ONE_YEAR_IN_DATA_UNIT[this.context.frequency];
+    
+    if(opt.indexOf('-J') !== -1){
+      method.J = opt[opt.indexOf('-J') + 1]; 
+    }
+    if(opt.indexOf('-s') !== -1){
+      method.S = opt[opt.indexOf('-s') + 1]; 
+    }
+    if(opt.indexOf('--DT') !== -1){
+      method.S = opt[opt.indexOf('--DT') + 1]; 
+    }
+  } else {
+    method = cmd;
+  }
+
+
+  $('#algo').val(method.algo);
+  $('#ompl').val(method.impl);
+  $('#J').val(method.J);
+  $('#S')
+    .val(method.S)
+    .next('span').html(this.fhr[this.context.frequency]);
+
+  //kalman can only be used with sde
+  $('#algo').on('change', function(e){
+    if($(this).val() === 'kalman') {
+      $('#impl').val('sde');
+    }
+  });
+
+  $('#impl').on('change', function(e){
+    if($('#algo').val() === 'kalman' && $(this).val() !== 'sde') {
+      $(this).val('sde');
+    }
+  });
+
+};
+
+
+Control.prototype._theta = function(){
+
+  var that = this;
+  var theta = this.theta;
 
   $('input.theta').on('change', function() {
     var myName = $(this).attr('name').split('___')
-      , prop = myName[0]
-      , par = myName[1]
-      , group = myName[2]
+      , par = myName[0]
+      , group = myName[1]
+      , prop = myName[2]
       , newValue = parseFloat($(this).val());
 
     theta.value[par][prop][group] = newValue;
@@ -82,13 +181,13 @@ Control.prototype.theta = function(theta, plomTs){
       if($(this).hasClass('guess')){
 
         var myName = $(this).attr('name').split('___')
-        , prop = myName[0]
-        , par = myName[1]
-        , group = myName[2]
-        , guess = parseFloat($(this).val());
+          , par = myName[0]
+          , group = myName[1]
+          , prop = myName[2]
+          , guess = parseFloat($(this).val());
 
-        var min = parseFloat($('input.theta[name="' + ['min', par, group].join('___') + '"]').val())
-          , max = parseFloat($('input.theta[name="' + ['max', par, group].join('___') + '"]').val());
+        var min = parseFloat($('input.theta[name="' + [par, group, 'min'].join('___') + '"]').val())
+          , max = parseFloat($('input.theta[name="' + [par, group, 'max'].join('___') + '"]').val());
 
         var pos = $(this).position();
         pos.top -= 15;
@@ -124,20 +223,20 @@ Control.prototype.theta = function(theta, plomTs){
   //graph visibility
   $('input.tick_traj')
     .on('change', function(){
-      plomTs.graphTraj.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
-      plomTs.graphTraj.setVisibility(plomTs.N_TS+parseInt($(this).val(), 10), $(this).is(':checked'));
+      that.plomTs.graphTraj.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+      that.plomTs.graphTraj.setVisibility(that.N_TS+parseInt($(this).val(), 10), $(this).is(':checked'));
     })
     .trigger('change');
 
   $('input.tick_state')
     .on('change', function(){
-      plomTs.graphState.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+      that.plomTs.graphState.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
     })
     .trigger('change');
 
   $('input.tick_predRes')
     .on('change', function(){
-      plomTs.graphPredRes.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+      that.plomTs.graphPredRes.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
     })
     .trigger('change');
 
@@ -148,6 +247,5 @@ Control.prototype.theta = function(theta, plomTs){
       $(this).css('color', cols(i));
     });
   });
-
 
 };

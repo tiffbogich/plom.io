@@ -304,6 +304,13 @@ PlomTs.prototype.updateGraphEss = function(){
   this.graphEss.updateOptions( { 'file': this.dataEss } );
 };
 
+PlomTs.prototype.updateGraphs = function(){
+  this.updateGraphState();
+  this.updateGraphTraj();
+  this.updateGraphPredRes();
+  this.updateGraphEss();
+};
+
 
 
 /**
@@ -329,10 +336,7 @@ PlomTs.prototype.run = function(socket, options){
     socket.emit('start', {'exec': exec[options.algo], 'plomModelId': this.link._id, 'theta': this.theta});
 
     plomGlobal.intervalId.push(setInterval(function(){
-      that.updateGraphState();
-      that.updateGraphTraj();
-      that.updateGraphPredRes();
-      that.updateGraphEss();
+      that.updateGraphs();
     }, 100));
 
   } else{

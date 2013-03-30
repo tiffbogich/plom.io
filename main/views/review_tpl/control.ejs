@@ -15,9 +15,9 @@
     <form class="form-horizontal">
 
       <div class="control-group">
-        <label class="control-label" for="opt-method">Method</label>
+        <label class="control-label" for="algo">Method</label>
         <div class="controls">
-          <select id="optAlgo">
+          <select id="algo">
             <option value="simul">Simulation</option>
             <option value="smc">Sequential Monte Carlo</option>
             <option value="kalman">Extended Kalman Filter</option>
@@ -26,9 +26,9 @@
       </div>
 
       <div class="control-group">
-        <label class="control-label" for="opt-impl">Implementation</label>
+        <label class="control-label" for="impl">Implementation</label>
         <div class="controls">
-          <select id="optImpl">
+          <select id="impl">
             <option value="ode">Ordinary differential equation</option>
             <option value="sde">Stochastic differential equation</option>
             <option value="psr">Poisson process</option>
@@ -51,16 +51,16 @@
       </div>
 
       <div class="control-group">
-        <label class="control-label" for="opt-J">Number of particles/ realisations</label>
+        <label class="control-label" for="J">Number of particles/ realisations</label>
         <div class="controls">
-          <input type="text" id="optJ" class="input-small">
+          <input type="text" id="J" class="input-small">
         </div>
       </div>
 
       <div class="control-group">
-        <label class="control-label" for="opt-S">Integration time step</label>
+        <label class="control-label" for="S">Integration time step</label>
         <div class="controls">
-          <input type="text" id="optS" class="input-small"> <span>unit</span>
+          <input type="text" id="S" class="input-small"> <span>unit</span>
         </div>
       </div>
 
@@ -70,7 +70,6 @@
 
   <!-- Parameters -->
   <div class="tab-pane" id="ctr-theta">
-
     <div id="slider" class="hidden"></div>
 
     <table>
@@ -89,9 +88,9 @@
       <% for(var group in t.value[par.id].guess){ %>
       <tr>
         <td><%= par.id %>: <%= group.split('__').join('; ') %></td>
-        <td><input type="text" name="min___<%= par.id %>___<%= group %>" value="<%= t.value[par.id]['min'][group] %>" class="input-mini theta" /></td>
-        <td><input type="text" name="guess___<%= par.id %>___<%= group %>" value="<%= t.value[par.id]['guess'][group] %>" class="input-mini theta guess" /></td>
-        <td><input type="text" name="max___<%= par.id %>___<%= group %>" value="<%= t.value[par.id]['max'][group] %>" class="input-mini theta" /></td>
+        <td><input type="text" name="<%= par.id %>___<%= group %>___min"   value="<%= t.value[par.id]['min'][group] %>"   class="input-mini theta" /></td>
+        <td><input type="text" name="<%= par.id %>___<%= group %>___guess" value="<%= t.value[par.id]['guess'][group] %>" class="input-mini theta guess" /></td>
+        <td><input type="text" name="<%= par.id %>___<%= group %>___max"   value="<%= t.value[par.id]['max'][group] %>"   class="input-mini theta" /></td>
 
         <% if(t.status !== 'best'){ %>
         <td> <i class="icon-arrow-down"></td>
@@ -100,9 +99,6 @@
       </tr>
       <% } }; });  %>
     </table>
-
-    
   </div>
-
 </div>
 

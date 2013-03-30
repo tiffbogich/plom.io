@@ -48,7 +48,7 @@
       <div class="tab-pane active" id="theta">
 
         <!-- parameter list (templated) -->
-        <div class="horizontal-scroll" data-toggle="buttons-radio" id="theta-list"></div>
+        <div class="horizontal-scroll" data-toggle="buttons-radio" id="thetaList"></div>
 
         <hr/>
 
@@ -221,7 +221,7 @@
               <textarea id="feedbackMethod" rows="3" class="span5"></textarea>
 
               <label for="feedbackTheta">Provide feedback on the parameter values</label>
-              <button class="btn" style="float:left;" type="button"><i class="icon-file"></i> Attach run</button>
+              <button id="vizbit" class="btn" style="float:left;" type="button"><i class="icon-file"></i> Attach run</button> <a id="vizbitLink" href="#"></a>
               <textarea id="feedbackTheta" rows="3" class="span5"></textarea>
 
               <p>
@@ -285,10 +285,8 @@
             <h3>Add</h3>
 
             <form>
-
               <label for="feedbackModel">Provide feedback on the model and its adequation to the context</label>
               <textarea id="feedbackModel" rows="3" class="span5"></textarea>
-
               <p>
                 <button class="btn btn-success" type="button">Validate</button>
                 <button class="btn btn-danger" type="button">Not convincing</button>
