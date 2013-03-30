@@ -9,7 +9,8 @@ function Control(data){
   this.process = data.comps.process;
   this.link = data.comps.link;
   this.thetas = data.comps.thetas;
-  this.theta = this.thetas[0];
+  this.i = 0; //the selected theta (among thetas)
+  this.theta = this.thetas[this.i];
 
   this.plomTs = new PlomTs({
     context: this.context,
@@ -43,10 +44,11 @@ Control.prototype.thetaList = function(){
 
   var that = this;
   $('.review-theta').on('click', function(e){
-    var i = parseInt($(this).val(), 10);
-    that.theta = $.extend(true, {}, that.thetas[i]);
+    that.i = parseInt($(this).val(), 10);
+    that.theta = $.extend(true, {}, that.thetas[that.i]);
 
     that.summaryTable();
+    $('.review-trace-id').first().trigger('click');
 
     //force redraw of the correlation matrix as the number of parameters could have changed... TODO: improve update to avoid full redraw
     that.updateMat = parMatrix(that.theta.diagnostic.detail[0], that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2);
@@ -62,9 +64,8 @@ Control.prototype.summaryTable = function(){
   //when user select a trace:
   $('.review-trace-id').on('click', function(e){
     var h = parseInt($(this).val(), 10);
-
-    that.updateTheta(that.theta, that.theta.design.cmd);
-    that.updateMat(that.theta.diagnostic.detail[h]);
+    that.updateTheta(that.thetas[that.i], that.thetas[that.i].design.cmd);
+    that.updateMat(that.thetas[that.i].diagnostic.detail[h]);
 
   });
 
@@ -91,10 +92,10 @@ Control.prototype.updateTheta = function(theta, cmd){
 Control.prototype.getMethod = function(){
 
   return {
-    impl: $('#impl').val(),
     algo: $('#algo').val(),
+    impl: $('#impl').val(),
     J: parseInt($('#J').val(), 10),
-    s: parseFloat($('#S').val())
+    s: parseFloat($('#s').val())
   };
 
 };
@@ -118,27 +119,28 @@ Control.prototype._method = function(cmd){
 
     //default value if not specified by design
     method.J = 1000;
-    method.S = 0.25/365.0 * this.ONE_YEAR_IN_DATA_UNIT[this.context.frequency];
+    method.s = 0.25/365.0 * this.ONE_YEAR_IN_DATA_UNIT[this.context.frequency];
     
     if(opt.indexOf('-J') !== -1){
       method.J = opt[opt.indexOf('-J') + 1]; 
     }
     if(opt.indexOf('-s') !== -1){
-      method.S = opt[opt.indexOf('-s') + 1]; 
+      method.s = opt[opt.indexOf('-s') + 1]; 
     }
     if(opt.indexOf('--DT') !== -1){
-      method.S = opt[opt.indexOf('--DT') + 1]; 
+      method.s = opt[opt.indexOf('--DT') + 1]; 
     }
   } else {
     method = cmd;
   }
 
 
+  //set method
   $('#algo').val(method.algo);
-  $('#ompl').val(method.impl);
+  $('#impl').val(method.impl);
   $('#J').val(method.J);
-  $('#S')
-    .val(method.S)
+  $('#s')
+    .val(method.s)
     .next('span').html(this.fhr[this.context.frequency]);
 
   //kalman can only be used with sde

@@ -15,7 +15,25 @@ $(document).ready(function() {
     ctrl.updateTheta(ctrl.theta, ctrl.theta.design.cmd);
 
     $('.review-theta').first().trigger('click');
-    $('.review-trace-id').first().trigger('click');
+
+    //vizbit
+    $("#vizbit").on('click', function(){
+      $(this).next()
+        .html('run')
+        .data({theta: $.extend(true, {}, ctrl.theta), method: ctrl.getMethod()})
+        .next().show();
+    });
+
+    $(".vizbitLink").on('click', function(){
+      var vdata = $(this).data();
+      ctrl.updateTheta(vdata.theta, vdata.method);
+      $("#run").trigger('click');
+    });
+
+    $("#vizbitRemove").on('click', function(e){
+      e.preventDefault();
+      $(this).hide().prev().html('').removeData();
+    });
 
     ////////////////////////////////////////////////////////////////////////////////////////
     //websocket
@@ -31,8 +49,8 @@ $(document).ready(function() {
 
     if(socket) {
 
+      //set all callbacks
       socket.on('connect', function () {
-        //set all callbacks
 
         socket.on('filter', function (msg) {
           ctrl.plomTs.processMsg(msg);
@@ -43,22 +61,16 @@ $(document).ready(function() {
         });
 
         socket.on('theEnd', function (msg) {
-
           //remove actions set with setInterval
           for(var i=0; i<plomGlobal.intervalId.length; i++){
             clearInterval(plomGlobal.intervalId.pop());
           }
-
           ctrl.plomTs.updateGraphs();
-
           plomGlobal.canRun = true;
         });
 
       });
 
-      ////////////////////////////////////////////////////////////////////////////////////////
-      //action!
-      ////////////////////////////////////////////////////////////////////////////////////////
       $('#stop').click(function(){
         socket.emit('killme', true);
       });
