@@ -171,7 +171,7 @@ Control.prototype._theta = function(){
       , prop = myName[2]
       , newValue = parseFloat($(this).val());
 
-    theta.value[par][prop][group] = newValue;
+    theta.parameter[par]['group'][group][prop]['value'] = newValue;
 
     if(prop === 'guess'){
       $('#run').trigger('click');

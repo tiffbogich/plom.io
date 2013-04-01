@@ -16,7 +16,9 @@ $(document).ready(function() {
 
     $('.review-theta').first().trigger('click');
 
+    ////////
     //vizbit
+    ////////
     $("#vizbit").on('click', function(){
       $(this).next()
         .html('run')
@@ -35,9 +37,37 @@ $(document).ready(function() {
       $(this).hide().prev().html('').removeData();
     });
 
-    ////////////////////////////////////////////////////////////////////////////////////////
+    ////////
+    //social
+    ////////
+
+    $('button[type="submit"]').on('click', function(e){
+      e.preventDefault();
+      
+      var $this = $(this);
+
+      var pdata = {
+        theta_id: ctrl.theta._id,
+        accept: $this.val(),
+        feedbackTheta: $('#feedbackTheta').val()
+      };
+      
+      var vdata = $('#vizbit').next().data();
+
+      if(vdata && 'theta' in vdata){
+        pdata.theta = vdata.theta,
+        pdata.method = vdata.method
+      }
+      
+      var url = $this.closest('form').attr('action');
+      $.post(url, pdata, function(success){
+        console.log(success)
+      });
+    });
+
+    ///////////
     //websocket
-    ////////////////////////////////////////////////////////////////////////////////////////
+    ///////////
     try{
       var socket = io.connect();
       console.log("websocket OK !");

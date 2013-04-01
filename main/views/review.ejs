@@ -69,7 +69,7 @@
 	    <div id="ActiveMatComp"></div>
 	    <div id="popover_content_wrapper" style="display: none"><div></div></div>	      
 	    <div id="lock"></div>
-	    <div id="outlaid"><a href="#" rel="tooltip" data-placement="top" title="This is the tooltip!"></a></div>
+	    <div id="outlaid"><a href="#" rel="tooltip" data-placement="top" title=""></a></div>
 	    <div id="vis"></div>
           </div>
 
@@ -214,21 +214,18 @@
           </div>
 
           <div class="span5">
-            <h3>Add</h3>
+            <h3>Add your feedback</h3>
 
-            <form>
-              <label for="feedbackMethod">Provide feedback on the method</label>              
-              <textarea id="feedbackMethod" rows="3" class="span5"></textarea>
-
-              <label for="feedbackTheta">Provide feedback on the parameter values</label>
+            <form id="formFeedbackTheta" action="/feedbacktheta">
+              <label for="feedbackTheta">Any thoughts on the methods or the parameter values you would like to transmit ?</label>
               <button id="vizbit" class="btn" style="float:left;" type="button"><i class="icon-file"></i> Attach run</button> 
               <a class="vizbitLink" href="#filtering"></a>
               <a id="vizbitRemove" class="hidden" href="#"><i class="icon-remove"></i></a>
-              <textarea id="feedbackTheta" rows="3" class="span5"></textarea>
+              <textarea id="feedbackTheta" rows="5" class="span5"></textarea>
 
               <p>
-                <button class="btn btn-success" type="button">Validate</button>
-                <button class="btn btn-danger" type="button">Need more work</button>
+                <button class="btn btn-success" type="submit" value="true">Validate</button>
+                <button class="btn btn-danger" type="submit" value="false">Need more work</button>
               </p>
             </form>
           </div>
@@ -286,7 +283,7 @@
           <div class="span5">
             <h3>Add</h3>
 
-            <form>
+            <form id="formFeedbackModel" action="/feedbackmodel">
               <label for="feedbackModel">Provide feedback on the model and its adequation to the context</label>
               <textarea id="feedbackModel" rows="3" class="span5"></textarea>
               <p>

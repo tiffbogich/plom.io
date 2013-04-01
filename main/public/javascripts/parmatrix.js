@@ -4,7 +4,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   $('#vis svg').remove();
   d3.select("#ActiveMatComp").classed('hidden', true);
   d3.select("#lock").classed('hidden', true);
-  d3.select("#ourtooltip").classed('hidden', true);
+  d3.select("#outlaid").classed('hidden', true);
 
   ////////////////////////
   // Variables definition
@@ -130,18 +130,18 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
         .style("top", posActCell.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px");
 
 
-      d3.select("#ourtooltip")
+      d3.select("#outlaid")
         .classed('hidden', false)
         .style("left", posActCell.left +cellSize/2 + "px")
         .style("top", posActCell.top + "px");
 
       if (indi == indj){
-        $('#ourtooltip a[rel=tooltip]').attr('data-original-title','ESS: ' + Math.round(ess*100)/100).tooltip('fixTitle');
+        $('#outlaid a[rel=tooltip]').attr('data-original-title','ESS: ' + Math.round(ess*100)/100).tooltip('fixTitle');
       } else {
-        $('#ourtooltip a[rel=tooltip]').attr('data-original-title','Corr: ' + Math.round(cc*100)/100).tooltip('fixTitle');
+        $('#outlaid a[rel=tooltip]').attr('data-original-title','Corr: ' + Math.round(cc*100)/100).tooltip('fixTitle');
       }
 
-      $('#ourtooltip a[rel=tooltip]').tooltip("show");
+      $('#outlaid a[rel=tooltip]').tooltip("show");
 
       if(!activMatClicked){
         mouseov(indi,indj);

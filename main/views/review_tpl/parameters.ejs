@@ -3,6 +3,10 @@
      <ul>
        <li>username</li>
        <li>DIC: <%= Math.min.apply(Math, theta.diagnostic.summary.map(function(x){return x.dic;})) %></li>
+       <% if (_.last(theta.design.cmd).fit) { %>
+       <li>fit: <%= _.last(theta.design.cmd).fit %></li>
+       <% } %>
+       <li><%= _.last(theta.design.cmd).algorithm %></li>
      </ul>
 
      <button class="btn review-theta" type="button" value="<%= i %>">review</button>

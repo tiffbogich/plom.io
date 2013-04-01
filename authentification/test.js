@@ -2,11 +2,11 @@ var app  = require('./app')
   , http = require('http')
   , mongodb = require('mongodb');
 
-
 var server = http.createServer(app);
 
-var db = exports.db = new mongodb.Db('plom', new mongodb.Server("127.0.0.1", 27017), {safe:true});
-db.open(function (err, client) {
+var MongoClient = mongodb.MongoClient;
+
+MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
 
   if (err) throw err;
   console.log("Connected to mongodb");
