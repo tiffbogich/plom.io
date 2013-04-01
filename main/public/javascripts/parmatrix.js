@@ -225,7 +225,6 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       $('#ess').html(Math.round(data[indi][indi].ess*100)/100);
 
     } else {
-
       $('#corr1, #corr2, #density1').removeClass('hidden');
       $('#trace, #autocor, #test').addClass('hidden');
 
