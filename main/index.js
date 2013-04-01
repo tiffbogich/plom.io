@@ -4,6 +4,7 @@
 
 var express = require('express')
   , routes = require('./routes')
+  , social = require('./routes/social')
   , fs = require('fs')
   , path = require('path')
   , http = require('http')
@@ -60,6 +61,9 @@ app.post('/', routes.postIndex);
 app.post('/fork', routes.postFork);
 app.get('/review', routes.review);
 app.get('/trace/:_id', routes.trace);
+
+app.post('/feedbacktheta', social.feedbacktheta_post);
+
 //app.get('/context', secure, routes.context);
 
 
@@ -88,6 +92,7 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   app.set('db', db);
   app.set('users',  new mongodb.Collection(db, 'users'));
   app.set('components',  new mongodb.Collection(db, 'components'));
+  app.set('feedback',  new mongodb.Collection(db, 'feedback'));
   app.set('diag',  new mongodb.Collection(db, 'diag'));
 
   //TODO ensureIndex

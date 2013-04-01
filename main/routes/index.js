@@ -253,8 +253,8 @@ exports.postFork = function(req, res, next){
 exports.review = function(req, res, next){
 
   var c = req.session.context
-  , p = req.session.process
-  , l = req.session.link;
+    , p = req.session.process
+    , l = req.session.link;
 
   //TODO check session exists
 
@@ -310,7 +310,7 @@ exports.trace = function(req, res, next){
     res.end(doc.data.buffer);
   });
 
-}
+};
 
 
 

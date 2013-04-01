@@ -2,89 +2,72 @@ var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 
+  $('#reviewTab a[href=#theta]').tab('show');
+  $('#reviewModelTab a[href=#review-context]').tab('show');
+  $('a[rel=tooltip]').tooltip();
+
   $.getJSON('/review', function(data) {
 
-    var c = data.comps.context
-      , p = data.comps.process
-      , l = data.comps.link
-      , t = data.comps.thetas;
+    var ctrl = new Control(data);
 
-    //compile templates
-    var compiled = {};
-    for(var k in data.tpl){
-      compiled[k] = _.template(data.tpl[k]);
-    }
-
-
-    $('#reviewTab a[href=#theta]').tab('show');
-    $('#reviewModelTab a[href=#review-context]').tab('show');
-    $('a[rel=tooltip]').tooltip();
-
-    //start with the first parameter and first trace selected
-    $('#theta-list').html(compiled.parameters(data.comps));
-    $('#summaryTable').html(compiled.summaryTable(t[0].diagnostic));      
-    $('#control').html(compiled.control({c:c, p:p, l:l, t:t[0]}));        
-
-    var updateCorr1 = plotCorr(t[0].diagnostic.detail[0], 0, 1, 1)
-      , updateCorr2 = plotCorr(t[0].diagnostic.detail[0], 1, 0, 2)
-      , updateDensity1 = plotDensity(t[0].diagnostic.detail[0], 0, 1)
-      , updateDensity2 = plotDensity(t[0].diagnostic.detail[0], 1, 2);
-
-    var updateMat = parMatrix(t[0].diagnostic.detail[0], updateCorr1, updateCorr2, updateDensity1, updateDensity2); 
-
-    var theta = $.extend(true, {}, t[0]);
-
-    var control = new Control();
-    control.method(c, theta.design);
-    control.theta(theta);
-
-    var plomTs = new PlomTs({
-      context: c,
-      process: p,
-      link: l,
-      theta: theta,
-      graphTrajId: 'graphTraj',
-      graphStateId: 'graphState',
-      graphLikeId: "graphLike",
-      graphPredResId: "graphPredRes",
-      graphEssId: "graphEss"
-    });
-
-    $('.review-theta').on('click', function(e){
-      var i = parseInt($(this).val(), 10);
-
-      $('#summaryTable').html(compiled.summaryTable(t[i].diagnostic));      
-      //force redraw of the correlation matrix as the number of parameters could have changed... TODO: improve update to avoid full redraw
-      updateMat = parMatrix(t[i].diagnostic.detail[0], updateCorr1, updateCorr2, updateDensity1, updateDensity2);
-
-      //when user select a trace:
-      $('.review-trace-id').on('click', function(e){              
-
-        theta = $.extend(true, {}, t[i]);
-
-        var h = parseInt($(this).val(), 10);
-        $('#control').html(compiled.control({c:c, p:p, l:l, t:theta}));        
-        updateMat(theta.diagnostic.detail[h]);
-        control.method(c, theta.design);
-        plomTs.updateTheta(theta);
-
-        $('#tickTraj').html(compiled.ticks({'names': plomTs.getTrajNames() , prefix: 'traj'}));
-        $('#tickState').html(compiled.ticks({'names': plomTs.getStateNames() , prefix: 'state'}));
-        $('#tickPredRes').html(compiled.ticks({'names': plomTs.getTrajNames() , prefix: 'predRes'}));
-
-        control.theta(theta, plomTs);
-
-      });
-
-      $('.review-trace-id').first().trigger('click');
-
-    });
+    ctrl.thetaList();
+    ctrl.summaryTable();
+    ctrl.updateTheta(ctrl.theta, ctrl.theta.design.cmd);
 
     $('.review-theta').first().trigger('click');
 
-    ////////////////////////////////////////////////////////////////////////////////////////
+    ////////
+    //vizbit
+    ////////
+    $("#vizbit").on('click', function(){
+      $(this).next()
+        .html('run')
+        .data({theta: $.extend(true, {}, ctrl.theta), method: ctrl.getMethod()})
+        .next().show();
+    });
+
+    $(".vizbitLink").on('click', function(){
+      var vdata = $(this).data();
+      ctrl.updateTheta(vdata.theta, vdata.method);
+      $("#run").trigger('click');
+    });
+
+    $("#vizbitRemove").on('click', function(e){
+      e.preventDefault();
+      $(this).hide().prev().html('').removeData();
+    });
+
+    ////////
+    //social
+    ////////
+
+    $('button[type="submit"]').on('click', function(e){
+      e.preventDefault();
+      
+      var $this = $(this);
+
+      var pdata = {
+        theta_id: ctrl.theta._id,
+        accept: $this.val(),
+        feedbackTheta: $('#feedbackTheta').val()
+      };
+      
+      var vdata = $('#vizbit').next().data();
+
+      if(vdata && 'theta' in vdata){
+        pdata.theta = vdata.theta,
+        pdata.method = vdata.method
+      }
+      
+      var url = $this.closest('form').attr('action');
+      $.post(url, pdata, function(success){
+        console.log(success)
+      });
+    });
+
+    ///////////
     //websocket
-    ////////////////////////////////////////////////////////////////////////////////////////
+    ///////////
     try{
       var socket = io.connect();
       console.log("websocket OK !");
@@ -96,11 +79,11 @@ $(document).ready(function() {
 
     if(socket) {
 
+      //set all callbacks
       socket.on('connect', function () {
-        //set all callbacks
 
         socket.on('filter', function (msg) {
-          plomTs.processMsg(msg);
+          ctrl.plomTs.processMsg(msg);
         });
 
         socket.on('info', function (msg) {
@@ -108,25 +91,16 @@ $(document).ready(function() {
         });
 
         socket.on('theEnd', function (msg) {
-
           //remove actions set with setInterval
           for(var i=0; i<plomGlobal.intervalId.length; i++){
             clearInterval(plomGlobal.intervalId.pop());
           }
-
-          plomTs.updateGraphState();
-          plomTs.updateGraphTraj();
-          plomTs.updateGraphPredRes();
-          plomTs.updateGraphEss();
-
+          ctrl.plomTs.updateGraphs();
           plomGlobal.canRun = true;
         });
 
       });
 
-      ////////////////////////////////////////////////////////////////////////////////////////
-      //action!
-      ////////////////////////////////////////////////////////////////////////////////////////
       $('#stop').click(function(){
         socket.emit('killme', true);
       });
@@ -134,13 +108,12 @@ $(document).ready(function() {
       $("#run").click(function(){
         if(plomGlobal.canRun){
           plomGlobal.canRun = false;
-          plomTs.run(socket, control.getMethod());
+          ctrl.plomTs.run(socket, ctrl.getMethod());
         }
       });
 
     } //if socket
 
-  });
-
+  }); //AJAX review
 
 });
