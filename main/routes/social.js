@@ -7,21 +7,18 @@ var fs = require('fs')
   , _ = require('underscore');
 
 exports.feedbacktheta_post = function(req, res, next){
-  
-//  var f = req.app.get('feedback');
-//
-//  f.insert({}, function(err, docs){
-//    
-//
-//    f.find().toArray(function(){
-//      
-//      .map(function())
-//    })
-//
-//  });
 
-  console.log(req.body);
+  var f = req.app.get('feedback');
+  var review = req.body;
 
-  res.send({success:true});
+  f.insert(review, function(err, review){
+    if(err) return next(err);
+
+    f.find({theta_id: review[0].theta_id}).sort({_id:1}).toArray(function(err, reviews){
+      if(err) return next(err);
+      res.send(reviews);
+    });
+
+  });
 
 };

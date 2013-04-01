@@ -118,7 +118,7 @@ exports.index = function(req, res){
                          }
                          c.model.push(model);
                        });
-                       
+
                        //TODO sort by DIC first then AICc (Bayesian methods win)
 
 
@@ -289,7 +289,8 @@ exports.review = function(req, res, next){
                 control: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','control.ejs'), 'utf8'),
                 summaryTable: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','summary_table.ejs'), 'utf8'),
                 parameters: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','parameters.ejs'), 'utf8'),
-                ticks: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','ticks.ejs'), 'utf8')
+                ticks: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','ticks.ejs'), 'utf8'),
+                reviews: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','reviews.ejs'), 'utf8')
               },
               comps: comps
             });
