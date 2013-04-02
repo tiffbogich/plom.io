@@ -210,24 +210,33 @@
         <!-- Feedback zone -->
         <div class="row" id="rowFeedbackTheta">
           <div class="span7">
-            <h3>Feedback</h3>
+            <h3>Reviews</h3>
             <div id="feedbackThread"></div>
 
           </div>
 
           <div class="span5">
-            <h3>Add your feedback</h3>
+            <h3>Submit a new review</h3>
 
             <form id="formFeedbackTheta" action="/feedbacktheta">
-              <label for="feedbackTheta">Any thoughts on the methods or the parameter values you would like to transmit ?</label>
+
+              <label for="feedbackTheta">Review the methods and the parameter values</label>
               <button id="vizbit" class="btn" style="float:left;" type="button"><i class="icon-file"></i> Attach run</button> 
               <a class="vizbitLink" href="#filtering"></a>
               <a id="vizbitRemove" class="hidden" href="#"><i class="icon-remove"></i></a>
               <textarea id="feedbackTheta" rows="5" class="span5"></textarea>
 
+              <label class="radio inline">
+                <input type="radio" name="decision" value="validate" checked>
+                Validate
+              </label>
+              <label class="radio inline">
+                <input type="radio" name="decision"  value="reject">
+                Reject
+              </label>
+
               <p>
-                <button class="btn btn-success" type="submit" value="true">Validate</button>
-                <button class="btn btn-danger" type="submit" value="false">Need more work</button>
+                <button class="btn" type="submit">Submit</button>
               </p>
             </form>
           </div>

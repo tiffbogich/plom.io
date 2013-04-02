@@ -1,12 +1,38 @@
-<ul>
-  <% reviews.forEach(function(review){ %>
-  <li>
+<% reviews.forEach(function(review, i){ %>
+<div class="row">
+  <div class="span5">
     <ul>
       <li>username</li>
       <li>on date</li>
-      <li><%= (review.accept) ? 'accepted': 'rejected' %></li>
-      <li><%= review.body %></li>
+      <li><%= (review.decision === 'validate') ? 'validated': 'rejected' %></li>
+      <% if (review.body){ %>
+      <li><%= review.body %></li>      
+      <% } %>
     </ul>
-  </li>
-  <% }) %>
-</ul>
+
+    
+    <button type="button" class="btn" data-toggle="collapse" data-target="#review_<%= i %>">
+      Comment / contest
+    </button>
+    
+    <div id="review_<%= i %>" class="collapse">
+      
+      <form action="/comment_theta">
+
+        <label class="checkbox">
+          <input type="checkbox"> Ask the reviewer to change its status to <%= (review.decision === 'validate') ? 'rejected': 'validated' %></li>
+        </label>
+
+        <textarea rows="3" class="span5"></textarea>
+        <input type="hidden" value="<%= review._id %>"/>
+
+        <p>
+          <button class="btn" type="submit">Submit</button>
+        </p>
+      </form>
+
+    </div>
+
+  </div>
+</div>
+<% }) %>

@@ -40,6 +40,8 @@ $(document).ready(function() {
     ////////
     //social
     ////////
+    $('#feedbackThread').html(ctrl.compiled.reviews({reviews:[{body:'adsdsdsd', decision:'validate', _id:1}, {body:'adsdsdsd', decision:'validate', _id:2}]}));
+
     $('button[type="submit"]').on('click', function(e){
       e.preventDefault();
 
