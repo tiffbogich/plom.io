@@ -1,0 +1,12 @@
+<ul>
+  <% reviews.forEach(function(review){ %>
+  <li>
+    <ul>
+      <li>username</li>
+      <li>on date</li>
+      <li><%= (review.accept) ? 'accepted': 'rejected' %></li>
+      <li><%= review.body %></li>
+    </ul>
+  </li>
+  <% }) %>
+</ul>
