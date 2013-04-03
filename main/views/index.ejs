@@ -99,6 +99,7 @@
               <input type="hidden" name="process" value="<%= m.process._id %>" />
               <input type="hidden" name="link" value="<%= m.link._id %>" />
               <input type="hidden" name="theta" value="<%= m.theta._id %>" />
+              <input type="hidden" name="_csrf" value="<%= token %>"/>
               <input class="btn" type="submit" value="Fork" />
             </form>
 
@@ -106,6 +107,7 @@
               <input type="hidden" name="context" value="<%= c._id %>" />
               <input type="hidden" name="process" value="<%= m.process._id %>" />
               <input type="hidden" name="link" value="<%= m.link._id %>" />
+              <input type="hidden" name="_csrf" value="<%= token %>"/>
               <input class="btn" type="submit" value="Review" />
             </form>            
             

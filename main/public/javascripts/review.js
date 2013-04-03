@@ -20,41 +20,51 @@ $(document).ready(function() {
     //vizbit
     ////////
     $("#vizbit").on('click', function(){
+      ctrl.setVizBit();
+
       $(this).next()
         .html('run')
-        .data({theta: $.extend(true, {}, ctrl.theta), method: ctrl.getMethod()})
         .next().show();
     });
 
     $(".vizbitLink").on('click', function(){
-      var vdata = $(this).data();
+      var vdata = ctrl.vizBit;
       ctrl.updateTheta(vdata.theta, vdata.method);
       $("#run").trigger('click');
     });
 
     $("#vizbitRemove").on('click', function(e){
+      ctr.vizBit = undefined;
       e.preventDefault();
-      $(this).hide().prev().html('').removeData();
+      $(this).hide().prev().html('');
     });
+
+
 
     ////////
     //social
     ////////
-    $('#feedbackThread').html(ctrl.compiled.reviews({reviews:[{body:'adsdsdsd', decision:'validate', _id:1}, {body:'adsdsdsd', decision:'validate', _id:2}]}));
+    $.get('/reviewstheta/'+ ctrl.theta._id, function(reviews) {
+      $('#reviewThread').html(ctrl.compiled.reviews(reviews));
+    });
 
-    $('button[type="submit"]').on('click', function(e){
+
+    $('#formReviewTheta').on('submit', function(e){
       e.preventDefault();
 
-      var $this = $(this);
+      var $this = $(this)
+        , $body = $this.find( 'textarea[name="body"]' );
 
       var pdata = {
         theta_id: ctrl.theta._id,
-        accept: $this.val(),
-        body: $('#feedbackTheta').val()
+        decision: $this.find( 'input[name="decision"]:checked' ).val(),
+        body: $body.val(),
+        _csrf: $this.find( 'input[name="_csrf"]' ).val(),
       };
 
-      var vdata = $('#vizbit').next().data();
+      $body.val('');
 
+      var vdata = ctrl.vizBit;
       if(vdata && 'theta' in vdata){
         pdata.theta = vdata.theta,
         pdata.method = vdata.method
@@ -62,9 +72,35 @@ $(document).ready(function() {
 
       var url = $this.closest('form').attr('action');
       $.post(url, pdata, function(reviews){
-        $('#feedbackThread').html(ctrl.compiled.reviews({reviews:reviews}));
+        $('#reviewThread').html(ctrl.compiled.reviews(reviews));
       });
     });
+
+
+    $('#reviewThread').on('submit', 'form', function(e){
+      e.preventDefault();
+
+      var $this = $(this)
+        , $body = $this.find( 'textarea[name="body"]' );
+
+      var pdata = {
+        review_id: $this.find( 'input[name="review_id"]' ).val(),
+        decision: $this.find( 'input[name="decision"]:checked' ).val(),
+        change: $this.find( 'input[name="change"]:checked' ).val(),
+        body: $body.val(),
+        _csrf: $this.find( 'input[name="_csrf"]' ).val()
+      };
+
+      $body.val('');
+
+      var url = $this.closest('form').attr('action');
+      $.post(url, pdata, function(reviews){
+        $('#reviewThread').html(ctrl.compiled.reviews(reviews));
+      });
+      
+    });
+
+
 
     ///////////
     //websocket

@@ -2,30 +2,63 @@
 <div class="row">
   <div class="span5">
     <ul>
-      <li>username</li>
-      <li>on date</li>
-      <li><%= (review.decision === 'validate') ? 'validated': 'rejected' %></li>
+      <li><%= review.username %></li>
+      <li>on <%= review.date %></li>
+      <li><span class="label label-<%= (review.decision === 'validated') ? 'success': 'important' %>"><%= (review.decision === 'validated') ? 'validated': 'rejected' %></span></li>
       <% if (review.body){ %>
       <li><%= review.body %></li>      
       <% } %>
     </ul>
+    
 
+    <% if(review.comments) { review.comments.forEach(function(comment, j){ %>
+    <div class="row">
+      <div class="span4 offset1">    
+
+        <ul>
+          <li><%= comment.username %></li>
+          <li>on <%= comment.date %></li>
+
+          <% if(comment.decision){ %>
+          <li>Requested to set status to: <span class="label label-<%= (comment.decision === 'validated') ? 'success': 'important' %>"><%= (comment.decision === 'validated') ? 'validated': 'rejected' %></span></li>
+          <% } %>
+
+          <% if(comment.change){ %>
+          <li>Changed status to: <span class="label label-<%= (comment.change === 'validated') ? 'success': 'important' %>"><%= (comment.change === 'validated') ? 'validated': 'rejected' %></span></li>
+          <% } %>
+
+          <% if(comment.body){ %>
+          <li><%= comment.body %></li>      
+          <% } %>
+
+        </ul>
+
+      </div>
+    </div>
+    <% })}; %>
     
     <button type="button" class="btn" data-toggle="collapse" data-target="#review_<%= i %>">
       Comment / contest
     </button>
-    
+
     <div id="review_<%= i %>" class="collapse">
       
-      <form action="/comment_theta">
+      <form class="comment-review-theta" action="/commentreviewtheta" method="post">
 
+        <% if(username !== review.username){ %>
         <label class="checkbox">
-          <input type="checkbox"> Ask the reviewer to change its status to <%= (review.decision === 'validate') ? 'rejected': 'validated' %></li>
+          <input type="checkbox" name="decision" value="<%= (review.decision === 'validated') ? 'rejected': 'validated' %>"/> Ask the reviewer to change its status to <%= (review.decision === 'validated') ? 'rejected': 'validated' %>
         </label>
+        <% } else { %>
+        <label class="checkbox">
+          <input type="checkbox" name="change" value="<%= (review.decision === 'validated') ? 'rejected': 'validated' %>"/> Change the status of my review to <%= (review.decision === 'validated') ? 'rejected': 'validated' %>
+        </label>
+        <% } %>        
 
-        <textarea rows="3" class="span5"></textarea>
-        <input type="hidden" value="<%= review._id %>"/>
-
+        <textarea rows="3" class="span5" name="body"></textarea>
+        <input type="hidden" name="review_id" value="<%= review._id %>"/>
+        <input type="hidden" name="_csrf" value="<%= token %>"/>
+        
         <p>
           <button class="btn" type="submit">Submit</button>
         </p>
@@ -35,4 +68,4 @@
 
   </div>
 </div>
-<% }) %>
+<% }); %>

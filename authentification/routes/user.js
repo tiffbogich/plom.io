@@ -110,7 +110,7 @@ exports.register_post = function(req, res) {
 
       // Store hash and salt in DB.
       var users = req.app.get('users');
-      users.insert({_id:me._id, hash:hash, email: me.email}, function(err, objs) {
+      users.insert({_id:me._id, hash:hash, email: me.email, date: new Date()}, function(err, objs) {
 
         if (err) {
 

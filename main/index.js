@@ -29,6 +29,7 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(express.session({ secret: 'my secret'}));
 
+  app.use(express.csrf());
   app.use(is_logged_in);
   app.use(app.router);
 
@@ -56,13 +57,17 @@ app.configure('production', function(){
 
 // Routes
 
-app.get('/', routes.index);
-app.post('/', routes.postIndex);
-app.post('/fork', routes.postFork);
-app.get('/review', routes.review);
-app.get('/trace/:_id', routes.trace);
+app.get('/', csrf, routes.index);
+app.post('/', csrf, routes.postIndex);
+app.post('/fork', csrf, routes.postFork);
 
-app.post('/feedbacktheta', social.feedbacktheta_post);
+app.get('/review', secure, csrf, routes.review);
+app.get('/trace/:_id', secure, routes.trace);
+
+app.get('/reviewstheta/:theta_id', secure, social.reviewsTheta);
+app.post('/reviewtheta', secure, csrf, social.postReviewTheta);
+app.post('/commentreviewtheta', secure, csrf, social.postCommentReviewTheta);
+
 
 //app.get('/context', secure, routes.context);
 
@@ -92,7 +97,7 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   app.set('db', db);
   app.set('users',  new mongodb.Collection(db, 'users'));
   app.set('components',  new mongodb.Collection(db, 'components'));
-  app.set('feedback',  new mongodb.Collection(db, 'feedback'));
+  app.set('reviews',  new mongodb.Collection(db, 'reviews'));
   app.set('diag',  new mongodb.Collection(db, 'diag'));
 
   //TODO ensureIndex

@@ -207,31 +207,33 @@
 
         <hr/>
 
-        <!-- Feedback zone -->
-        <div class="row" id="rowFeedbackTheta">
+        <!-- Review zone -->
+        <div class="row" id="rowReviewTheta">
           <div class="span7">
             <h3>Reviews</h3>
-            <div id="feedbackThread"></div>
+            <div id="reviewThread"></div>
 
           </div>
 
           <div class="span5">
             <h3>Submit a new review</h3>
 
-            <form id="formFeedbackTheta" action="/feedbacktheta">
+            <form id="formReviewTheta" action="/reviewtheta" method="post">
 
-              <label for="feedbackTheta">Review the methods and the parameter values</label>
+              <label for="reviewTheta">Review the methods and the parameter values</label>
               <button id="vizbit" class="btn" style="float:left;" type="button"><i class="icon-file"></i> Attach run</button> 
               <a class="vizbitLink" href="#filtering"></a>
               <a id="vizbitRemove" class="hidden" href="#"><i class="icon-remove"></i></a>
-              <textarea id="feedbackTheta" rows="5" class="span5"></textarea>
+              <textarea id="reviewTheta" rows="5" name="body", class="span5"></textarea>
+
+              <input type="hidden" name="_csrf" value="<%= token %>"/>
 
               <label class="radio inline">
-                <input type="radio" name="decision" value="validate" checked>
+                <input type="radio" name="decision" value="validated">
                 Validate
               </label>
               <label class="radio inline">
-                <input type="radio" name="decision"  value="reject">
+                <input type="radio" name="decision"  value="rejected">
                 Reject
               </label>
 

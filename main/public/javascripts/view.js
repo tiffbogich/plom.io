@@ -251,3 +251,13 @@ Control.prototype._theta = function(){
   });
 
 };
+
+
+Control.prototype.setVizBit = function(){
+
+  this.vizBit = {
+    theta: $.extend(true, {}, this.theta),
+    method: this.getMethod()
+  };
+
+};
