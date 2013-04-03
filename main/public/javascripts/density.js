@@ -4,7 +4,8 @@ function plotDensity(diag, i, ind){
   diag[i][i].posterior.x.forEach(function(x, k){
     data.push({
       x: x, 
-      y: diag[i][i].posterior.y[k],
+      ypost: diag[i][i].posterior.y[k],
+      yprior: diag[i][i].prior.y[k],
     });
   });
 
@@ -20,7 +21,8 @@ function plotDensity(diag, i, ind){
 
   var y = d3.scale.linear()
     .range([height, 0])
-    .domain(d3.extent(data, function(d) { return d.y; })).nice();
+    .domain(d3.extent(data, function(d) { return d.ypost; })).nice();
+
 
   var xAxis = d3.svg.axis()
     .scale(x)
@@ -32,9 +34,13 @@ function plotDensity(diag, i, ind){
     .orient("left")
     .ticks(3);
 
-  var line = d3.svg.line()
+  var linepost = d3.svg.line()
     .x(function(d) { return x(d.x); })
-    .y(function(d) { return y(d.y); });
+    .y(function(d) { return y(d.ypost); });
+
+  var lineprior = d3.svg.line()
+    .x(function(d) { return x(d.x); })
+    .y(function(d) { return y(d.yprior); });
 
   var svg = d3.select("#density" + ind).append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -61,9 +67,13 @@ function plotDensity(diag, i, ind){
 
   svg.append("path")
     .datum(data)
-    .attr("class", "density")
-    .attr("d", line);
+    .attr("class", "density_prior")
+    .attr("d", lineprior);
 
+  svg.append("path")
+    .datum(data)
+    .attr("class", "density_post")
+    .attr("d", linepost);
 
   return function(diag, i){
 
@@ -73,20 +83,27 @@ function plotDensity(diag, i, ind){
     diag[i][i].posterior.x.forEach(function(x, k){
       data.push({
         x: x, 
-        y: diag[i][i].posterior.y[k],
+        ypost: diag[i][i].posterior.y[k],
+	yprior: diag[i][i].prior.y[k],
       });
     });
 
     x.domain(d3.extent(data, function(d) { return d.x; })).nice();
-    y.domain(d3.extent(data, function(d) { return d.y; })).nice();
+    y.domain(d3.extent(data, function(d) { return d.ypost; })).nice();
     xAxis.scale(x);
     yAxis.scale(y);
 
-    svg.select(".density")
+    svg.select(".density_prior")
       .datum(data)
       .transition()
       .duration(200)
-      .attr("d", line);
+      .attr("d", lineprior)
+
+    svg.select(".density_post")
+      .datum(data)
+      .transition()
+      .duration(200)
+      .attr("d", linepost)
 
     d3.select("#x-axis-density" + ind)
       .call(xAxis)

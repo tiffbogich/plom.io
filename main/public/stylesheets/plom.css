@@ -149,6 +149,18 @@ text.shadow {
   stroke-width: 1.5px;
 }
 
+.density_prior {
+  fill: rgba(234,234,234,0.8);
+  stroke-width: 1.5px;
+}
+
+.density_post {
+  fill: rgba(200,200,200,0.8);
+  stroke-width: 1.5px;
+}
+
+
+
 #diag-plots{
   height: 480px;
 }
