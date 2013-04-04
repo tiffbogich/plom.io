@@ -37,7 +37,7 @@ type and option
 - follow_context
 - unfollow_user
 - unfollow_context
-- fork (an user clicked on the fork button. He might not have done anything then). If the user do something with his fork, an add event will be triggered
+- fork (an user clicked on the fork button. He might not have done anything then). If the user do something with his fork, a create event will be triggered
 - create
     - context
     - model

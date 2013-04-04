@@ -205,6 +205,7 @@ app.post('/commit', function(req, res, next){
       for(var key in published){
         if(!published[key] && m[key]){
           m[key]._keywords = dbUtil.addKeywords(m[key]);
+          m[key].username = req.user;
           to_be_published.push(m[key]);
         }
       }

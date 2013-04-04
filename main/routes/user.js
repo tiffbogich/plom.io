@@ -1,10 +1,14 @@
 var fs = require('fs')
   , check = require('validator').check
+  , async = require('async')
   , mongodb = require('mongodb')
   , ObjectID = require('mongodb').ObjectID
   , path = require('path');
 
 
+/**
+ * Get the user events and components
+ */
 exports.user = function(req, res, next){
 
   var u = req.app.get('users');
@@ -12,23 +16,63 @@ exports.user = function(req, res, next){
   u.findOne({_id: req.params.username}, function(err, user){
     if(err) return next(err);
 
-    //get events
-    var e = req.app.get('events');
-    var q = {
-      $or: [
-        {from: req.session.username},
-        {user_id: req.session.username},
-        {context_id: {$in: user.context_id}},
-        {user_id: {$in: user.user_id}},
-      ]};
+    var e = req.app.get('events')
+      , c = req.app.get('components')
+      , r = req.app.get('reviews');
 
-    e.find(q).sort({_id:-1}).toArray(function(err, events){
-      if(err) return next(err);
+    async.parallel({
 
-      res.render('user', {user: user, events: events});
-    });
+      events: function(callback){
+        var q = {
+          $or: [
+            {from: req.session.username},
+            {user_id: req.session.username},
+            {context_id: {$in: user.context_id}},
+            {user_id: {$in: user.user_id}},
+          ]};
 
+        e.find(q).sort({_id:-1}).toArray(function(err, docs){
+          if(err) callback(err);
+          callback(null, docs);
+        });
+      },
+
+      contexts: function(callback){
+        c.find({type:'context', username: req.session.username}, {disease:true, name:true, _id:true}).sort({_id:-1}).toArray(function(err, docs){
+          if(err) callback(err);
+          callback(null, docs);
+        });
+      },
+
+      models: function(callback){
+        c.find({type:'link', username: req.session.username}, {context_disease:true, context_name:true, process_name:true, name:true, _id:true}).sort({_id:-1}).toArray(function(err, docs){
+          if(err) callback(err);
+          callback(null, docs);
+        });
+      },
+
+      thetas: function(callback){
+        c.find({type:'theta', username: req.session.username}, {context_disease:true, context_name:true, process_name:true, link_name:true, name:true, _id:true, link_id:true}).sort({_id:-1}).toArray(function(err, docs){
+          if(err) callback(err);
+          callback(null, docs);
+        });
+      },
+
+      reviews: function(callback){
+        r.find({username: req.session.username}).sort({_id:-1}).toArray(function(err, docs){
+          if(err) callback(err);
+          callback(null, docs);
+        });
+      }
+      
+    },
+
+                   function(err, results) {
+                     results.user = user;                     
+                     res.render('user', results);                    
+                   });
   });
+
 };
 
 
