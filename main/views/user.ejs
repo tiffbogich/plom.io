@@ -99,7 +99,7 @@
       <ul>
         <% reviews.forEach(function(review){ %>
         <li>
-          <%= review.context_disease.join('; ') + ' / ' +  review.context_name + ' / ' + review.process_name + ' - ' + review.link_name %>
+          <%= review.name %>
           <%= review._id.getTimestamp() %>
         </li>
         <% }); %>

@@ -12,6 +12,8 @@ function Control(data){
   this.i = 0; //the selected theta (among thetas)
   this.theta = this.thetas[this.i];
 
+  this.name = this.context.disease.join('; ') + ' / ' +  this.context.name + ' / ' + this.process.name + ' - ' + this.link.name;
+
   this.plomTs = new PlomTs({
     context: this.context,
     process: this.process,

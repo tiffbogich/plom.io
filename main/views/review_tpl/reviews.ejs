@@ -3,7 +3,7 @@
   <div class="span5">
     <ul>
       <li><%= review.username %></li>
-      <li>on <%= review.date %></li>
+      <li>on <%= review._id.date %></li>
       <li><span class="label label-<%= (review.decision === 'validated') ? 'success': 'important' %>"><%= (review.decision === 'validated') ? 'validated': 'rejected' %></span></li>
       <% if (review.body){ %>
       <li><%= review.body %></li>      

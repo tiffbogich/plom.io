@@ -56,7 +56,11 @@ $(document).ready(function() {
         , $body = $this.find( 'textarea[name="body"]' );
 
       var pdata = {
+        context_id: ctrl.context._id,
+        process_id: ctrl.process._id,
+        link_id: ctrl.link._id,
         theta_id: ctrl.theta._id,
+        name: ctrl.name,
         decision: $this.find( 'input[name="decision"]:checked' ).val(),
         body: $body.val(),
         _csrf: $this.find( 'input[name="_csrf"]' ).val(),
@@ -76,7 +80,7 @@ $(document).ready(function() {
       });
     });
 
-
+    //post comments
     $('#reviewThread').on('submit', 'form', function(e){
       e.preventDefault();
 
