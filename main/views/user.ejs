@@ -1,0 +1,58 @@
+<% include layout %>
+
+<% include header %>
+
+<div class="row">
+
+  <div class="span7">
+    <h2>Social and Activity Stream</h2>
+
+    <% events.forEach(function(e, i){ %>
+
+    <a href="/<%= e.from %>"><%= e.from %></a>
+    
+    <%= e.type %> 
+
+    <%= e.option %> 
+
+    <a href="#"><%= e.name %></a>
+
+    <%= e._id.getTimestamp() %>
+
+    <hr/>    
+
+    <% }) %>
+    
+
+  </div>
+
+  <div class="span5">
+
+    <div>
+      <h2>Contexts</h2>      
+
+    </div>
+
+    <div>
+      <h2>Models</h2>      
+
+    </div>
+
+    <div>
+      <h2>Thetas</h2>      
+
+    </div>
+
+    <div>
+      <h2>Reviews</h2>      
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+
+<% include footer %>

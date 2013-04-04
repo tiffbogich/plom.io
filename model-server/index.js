@@ -214,39 +214,100 @@ app.post('/commit', function(req, res, next){
         components.insert(to_be_published, {safe: true}, function(err, records){
           if(err) return next(err);
 
-          var is_new_theta = (! published.theta) && ('theta' in m);
+          var is_new_theta = (! published.theta) && ('theta' in m)
+            , is_new_context = (! published.context) && ('context' in m)
+            , is_new_process = (! published.process) && ('process' in m)
+            , is_new_link = (! published.link) && ('link' in m);
 
+          //simplify access
           records.forEach(function(record){
             published[record.type] = record;
           });
 
-          //update link:
-          var update = {
-            $set: {
-              context_id: published.context._id,
-              context_disease: published.context.disease,
-              context_name: published.context.name,
-              process_id: published.process._id,
-              process_name: published.process.name
-            },
-            $addToSet: {_keywords: {$each :published.context._keywords.concat(published.process._keywords)}}
-          };
+          var events = req.app.get('events');
 
-          if (is_new_theta) {
-            update['$push'] = {theta_id: published.theta._id};
+          //register event for context creation:
+          if(is_new_context){
+            events.insert({
+              from: req.user,
+              type: 'create',
+              option: 'context',
+              context_id: published.context._id,
+              name: published.context.disease.join('; ') + ' / ' +  published.context.name            
+            }, function(err, docs){if(err) return next(err);});
           }
 
-          //update link
-          components.update({_id: published.link._id}, update, {safe:true}, function(err, cnt){
-            if(err) return next(err);
+          //update link:
+          if(is_new_link || is_new_theta){
+            var linkUpdate = {
+              $set: {
+                context_id: published.context._id,
+                context_disease: published.context.disease,
+                context_name: published.context.name,
+                process_id: published.process._id,
+                process_name: published.process.name
+              },
+              $addToSet: {_keywords: {$each :published.context._keywords.concat(published.process._keywords)}}
+            };
 
-            if(! is_new_theta){
-              res.json({'success': true, 'msg': 'your model has been published'});
+            if (is_new_theta) {
+              linkUpdate['$push'] = {theta_id: published.theta._id};
             }
-          });
 
-          //store traces in mongo and update theta
+            //update link
+            components.update({_id: published.link._id}, linkUpdate, {safe:true}, function(err, cnt){
+              if(err) return next(err);
+              if(! is_new_theta){
+                res.json({'success': true, 'msg': 'your model has been published'});
+              }
+            });
+          }
+
+          //register event for link == model creation:
+          if(is_new_link || is_new_process){
+            events.insert({
+              from: req.user,
+              type: 'create',
+              option: 'model',
+              context_id: published.context._id,
+              process_id: published.process._id,
+              link_id: published.link._id,
+              name: published.context.disease.join('; ') + ' / ' +  published.context.name + ' / ' + published.process.name + ' - ' + published.link.name
+            }, function(err, docs){if(err) return next(err);});
+          }
+
+
+          //update theta
           if (is_new_theta) {
+
+            var thetaUpdate = {
+              $set: {
+                context_id: published.context._id,
+                context_disease: published.context.disease,
+                context_name: published.context.name,
+                process_id: published.process._id,
+                process_name: published.process.name,
+                link_id: published.link._id,
+                link_name: published.link.name
+              }
+            };
+            components.update({_id: published.theta._id}, thetaUpdate, {safe:true}, function(err, cnt){
+              if(err) return next(err);
+            });
+            
+            //register event
+            events.insert({
+              from: req.user,
+              type: 'create',
+              option: 'theta',
+              context_id: published.context._id,
+              process_id: published.process._id,
+              link_id: published.link._id,
+              theta_id: published.theta._id,
+              name: published.context.disease.join('; ') + ' / ' +  published.context.name + ' / ' + published.process.name + ' - ' + published.link.name
+            }, function(err, docs){if(err) return next(err);});
+
+            //store traces in mongo and start diagnostic
             if(req.files){
               var gfs = Grid(req.app.get('db'), mongodb);
               var writestream = gfs.createWriteStream(req.body.trace_checksum)
@@ -266,9 +327,10 @@ app.post('/commit', function(req, res, next){
               res.json({'success': true, 'msg': 'your results are being reviewed'});
             }
           }
-        });
 
-      } else {
+        }); //end insert callback
+
+      } else { //nothing to be published
         return res.json({'success': false, 'msg': 'everything has already been published'});
       }
     });
@@ -295,9 +357,10 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
 
   //store ref to db and the collections so that it is easily accessible (app is accessible in req and res!)
   app.set('db', db);
-  app.set('users',  new mongodb.Collection(db, 'users'));
-  app.set('components',  new mongodb.Collection(db, 'components'));
-  app.set('diag',  new mongodb.Collection(db, 'diag'));
+  app.set('users', new mongodb.Collection(db, 'users'));
+  app.set('events', new mongodb.Collection(db, 'events'));
+  app.set('components', new mongodb.Collection(db, 'components'));
+  app.set('diag', new mongodb.Collection(db, 'diag'));
 
   //TODO ensureIndex
 

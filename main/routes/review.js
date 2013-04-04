@@ -5,7 +5,7 @@ var fs = require('fs')
   , path = require('path');
 
 
-exports.reviewsTheta = function(req, res, next){
+exports.theta = function(req, res, next){
 
   var r = req.app.get('reviews');
 
@@ -18,7 +18,7 @@ exports.reviewsTheta = function(req, res, next){
 
 
 
-exports.postReviewTheta = function(req, res, next){
+exports.postTheta = function(req, res, next){
 
   var r = req.app.get('reviews');
   var review = req.body;
@@ -41,7 +41,7 @@ exports.postReviewTheta = function(req, res, next){
 
 
 
-exports.postCommentReviewTheta = function(req, res, next){
+exports.postCommentTheta = function(req, res, next){
 
   var r = req.app.get('reviews');
   var comment = req.body;

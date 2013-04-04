@@ -269,22 +269,32 @@ exports.review = function(req, res, next){
 
     res.format({
       html: function(){
-        res.render('review', {
-          diseaseName: comps.context.disease.join('; '),
-          contextName: comps.context.name,
-          modelName: comps.process.name + ' - ' + comps.link.name,
+        var u = req.app.get('users');
+        u.findOne({_id: req.session.username}, function(err, user){
+          if (err) return next(err);
+
+          res.render('review', {
+            diseaseName: comps.context.disease.join('; '),
+            contextName: comps.context.name,
+            modelName: comps.process.name + ' - ' + comps.link.name,
+            context_id: comps.context._id,
+            context_followed: (user.context_id || []).indexOf(comps.context._id) !== -1
+          });
+
         });
+
       },
+
 
       json: function(){
         components
           .find({_id: {$in: comps.link.theta_id}})
           .toArray(function(err, thetas){
-            if (err) next(err);
+            if (err) return next(err);
 
             comps.thetas = thetas;
             res.json({
-              tpl:{
+              tpl:{ //TODO browserify...
                 control: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','control.ejs'), 'utf8'),
                 summaryTable: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','summary_table.ejs'), 'utf8'),
                 parameters: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','parameters.ejs'), 'utf8'),

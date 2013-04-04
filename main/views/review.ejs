@@ -23,8 +23,16 @@
 
   <div class="span3">
     <div class="review-action">
-      <button class="btn btn-primary" type="button"><i class="icon-eye-open"></i> Follow</button>
-      <button class="btn btn-danger" type="button"><i class="icon-download"></i> Fork</button>
+
+      <form id="followContext" action="/followcontext" method="post">
+        <input type="hidden" name="_csrf" value="<%= token %>"/>
+        <button class="btn btn-primary" type="submit" name="action" value="<%= (context_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (context_followed) ? 'Unfollow': 'Follow' %> Context</span></button>
+      </form>
+
+      <form>
+        <button class="btn btn-danger" type="submit"><i class="icon-download"></i> Fork</button>
+      </form>
+
     </div>
   </div>
 

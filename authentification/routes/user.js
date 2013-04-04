@@ -22,7 +22,7 @@ exports.authenticate = function(collection, username, password, callback){
 
       bcrypt.compare(password, doc.hash, function(err, is_identical) {
         if (err) callback(err, false);
-        callback(null, is_identical);
+        callback(null, username);
       });
 
     } else {

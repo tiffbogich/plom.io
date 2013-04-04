@@ -4,7 +4,8 @@
 
 var express = require('express')
   , routes = require('./routes')
-  , social = require('./routes/social')
+  , review = require('./routes/review')
+  , user = require('./routes/user')
   , fs = require('fs')
   , path = require('path')
   , http = require('http')
@@ -31,7 +32,6 @@ app.configure(function(){
 
   app.use(express.csrf());
   app.use(is_logged_in);
-  app.use(app.router);
 
   app.use(express.static(__dirname + '/public'));
 
@@ -40,6 +40,8 @@ app.configure(function(){
 
   //authentification (/login, /logout, /register)
   app.use(plomAuth);
+
+  app.use(app.router);
 
 });
 
@@ -64,12 +66,16 @@ app.post('/fork', csrf, routes.postFork);
 app.get('/review', secure, csrf, routes.review);
 app.get('/trace/:_id', secure, routes.trace);
 
-app.get('/reviewstheta/:theta_id', secure, social.reviewsTheta);
-app.post('/reviewtheta', secure, csrf, social.postReviewTheta);
-app.post('/commentreviewtheta', secure, csrf, social.postCommentReviewTheta);
+//review page
+app.get('/reviewstheta/:theta_id', secure, review.theta);
+app.post('/reviewtheta', secure, csrf, review.postTheta);
+app.post('/commentreviewtheta', secure, csrf, review.postCommentTheta);
 
+//social network
+app.get('/:username', user.user);
+app.post('/followcontext', secure, csrf, user.postFollow);
+app.post('/followuser', secure, csrf, user.postFollow);
 
-//app.get('/context', secure, routes.context);
 
 
 
@@ -96,6 +102,7 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   //store ref to the collections so that it is easily accessible (app is accessible in req and res!)
   app.set('db', db);
   app.set('users',  new mongodb.Collection(db, 'users'));
+  app.set('events',  new mongodb.Collection(db, 'events'));
   app.set('components',  new mongodb.Collection(db, 'components'));
   app.set('reviews',  new mongodb.Collection(db, 'reviews'));
   app.set('diag',  new mongodb.Collection(db, 'diag'));

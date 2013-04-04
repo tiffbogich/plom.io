@@ -7,9 +7,9 @@
   },
   "dependencies": {
     "jade": "~0.28.2",
-    "mongodb": "~1.1.11",
     "validator": "~0.4.27",
     "bcrypt": "~0.7.5",
-    "express": "~3.1.0"
+    "mongodb": "~1.2.14",
+    "express": "~3.1.1"
   }
 }

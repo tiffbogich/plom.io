@@ -31,7 +31,6 @@ app.configure('development', function(){
 var csrf = require('./lib/middleware').csrf
   , secure = require('./lib/middleware').secure;
 
-app.get('/', secure, routes.index);
 app.get('/login', csrf, user.login);
 app.get('/success', function(req, res, next){res.send("authenticated");});
 app.get('/logout', user.logout);

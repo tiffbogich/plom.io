@@ -101,6 +101,33 @@ $(document).ready(function() {
     });
 
 
+    $('#followContext').on('submit', function(e){
+      e.preventDefault();
+
+      var $this = $(this)
+        , $btn = $this.find( 'button[name="action"]' );
+
+      var pdata = {
+        action: $btn.val(),
+        context_id: ctrl.context._id,
+        name: ctrl.context.disease.join('; ') + ' / ' +  ctrl.context.name,
+        _csrf: $this.find( 'input[name="_csrf"]' ).val()
+      };
+
+      $.post($this.attr('action'), pdata, function(status){
+        if(status.success){
+          if(pdata.action === 'follow'){
+            $btn.val('unfollow');
+            $this.find('span').html('Unfollow Context');
+          } else {
+            $btn.val('follow');
+            $this.find('span').html('Follow Context');
+          }
+        }
+      });
+      
+    });
+
 
     ///////////
     //websocket
