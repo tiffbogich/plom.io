@@ -70,12 +70,12 @@ app.get('/trace/:_id', secure, routes.trace);
 app.get('/reviewstheta/:theta_id', secure, review.theta);
 app.post('/reviewtheta', secure, csrf, review.postTheta);
 app.post('/commentreviewtheta', secure, csrf, review.postCommentTheta);
+app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 
 //social network
-app.get('/:username', user.user);
 app.post('/followcontext', secure, csrf, user.postFollow);
 app.post('/followuser', secure, csrf, user.postFollow);
-
+app.get('/:username', user.user);
 
 
 

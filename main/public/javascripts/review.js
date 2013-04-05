@@ -19,24 +19,46 @@ $(document).ready(function() {
     ////////
     //vizbit
     ////////
-    $("#vizbit").on('click', function(){
-      ctrl.setVizBit();
+    $("#rowReviewTheta").on('click', '.vizbit',  function(e){
+      e.preventDefault();
 
+      $('.vizbitRemove').trigger('click');
+
+      ctrl.setVizBit();
       $(this).next()
         .html('run')
         .next().show();
     });
 
-    $(".vizbitLink").on('click', function(){
+    $("#rowReviewTheta").on('click', '.vizbitLink',  function(e){
+      e.preventDefault();
+     
       var vdata = ctrl.vizBit;
       ctrl.updateTheta(vdata.theta, vdata.method);
       $("#run").trigger('click');
     });
 
-    $("#vizbitRemove").on('click', function(e){
-      ctr.vizBit = undefined;
+    $("#rowReviewTheta").on('click', '.vizbitRemove',  function(e){
       e.preventDefault();
+
+      ctrl.vizBit = undefined;
       $(this).hide().prev().html('');
+    });
+
+
+    $('#rowReviewTheta').on('submit', function(e){
+      $('.vizbitRemove').trigger('click');
+    });
+
+
+    $('#rowReviewTheta').on('click', '.vizbitFetch',  function(e){
+      e.preventDefault();
+
+      $.getJSON($(this).attr('href'), function(vdata){       
+        ctrl.updateTheta(vdata.theta, vdata.method);
+        $("#run").trigger('click');
+      });
+            
     });
 
 
@@ -70,15 +92,23 @@ $(document).ready(function() {
 
       var vdata = ctrl.vizBit;
       if(vdata && 'theta' in vdata){
-        pdata.theta = vdata.theta,
-        pdata.method = vdata.method
+        pdata.vizbit = {theta:vdata.theta, method:vdata.method};
       }
 
       var url = $this.closest('form').attr('action');
-      $.post(url, pdata, function(reviews){
-        $('#reviewThread').html(ctrl.compiled.reviews(reviews));
+      $.ajax(url, {
+        data : JSON.stringify(pdata),
+        contentType : 'application/json',
+        type : 'POST',        
+        success: function(reviews){
+          $('#reviewThread').html(ctrl.compiled.reviews(reviews));
+        }
       });
+
     });
+
+
+
 
     //post comments
     $('#reviewThread').on('submit', 'form', function(e){
@@ -97,9 +127,19 @@ $(document).ready(function() {
 
       $body.val('');
 
+      var vdata = ctrl.vizBit;
+      if(vdata && 'theta' in vdata){
+        pdata.vizbit = {theta: vdata.theta, method:vdata.method};
+      }
+
       var url = $this.closest('form').attr('action');
-      $.post(url, pdata, function(reviews){
-        $('#reviewThread').html(ctrl.compiled.reviews(reviews));
+      $.ajax(url, {
+        data : JSON.stringify(pdata),
+        contentType : 'application/json',
+        type : 'POST',        
+        success: function(reviews){
+          $('#reviewThread').html(ctrl.compiled.reviews(reviews));
+        }
       });
       
     });
@@ -131,7 +171,6 @@ $(document).ready(function() {
       });
       
     });
-
 
     ///////////
     //websocket

@@ -8,6 +8,7 @@
   <div class="span7">
     <h2>Social and Activity Stream</h2>
 
+    <% if(events && events.length){ %>
     <% events.forEach(function(e, i){ %>
 
     <a href="/<%= e.from %>"><%= e.from %></a>
@@ -23,9 +24,11 @@
     <hr/>    
 
     <% }) %>
+    <% } else { %>
+    Nothing happened...
+    <% } %>
    
   </div>
-
 
 
   <!-- the user components and reviews -->

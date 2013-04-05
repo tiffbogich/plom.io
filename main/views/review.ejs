@@ -229,9 +229,9 @@
             <form id="formReviewTheta" action="/reviewtheta" method="post">
 
               <label for="reviewTheta">Review the methods and the parameter values</label>
-              <button id="vizbit" class="btn" style="float:left;" type="button"><i class="icon-file"></i> Attach run</button> 
+              <button class="vizbit btn"><i class="icon-file"></i> Attach run</button> 
               <a class="vizbitLink" href="#filtering"></a>
-              <a id="vizbitRemove" class="hidden" href="#"><i class="icon-remove"></i></a>
+              <a class="vizbitRemove hidden" href="#"><i class="icon-remove"></i></a>
               <textarea id="reviewTheta" rows="5" name="body", class="span5"></textarea>
 
               <input type="hidden" name="_csrf" value="<%= token %>"/>

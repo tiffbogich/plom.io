@@ -25,42 +25,47 @@ exports.user = function(req, res, next){
       events: function(callback){
         var q = {
           $or: [
-            {from: req.session.username},
-            {user_id: req.session.username},
-            {context_id: {$in: user.context_id}},
-            {user_id: {$in: user.user_id}},
+            {from: req.params.username},
+            {user_id: req.params.username}
           ]};
 
+        if(user.context_id && user.context_id.length){
+          q['$or']['context_id'] = {$in: user.context_id};
+        }
+        if(user.user_id && user.user_id.length){
+          q['$or']['user_id'] = {$in: user.user_id};
+        }
+
         e.find(q).sort({_id:-1}).toArray(function(err, docs){
-          if(err) callback(err);
+          if(err) return callback(err);
           callback(null, docs);
         });
       },
 
       contexts: function(callback){
         c.find({type:'context', username: req.session.username}, {disease:true, name:true, _id:true}).sort({_id:-1}).toArray(function(err, docs){
-          if(err) callback(err);
+          if(err) return callback(err);
           callback(null, docs);
         });
       },
 
       models: function(callback){
         c.find({type:'link', username: req.session.username}, {context_disease:true, context_name:true, process_name:true, name:true, _id:true}).sort({_id:-1}).toArray(function(err, docs){
-          if(err) callback(err);
+          if(err) return callback(err);
           callback(null, docs);
         });
       },
 
       thetas: function(callback){
         c.find({type:'theta', username: req.session.username}, {context_disease:true, context_name:true, process_name:true, link_name:true, name:true, _id:true, link_id:true}).sort({_id:-1}).toArray(function(err, docs){
-          if(err) callback(err);
+          if(err) return callback(err);
           callback(null, docs);
         });
       },
 
       reviews: function(callback){
         r.find({username: req.session.username}).sort({_id:-1}).toArray(function(err, docs){
-          if(err) callback(err);
+          if(err) return callback(err);
           callback(null, docs);
         });
       }

@@ -333,7 +333,7 @@ PlomTs.prototype.run = function(socket, options){
       kalman: {exec: 'kalman', opt: [options.impl, '-b']}
     };
     
-    socket.emit('start', {'exec': exec[options.algo], 'plomModelId': this.link._id, 'theta': this.theta});
+    socket.emit('start', {'exec': exec[options.algo], 'plomModelId': this.link._id, 'theta': {partition: this.theta.partition, parameter: this.theta.parameter}});
 
     plomGlobal.intervalId.push(setInterval(function(){
       that.updateGraphs();
@@ -344,6 +344,7 @@ PlomTs.prototype.run = function(socket, options){
   }
 
 };
+
 
 PlomTs.prototype.processMsg = function(msg, appendLog){
 
@@ -365,7 +366,6 @@ PlomTs.prototype.processMsg = function(msg, appendLog){
     this.processPredRes(msg.msg);
     break;
   }
-
 
 };
 

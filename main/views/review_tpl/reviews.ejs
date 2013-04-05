@@ -2,18 +2,27 @@
 <div class="row">
   <div class="span5">
     <ul>
+
       <li><%= review.username %></li>
+
       <li>on <%= review._id.date %></li>
+
       <li><span class="label label-<%= (review.decision === 'validated') ? 'success': 'important' %>"><%= (review.decision === 'validated') ? 'validated': 'rejected' %></span></li>
+
+      <% if (review.vizbit){ %>
+      <li><a class="vizbitFetch" href="/vizbit/<%= review._id %>" data-view="#filtering">run</a></li>
+      <% } %>
+
       <% if (review.body){ %>
       <li><%= review.body %></li>      
       <% } %>
+
     </ul>
     
 
     <% if(review.comments) { review.comments.forEach(function(comment, j){ %>
     <div class="row">
-      <div class="span4 offset1">    
+      <div class="span4 offset1">
 
         <ul>
           <li><%= comment.username %></li>
@@ -25,6 +34,10 @@
 
           <% if(comment.change){ %>
           <li>Changed status to: <span class="label label-<%= (comment.change === 'validated') ? 'success': 'important' %>"><%= (comment.change === 'validated') ? 'validated': 'rejected' %></span></li>
+          <% } %>
+
+          <% if (comment.vizbit){ %>
+          <li><a class="vizbitFetch" href="/vizbit/<%= review._id %>/<%= j %>" data-view="#filtering">run</a></li>
           <% } %>
 
           <% if(comment.body){ %>
@@ -54,6 +67,10 @@
           <input type="checkbox" name="change" value="<%= (review.decision === 'validated') ? 'rejected': 'validated' %>"/> Change the status of my review to <%= (review.decision === 'validated') ? 'rejected': 'validated' %>
         </label>
         <% } %>        
+
+        <button class="vizbit btn"><i class="icon-file"></i> Attach run</button> 
+        <a class="vizbitLink" href="#filtering"></a>
+        <a class="vizbitRemove hidden" href="#"><i class="icon-remove"></i></a>
 
         <textarea rows="3" class="span5" name="body"></textarea>
         <input type="hidden" name="review_id" value="<%= review._id %>"/>

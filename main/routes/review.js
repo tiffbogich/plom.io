@@ -16,6 +16,32 @@ exports.theta = function(req, res, next){
 
 };
 
+
+
+exports.vizbit = function(req, res, next){
+
+  var projection = {vizbit:true, comments: true, _id:false};
+
+  if(typeof req.params.comment_id !== 'undefined'){
+    projection.comments = {'$slice': [req.params.comment_id, 1]};
+  }
+
+  var r = req.app.get('reviews');
+  r.findOne({_id: new ObjectID(req.params.review_id)}, projection, function(err, doc){
+    if(err) return next(err);
+
+    if(typeof req.params.comment_id !== 'undefined'){
+      res.json(doc.comments[0].vizbit);
+    } else {
+      res.json(doc.vizbit);
+    }
+
+
+  });
+
+};
+
+
 exports.postTheta = function(req, res, next){
 
   var r = req.app.get('reviews');
@@ -79,13 +105,14 @@ exports.postCommentTheta = function(req, res, next){
     var mye = {
       from: req.session.username,
       type: 'review',
-      option: (comment.change) ? (((review.username === req.session.username) ? 'revised_': 'contested_') + comment.change) : 'commented',
+      option: (comment.change) ? 'revised_': ((comment.decision) ? 'contested_' + comment.decision : 'commented'),
       review_id: review._id,
       comment_id: review.comments.length-1,
       context_id: review.context_id,
       process_id: review.process_id,
       link_id: review.link_id,
       theta_id: review.theta_id,
+      user_id: review.username,
       name: review.name
     };
 

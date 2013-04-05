@@ -9,8 +9,16 @@ function Control(data){
   this.process = data.comps.process;
   this.link = data.comps.link;
   this.thetas = data.comps.thetas;
+  this.diagnostics = this.thetas.map(function(x){return x.diagnostic});
+
+  this.thetas.forEach(function(x){
+    delete x.diagnostic;
+  })
+
   this.i = 0; //the selected theta (among thetas)
-  this.theta = this.thetas[this.i];
+  this.theta = $.extend(true, {}, this.thetas[this.i]); //this.theta will be mutated so we always work on a copy
+
+  this.diagnostic = this.diagnostics[this.i]; //diagnostics are not mutated, we just work with references
 
   this.name = this.context.disease.join('; ') + ' / ' +  this.context.name + ' / ' + this.process.name + ' - ' + this.link.name;
 
@@ -27,12 +35,12 @@ function Control(data){
   });
 
   //d3 plots
-  this.updateCorr1 = plotCorr(this.theta.diagnostic.detail[0], 0, 1, 1);
-  this.updateCorr2 = plotCorr(this.theta.diagnostic.detail[0], 1, 0, 2);
-  this.updateDensity1 = plotDensity(this.theta.diagnostic.detail[0], 0, 1);
-  this.updateDensity2 = plotDensity(this.theta.diagnostic.detail[0], 1, 2);
+  this.updateCorr1 = plotCorr(this.diagnostic.detail[0], 0, 1, 1);
+  this.updateCorr2 = plotCorr(this.diagnostic.detail[0], 1, 0, 2);
+  this.updateDensity1 = plotDensity(this.diagnostic.detail[0], 0, 1);
+  this.updateDensity2 = plotDensity(this.diagnostic.detail[0], 1, 2);
 
-  this.updateMat = parMatrix(this.theta.diagnostic.detail[0], this.updateCorr1, this.updateCorr2, this.updateDensity1, this.updateDensity2); 
+  this.updateMat = parMatrix(this.diagnostic.detail[0], this.updateCorr1, this.updateCorr2, this.updateDensity1, this.updateDensity2); 
 
   this.ONE_YEAR_IN_DATA_UNIT = {D:365.0, W:365.0/7.0, M:12.0, Y:1.0 };
   this.fhr = {D: 'days', W: 'weeks', M: 'months', Y: 'years'};
@@ -40,41 +48,45 @@ function Control(data){
 };
 
 
-
 Control.prototype.thetaList = function(){
-  $('#thetaList').html(this.compiled.parameters({thetas: this.thetas}));
+  $('#thetaList').html(this.compiled.parameters({thetas: this.thetas, diagnostics: this.diagnostics}));
 
   var that = this;
   $('.review-theta').on('click', function(e){
     that.i = parseInt($(this).val(), 10);
-    that.theta = $.extend(true, {}, that.thetas[that.i]);
+    that.diagnostic = that.diagnostics[that.i];
 
     that.summaryTable();
     $('.review-trace-id').first().trigger('click');
 
     //force redraw of the correlation matrix as the number of parameters could have changed... TODO: improve update to avoid full redraw
-    that.updateMat = parMatrix(that.theta.diagnostic.detail[0], that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2);
+    that.updateMat = parMatrix(that.diagnostic.detail[0], that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2);
   });
 
 };
 
 
 Control.prototype.summaryTable = function(){
-  $('#summaryTable').html(this.compiled.summaryTable(this.theta.diagnostic));
+  $('#summaryTable').html(this.compiled.summaryTable(this.diagnostic));
 
   var that = this;
   //when user select a trace:
   $('.review-trace-id').on('click', function(e){
     var h = parseInt($(this).val(), 10);
     that.updateTheta(that.thetas[that.i], that.thetas[that.i].design.cmd);
-    that.updateMat(that.thetas[that.i].diagnostic.detail[h]);
-
+    that.updateMat(that.diagnostics[that.i].detail[h]);
   });
 
 };
 
 Control.prototype.updateTheta = function(theta, cmd){
-  this.theta = $.extend(true, {}, theta);
+
+  if('_id' in theta){
+    this.theta = $.extend(true, {}, theta);
+  } else { //theta comes from vizbit: preserve metadata but replace parameter and partition
+    this.theta.parameter = $.extend(true, {}, theta.parameter);
+    this.theta.partition = $.extend(true, {}, theta.partition);
+  }
 
   //render    
   $('#control').html(this.compiled.control({c:this.context, p:this.process, l:this.link, t:this.theta}));
@@ -258,7 +270,7 @@ Control.prototype._theta = function(){
 Control.prototype.setVizBit = function(){
 
   this.vizBit = {
-    theta: $.extend(true, {}, this.theta),
+    theta: $.extend(true, {}, {partition: this.theta.partition, parameter: this.theta.parameter}), //do not copy meta data
     method: this.getMethod()
   };
 
