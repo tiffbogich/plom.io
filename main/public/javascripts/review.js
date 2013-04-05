@@ -50,17 +50,22 @@ $(document).ready(function() {
       $('.vizbitRemove').trigger('click');
     });
 
-
     $('#rowReviewTheta').on('click', '.vizbitFetch',  function(e){
       e.preventDefault();
+      var $this = $(this);
 
-      $.getJSON($(this).attr('href'), function(vdata){       
+      $.getJSON($this.attr('href'), function(vdata){       
         ctrl.updateTheta(vdata.theta, vdata.method);
+
+        $('html, body').animate({
+          scrollTop: $($this.attr('data-view')).offset().top
+        });
+
         $("#run").trigger('click');
+
       });
             
     });
-
 
 
     ////////
