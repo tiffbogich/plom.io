@@ -32,7 +32,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
   var maxtextlength = Math.max.apply(Math, rowdataset.map(function(x){return x.length;}))
     , textfont = 10
-    , matTotSize = 500 - maxtextlength * textfont
+    , matTotSize = 400 - maxtextlength * textfont
     , figsSize = matTotSize
     , matMarginSize = maxtextlength/2 * textfont // /2 is completely arbitrary TODO: understand fonts size
     , matSize = matTotSize - matMarginSize
@@ -208,10 +208,10 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     if(indi === indj){
 
       $('#corr1, #corr2, #density1').addClass('hidden');
-      $('#trace, #autocor, #test').removeClass('hidden');
+      $('#trace, .autocor, #test').removeClass('hidden');
 
       $('#trace img').attr('src', '/trace/' + data[indi][indi].png.trace_id);
-      $('#autocor img').attr('src', '/trace/' + data[indi][indi].png.autocor_id);
+      $('.autocor img').attr('src', '/trace/' + data[indi][indi].png.autocor_id);
 
       $('#geweke').html(data[indi][indi].geweke);
       $('#heidel-start').html(data[indi][indi].heidel.start);
@@ -226,7 +226,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
     } else {
       $('#corr1, #corr2, #density1').removeClass('hidden');
-      $('#trace, #autocor, #test').addClass('hidden');
+      $('#trace, .autocor, #test').addClass('hidden');
 
     }
 

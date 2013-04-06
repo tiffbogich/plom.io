@@ -32,7 +32,7 @@ $(document).ready(function() {
 
     $("#rowReviewTheta").on('click', '.vizbitLink',  function(e){
       e.preventDefault();
-     
+
       var vdata = ctrl.vizBit;
       ctrl.updateTheta(vdata.theta, vdata.method);
       $("#run").trigger('click');
@@ -54,7 +54,7 @@ $(document).ready(function() {
       e.preventDefault();
       var $this = $(this);
 
-      $.getJSON($this.attr('href'), function(vdata){       
+      $.getJSON($this.attr('href'), function(vdata){
         ctrl.updateTheta(vdata.theta, vdata.method);
 
         $('html, body').animate({
@@ -64,7 +64,7 @@ $(document).ready(function() {
         $("#run").trigger('click');
 
       });
-            
+
     });
 
 
@@ -104,7 +104,7 @@ $(document).ready(function() {
       $.ajax(url, {
         data : JSON.stringify(pdata),
         contentType : 'application/json',
-        type : 'POST',        
+        type : 'POST',
         success: function(reviews){
           $('#reviewThread').html(ctrl.compiled.reviews(reviews));
         }
@@ -141,12 +141,12 @@ $(document).ready(function() {
       $.ajax(url, {
         data : JSON.stringify(pdata),
         contentType : 'application/json',
-        type : 'POST',        
+        type : 'POST',
         success: function(reviews){
           $('#reviewThread').html(ctrl.compiled.reviews(reviews));
         }
       });
-      
+
     });
 
 
@@ -167,14 +167,14 @@ $(document).ready(function() {
         if(status.success){
           if(pdata.action === 'follow'){
             $btn.val('unfollow');
-            $this.find('span').html('Unfollow Context');
+            $this.find('span').html('Unfollow');
           } else {
             $btn.val('follow');
-            $this.find('span').html('Follow Context');
+            $this.find('span').html('Follow');
           }
         }
       });
-      
+
     });
 
     ///////////

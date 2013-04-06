@@ -1,0 +1,197 @@
+<% include ../layout %>
+
+<script src="/javascripts/PlomTs.js"></script>
+<script src="/javascripts/parmatrix.js"></script>
+<script src="/javascripts/corr.js"></script>
+<script src="/javascripts/density.js"></script>
+<script src="/javascripts/view.js"></script>
+<script src="/javascripts/review.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+</head>
+
+<body onload="prettyPrint()">
+
+  <div class="container">
+
+    <div class="row">
+      <div id="headerLogo" class="span4">
+        <h1 class="muted">PLoM.io</h1>
+        <p class="plom-brand"> Public Library of Models</p>
+      </div>
+
+      <ul id="plomNav" class="nav nav-pills">
+        <li><a href="#"><%= diseaseName %></a></li>
+        <li><a href="#"><%= contextName %></a></li>
+        <li class="active"><a href="#"><%= modelName %></a></li>
+      </ul>
+    </div>
+
+    <div class="row">
+
+      <div class="social-action">
+
+        <form id="followContext" action="/followcontext" method="post">
+          <input type="hidden" name="_csrf" value="<%= token %>"/>
+          <button class="btn" type="submit" name="action" value="<%= (context_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (context_followed) ? 'Unfollow': 'Follow' %></span></button>
+        </form>
+
+        <form>
+          <button class="btn" type="submit"><i class="icon-download"></i> Fork</button>
+        </form>
+
+
+      </div>
+
+    </div>
+
+
+    <div class="row">
+      <div class="span12">
+
+        <ul class="nav nav-tabs" id="reviewTab">
+          <li class="active">
+            <a href="#theta" data-toggle="tab">Parameters</a>
+          </li>
+          <li>
+            <a href="#model" data-toggle="tab">Model</a>
+          </li>
+        </ul>
+        
+        <div class="tab-content">
+
+          <div class="tab-pane active" id="theta">
+
+            <!-- parameter list (templated) -->
+            <div class="horizontal-scroll" data-toggle="buttons-radio" id="thetaList"></div>
+
+            <hr/>
+            
+            <!-- Summary table (templated) -->
+            <div class="accordion" id="accSummaryTable">
+              <div class="accordion-group">
+                <div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accSummaryTable" href="#accSummaryTableContent">Traces summary</a></div>
+
+                <div id="accSummaryTableContent" class="accordion-body collapse in">
+                  <div class="accordion-inner">
+                    <div class="row"><div class="span12" data-toggle="buttons-radio" id="summaryTable"></div></div>	      	
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- plots -->
+            <div class="accordion" id="accDiagPlots">
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accDiagPlots" href="#accDiagPlotsContent">Diagnostic plots</a>
+                </div>
+
+                <div id="accDiagPlotsContent" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <div class="row" id="diagPlots"><% include diagnostics %></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filtering -->
+            <div class="accordion" id="accFiltering">
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accFiltering" href="#accFilteringContent">Simulation and filtering</a>
+                </div>
+
+                <div id="accFilteringContent" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <div class="row" id="filtering"><% include filtering %></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Review zone -->
+            <div class="accordion" id="accReview">
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accReview" href="#accReviewContent">Reviews</a>
+                </div>
+
+                <div id="accReviewContent" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <div class="row" id="rowReviewTheta"><% include theta %></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr/>
+
+          </div> <!-- end div#theta -->
+
+
+          <!-- Model review -->
+          <div class="tab-pane" id="model">
+
+            <div class="row">
+              <div class="span12">
+
+                <ul class="nav nav-tabs" id="reviewModelTab">
+                  <li class="active">
+                    <a href="#review-context" data-toggle="tab">Context</a>
+                  </li>
+                  <li>
+                    <a href="#review-process" data-toggle="tab">Process Model</a>
+                  </li>
+                  <li>
+                    <a href="#review-link" data-toggle="tab">Observation Model</a>
+                  </li>
+                </ul>
+
+                <div class="tab-content">
+
+                  <!-- context -->
+                  <div class="tab-pane active" id="review-context">
+                    <p>This is the context</p>
+                  </div>
+
+                  <!-- process -->
+                  <div class="tab-pane" id="review-process">
+                    <p>This is the process</p>                
+                  </div>
+
+                  <!-- link -->
+                  <div class="tab-pane" id="review-link">
+                    <p>This is the link</p>               
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Feedback zone -->
+            <div class="row">
+              <div class="span7"><h3>Feedback</h3></div>
+
+              <div class="span5">
+                <h3>Add</h3>
+
+                <form id="formFeedbackModel" action="/feedbackmodel">
+                  <label for="feedbackModel">Provide feedback on the model and its adequation to the context</label>
+                  <textarea id="feedbackModel" rows="3" class="span5"></textarea>
+                  <p>
+                    <button class="btn btn-success" type="button">Validate</button>
+                    <button class="btn btn-danger" type="button">Not convincing</button>
+                  </p>
+                </form>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% include ../footer %>

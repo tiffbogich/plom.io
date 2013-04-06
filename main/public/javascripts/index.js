@@ -10,7 +10,7 @@ $(document).ready(function() {
     e.stopPropagation();
   });
 
-  $.getJSON('/', function(ctree) {
+  $.getJSON('/library', function(ctree) {
 
     ctree.forEach(function(c, indc){
 

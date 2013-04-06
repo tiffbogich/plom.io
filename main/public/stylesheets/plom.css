@@ -1,14 +1,108 @@
+/* welcome */
+#plomMain{
+  background-color: white;  
+  margin-top: 20px;
+//  border: 1px solid rgb(238,238,238);
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background-color: rgba(112,197, 235, 0.4);
+//  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#plomMain h1{
+  font-size: 36pt;
+ }
+
+ #plomMain form{
+   margin-left:70px;
+
+ }
+
+ #headerLogo{
+   background:url(../images/logo-large.png) no-repeat left center;
+   background-size: auto 80px;
+ }
+
+ #headerLogo h1, #headerLogo p{
+   margin-left: 120px;
+ }
+
+
+ .homebox h4
+ {
+   text-align: center;
+ }
+
+ .featurette h2 {
+   color: #3DAAE0;
+   font-weight: 400;
+ }
+
+ .get-started{
+   margin-top:10px;
+ }
+
+#plomNav {
+  float: right;
+  margin-top: 3%;
+}
+
+
+
+/* about */
+
+h3.role{
+  border-bottom:1px solid #eaeaea;
+  padding-bottom:25px;position:relative;
+  text-align:center
+}
+
+h3.role:after,h3.role:before{
+  border:20px solid transparent;
+  bottom:-20px;content:"";
+  display:inline-block;
+  margin-right:-20px;position:absolute;right:50%
+}
+
+h3.role:after{
+  border-bottom-width:0;
+  border-top-color:#fff;
+  margin-bottom:2px;z-index:2
+}
+h3.role:before{
+  border-bottom-width:0;
+  border-top-color:#eaeaea;
+  z-index:1
+}
+p:before{
+  border-left-width:0;
+  border-right-color:#eaeaea;
+  z-index:1
+}
+
+.bio{
+  height:150px;
+}
+
+.bio:hover{
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.55); 
+}
+
+
 /* review */
 
-.review-action{
+.social-action{
   float:right;
 }
 
+.social-action form{
+  float: left;
+  margin-right: 10px;
+}
+
+
 
 /* index */
-#plom-search{
-  width:294px;
-}
 
 .folderContent{
   padding: 10px;
@@ -161,7 +255,7 @@ text.shadow {
 
 
 
-#diag-plots{
+#diagPlots{
   height: 480px;
 }
 
@@ -214,3 +308,5 @@ text.shadow {
   display:table-cell; 
   padding-right: 20px; 
 }
+
+

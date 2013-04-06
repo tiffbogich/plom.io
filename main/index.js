@@ -59,8 +59,11 @@ app.configure('production', function(){
 
 // Routes
 
-app.get('/', csrf, routes.index);
-app.post('/', csrf, routes.postIndex);
+app.get('/', routes.welcome);
+app.get('/about', routes.about);
+
+app.get('/library', csrf, routes.index);
+app.post('/library', csrf, routes.postIndex);
 app.post('/fork', csrf, routes.postFork);
 
 app.get('/review', secure, csrf, routes.review);
@@ -75,7 +78,7 @@ app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 //social network
 app.post('/followcontext', secure, csrf, user.postFollow);
 app.post('/followuser', secure, csrf, user.postFollow);
-app.get('/:username', user.user);
+app.get('/:username', csrf, user.user);
 
 
 

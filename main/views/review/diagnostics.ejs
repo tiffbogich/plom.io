@@ -1,0 +1,57 @@
+<!-- correlation matrix -->
+<div class="span4">
+  <div id="ActiveMatComp"></div>
+  <div id="popover_content_wrapper" style="display: none"><div></div></div>	      
+  <div id="lock"></div>
+  <div id="outlaid"><a href="#" rel="tooltip" data-placement="top" title=""></a></div>
+  <div id="vis"></div>
+</div>
+
+
+<!-- diagnostic plots and test details -->
+<div class="span7">
+
+  <div class="row">
+    <div class="span3" id="density2"></div>
+    <div class="span3" id="corr1"></div>
+    <div class="span3 hidden" id="trace"><img class="img-diag" alt="trace plot"/></div>
+  </div>
+
+  <div class="row">
+    <div class="span3" id="corr2"></div>
+    <div class="span3" id="density1"></div>
+    <div class="span3 hidden autocor"><img class="img-diag" alt="autocorrelation plot" /></div>
+    
+    <div class="span4 hidden autocor">
+      <table class="table table-condensed">
+	<tbody>
+	  <tr>
+	    <th>Geweke</th>
+	    <th colspan = 2><span id="geweke" class="diagnostics"></span></th>
+	  </tr>
+	  <tr>
+	    <th rowspan=2 style="font-style:normal">  Raftery </th>
+	    <th>M: <span id="raftery-M"></span></th>
+	    <th>N: <span id="raftery-N" class="diagnostics"></span></th>
+	  </tr>
+	  <tr>
+	    <th>Nmin: <span id="raftery-Nmin" class="diagnostics"></span></th>
+	    <th>I: <span id="raftery-I" class="diagnostics"></span></th>
+	  </tr>
+	  
+	  <tr>
+	    <th>Heidel.</th>
+	    <th>start: <span id="heidel-start" class="diagnostics"></span></th>
+	    <th>p-value: <span id="heidel-pvalue" class="diagnostics"></span></th>
+	  </tr>
+
+	  <tr>
+	    <th>ESS</th>
+	    <th colspan = 2><span id="ess" class="diagnostics"></span></th>
+	  </tr>
+	</tbody>
+      </table>
+    </div>
+
+  </div>            
+</div>

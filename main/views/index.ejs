@@ -2,27 +2,15 @@
 
 <script src="/javascripts/plomGraphModel.js"></script>
 <script src="/javascripts/index.js"></script>
-
+    
 <% include header %>
-
-<a href="https://github.com/plom"><img style="position:absolute; top:42px; right:0;  border: 0;" src="images/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
-
-<div class="row">
-
-  <div class="span5" style="background:url(images/logo-large.png) no-repeat right center; background-size: auto 80px;">
-    <h1>PLoM.io</h1>
-    <p class="sfr-brand"> Public Library of Models</p>
-  </div>
-
-</div>
 
 
 <section>
 
-
   <form>
     <div class="input-append">
-      <input type="text" name="q" class="input-xlarge" id="plom-search"/>
+      <input type="text" name="q" id="plom-search" class="span4"/>
       <button type="submit" class="btn">Search</button>
     </div>
   </form>
@@ -103,7 +91,7 @@
               <input class="btn" type="submit" value="Fork" />
             </form>
 
-            <form action="/" method="POST" class="explore">
+            <form action="/library" method="POST" class="explore">
               <input type="hidden" name="context" value="<%= c._id %>" />
               <input type="hidden" name="process" value="<%= m.process._id %>" />
               <input type="hidden" name="link" value="<%= m.link._id %>" />
@@ -157,5 +145,5 @@
 </section>
 
 
-
+<hr />
 <% include footer %>

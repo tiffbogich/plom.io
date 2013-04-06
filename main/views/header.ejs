@@ -1,27 +1,23 @@
-  </head>
+</head>
 
-  <body onload="prettyPrint()">
+<body onload="prettyPrint()">
 
-    <div class="navbar">
-      <div class="navbar-inner">
-        <a href="/" class="brand"><img src="/images/logo-small.png"></a>
-        <ul class="nav">
-          <li> <a href="/library">Library</a> </li>
-          <li> <a href="#">Social</a> </li>
-          <li> <a href="/doc">Documentation</a></li>
-        </ul>
+  <div class="container">
 
-        <ul class="nav pull-right">
-          <% if(locals.is_logged_in) { %>
-          <li> <a href="/logout">Logout</a> </li>
-          <% } else { %>
-          <li> <a href="/login">Login</a> </li>
-          <li> <a href="/register">Register</a> </li>
-          <% } %>
-        </ul>
-
+    <div class="row">
+      <div id="headerLogo" class="span4">
+        <h1 class="muted">PLoM.io</h1>
+        <p class="plom-brand"> Public Library of Models</p>
       </div>
 
+      <ul id="plomNav" class="nav nav-pills">
+        <li><a href="/">Home</a></li>
+        <li><a href="/library">Library</a></li>
+        <li><a href="/about">About us</a></li>
+        <% if(locals.is_logged_in) { %>
+        <li> <a href="/logout">Logout</a> </li>
+        <% } else { %>
+        <li> <a href="/login">Login</a> </li>
+        <% } %>
+      </ul>
     </div>
-
-    <div class="container">

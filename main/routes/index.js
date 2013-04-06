@@ -13,6 +13,15 @@ var fs = require('fs')
   , dbUtil = require('../../db-utils');
 
 
+exports.welcome = function(req, res){
+  res.render('welcome');
+};
+
+exports.about = function(req, res){
+  res.render('about');
+};
+
+
 exports.index = function(req, res){
 
   var components = req.app.get('components');
@@ -273,7 +282,7 @@ exports.review = function(req, res, next){
         u.findOne({_id: req.session.username}, function(err, user){
           if (err) return next(err);
 
-          res.render('review', {
+          res.render('review/index', {
             diseaseName: comps.context.disease.join('; '),
             contextName: comps.context.name,
             modelName: comps.process.name + ' - ' + comps.link.name,
@@ -295,11 +304,11 @@ exports.review = function(req, res, next){
             comps.thetas = thetas;
             res.json({
               tpl:{ //TODO browserify...
-                control: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','control.ejs'), 'utf8'),
-                summaryTable: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','summary_table.ejs'), 'utf8'),
-                parameters: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','parameters.ejs'), 'utf8'),
-                ticks: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','ticks.ejs'), 'utf8'),
-                reviews: fs.readFileSync(path.join(req.app.get('views'),'review_tpl','reviews.ejs'), 'utf8').replace('<%= token %>', req.session._csrf)
+                control: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','control.ejs'), 'utf8'),
+                summaryTable: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','summary_table.ejs'), 'utf8'),
+                parameters: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','parameters.ejs'), 'utf8'),
+                ticks: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8'),
+                reviews: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','reviews.ejs'), 'utf8').replace('<%= token %>', req.session._csrf)
               },
               comps: comps
             });

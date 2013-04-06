@@ -2,6 +2,21 @@
 
 <% include header %>
 
+
+<div class="row">
+
+  <div class="social-action">
+      <form id="followUser" action="/followuser" method="post">
+        <input type="hidden" name="_csrf" value="<%= token %>"/>
+        <button class="btn" type="submit" name="action" value="unfollow"><i class="icon-eye-open"></i> <span>Follow</span></button>
+      </form>
+
+  </div>
+
+</div>
+
+
+
 <div class="row">
 
   <!-- social and activity stream -->
