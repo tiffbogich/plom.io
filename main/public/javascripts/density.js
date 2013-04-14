@@ -111,7 +111,12 @@ function plotDensity(diag, i, ind){
       .text(xlabel);
     
     d3.select("#y-axis-density" + ind)
-      .call(yAxis);
+      .call(yAxis)
+      .selectAll('text')
+      .attr("transform", function(d){
+	return "rotate(-90) translate(10,-15)"
+      })
+      .style("text-anchor", "middle");
 
   };
 
