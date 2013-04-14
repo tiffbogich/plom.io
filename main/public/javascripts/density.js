@@ -11,7 +11,7 @@ function plotDensity(diag, i, ind){
 
   var xlabel = diag[i][i].par + ':' + diag[i][i].group;
 
-  var margin = {top: 20, right: 20, bottom: 30, left: 40}
+  var margin = {top: 25, right: 25, bottom: 35, left: 40}
     , width = 220 - margin.left - margin.right
     , height = 220 - margin.top - margin.bottom;
 
@@ -55,9 +55,9 @@ function plotDensity(diag, i, ind){
     .call(xAxis)
     .append("text")
     .attr("class", "label")
-    .attr("x", width)
-    .attr("y", -6)
-    .style("text-anchor", "end")
+    .attr("x", 90)
+    .attr("y", +32)
+    .style("text-anchor", "middle")
     .text(xlabel);
 
   svg.append("g")

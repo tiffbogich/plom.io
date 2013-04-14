@@ -32,7 +32,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
   var maxtextlength = Math.max.apply(Math, rowdataset.map(function(x){return x.length;}))
     , textfont = 10
-    , matTotSize = 400 - maxtextlength * textfont
+    , matTotSize = 500 - maxtextlength * textfont
     , figsSize = matTotSize
     , matMarginSize = maxtextlength/2 * textfont // /2 is completely arbitrary TODO: understand fonts size
     , matSize = matTotSize - matMarginSize
@@ -118,39 +118,18 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       var cc = d[2].cc;
       var ess = d[2].ess;
 
-      activeCell = [d[0],d[1]];
-
-      d3.select("#ActiveMatComp")
-        .classed('hidden', false)
-        .style("background-color",function(d) {
-          return color(cc);})
-        .style("width", cellSize*Math.sqrt(growFact) + "px")
-        .style("height", cellSize*Math.sqrt(growFact) + "px")
-        .style("left", posActCell.left -cellSize*(Math.sqrt(growFact)-1)/2 + "px")
-        .style("top", posActCell.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px");
-
-
-      d3.select("#outlaid")
-        .classed('hidden', false)
-        .style("left", posActCell.left +cellSize/2 + "px")
-        .style("top", posActCell.top + "px");
-
-      if (indi == indj){
-        $('#outlaid a[rel=tooltip]').attr('data-original-title','ESS: ' + Math.round(ess*100)/100).tooltip('fixTitle');
-      } else {
-        $('#outlaid a[rel=tooltip]').attr('data-original-title','Corr: ' + Math.round(cc*100)/100).tooltip('fixTitle');
-      }
-
-      $('#outlaid a[rel=tooltip]').tooltip("show");
-
-      if(!activMatClicked){
-        mouseov(indi,indj);
-      }
-
+      mouseov(indi,indj);
     })
     .on("mouseout",function(d){
       d3.event.stopPropagation();
     });
+
+  d3.select('#outlaid')
+    .on("mouseover",function(d){
+      var indi = activeCell[0];
+      var indj = Math.max(0,activeCell[1]-1);
+      mouseov(indi,indj);
+  });
 
   d3.select("#ActiveMatComp")
     .on("click",function(){
@@ -196,51 +175,86 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       };
     });
 
+
+
   function mouseov(indi,indj){
-    d3.selectAll(".row text").classed("activetext", function(d,i){
-      return i == indj;
-    })
-    d3.selectAll(".column text").classed("activetext", function(d,i){
-      return i == indi;
-    })
+
+    cell = $(matTot.selectAll("rect")[0][indi*nbpars+indj]);
+    d = dataset[indi*nbpars+indj];
+    posActCell = cell.position();
+    var cc = d[2].cc;
+    var ess = d[2].ess;
+  
+    activeCell = [d[0],d[1]];
+
+    d3.select("#ActiveMatComp")
+      .classed('hidden', false)
+      .style("background-color",function(d) {
+        return color(cc);})
+      .style("width", cellSize*Math.sqrt(growFact) + "px")
+      .style("height", cellSize*Math.sqrt(growFact) + "px")
+      .style("left", posActCell.left -cellSize*(Math.sqrt(growFact)-1)/2 + "px")
+      .style("top", posActCell.top - cellSize*(Math.sqrt(growFact)-1)/2 + "px");
 
 
-    if(indi === indj){
+    d3.select("#outlaid")
+      .classed('hidden', false)
+      .style("left", posActCell.left +cellSize/2 + "px")
+      .style("top", posActCell.top + "px");
 
-      $('#corr1, #corr2, #density1').addClass('hidden');
-      $('#trace, .autocor, #test').removeClass('hidden');
-
-      $('#trace img').attr('src', '/trace/' + data[indi][indi].png.trace_id);
-      $('.autocor img').attr('src', '/trace/' + data[indi][indi].png.autocor_id);
-
-      $('#geweke').html(data[indi][indi].geweke);
-      $('#heidel-start').html(data[indi][indi].heidel.start);
-      $('#heidel-pvalue').html(Math.round(data[indi][indi].heidel.pvalue*10000)/10000);
-
-      $('#raftery-M').html(data[indi][indi].raftery.M || 'failed');
-      $('#raftery-N').html(data[indi][indi].raftery.N || 'failed');
-      $('#raftery-Nmin').html(data[indi][indi].raftery.Nmin || 'failed');
-      $('#raftery-I').html(data[indi][indi].raftery.I || 'failed');
-
-      $('#ess').html(Math.round(data[indi][indi].ess*100)/100);
-
+    if (indi == indj){
+      $('#outlaid a[rel=tooltip]').attr('data-original-title','ESS: ' + Math.round(ess*100)/100).tooltip('fixTitle');
     } else {
-      $('#corr1, #corr2, #density1').removeClass('hidden');
-      $('#trace, .autocor, #test').addClass('hidden');
-
+      $('#outlaid a[rel=tooltip]').attr('data-original-title','Corr: ' + Math.round(cc*100)/100).tooltip('fixTitle');
     }
 
-    updateCorr1(data, indi, indj);
-    updateCorr2(data, indj, indi);
+    $('#outlaid a[rel=tooltip]').tooltip("show");
 
-    updateDensity1(data, indi);
-    updateDensity2(data, indj);
 
+    if(!activMatClicked){
+      d3.selectAll(".row text").classed("activetext", function(d,i){
+	return i == indj;
+      })
+      d3.selectAll(".column text").classed("activetext", function(d,i){
+	return i == indi;
+      })
+
+
+      if(indi === indj){
+
+	$('#corr1, #corr2, #density1').addClass('hidden');
+	$('#trace, .autocor, #test').removeClass('hidden');
+
+	$('#trace img').attr('src', '/trace/' + data[indi][indi].png.trace_id).height('220px').width('220px');
+	$('.autocor img').attr('src', '/trace/' + data[indi][indi].png.autocor_id).height('220px').width('220px');
+
+
+	$('#geweke').html(data[indi][indi].geweke);
+	$('#heidel-start').html(data[indi][indi].heidel.start);
+	$('#heidel-pvalue').html(Math.round(data[indi][indi].heidel.pvalue*10000)/10000);
+
+	$('#raftery-M').html(data[indi][indi].raftery.M || 'failed');
+	$('#raftery-N').html(data[indi][indi].raftery.N || 'failed');
+	$('#raftery-Nmin').html(data[indi][indi].raftery.Nmin || 'failed');
+	$('#raftery-I').html(data[indi][indi].raftery.I || 'failed');
+
+	$('#ess').html(Math.round(data[indi][indi].ess*100)/100)
+
+      } else {
+	$('#corr1, #corr2, #density1').removeClass('hidden');
+	$('#trace, .autocor, #test').addClass('hidden');
+	
+      }
+
+      updateCorr1(data, indi, indj);
+      updateCorr2(data, indj, indi);
+
+      updateDensity1(data, indi);
+      updateDensity2(data, indj);
+    }
   };
 
-  mat.on("mouseout",function(d){
-    d3.select("#ActiveMatComp").classed('hidden', true);
-  });
+
 
   //return update function (assume that only colors change)
 
