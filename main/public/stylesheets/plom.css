@@ -308,4 +308,12 @@ text.shadow {
   padding-right: 20px; 
 }
 
+.goodIndicator{
+    font-size:x-small;
+}
+
+.badIndicator{
+    font-size:small;
+    color:red;
+}
 

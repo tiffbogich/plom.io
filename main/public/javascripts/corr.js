@@ -12,7 +12,7 @@ function plotCorr(diag, i, j, ind){
     });
   });
 
-  var margin = {top: 20, right: 20, bottom: 30, left: 40}
+  var margin = {top: 25, right: 25, bottom: 35, left: 40}
     , width = 220 - margin.left - margin.right
     , height = 220 - margin.top - margin.bottom;
 
@@ -45,6 +45,9 @@ function plotCorr(diag, i, j, ind){
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+
+  
+
   svg.append("g")
     .attr("id", "x-axis" + ind)
     .attr("class", "x axis")
@@ -52,10 +55,12 @@ function plotCorr(diag, i, j, ind){
     .call(xAxis)
     .append("text")
     .attr("class", "label")
-    .attr("x", width)
-    .attr("y", -6)
-    .style("text-anchor", "end")
+    .attr("x", 90)
+    .attr("y", 32)
+    .style("text-anchor", "middle")
     .text(xlabel);
+
+ 
 
   svg.append("g")
     .attr("id", "y-axis" + ind)
@@ -63,12 +68,15 @@ function plotCorr(diag, i, j, ind){
     .call(yAxis)
     .append("text")
     .attr("class", "label")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 6)
+ //   .attr("transform", "rotate(-90)")
+    .attr("y", -20)
+    .attr("x", -100)
     .attr("dy", ".71em")
-    .style("text-anchor", "end")
-    .text(ylabel)
+    .style("text-anchor", "middle")
+    .text(ylabel);
 
+
+  
   svg.selectAll(".dot")
     .data(data)
     .enter().append("circle")
@@ -115,8 +123,17 @@ function plotCorr(diag, i, j, ind){
     d3.select("#y-axis" + ind)
       .call(yAxis)
       .select('.label')
-      .text(ylabel);
-    
-  };
+      .text(ylabel);    
 
-}
+    d3.select("#y-axis" + ind)
+      .call(yAxis)
+      .selectAll('text')
+      .attr("transform", function(d){
+	return "rotate(-90) translate(0,-15)"
+      })
+      .style("text-anchor", "start");
+      //.attr("transform", "translate(-20,0)");
+    
+ 
+  };}
+	  

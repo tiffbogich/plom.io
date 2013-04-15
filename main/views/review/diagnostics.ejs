@@ -1,5 +1,5 @@
 <!-- correlation matrix -->
-<div class="span4">
+<div class="span5">
   <div id="ActiveMatComp"></div>
   <div id="popover_content_wrapper" style="display: none"><div></div></div>	      
   <div id="lock"></div>
@@ -9,7 +9,7 @@
 
 
 <!-- diagnostic plots and test details -->
-<div class="span7">
+<div class="span6">
 
   <div class="row">
     <div class="span3" id="density2"></div>
@@ -18,40 +18,55 @@
   </div>
 
   <div class="row">
-    <div class="span3" id="corr2"></div>
-    <div class="span3" id="density1"></div>
-    <div class="span3 hidden autocor"><img class="img-diag" alt="autocorrelation plot" /></div>
-    
-    <div class="span4 hidden autocor">
+
+   <table>
+     <tr>
+       <td>
+       	 <div class="span3" id="corr2"></div>
+       </td>
+       <td>
+         <div class="span3" id="density1"></div>
+       </td>
+     </tr>
+     <tr>
+       <td>
+         <div class="span3 hidden autocor"><img class="img-diag" alt="autocorrelation plot" /></div>
+       </td>
+       <td>
+    <div class="span3 hidden autocor" style="vertical-align:center;">
       <table class="table table-condensed">
-	<tbody>
+        <thead>
+	</thead>
+	<tbody >
 	  <tr>
-	    <th>Geweke</th>
-	    <th colspan = 2><span id="geweke" class="diagnostics"></span></th>
+	    <th class="goodIndicator">Geweke</th>
+	    <th class="goodIndicator" colspan = 2 ><span id="geweke"></span></th>
 	  </tr>
 	  <tr>
-	    <th rowspan=2 style="font-style:normal">  Raftery </th>
-	    <th>M: <span id="raftery-M"></span></th>
-	    <th>N: <span id="raftery-N" class="diagnostics"></span></th>
+	    <th rowspan=2 class="goodIndicator">  Raftery </th>
+	    <th class="goodIndicator">M: <span id="raftery-M"></span></th>
+	    <th class="goodIndicator">N: <span id="raftery-N"></span></th>
 	  </tr>
 	  <tr>
-	    <th>Nmin: <span id="raftery-Nmin" class="diagnostics"></span></th>
-	    <th>I: <span id="raftery-I" class="diagnostics"></span></th>
+	    <th class="goodIndicator">Nmin: <span id="raftery-Nmin"></span></th>
+	    <th class="goodIndicator">I: <span id="raftery-I"></span></th>
 	  </tr>
 	  
 	  <tr>
-	    <th>Heidel.</th>
-	    <th>start: <span id="heidel-start" class="diagnostics"></span></th>
-	    <th>p-value: <span id="heidel-pvalue" class="diagnostics"></span></th>
+	    <th class="goodIndicator">Heidel.</th>
+	    <th class="goodIndicator">start: <span id="heidel-start"></span></th>
+	    <th class="goodIndicator">p-value: <span id="heidel-pvalue"></span></th>
 	  </tr>
 
 	  <tr>
-	    <th>ESS</th>
-	    <th colspan = 2><span id="ess" class="diagnostics"></span></th>
+	    <th class="goodIndicator">ESS</th>
+	    <th class="goodIndicator" colspan = 2><span id="ess"></span></th>
 	  </tr>
 	</tbody>
       </table>
     </div>
-
+    </td>
+    </tr>
+    </table>
   </div>            
 </div>
