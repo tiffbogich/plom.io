@@ -1,79 +1,13 @@
-#GSoC2012{
-  margin-top:100px;
-  margin-left:30px;
-  height:90px;
-  width:150px;
-  background-image:url('/images/hiring6.png');
-  background-repeat:no-repeat;
-  background-position:left;
-  background-color: rgba(190,231, 242, 1);
-
-  -webkit-transform: rotate(-15deg);
-  -moz-transform: rotate(-15deg);
-  -ms-transform: rotate(-15deg);
-  transform: rotate(-15deg);
-
-  font-size:19pt;
-  color:red;
-
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-
-  border: 2px solid rgb(238,238,238);
+#headerLogo{
+  background:url(../images/logo-large.png) no-repeat left center;
+  background-size: auto 80px;
 }
 
-#GSoC2012:hover
-{
-  border: 2px solid rgb(221,72,20);
+#headerLogo h1, #headerLogo p{
+  margin-left: 120px;
 }
 
-
-#canvasTree
-{
-  width:605px;
-  height: 303px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-
-.home_img_container
-{
-  height:150px;    
-}
-
-.home_img_container img
-{
-  display:block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-
-.homebox
-{
-  border: 2px solid rgb(238,238,238);
-  width:218px;
-  float:left;
-
-  margin-left:9px;
-  margin-right:9px;
-  margin-top:10px;
-  margin-bottom:10px;
-  border: 2px solid rgb(238,238,238);
-
-  -moz-border-radius: 15px;
-  border-radius: 15px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.homebox h4
-{
-  text-align:center;
-}
-
-.divclickable:hover
-{
-  border: 2px solid rgb(221,72,20);
-  cursor: pointer;
+#plomNav {
+  float: right;
+  margin-top: 3%;
 }

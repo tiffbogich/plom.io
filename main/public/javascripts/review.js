@@ -148,6 +148,37 @@ $(document).ready(function() {
     });
 
 
+    //pmodel discussion
+    $('#model').on('submit', 'form.discuss-pmodel', function(e){
+      e.preventDefault();
+
+      var $this = $(this)
+        , $body = $this.find( 'textarea[name="body"]' );
+
+      var pdata = {
+        context_id: ctrl.context._id,
+        process_id: ctrl.process._id,
+        link_id: ctrl.link._id,
+        reaction_id: parseInt($this.find( 'input[name="reaction_id"]' ).val(), 10),
+        name: ctrl.name,
+        body: $body.val(),
+        _csrf: $this.find( 'input[name="_csrf"]' ).val()
+      };
+
+      $body.val('');
+
+      var url = $this.closest('form').attr('action');
+      $.ajax(url, {
+        data : JSON.stringify(pdata),
+        contentType : 'application/json',
+        type : 'POST',
+        success: function(discussion){
+          $('#discussPmodel_' + pdata.reaction_id).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
+        }
+      });
+    });
+
+
     ///////////
     //websocket
     ///////////

@@ -13,6 +13,8 @@ PLoM Events
       link_id:
       user_id:
       review_id:
+      reaction_id:
+      observed_id:
       comment_id:
     }
 
@@ -43,7 +45,9 @@ type and option
     - model
     - theta
 - view (Not implemented for now: someone requested the review page of a model, the context follower are notified)
-
+- discuss_pmodel
+- discuss_omodel
+- discuss_prior
 
 name
 ====

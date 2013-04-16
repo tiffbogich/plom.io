@@ -2,7 +2,7 @@ $(document).ready(function() {
 
   $('.app-folders-container').appFolders();
 
-  $('.ts-picker, .followContext, .context-graph').click(function(e){
+  $('.ts-picker, .followContext, .context-graph, .social-action').click(function(e){
     e.stopPropagation();
   });
 

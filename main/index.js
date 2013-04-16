@@ -59,7 +59,7 @@ app.configure('production', function(){
 
 // Routes
 
-app.get('/', routes.welcome);
+app.get('/', csrf, routes.welcome);
 app.get('/about', routes.about);
 
 app.get('/library', secure, csrf, routes.index);
@@ -76,6 +76,10 @@ app.get('/reviewstheta/:theta_id', secure, review.theta);
 app.post('/reviewtheta', secure, csrf, review.postTheta);
 app.post('/commentreviewtheta', secure, csrf, review.postCommentTheta);
 app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
+
+//discussion
+app.post('/discusspmodel', secure, csrf, review.postDiscussPmodel);
+
 
 //social network
 app.post('/followcontext', secure, csrf, user.postFollow);
