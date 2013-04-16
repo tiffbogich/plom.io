@@ -10,7 +10,8 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   // Variables definition
   ////////////////////////
   var dataset = []
-    , rowdataset = [];
+    , rowdataset = []
+    , likdata = [];
 
   var color = d3.scale.linear()
     .domain([-1,0,1])
@@ -22,13 +23,17 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   var clickedCell = [];
   var posActCell = [];
 
-  for (var i=0; i<nbpars; i++){
+  for (var i=0; i<nbpars-1; i++){
     rowdataset.push(data[i][i].par + ((data[i][i].group) ? ':' + data[i][i].group : '') );
     data[i][i].cc=1; // in order to have diagonal terms with maximal correlation
-    for (var j=0; j<nbpars; j++){
+    for (var j=0; j<nbpars-1; j++){
       dataset.push([i, j, data[i][j]]);
     }
-  }
+  };
+
+  data[nbpars-1][nbpars-1].cc=1;
+  likdata.push([nbpars-1,nbpars-1,data[nbpars-1][nbpars-1]]);
+  
 
   var maxtextlength = Math.max.apply(Math, rowdataset.map(function(x){return x.length;}))
     , textfont = 10
@@ -36,7 +41,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     , figsSize = matTotSize
     , matMarginSize = maxtextlength/2 * textfont // /2 is completely arbitrary TODO: understand fonts size
     , matSize = matTotSize - matMarginSize
-    , cellSize = matSize/nbpars
+    , cellSize = matSize/(nbpars-1)
     , growFact = 1.2;
 
   ///////////////////////////////
@@ -45,7 +50,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   var matTot = d3.select("#vis")
     .append("svg")
     .attr("width",matTotSize)
-    .attr("height",matTotSize)
+    .attr("height",matTotSize+2*matMarginSize)
   //.style("margin-left", - matMarginSize + "px")
     .append("g")
     .attr("transform", "translate(" + matMarginSize   + "," + matMarginSize + ")");
@@ -56,6 +61,11 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     .attr("x",0)
     .attr("y",0);
 
+  var matLik = matTot.append("svg")
+    .attr("width",cellSize)
+    .attr("height",cellSize)
+    .attr("x",matSize/2-cellSize/2-2*textfont)
+    .attr("y",(nbpars-1+0.25)*cellSize);
 
   d3.select("#lock").selectAll("img").remove();
   d3.select("#lock")
@@ -68,7 +78,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   /////////////////////////////////
   // Static initialisation of svgs
   /////////////////////////////////
-  matTot.selectAll("rect")
+  mat.selectAll("rect")
     .data(dataset)
     .enter()
     .append("rect")
@@ -77,8 +87,29 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       y: function(d){ return d[1]*cellSize + "px"; },
       width: cellSize + "px",
       height: cellSize + "px",
-      fill: function(d) {return color(d[2].cc);}
+      fill: function(d) {
+	return color(d[2].cc);
+      }
     });
+
+  
+  matLik.selectAll("rect")
+    .data(likdata)
+    .enter()
+    .append("rect")
+    .attr({
+      x: function(d){return 0 + "px"},
+      y: function(d){return 0 + "px"},
+      width: cellSize + "px",
+      height: cellSize + "px",
+      fill: function(d,i) {
+	return color(d[2].cc);}
+    });
+
+  matTot.append("text")
+    .attr("x",matSize/2+cellSize/2-textfont)
+    .attr("y",(nbpars-1+0.75)*cellSize)
+    .text("loglik");
 
   var row = matTot.selectAll(".row")
     .data(rowdataset)
@@ -110,7 +141,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   //////////////////////////////////////
   // Listeners / interactive components
   //////////////////////////////////////
-  matTot.selectAll("rect")
+  mat.selectAll("rect")
     .on("mouseover",function(d){
       posActCell = $(this).position();
       var indi = d[0];
@@ -122,7 +153,21 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     })
     .on("mouseout",function(d){
       d3.event.stopPropagation();
-    });
+  });
+
+  matLik.selectAll("rect")
+    .on("mouseover",function(d){
+      posActCell = $(this).position();
+      var indi = nbpars-1;
+      var indj = nbpars-1;
+      var cc = d[2].cc;
+      var ess = d[2].ess;
+
+      mouseov(indi,indj);
+    })
+    .on("mouseout",function(d){
+      d3.event.stopPropagation();
+  });
 
   d3.select('#outlaid')
     .on("mouseover",function(d){
@@ -179,13 +224,26 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
   function mouseov(indi,indj){
 
-    cell = $(matTot.selectAll("rect")[0][indi*nbpars+indj]);
-    d = dataset[indi*nbpars+indj];
+
+    if (indi<nbpars-1){
+      cell = $(mat.selectAll("rect")[0][indi*(nbpars-1)+indj]);
+      console.log(cell)
+    } else {
+      cell = $(matLik.selectAll("rect")[0]);
+      console.log(matLik.selectAll("rect")[0])
+    }
+
+    //d = dataset[indi*(nbpars-1)+indj];
+    d = data[indi][indj];
+
     posActCell = cell.position();
-    var cc = d[2].cc;
-    var ess = d[2].ess;
+    var cc = d.cc;
+    var ess = d.ess;
+
+    console.log(cc);
+    console.log(posActCell);
   
-    activeCell = [d[0],d[1]];
+    activeCell = [indi,indj];
 
     d3.select("#ActiveMatComp")
       .classed('hidden', false)
@@ -251,8 +309,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
       updateDensity1(data, indi);
       updateDensity2(data, indj);
-    }
-  };
+    }};
 
 
 
