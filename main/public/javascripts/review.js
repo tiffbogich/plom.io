@@ -8,10 +8,12 @@ $(document).ready(function() {
 
   $.getJSON('/review', function(data) {
 
+
+    plomGraphModel(data.comps.process, "#pgraph"+data.comps.link._id);
+
     var ctrl = new Control(data);
 
     ctrl.thetaList();
-    ctrl.summaryTable();
     ctrl.updateTheta(ctrl.theta, ctrl.theta.design.cmd);
 
     $('.review-theta').first().trigger('click');
@@ -149,33 +151,6 @@ $(document).ready(function() {
 
     });
 
-
-    $('#followContext').on('submit', function(e){
-      e.preventDefault();
-
-      var $this = $(this)
-        , $btn = $this.find( 'button[name="action"]' );
-
-      var pdata = {
-        action: $btn.val(),
-        context_id: ctrl.context._id,
-        name: ctrl.context.disease.join('; ') + ' / ' +  ctrl.context.name,
-        _csrf: $this.find( 'input[name="_csrf"]' ).val()
-      };
-
-      $.post($this.attr('action'), pdata, function(status){
-        if(status.success){
-          if(pdata.action === 'follow'){
-            $btn.val('unfollow');
-            $this.find('span').html('Unfollow');
-          } else {
-            $btn.val('follow');
-            $this.find('span').html('Follow');
-          }
-        }
-      });
-
-    });
 
     ///////////
     //websocket

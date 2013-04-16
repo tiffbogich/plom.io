@@ -29,9 +29,20 @@
 
       <a href="#"><%= c.disease.join('; ') + ' / ' + c.name %></a>
 
-      <p>
-        <%= c.model.length %> model<%= (c.model.length > 1) ? 's': ''%>; <%= (c.contributor && c.contributor.length) || 0 %> contributor<%= (c.contributor && (c.contributor.length > 1)) ? 's': '' %>
-      </p>
+      <div>
+        <%= c.model.length %> model<%= (c.model.length > 1) ? 's': ''%>
+
+
+        <form class="followContext social-action" action="/followcontext" method="post">
+          <input type="hidden" name="_csrf" value="<%= token %>"/>
+          <input type="hidden" name="context_id" value="<%= c._id %>"/>
+          <input type="hidden" name="name" value="<%= c.disease.join('; ') + ' / ' +  c.name %>"/>
+
+          <% var is_followed = (context_followed.indexOf(c._id.toString()) !== -1); %>
+          <button class="btn btn-mini" type="submit" name="action" value="<%= (is_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (is_followed) ? 'Unfollow': 'Follow' %></span></button>
+        </form>
+
+      </div>
 
       <!-- placeholder for timeseries plot -->
       <div id="graphdiv<%= i %>" class="context-graph"></div>
@@ -74,10 +85,8 @@
             <!-- score (DIC or AICc or rating) -->
             <% if (m.theta) { %>
             <div class="score">
-              <% if ('diagnostic' in m.theta) { %>
-              DIC: <span><%= m.theta.diagnostic.summary.map(function(x){ return x.dic; }).sort(function(a,b){return a-b;})[0] %></span>
-              <% } else { %>
-              AICc: <span><%= m.theta && m.theta.information_criterion.AICc %></span>
+              <% if ('dic' in m.theta) { %>
+              DIC: <span><%= m.theta.dic %></span>
               <% }; %>
             </div>
             <% }; %>

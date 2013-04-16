@@ -135,7 +135,6 @@ p:before{
 .score span{
   color: #f15b22;
   font-size: 18px;
-  text-shadow: 1px 1px 1px grey;
 }
 
 .horizontal-scroll

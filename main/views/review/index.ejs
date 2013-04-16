@@ -7,6 +7,7 @@
 <script src="/javascripts/view.js"></script>
 <script src="/javascripts/review.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/plomGraphModel.js"></script>
 
 </head>
 
@@ -21,20 +22,15 @@
       </div>
 
       <ul id="plomNav" class="nav nav-pills">
-        <li><a href="#"><%= diseaseName %></a></li>
-        <li><a href="#"><%= contextName %></a></li>
-        <li class="active"><a href="#"><%= modelName %></a></li>
+        <li><a href="/library"><%= context.disease.join('; ') %></a></li>
+        <li><a href="/library"><%= context.name %></a></li>
+        <li class="active"><a href="/library"><%= process.name + ' - ' + link.name %></a></li>
       </ul>
     </div>
 
     <div class="row">
 
       <div class="social-action">
-
-        <form id="followContext" action="/followcontext" method="post">
-          <input type="hidden" name="_csrf" value="<%= token %>"/>
-          <button class="btn" type="submit" name="action" value="<%= (context_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (context_followed) ? 'Unfollow': 'Follow' %></span></button>
-        </form>
 
         <form>
           <button class="btn" type="submit"><i class="icon-download"></i> Fork</button>
@@ -49,9 +45,16 @@
     <div class="row">
       <div class="span12">
 
+        <!-- parameter list (templated) -->
+        <div class="horizontal-scroll" data-toggle="buttons-radio" id="thetaList"></div>
+
+        <hr/>
+        
+
+
         <ul class="nav nav-tabs" id="reviewTab">
           <li class="active">
-            <a href="#theta" data-toggle="tab">Parameters</a>
+            <a href="#theta" data-toggle="tab">Results</a>
           </li>
           <li>
             <a href="#model" data-toggle="tab">Model</a>
@@ -62,11 +65,7 @@
 
           <div class="tab-pane active" id="theta">
 
-            <!-- parameter list (templated) -->
-            <div class="horizontal-scroll" data-toggle="buttons-radio" id="thetaList"></div>
 
-            <hr/>
-            
             <!-- Summary table (templated) -->
             <div class="accordion" id="accSummaryTable">
               <div class="accordion-group">
@@ -136,38 +135,69 @@
             <div class="row">
               <div class="span12">
 
-                <ul class="nav nav-tabs" id="reviewModelTab">
-                  <li class="active">
-                    <a href="#review-context" data-toggle="tab">Context</a>
+                <h2>Context</h2>
+
+                <%= context.description|| '' %>
+
+                <h2>Model</h2>
+
+                <h3>Process Model</h3>
+
+                <!-- placeholder for d3 viz of compartmental model -->
+                <div id="pgraph<%= link._id %>" class="process-graph"></div>
+
+
+                <h3>Observation Model</h3>
+
+                
+                <% link.observed.forEach(function(o){ %>
+                <%= o.id %>:
+
+                <ul>
+                  <li> definition: 
+                    <% if(typeof o.definition[0] === 'string'){ %>
+                    
+                    <%= o.definition.join(' + ') %>
+
+                    <% } else { %>
+
+                    <%= o.definition.map(function(d){ return d.from + '->' + d.to;}).join(' + ') %>
+
+                    <% } %>
                   </li>
+
                   <li>
-                    <a href="#review-process" data-toggle="tab">Process Model</a>
+                    mapped to: <%= o.time_series_id.map(function(x){return x.split('__').slice(0,2).join(':')}).join(' ; ') %>
                   </li>
+
                   <li>
-                    <a href="#review-link" data-toggle="tab">Observation Model</a>
+                    model: <%= link.model[o.model_id].distribution %>
+
+                    <ul>
+                      <% for(var p in link.model[o.model_id]){ %>
+                      <% if(p !== 'distribution'){ %>
+                      <li>
+                        <%= p %>: <%= link.model[o.model_id][p] %>
+                      </li>
+                      <% } %>
+                      <% } %>
+                    </ul>
                   </li>
                 </ul>
 
-                <div class="tab-content">
+                <hr/>    
+                <% }); %>
 
-                  <!-- context -->
-                  <div class="tab-pane active" id="review-context">
-                    <p>This is the context</p>
-                  </div>
 
-                  <!-- process -->
-                  <div class="tab-pane" id="review-process">
-                    <p>This is the process</p>                
-                  </div>
+                <h2>Prior</h2>
+                
+                
 
-                  <!-- link -->
-                  <div class="tab-pane" id="review-link">
-                    <p>This is the link</p>               
-                  </div>
-
-                </div>
               </div>
             </div>
+
+
+
 
             <!-- Feedback zone -->
             <div class="row">
