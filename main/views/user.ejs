@@ -3,24 +3,21 @@
 <% include header %>
 
 
-
-
-
-
-
-<div class="container">
-	
-	<div class="row">
-		<div class="span12">
-			<hr>
-		</div>
-	</div>
-	
+<hr>
+<div class="social-action">
+    <form id="followUser" action="/followuser" method="post">
+    <input type="hidden" name="_csrf" value="<%= token %>"/>
+    <button class="btn" type="submit" name="action" value="unfollow"><i class="icon-eye-open"></i> <span>Follow</span></button>
+    </form>
+</div>
+<div class="container">	
 	<div class="row">
 		<div class="span4">
-			<img src="http://placehold.it/160x160" class="img-polaroid">
-			<h3><span>UserName</span></h3>
-			<p><small>Joined on DATE.  Latest posting on DATE.</small></p>
+			<img src="http://placehold.it/210x210" class="img-polaroid">		
+			<h3>UserName</h3>
+			<hr style="width:80%">
+			<p>Joined on DATE.</p>  
+			<p>Latest posting on DATE.</p>
 			<div class="row">
 				<div class="span4">
 					<hr style="width:80%">
@@ -55,7 +52,7 @@
 					<h5>Comment</h5>
 				</div>
 				
-			</div><br>
+			</div>
 
 			<div class="row">
 				<div class="span4">
@@ -73,7 +70,7 @@
 				<div class="span1">
 					<h5>Comment</h5>
 				</div>
-			</div><br>
+			</div>
 			
 			<div class="row">
 				<div class="span4">
@@ -91,7 +88,7 @@
 				<div class="span1">
 					<h5>Comment</h5>
 				</div>
-			</div><br>
+			</div>
 			
 			<div class="row">
 				<div class="span4">
@@ -109,14 +106,117 @@
 				<div class="span1">
 					<h5>Comment</h5>
 				</div>
-			</div><br>
+			</div><br><br><br>
+			
+			<div class="row">
+				<div class="span8">
+					<ul class="nav nav-tabs" id="socTabs">
+  						<li class="active"><a href="#Social" data-toggle="tab">Social</a></li>
+  						<li><a href="#Context" data-toggle="tab">Context</a></li>
+  						<li><a href="#Models" data-toggle="tab">Models</a></li>
+  						<li><a href="#Thetas" data-toggle="tab">Thetas</a></li>
+  						<li><a href="#Reviews" data-toggle="tab">Reviews</a></li>
+					</ul>
+					
+					<div class="tab-content">
+						<div class="tab-pane active" id="Social">
+						
+
+    <% if(events && events.length){ %>
+    <% events.forEach(function(e, i){ %>
+
+    <a href="/<%= e.from %>"><%= e.from %></a>
+    
+    <%= e.type %> 
+
+    <%= e.option %> 
+
+    <a href="#"><%= e.name %></a>
+
+    <%= e._id.getTimestamp() %>
+
+    <hr/>    
+
+    <% }) %>
+    <% } else { %>
+    Nothing happened...
+    <% } %>
+						</div>
+						<div class="tab-pane" id="Context">
+						
+						<% if(contexts && contexts.length){ %>
+      <ul>
+        <% contexts.forEach(function(context){ %>
+        <li>
+          <%= context.disease.join('; ') + ' / ' +  context.name %>
+          <%= context._id.getTimestamp() %>
+        </li>
+        <% }); %>        
+      </ul>
+      <% } else { %>
+      0 context published
+      <% } %>
+						
+						
+						</div>
+						<div class="tab-pane" id="Models">
+						<% if(models && models.length){ %>
+      <ul>
+        <% models.forEach(function(model){ %>
+        <li>
+          <%= model.context_disease.join('; ') + ' / ' +  model.context_name + ' / ' + model.process_name + ' - ' + model.name %>
+          <%= model._id.getTimestamp() %>
+        </li>
+        <% }); %>
+      </ul>
+      <% } else { %>
+      0 model published
+      <% } %>
+						</div>
+						<div class="tab-pane" id="Thetas">
+
+<% if(thetas && thetas.length){ %>
+      <ul>
+        <% thetas.forEach(function(theta){ %>
+        <li>
+          <%= theta.context_disease.join('; ') + ' / ' +  theta.context_name + ' / ' + theta.process_name + ' - ' + theta.link_name %>
+          <%= theta._id.getTimestamp() %>
+        </li>
+        <% }); %>        
+      </ul>
+      <% } else { %>
+      0 theta published
+      <% } %>
+
+
+
+						</div>
+						<div class="tab-pane" id="Reviews">
+						
+						<% if(reviews && reviews.length){ %>
+      <ul>
+        <% reviews.forEach(function(review){ %>
+        <li>
+          <%= review.name %>
+          <%= review._id.getTimestamp() %>
+        </li>
+        <% }); %>
+      </ul>
+      <% } else { %>
+      0 review published
+      <% } %>
+						
+						
+						
+						</div>
+						
+					</div>
+					
+				</div>
+			</div>
+			
 		</div>
-	</div>
-	
-	<div class="row">
-		<div class="span12">
-			<hr>
-		</div>
+		
 	</div>
 
 </div>
