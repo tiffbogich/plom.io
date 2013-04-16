@@ -3,136 +3,120 @@
 <% include header %>
 
 
-<div class="row">
-
-  <div class="social-action">
-      <form id="followUser" action="/followuser" method="post">
-        <input type="hidden" name="_csrf" value="<%= token %>"/>
-        <button class="btn" type="submit" name="action" value="unfollow"><i class="icon-eye-open"></i> <span>Follow</span></button>
-      </form>
-
-  </div>
-
-</div>
 
 
 
-<div class="row">
-
-  <!-- social and activity stream -->
-  <div class="span7">
-    <h2>Social and Activity Stream</h2>
-
-    <% if(events && events.length){ %>
-    <% events.forEach(function(e, i){ %>
-
-    <a href="/<%= e.from %>"><%= e.from %></a>
-    
-    <%= e.type %> 
-
-    <%= e.option %> 
-
-    <a href="#"><%= e.name %></a>
-
-    <%= e._id.getTimestamp() %>
-
-    <hr/>    
-
-    <% }) %>
-    <% } else { %>
-    Nothing happened...
-    <% } %>
-   
-  </div>
 
 
-  <!-- the user components and reviews -->
-  <div class="span5">
+<div class="container">
+	
+	<div class="row">
+		<div class="span12">
+			<hr>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="span4">
+			<img src="http://placehold.it/160x160" class="img-polaroid">
+			<h3><span>UserName</span></h3>
+			<p><small>Joined on DATE.  Latest posting on DATE.</small></p>
+			<div class="row">
+				<div class="span4">
+					<hr style="width:80%">
+				</div>
+			</div>
+			<div class="row">
+				<div class="span2">
+					<p><strong>3</strong><small><br>followers</small></p>
+				</div>
+				<div class="span2">
+					<p><strong>10</strong><small><br>following</small></p>
+				</div>
+			</div>
 
-    <!-- contexts -->
-    <div>
-      <h2>Contexts</h2>      
+		</div>
+		<div class="span8">
+			<h3>Activity Summary</h3><br>
+			<div class="row">
+				<div class="span4">
+					<h4>Context</h4>
+				</div>
+				<div class="span1">
+					<h5>Create</h5>
+				</div>
+				<div class="span1">
+					<h5>Follow</h5>
+				</div>
+				<div class="span1">
+					<h5>Fork</h5>
+				</div>
+				<div class="span1">
+					<h5>Comment</h5>
+				</div>
+				
+			</div><br>
 
-      <% if(contexts && contexts.length){ %>
-      <ul>
-        <% contexts.forEach(function(context){ %>
-        <li>
-          <%= context.disease.join('; ') + ' / ' +  context.name %>
-          <%= context._id.getTimestamp() %>
-        </li>
-        <% }); %>        
-      </ul>
-      <% } else { %>
-      0 context published
-      <% } %>
-
-    </div>
-
-
-    <!-- models -->
-    <div>
-      <h2>Models</h2>      
-
-      <% if(models && models.length){ %>
-      <ul>
-        <% models.forEach(function(model){ %>
-        <li>
-          <%= model.context_disease.join('; ') + ' / ' +  model.context_name + ' / ' + model.process_name + ' - ' + model.name %>
-          <%= model._id.getTimestamp() %>
-        </li>
-        <% }); %>
-      </ul>
-      <% } else { %>
-      0 model published
-      <% } %>
-
-    </div>
-
-    <!-- thetas -->
-    <div>
-
-      <h2>Thetas</h2>      
-
-      <% if(thetas && thetas.length){ %>
-      <ul>
-        <% thetas.forEach(function(theta){ %>
-        <li>
-          <%= theta.context_disease.join('; ') + ' / ' +  theta.context_name + ' / ' + theta.process_name + ' - ' + theta.link_name %>
-          <%= theta._id.getTimestamp() %>
-        </li>
-        <% }); %>        
-      </ul>
-      <% } else { %>
-      0 theta published
-      <% } %>
-
-    </div>
-
-
-    <!-- reviews -->
-    <div>
-      <h2>Reviews</h2>      
-
-      <% if(reviews && reviews.length){ %>
-      <ul>
-        <% reviews.forEach(function(review){ %>
-        <li>
-          <%= review.name %>
-          <%= review._id.getTimestamp() %>
-        </li>
-        <% }); %>
-      </ul>
-      <% } else { %>
-      0 review published
-      <% } %>
-
-    </div>
-
-
-  </div>
+			<div class="row">
+				<div class="span4">
+					<h4>Model</h4>
+				</div>
+				<div class="span1">
+					<h5>Create</h5>
+				</div>
+				<div class="span1">
+					<h5>Follow</h5>
+				</div>
+				<div class="span1">
+					<h5>Fork</h5>
+				</div>
+				<div class="span1">
+					<h5>Comment</h5>
+				</div>
+			</div><br>
+			
+			<div class="row">
+				<div class="span4">
+					<h4>Theta</h4>
+				</div>
+				<div class="span1">
+					<h5>Create</h5>
+				</div>
+				<div class="span1">
+					<h5>Follow</h5>
+				</div>
+				<div class="span1">
+					<h5>Fork</h5>
+				</div>
+				<div class="span1">
+					<h5>Comment</h5>
+				</div>
+			</div><br>
+			
+			<div class="row">
+				<div class="span4">
+					<h4>Review</h4>
+				</div>
+				<div class="span1">
+					<h5>Create</h5>
+				</div>
+				<div class="span1">
+					<h5>Follow</h5>
+				</div>
+				<div class="span1">
+					<h5>Fork</h5>
+				</div>
+				<div class="span1">
+					<h5>Comment</h5>
+				</div>
+			</div><br>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="span12">
+			<hr>
+		</div>
+	</div>
 
 </div>
-
-
-
-<% include footer %>

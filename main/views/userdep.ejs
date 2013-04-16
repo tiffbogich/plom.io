@@ -1,0 +1,138 @@
+<% include layout %>
+
+<% include header %>
+
+
+<div class="row">
+
+  <div class="social-action">
+      <form id="followUser" action="/followuser" method="post">
+        <input type="hidden" name="_csrf" value="<%= token %>"/>
+        <button class="btn" type="submit" name="action" value="unfollow"><i class="icon-eye-open"></i> <span>Follow <%= events.from %></span></button>
+      </form>
+
+  </div>
+
+</div>
+
+
+
+<div class="row">
+
+  <!-- social and activity stream -->
+  <div class="span7">
+    <h2>Social and Activity Stream</h2>
+
+    <% if(events && events.length){ %>
+    <% events.forEach(function(e, i){ %>
+
+    <a href="/<%= e.from %>"><%= e.from %></a>
+    
+    <%= e.type %> 
+
+    <%= e.option %> 
+
+    <a href="#"><%= e.name %></a>
+
+    <%= e._id.getTimestamp() %>
+
+    <hr/>    
+
+    <% }) %>
+    <% } else { %>
+    Nothing happened...
+    <% } %>
+   
+  </div>
+
+
+  <!-- the user components and reviews -->
+  <div class="span5">
+
+    <!-- contexts -->
+    <div>
+      <h2>Contexts</h2>      
+
+      <% if(contexts && contexts.length){ %>
+      <ul>
+        <% contexts.forEach(function(context){ %>
+        <li>
+          <%= context.disease.join('; ') + ' / ' +  context.name %>
+          <%= context._id.getTimestamp() %>
+        </li>
+        <% }); %>        
+      </ul>
+      <% } else { %>
+      0 context published
+      <% } %>
+
+    </div>
+
+
+    <!-- models -->
+    <div>
+      <h2>Models</h2>      
+
+      <% if(models && models.length){ %>
+      <ul>
+        <% models.forEach(function(model){ %>
+        <li>
+          <%= model.context_disease.join('; ') + ' / ' +  model.context_name + ' / ' + model.process_name + ' - ' + model.name %>
+          <%= model._id.getTimestamp() %>
+        </li>
+        <% }); %>
+      </ul>
+      <% } else { %>
+      0 model published
+      <% } %>
+
+    </div>
+
+    <!-- thetas -->
+    <div>
+
+      <h2>Thetas</h2>      
+
+      <% if(thetas && thetas.length){ %>
+      <ul>
+        <% thetas.forEach(function(theta){ %>
+        <li>
+          <%= theta.context_disease.join('; ') + ' / ' +  theta.context_name + ' / ' + theta.process_name + ' - ' + theta.link_name %>
+          <%= theta._id.getTimestamp() %>
+        </li>
+        <% }); %>        
+      </ul>
+      <% } else { %>
+      0 theta published
+      <% } %>
+
+    </div>
+
+
+    <!-- reviews -->
+    <div>
+      <h2>Reviews</h2>      
+
+      <% if(reviews && reviews.length){ %>
+      <ul>
+        <% reviews.forEach(function(review){ %>
+        <li>
+          <%= review.name %>
+          <%= review._id.getTimestamp() %>
+        </li>
+        <% }); %>
+      </ul>
+      <% } else { %>
+      0 review published
+      <% } %>
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+
+<% include footer %>
