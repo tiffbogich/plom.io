@@ -78,7 +78,7 @@ app.post('/commentreviewtheta', secure, csrf, review.postCommentTheta);
 app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 
 //discussion
-app.post('/discusspmodel', secure, csrf, review.postDiscussPmodel);
+app.post('/discuss/:type', secure, csrf, review.postDiscuss);
 
 
 //social network

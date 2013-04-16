@@ -49,9 +49,9 @@
               </div>
 
               <div class="span4">
-                <form class="discuss-pmodel" action="/discusspmodel" method="post">
+                <form class="discuss" action="/discuss/pmodel" method="post">
                   <textarea rows="2" class="span4" name="body"></textarea>
-                  <input type="hidden" name="reaction_id" value="<%= i %>"/>
+                  <input type="hidden" name="array_id" value="<%= i %>"/>
                   <input type="hidden" name="_csrf" value="<%= token %>"/>                  
                   <p><button class="btn" type="submit">Submit</button></p>
                 </form>               
@@ -76,7 +76,7 @@
         <div id="accOmodelContent" class="accordion-body collapse">
           <div class="accordion-inner">
 
-            <% link.observed.forEach(function(o){ %>
+            <% link.observed.forEach(function(o, i){ %>
 
             <div class="row">
               <div class="span5">
@@ -123,11 +123,36 @@
                 </ul>
               </div>
 
-              <div class="span5">
-                <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#demo">Discuss</button>                
-                <div id="demo" class="collapse"> list of discuss </div>
-              </div>
 
+
+              <div class="span5">
+                <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussOmodel_<%= i %>">Discuss</button>                
+
+                <!-- discussion on the process model specific reaction -->
+                <div id="discussOmodel_<%= i %>" class="collapse">
+                  <div class="thread"> 
+                    <% if (o.discussion && o.discussion.length){ %>
+                    <ul>
+                      <% o.discussion.forEach(function(d){ %>
+                      <li><%= d.username %> on <%= d.date %></li>
+                      <li><%= d.body %></li>                
+                      <% }); %>
+                    </ul>
+                    <% } %>
+                  </div>
+
+                  <div>
+                    <form class="discuss" action="/discuss/omodel" method="post">
+                      <textarea rows="2" class="span4" name="body"></textarea>
+                      <input type="hidden" name="array_id" value="<%= i %>"/>
+                      <input type="hidden" name="_csrf" value="<%= token %>"/>                  
+                      <p><button class="btn" type="submit">Submit</button></p>
+                    </form>               
+                  </div>
+
+                </div>                  
+              </div>
+                           
             </div>
 
             <hr/>    

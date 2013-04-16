@@ -13,8 +13,7 @@ PLoM Events
       link_id:
       user_id:
       review_id:
-      reaction_id:
-      observed_id:
+      array_id:
       comment_id:
     }
 

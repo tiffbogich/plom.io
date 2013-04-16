@@ -130,7 +130,9 @@ exports.postCommentTheta = function(req, res, next){
 };
 
 
-exports.postDiscussPmodel = function(req, res, next){
+exports.postDiscuss = function(req, res, next){
+
+  var type = req.params.type;
 
   var c = req.app.get('components');
   var d = req.body;
@@ -140,7 +142,10 @@ exports.postDiscussPmodel = function(req, res, next){
   d.date = new Date();
 
   var upd = {$push:{}};
-  upd['$push']['process_model.' + d.reaction_id + '.discussion'] = d;
+  upd['$push'][((type === 'pmodel') ? 'process_model.' : 'observed.') + d.array_id + '.discussion'] = d;
+
+  console.log(upd);
+  console.log(d);
 
   c.findAndModify({_id: new ObjectID(d.link_id)}, [], upd, {safe:true, 'new':true}, function(err, doc) {
     if (err) return next(err);
@@ -148,9 +153,9 @@ exports.postDiscussPmodel = function(req, res, next){
     //add event
     var mye = {
       from: req.session.username,
-      type: 'discuss_pmodel',
+      type: (type === 'pmodel') ? 'discuss_pmodel': 'discuss_omodel',
       name: d.name,
-      reaction_id: d.reaction_id,
+      array_id: d.array_id,
       context_id: d.context_id,
       process_id: d.process_id,
       link_id: d.link_id
@@ -161,7 +166,12 @@ exports.postDiscussPmodel = function(req, res, next){
       if(err) return next(err);
     });
 
-    res.send(doc.process_model[d.reaction_id].discussion);
+    if(type === 'pmodel'){
+      res.send(doc.process_model[d.array_id].discussion);
+    } else {
+      res.send(doc.observed[d.array_id].discussion);
+    }
+
   });
 
 };

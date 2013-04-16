@@ -149,7 +149,7 @@ $(document).ready(function() {
 
 
     //pmodel discussion
-    $('#model').on('submit', 'form.discuss-pmodel', function(e){
+    $('#model').on('submit', 'form.discuss', function(e){
       e.preventDefault();
 
       var $this = $(this)
@@ -159,7 +159,7 @@ $(document).ready(function() {
         context_id: ctrl.context._id,
         process_id: ctrl.process._id,
         link_id: ctrl.link._id,
-        reaction_id: parseInt($this.find( 'input[name="reaction_id"]' ).val(), 10),
+        array_id: parseInt($this.find( 'input[name="array_id"]' ).val(), 10),
         name: ctrl.name,
         body: $body.val(),
         _csrf: $this.find( 'input[name="_csrf"]' ).val()
@@ -173,7 +173,7 @@ $(document).ready(function() {
         contentType : 'application/json',
         type : 'POST',
         success: function(discussion){
-          $('#discussPmodel_' + pdata.reaction_id).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
+          $(((url.indexOf('pmodel') === -1) ? '#discussOmodel_' : '#discussPmodel_')  + pdata.array_id).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
         }
       });
     });
