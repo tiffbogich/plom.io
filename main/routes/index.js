@@ -305,7 +305,8 @@ exports.review = function(req, res, next){
                 summaryTable: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','summary_table.ejs'), 'utf8'),
                 parameters: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','parameters.ejs'), 'utf8'),
                 ticks: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8'),
-                reviews: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','reviews.ejs'), 'utf8').replace('<%= token %>', req.session._csrf)
+                reviews: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','reviews.ejs'), 'utf8').replace('<%= token %>', req.session._csrf),
+                model: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','model.ejs'), 'utf8').replace('<%= token %>', req.session._csrf)
               },
               comps: comps
             });
