@@ -194,6 +194,10 @@ circle.infector {
   fill: #f15b22;
 }
 
+span.infector{
+  color: #f15b22;
+}
+
 circle.source {
   fill: #6ba5c5;
 }

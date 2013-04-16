@@ -3,6 +3,8 @@
 
     <h2>Context</h2>
 
+    Map here with movie...
+
     <%= context.description|| '' %>
 
     <h2>Model</h2>
@@ -16,7 +18,11 @@
     <% process.model.forEach(function(r){ %>
     <div class="row">
       <div class="span3">
-        <%=  r.from + ' &rarr; ' + r.to %>
+        <% if( infector.indexOf(r.from) !== -1) { %> <span class="infector"> <%= r.from %> </span> <% } else { %> <%= r.from %> <% } %> 
+        <% if( ('tag' in r) && ('transmission' in r['tag'])) { %> <span class="infector"> &rarr; </span> <% } else { %> &rarr; <% } %> 
+        <% if( infector.indexOf(r.to) !== -1) { %> <span class="infector"> <%= r.to %> </span> <% } else { %> <%= r.to %> <% } %> 
+
+        
       </div>
       <div class="span9">
         <%= r.tlt_rate %>
@@ -41,11 +47,20 @@
       <li> definition: 
         <% if(typeof o.definition[0] === 'string'){ %>
         
-        <%= o.definition.join(' + ') %>
+        <%= o.definition
+            .map(function(x){
+            return (infector.indexOf(x) !== -1) ? '<span class="infector"> ' + x + ' </span>' : x; 
+            })
+            .join(' + ') %>
 
         <% } else { %>
 
-        <%= o.definition.map(function(d){ return d.from + ' &rarr; ' + d.to;}).join(' + ') %>
+        <%= o.definition.map(function(d){
+            var from = (infector.indexOf(d.from) !== -1) ? '<span class="infector"> ' + d.from + ' </span>' : d.from;
+            var to = (infector.indexOf(d.to) !== -1) ? '<span class="infector"> ' + d.to + ' </span>' : d.to;
+            return from + ' &rarr; ' + to;
+            })
+            .join(' + ') %>
 
         <% } %>
       </li>
@@ -81,7 +96,31 @@
 
     <h2>Prior</h2>
     
+    <% process.parameter.concat(process.state, link.parameter).forEach(function(par){
+       if (par.id in theta.parameter) {
+       for(var group in theta.parameter[par.id].group){ %>
     
+      <div>
+        <a href="#" data-toggle="tooltip" title="<%= theta.parameter[par.id].comment %>"><%= par.id %>: <%= group.split('__').join('; ') %></a>                
+        <ul>
+          <li>
+            distribution: <%= theta.parameter[par.id]['group'][group]['prior']['value'] %>
+          </li>
+          <li>
+            min: <%= theta.parameter[par.id]['group'][group]['min']['value'] %>
+          </li>
+          <li>
+            max: <%= theta.parameter[par.id]['group'][group]['max']['value'] %>
+          </li>
 
+        </ul>
+
+        <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#demo1">Comments</button>
+
+
+        <hr/>
+      </div>
+      <% } } }); %>
+          
   </div>
 </div>

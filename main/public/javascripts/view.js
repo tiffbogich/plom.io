@@ -12,6 +12,14 @@ function Control(data){
   this.summaries = [];
   this.detail;
 
+  var infector = [];
+  this.process.model.forEach(function(r){
+    if( ('tag' in r) && ('transmission' in r['tag']) ){
+      infector = infector.concat(r['tag']['transmission']['by']);
+    }
+  });
+  this.infector = infector;
+
   this.thetas.forEach(function(x){
     delete x.diagnostic;
   })
@@ -59,7 +67,7 @@ Control.prototype.thetaList = function(){
     //model review
     that._tooltipify(that.link.model, that.thetas[that.i]);
     that._tooltipify(that.process.model, that.thetas[that.i]);
-    $('#model').html(that.compiled.model({context: that.context, process: that.process, link: that.link}));
+    $('#model').html(that.compiled.model({context: that.context, process: that.process, link: that.link, theta: that.thetas[that.i], infector: that.infector}));
     plomGraphModel(that.process, "#pgraph"+that.link._id);
     $('a[data-toggle="tooltip"]').tooltip();
 
