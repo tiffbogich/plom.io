@@ -1,0 +1,87 @@
+<div class="row">
+  <div class="span12">
+
+    <h2>Context</h2>
+
+    <%= context.description|| '' %>
+
+    <h2>Model</h2>
+
+    <h3>Process Model</h3>
+
+    <!-- placeholder for d3 viz of compartmental model -->
+    <div id="pgraph<%= link._id %>" class="process-graph"></div>
+
+
+    <% process.model.forEach(function(r){ %>
+    <div class="row">
+      <div class="span3">
+        <%=  r.from + ' &rarr; ' + r.to %>
+      </div>
+      <div class="span9">
+        <%= r.tlt_rate %>
+
+        <button type="button" class="btn btn-mini social-action" data-toggle="collapse" data-target="#demo1">Comments</button>   
+
+      </div>
+
+      <div id="demo1" class="row collapse"> <p> comments</p> </div>
+
+      <hr/>
+    </div>
+    <% }); %>
+
+    <h3>Observation Model</h3>
+
+    
+    <% link.observed.forEach(function(o){ %>
+    <%= o.id %>:
+
+    <ul>
+      <li> definition: 
+        <% if(typeof o.definition[0] === 'string'){ %>
+        
+        <%= o.definition.join(' + ') %>
+
+        <% } else { %>
+
+        <%= o.definition.map(function(d){ return d.from + ' &rarr; ' + d.to;}).join(' + ') %>
+
+        <% } %>
+      </li>
+
+      <li>
+        mapped to: <%= o.time_series_id.map(function(x){return x.split('__').slice(0,2).join(':')}).join(' ; ') %>
+      </li>
+
+      <li>
+        model: <%= link.model[o.model_id].distribution %>
+
+        <ul>
+          <% for(var p in link.model[o.model_id]){ %>
+          <% if(p !== 'distribution' && p.split('_')[0] === 'tlt'){ %>
+          <li>
+            <%= p.split('_').slice(1).join('_') %>: <%= link.model[o.model_id][p] %>
+          </li>
+          <% } %>
+          <% } %>
+        </ul>
+      </li>
+    </ul>
+
+
+    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#demo">Comments</button>
+    
+    <div id="demo" class="collapse"> list of comments </div>
+
+
+    <hr/>    
+    <% }); %>
+
+
+    <h2>Prior</h2>
+    
+    
+
+  </div>
+</div>
