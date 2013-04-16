@@ -208,6 +208,10 @@ circle.infector {
   fill: #f15b22;
 }
 
+span.infector{
+  color: #f15b22;
+}
+
 circle.source {
   fill: #6ba5c5;
 }
@@ -266,7 +270,11 @@ text.shadow {
   stroke-width: 1.5px;
 }
 
-
+.line{
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
+}
 
 #diagPlots{
   height: 480px;

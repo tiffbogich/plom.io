@@ -43,10 +43,7 @@ function plotCorr(diag, i, j, ind){
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-  
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");  
 
   svg.append("g")
     .attr("id", "x-axis" + ind)
@@ -59,8 +56,6 @@ function plotCorr(diag, i, j, ind){
     .attr("y", 32)
     .style("text-anchor", "middle")
     .text(xlabel);
-
- 
 
   svg.append("g")
     .attr("id", "y-axis" + ind)
@@ -87,6 +82,7 @@ function plotCorr(diag, i, j, ind){
     .style("fill", function(d) { return color(d.like); })
     .style("stroke", function(d) { return color(d.like); });
 
+
   return function(diag, i, j) {
 
     var data = [];
@@ -100,6 +96,7 @@ function plotCorr(diag, i, j, ind){
         like: diag[diag.length-1][diag.length-1].trace[k]
       });
     });
+
 
 
     x.domain(d3.extent(data, function(d) { return d.x; })).nice();
@@ -129,9 +126,9 @@ function plotCorr(diag, i, j, ind){
       .call(yAxis)
       .selectAll('text')
       .attr("transform", function(d){
-	return "rotate(-90) translate(0,-15)"
+	return "rotate(-90) translate(10,-15)"
       })
-      .style("text-anchor", "start");
+      .style("text-anchor", "middle");
       //.attr("transform", "translate(-20,0)");
     
  

@@ -4,6 +4,8 @@
 <script src="/javascripts/parmatrix.js"></script>
 <script src="/javascripts/corr.js"></script>
 <script src="/javascripts/density.js"></script>
+<script src="/javascripts/trace.js"></script>
+<script src="/javascripts/autocorr.js"></script>
 <script src="/javascripts/view.js"></script>
 <script src="/javascripts/review.js"></script>
 <script src="/socket.io/socket.io.js"></script>
@@ -57,7 +59,7 @@
             <a href="#theta" data-toggle="tab">Results</a>
           </li>
           <li>
-            <a href="#model" data-toggle="tab">Model</a>
+            <a href="#model" data-toggle="tab">Context & Model</a>
           </li>
         </ul>
         
@@ -131,93 +133,7 @@
 
           <!-- Model review -->
           <div class="tab-pane" id="model">
-
-            <div class="row">
-              <div class="span12">
-
-                <h2>Context</h2>
-
-                <%= context.description|| '' %>
-
-                <h2>Model</h2>
-
-                <h3>Process Model</h3>
-
-                <!-- placeholder for d3 viz of compartmental model -->
-                <div id="pgraph<%= link._id %>" class="process-graph"></div>
-
-
-                <h3>Observation Model</h3>
-
-                
-                <% link.observed.forEach(function(o){ %>
-                <%= o.id %>:
-
-                <ul>
-                  <li> definition: 
-                    <% if(typeof o.definition[0] === 'string'){ %>
-                    
-                    <%= o.definition.join(' + ') %>
-
-                    <% } else { %>
-
-                    <%= o.definition.map(function(d){ return d.from + '->' + d.to;}).join(' + ') %>
-
-                    <% } %>
-                  </li>
-
-                  <li>
-                    mapped to: <%= o.time_series_id.map(function(x){return x.split('__').slice(0,2).join(':')}).join(' ; ') %>
-                  </li>
-
-                  <li>
-                    model: <%= link.model[o.model_id].distribution %>
-
-                    <ul>
-                      <% for(var p in link.model[o.model_id]){ %>
-                      <% if(p !== 'distribution'){ %>
-                      <li>
-                        <%= p %>: <%= link.model[o.model_id][p] %>
-                      </li>
-                      <% } %>
-                      <% } %>
-                    </ul>
-                  </li>
-                </ul>
-
-                <hr/>    
-                <% }); %>
-
-
-                <h2>Prior</h2>
-                
-                
-
-              </div>
-            </div>
-
-
-
-
-            <!-- Feedback zone -->
-            <div class="row">
-              <div class="span7"><h3>Feedback</h3></div>
-
-              <div class="span5">
-                <h3>Add</h3>
-
-                <form id="formFeedbackModel" action="/feedbackmodel">
-                  <label for="feedbackModel">Provide feedback on the model and its adequation to the context</label>
-                  <textarea id="feedbackModel" rows="3" class="span5"></textarea>
-                  <p>
-                    <button class="btn btn-success" type="button">Validate</button>
-                    <button class="btn btn-danger" type="button">Not convincing</button>
-                  </p>
-                </form>
-
-              </div>
-
-            </div>
+            
 
           </div>
         </div>

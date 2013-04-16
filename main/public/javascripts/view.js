@@ -12,6 +12,14 @@ function Control(data){
   this.summaries = [];
   this.detail;
 
+  var infector = [];
+  this.process.model.forEach(function(r){
+    if( ('tag' in r) && ('transmission' in r['tag']) ){
+      infector = infector.concat(r['tag']['transmission']['by']);
+    }
+  });
+  this.infector = infector;
+
   this.thetas.forEach(function(x){
     delete x.diagnostic;
   })
@@ -38,12 +46,16 @@ function Control(data){
   this.updateCorr2 = undefined;
   this.updateDensity1 = undefined;
   this.updateDensity2 = undefined;
+  this.updateTrace = undefined;
+  this.updateAutocorr = undefined;
 
   this.updateMat = undefined; 
 
   this.ONE_YEAR_IN_DATA_UNIT = {D:365.0, W:365.0/7.0, M:12.0, Y:1.0 };
   this.fhr = {D: 'days', W: 'weeks', M: 'months', Y: 'years'};
   this.algo2filter = {mif: 'smc', kalman: 'kalman', kmcmc: 'kalman', smc: 'smc', pmcmc: 'smc', simul: 'simul', simplex: 'smc', ksimplex: 'kalman'};
+
+  this.op = ['+', '-', '*', '/', ',', '(', ')'];
 };
 
 
@@ -53,6 +65,13 @@ Control.prototype.thetaList = function(){
   var that = this;
   $('.review-theta').on('click', function(e){
     that.i = parseInt($(this).val(), 10);
+
+    //model review
+    that._tooltipify(that.link.model, that.thetas[that.i]);
+    that._tooltipify(that.process.model, that.thetas[that.i]);
+    $('#model').html(that.compiled.model({context: that.context, process: that.process, link: that.link, theta: that.thetas[that.i], infector: that.infector}));
+    plomGraphModel(that.process, "#pgraph"+that.link._id);
+    $('a[data-toggle="tooltip"]').tooltip();
 
     $.getJSON('/diagnostic/'+ that.thetas[that.i]._id, function(summaries) {
       that.summaries = summaries;
@@ -65,8 +84,10 @@ Control.prototype.thetaList = function(){
         that.updateCorr2 = that.updateCorr2 || plotCorr(detail, 1, 0, 2);
         that.updateDensity1 = that.updateDensity1 || plotDensity(detail, 0, 1);
         that.updateDensity2 = that.updateDensity2 || plotDensity(detail, 1, 2);
+	that.updateTrace = that.updateTrace || plotTrace(detail, 0, 1);
+	that.updateAutocorr = that.updateAutocorr || plotAutocorr(detail,0,1);
 
-        that.updateMat = parMatrix(detail, that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2); 
+        that.updateMat = parMatrix(detail, that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2, that.updateTrace,that.updateAutocorr); 
       });
 
     });
@@ -289,3 +310,77 @@ Control.prototype.setVizBit = function(){
   };
 
 };
+
+
+
+
+
+
+
+/** 
+ * Transform the rate into an array:
+ *
+ * example: 'r0*2*correct_rate(v)' ->
+ * ['r0', '*', '2', 'correct_rate', '(', 'v', ')']
+ */
+
+Control.prototype._parseRate = function(rate){
+
+  rate = rate.replace(/\s+/g, '');
+
+  var s = ''
+    , l = [];
+  
+  for (var i = 0; i< rate.length; i++){
+    if (this.op.indexOf(rate[i]) !== -1){
+      if(s.length){
+        l.push(s);
+        s = '';
+      }
+      l.push(rate[i]);
+    } else {
+      s += rate[i];
+    }
+    
+  }
+
+  if (s.length){
+    l.push(s);
+  }
+
+  return l;
+}
+
+
+Control.prototype._tooltipify = function(model, theta){
+  var that = this;
+
+  var ify = function(rate){
+    rate = that._parseRate(rate);
+    rate.forEach(function(r, j){
+      if(r in theta.parameter){
+        rate[j] = '<a href="#" data-toggle="tooltip" title="' + theta.parameter[r].comment + '">' + r + '</a>'
+      }
+    });
+    return rate.join('');    
+  };
+
+  if(_.isArray(model)) { //process model
+
+    model.forEach(function(reaction, i){
+      model[i].tlt_rate = ify(reaction.rate);    
+    });  
+
+  } else { //link
+
+    for(var m in model){
+      for(var p in model[m]){
+        if(p !== 'distribution' && p.split('_')[0] !== 'tlt'){
+          model[m]['tlt_' + p] = ify(model[m][p]); 
+        }
+      }
+    }
+
+  }
+
+}

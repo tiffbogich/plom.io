@@ -4,12 +4,8 @@ $(document).ready(function() {
 
   $('#reviewTab a[href=#theta]').tab('show');
   $('#reviewModelTab a[href=#review-context]').tab('show');
-  $('a[rel=tooltip]').tooltip();
 
   $.getJSON('/review', function(data) {
-
-
-    plomGraphModel(data.comps.process, "#pgraph"+data.comps.link._id);
 
     var ctrl = new Control(data);
 
