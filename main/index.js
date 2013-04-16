@@ -68,6 +68,8 @@ app.post('/fork', csrf, routes.postFork);
 
 app.get('/review', secure, csrf, routes.review);
 app.get('/trace/:_id', secure, routes.trace);
+app.get('/diagnostic/:theta_id', secure, routes.diagnosticSummary);
+app.get('/diagnostic/:theta_id/:h', secure, routes.diagnosticDetail);
 
 //review page
 app.get('/reviewstheta/:theta_id', secure, review.theta);
@@ -108,7 +110,8 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   app.set('events',  new mongodb.Collection(db, 'events'));
   app.set('components',  new mongodb.Collection(db, 'components'));
   app.set('reviews',  new mongodb.Collection(db, 'reviews'));
-  app.set('diag',  new mongodb.Collection(db, 'diag'));
+  app.set('diagnostics',  new mongodb.Collection(db, 'diagnostics'));
+  app.set('pngs',  new mongodb.Collection(db, 'pngs'));
 
   //TODO ensureIndex
 

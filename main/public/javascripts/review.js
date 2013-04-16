@@ -11,9 +11,6 @@ $(document).ready(function() {
     var ctrl = new Control(data);
 
     ctrl.thetaList();
-    ctrl.summaryTable();
-    ctrl.updateTheta(ctrl.theta, ctrl.theta.design.cmd);
-
     $('.review-theta').first().trigger('click');
 
     ////////

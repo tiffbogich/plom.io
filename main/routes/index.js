@@ -294,7 +294,6 @@ exports.review = function(req, res, next){
 
       },
 
-
       json: function(){
         components
           .find({_id: {$in: comps.link.theta_id}})
@@ -319,12 +318,34 @@ exports.review = function(req, res, next){
 };
 
 
+exports.diagnosticSummary = function(req, res, next){
+  var theta_id = req.params.theta_id
+    , diagnostics = req.app.get('diagnostics');
+
+  diagnostics.find({theta_id: theta_id}, {summary:true, h:true}).toArray(function(err, docs){
+    res.send(docs);
+  });
+
+}
+
+
+exports.diagnosticDetail = function(req, res, next){
+  var theta_id = req.params.theta_id
+    , h = parseInt(req.params.h, 10)
+    , diagnostics = req.app.get('diagnostics');
+
+  diagnostics.findOne({theta_id: theta_id, h:h}, {detail:true}, function(err, doc){
+    res.send(doc.detail);
+  });
+}
+
+
 exports.trace = function(req, res, next){
 
-  var diag = req.app.get('diag')
+  var pngs = req.app.get('pngs')
     , _id = new ObjectID(req.params._id);
 
-  diag.findOne({_id: _id}, function(err, doc){
+  pngs.findOne({_id: _id}, function(err, doc){
     res.set('Content-Type', doc["content-type"]);
     res.end(doc.data.buffer);
   });
