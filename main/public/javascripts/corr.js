@@ -129,9 +129,9 @@ function plotCorr(diag, i, j, ind){
       .call(yAxis)
       .selectAll('text')
       .attr("transform", function(d){
-	return "rotate(-90) translate(0,-15)"
+	return "rotate(-90) translate(10,-15)"
       })
-      .style("text-anchor", "start");
+      .style("text-anchor", "middle");
       //.attr("transform", "translate(-20,0)");
     
  

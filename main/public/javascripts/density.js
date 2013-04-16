@@ -11,7 +11,7 @@ function plotDensity(diag, i, ind){
 
   var xlabel = diag[i][i].par + ':' + diag[i][i].group;
 
-  var margin = {top: 25, right: 25, bottom: 35, left: 40}
+  var margin = {top: 25, right: 30, bottom: 35, left: 40}
     , width = 220 - margin.left - margin.right
     , height = 220 - margin.top - margin.bottom;
 
@@ -22,7 +22,11 @@ function plotDensity(diag, i, ind){
   var y = d3.scale.linear()
     .range([height, 0])
     .domain(d3.extent(data, function(d) { return d.ypost; })).nice();
-
+ 
+  var color_hash = {
+    0 : ["prior", d3.rgb(234,234,234)],
+    1 : ["post.", d3.rgb(200,200,200)] 
+  }
 
   var xAxis = d3.svg.axis()
     .scale(x)
@@ -74,6 +78,43 @@ function plotDensity(diag, i, ind){
     .datum(data)
     .attr("class", "density_post")
     .attr("d", linepost);
+
+  var legend = svg.append("g")
+    .attr('class','legend')
+    .attr('x',220-65)
+    .attr('y',25)
+    .attr("height",100)
+    .attr("width",100);
+
+  var tmp = [{x:1},{x:2}];
+  
+  legend.selectAll("rect")
+    .data(tmp)
+    .enter()
+    .append("rect")
+    .attr('x',220-85)
+    .attr('y',function(d,i){return i*20;})
+    .attr("height",10)
+    .attr("width",10)
+    .style("fill",function(d) {
+      var color = color_hash[tmp.indexOf(d)][1];
+      return color;
+    });
+
+  legend.selectAll("text")
+    .data(tmp)
+    .enter()
+    .append("text")
+    .attr('x',220-72)
+    .attr('y',function(d,i){return i*20+9;})
+    .attr("height",10)
+    .attr("width",10)
+    .text(function(d) {
+      var color = color_hash[tmp.indexOf(d)][0];
+      return color;
+    });
+
+
 
   return function(diag, i){
 
