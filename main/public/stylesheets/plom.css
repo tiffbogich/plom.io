@@ -252,7 +252,11 @@ text.shadow {
   stroke-width: 1.5px;
 }
 
-
+.line{
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
+}
 
 #diagPlots{
   height: 480px;

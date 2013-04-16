@@ -1,4 +1,4 @@
-function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity2) {
+function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity2,updateTrace,updateAutocorr) {
 
   //empty first parMatrix is called multiple times...
   $('#vis svg').remove();
@@ -107,6 +107,7 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     });
 
   matTot.append("text")
+    .attr('id','loglik')
     .attr("x",matSize/2+cellSize/2-textfont)
     .attr("y",(nbpars-1+0.75)*cellSize)
     .text("loglik");
@@ -210,7 +211,6 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
               .classed('hidden', true)
           }
       } else {
-        console.log(posActCell);
         activMatClicked = true;
         clickedCell = activeCell;
         d3.select("#lock")
@@ -227,22 +227,18 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
     if (indi<nbpars-1){
       cell = $(mat.selectAll("rect")[0][indi*(nbpars-1)+indj]);
-      console.log(cell)
     } else {
       cell = $(matLik.selectAll("rect")[0]);
-      console.log(matLik.selectAll("rect")[0])
     }
 
-    //d = dataset[indi*(nbpars-1)+indj];
     d = data[indi][indj];
+
 
     posActCell = cell.position();
     var cc = d.cc;
     var ess = d.ess;
 
-    console.log(cc);
-    console.log(posActCell);
-  
+    
     activeCell = [indi,indj];
 
     d3.select("#ActiveMatComp")
@@ -271,20 +267,22 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
     if(!activMatClicked){
       d3.selectAll(".row text").classed("activetext", function(d,i){
-	return i == indj;
+	return i == indj+1;
       })
       d3.selectAll(".column text").classed("activetext", function(d,i){
 	return i == indi;
       })
-
+      d3.select("#loglik").classed("activetext", function(d,i){
+	return indi == nbpars-1;
+      })
 
       if(indi === indj){
 
 	$('#corr1, #corr2, #density1').addClass('hidden');
-	$('#trace, .autocor, #test').removeClass('hidden');
+	$('#trace, #autocorr, #test').removeClass('hidden');
 
-	$('#trace img').attr('src', '/trace/' + data[indi][indi].png.trace_id).height('220px').width('220px');
-	$('.autocor img').attr('src', '/trace/' + data[indi][indi].png.autocor_id).height('220px').width('220px');
+//	$('#trace img').attr('src', '/trace/' + data[indi][indi].png.trace_id).height('220px').width('220px');
+//	$('.autocor img').attr('src', '/trace/' + data[indi][indi].png.autocor_id).height('220px').width('220px');
 
 
 	$('#geweke').html(data[indi][indi].geweke);
@@ -300,15 +298,19 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
 
       } else {
 	$('#corr1, #corr2, #density1').removeClass('hidden');
-	$('#trace, .autocor, #test').addClass('hidden');
+	$('#trace, #autocorr, #test').addClass('hidden');
 	
       }
+
 
       updateCorr1(data, indi, indj);
       updateCorr2(data, indj, indi);
 
       updateDensity1(data, indi);
       updateDensity2(data, indj);
+
+      updateTrace(data,indi);
+      updateAutocorr(data,indi);
     }};
 
 
@@ -337,6 +339,8 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     updateCorr2(data, 1, 0);
     updateDensity1(data, 0);
     updateDensity2(data, 1);
+    updateTrace(data,0);
+    updateAutocorr(data,0);
 
   };
 

@@ -38,6 +38,8 @@ function Control(data){
   this.updateCorr2 = undefined;
   this.updateDensity1 = undefined;
   this.updateDensity2 = undefined;
+  this.updateTrace = undefined;
+  this.updateAutocorr = undefined;
 
   this.updateMat = undefined; 
 
@@ -65,8 +67,10 @@ Control.prototype.thetaList = function(){
         that.updateCorr2 = that.updateCorr2 || plotCorr(detail, 1, 0, 2);
         that.updateDensity1 = that.updateDensity1 || plotDensity(detail, 0, 1);
         that.updateDensity2 = that.updateDensity2 || plotDensity(detail, 1, 2);
+	that.updateTrace = that.updateTrace || plotTrace(detail, 0, 1);
+	that.updateAutocorr = that.updateAutocorr || plotAutocorr(detail,0,1);
 
-        that.updateMat = parMatrix(detail, that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2); 
+        that.updateMat = parMatrix(detail, that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2, that.updateTrace,that.updateAutocorr); 
       });
 
     });
