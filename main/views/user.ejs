@@ -5,9 +5,9 @@
 
 <hr>
 <div class="social-action">
-    <form id="followUser" action="/followuser" method="post">
+    <form id="FollowedUser" action="/Followeduser" method="post">
     <input type="hidden" name="_csrf" value="<%= token %>"/>
-    <button class="btn" type="submit" name="action" value="unfollow"><i class="icon-eye-open"></i> <span>Follow</span></button>
+    <button class="btn" type="submit" name="action" value="unFollowed"><i class="icon-eye-open"></i> <span>Followed</span></button>
     </form>
 </div>
 <div class="container">	
@@ -25,10 +25,10 @@
 			</div>
 			<div class="row">
 				<div class="span2">
-					<p><strong>3</strong><small><br>followers</small></p>
+					<p><strong>3</strong><small><br>Followers</small></p>
 				</div>
 				<div class="span2">
-					<p><strong>10</strong><small><br>following</small></p>
+					<p><strong>10</strong><small><br>Following</small></p>
 				</div>
 			</div>
 
@@ -36,75 +36,63 @@
 		<div class="span8">
 			<h3>Activity Summary</h3><br>
 			<div class="row">
-				<div class="span4">
+				<div class="span2">
 					<h4>Context</h4>
 				</div>
-				<div class="span1">
-					<h5>Create</h5>
+				<div class="span2 create">
+					<h5><%= contexts.length %> <small>Created</small></h5>
 				</div>
-				<div class="span1">
-					<h5>Follow</h5>
+				<div class="span2 follow">
+					<h5>2 <small>Followed</small></h5>
 				</div>
-				<div class="span1">
-					<h5>Fork</h5>
-				</div>
-				<div class="span1">
-					<h5>Comment</h5>
+				<div class="span2 comment">
+					<h5>10 <small>Commented</small></h5>
 				</div>
 				
 			</div>
 
 			<div class="row">
-				<div class="span4">
+				<div class="span2">
 					<h4>Model</h4>
 				</div>
-				<div class="span1">
-					<h5>Create</h5>
+				<div class="span2 create">
+					<h5>5 <small>Created</small></h5>
 				</div>
-				<div class="span1">
-					<h5>Follow</h5>
+				<div class="span2 follow">
+					<h5>2 <small>Followed</small></h5>
 				</div>
-				<div class="span1">
-					<h5>Fork</h5>
-				</div>
-				<div class="span1">
-					<h5>Comment</h5>
+				<div class="span2 comment">
+					<h5>10 <small>Commented</small></h5>
 				</div>
 			</div>
 			
 			<div class="row">
-				<div class="span4">
+				<div class="span2">
 					<h4>Theta</h4>
 				</div>
-				<div class="span1">
-					<h5>Create</h5>
+				<div class="span2 create">
+					<h5>5 <small>Created</small></h5>
 				</div>
-				<div class="span1">
-					<h5>Follow</h5>
+				<div class="span2 follow">
+					<h5>2 <small>Followed</small></h5>
 				</div>
-				<div class="span1">
-					<h5>Fork</h5>
-				</div>
-				<div class="span1">
-					<h5>Comment</h5>
+				<div class="span2 comment">
+					<h5>10 <small>Commented</small></h5>
 				</div>
 			</div>
 			
 			<div class="row">
-				<div class="span4">
+				<div class="span2">
 					<h4>Review</h4>
 				</div>
-				<div class="span1">
-					<h5>Create</h5>
+				<div class="span2 create">
+					<h5>5 <small>Created</small></h5>
 				</div>
-				<div class="span1">
-					<h5>Follow</h5>
+				<div class="span2 follow">
+					<h5>2 <small>Followed</small></h5>
 				</div>
-				<div class="span1">
-					<h5>Fork</h5>
-				</div>
-				<div class="span1">
-					<h5>Comment</h5>
+				<div class="span2 comment">
+					<h5>10 <small>Commented</small></h5>
 				</div>
 			</div><br><br><br>
 			
@@ -120,94 +108,85 @@
 					
 					<div class="tab-content">
 						<div class="tab-pane active" id="Social">
-						
+						    <% if(events && events.length){ %>
+						    <% events.forEach(function(e, i){ %>
 
-    <% if(events && events.length){ %>
-    <% events.forEach(function(e, i){ %>
+						    <a href="/<%= e.from %>"><%= e.from %></a>
+						    
+						    <%= e.type %> 
 
-    <a href="/<%= e.from %>"><%= e.from %></a>
-    
-    <%= e.type %> 
+						    <%= e.option %> 
 
-    <%= e.option %> 
+						    <a href="#"><%= e.name %></a>
 
-    <a href="#"><%= e.name %></a>
+						    <%= e._id.getTimestamp() %>
 
-    <%= e._id.getTimestamp() %>
+						    <hr/>    
 
-    <hr/>    
-
-    <% }) %>
-    <% } else { %>
-    Nothing happened...
-    <% } %>
+						    <% }) %>
+						    <% } else { %>
+						    Nothing happened...
+						    <% } %>
 						</div>
+
 						<div class="tab-pane" id="Context">
 						
 						<% if(contexts && contexts.length){ %>
-      <ul>
-        <% contexts.forEach(function(context){ %>
-        <li>
-          <%= context.disease.join('; ') + ' / ' +  context.name %>
-          <%= context._id.getTimestamp() %>
-        </li>
-        <% }); %>        
-      </ul>
-      <% } else { %>
-      0 context published
-      <% } %>
-						
-						
+						    
+						        <% contexts.forEach(function(context){ %>
+						        
+						          <%= context.disease.join('; ') + ' / ' +  context.name %>
+						          <%= context._id.getTimestamp() %>
+						       
+						        <% }); %>        
+						    
+						      	<% } else { %>
+						      	0 context published
+						      	<% } %>			
 						</div>
 						<div class="tab-pane" id="Models">
-						<% if(models && models.length){ %>
-      <ul>
-        <% models.forEach(function(model){ %>
-        <li>
-          <%= model.context_disease.join('; ') + ' / ' +  model.context_name + ' / ' + model.process_name + ' - ' + model.name %>
-          <%= model._id.getTimestamp() %>
-        </li>
-        <% }); %>
-      </ul>
-      <% } else { %>
-      0 model published
-      <% } %>
+							<% if(models && models.length){ %>
+						    
+						        <% models.forEach(function(model){ %>
+						      
+						          <%= model.context_disease.join('; ') + ' / ' +  model.context_name + ' / ' + model.process_name + ' - ' + model.name %>
+						          <%= model._id.getTimestamp() %>
+						        
+						        <% }); %>
+						    
+						      <% } else { %>
+						      0 model published
+						      <% } %>
 						</div>
 						<div class="tab-pane" id="Thetas">
-
-<% if(thetas && thetas.length){ %>
-      <ul>
-        <% thetas.forEach(function(theta){ %>
-        <li>
-          <%= theta.context_disease.join('; ') + ' / ' +  theta.context_name + ' / ' + theta.process_name + ' - ' + theta.link_name %>
-          <%= theta._id.getTimestamp() %>
-        </li>
-        <% }); %>        
-      </ul>
-      <% } else { %>
-      0 theta published
-      <% } %>
-
-
-
+							<% if(thetas && thetas.length){ %>
+							      
+							        <% thetas.forEach(function(theta){ %>
+							       
+							          <%= theta.context_disease.join('; ') + ' / ' +  theta.context_name + ' / ' + theta.process_name + ' - ' + theta.link_name %>
+							          <%= theta._id.getTimestamp() %>
+							        
+							        <% }); %>        
+							      
+							      <% } else { %>
+							      0 theta published
+							      <% } %>
 						</div>
 						<div class="tab-pane" id="Reviews">
 						
 						<% if(reviews && reviews.length){ %>
-      <ul>
-        <% reviews.forEach(function(review){ %>
-        <li>
-          <%= review.name %>
-          <%= review._id.getTimestamp() %>
-        </li>
-        <% }); %>
-      </ul>
-      <% } else { %>
-      0 review published
-      <% } %>
-						
-						
-						
+						    
+						      <% reviews.forEach(function(review){ %>
+						      
+						        <%= review.name %>
+						        <%= review._id.getTimestamp() %>
+						      
+						        <% }); %>
+						    
+						      <% } else { %>
+						      0 review published
+						      <% } %>
+	
 						</div>
 						
 					</div>

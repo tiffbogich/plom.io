@@ -1,3 +1,17 @@
+/* user */
+div.create{
+  background-color: orange;
+  margin-top: 1px;
+
+}
+div.follow{
+  background-color: green;
+}
+div.comment{
+  background-color: purple;
+}
+
+
 /* welcome */
 #plomMain{
   background-color: white;  
