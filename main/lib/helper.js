@@ -40,4 +40,6 @@ module.exports.describeTheta = function (theta, proc, link) {
 
     theta['parameter'][p]['comment'] = comment_string + ' ' + constraint_string + unit_string;
   }
+
+  return theta;
 }

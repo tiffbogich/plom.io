@@ -62,8 +62,8 @@ app.configure('production', function(){
 app.get('/', routes.welcome);
 app.get('/about', routes.about);
 
-app.get('/library', csrf, routes.index);
-app.post('/library', csrf, routes.postIndex);
+app.get('/library', secure, csrf, routes.index);
+app.post('/library', secure, csrf, routes.postIndex);
 app.post('/fork', csrf, routes.postFork);
 
 app.get('/review', secure, csrf, routes.review);

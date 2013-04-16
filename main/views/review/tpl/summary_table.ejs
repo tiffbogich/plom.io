@@ -17,7 +17,7 @@
     <% summaries.map(function(x){return x.summary}).forEach(function(s, h) { %>
 
     <tr class="<%= (s.passed) ? 'success': 'error' %>">
-      <td><%= h %></td>
+      <td><%= summaries[h].h %></td>
       <td><%= s.geweke %></td>
       <td><%= (s.raftery.success) ? 'M: ' + s.raftery.M + ' N: ' + s.raftery.N + ' Nmin: ' + s.raftery.Nmin + ' I: ' + s.raftery.I : 'restart with M > ' + s.raftery.M %></td>
       <td><%= s.heidel %></td>

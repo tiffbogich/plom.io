@@ -139,7 +139,11 @@ exports.index = function(req, res){
                          res.send(ctree);
                        },
                        html: function(){
-                         res.render('index', {ctree:ctree});
+                         var u = req.app.get('users');
+                         u.findOne({_id: req.session.username}, function(err, user){
+                           if (err) return next(err);                           
+                           res.render('index', {ctree:ctree, context_followed: user.context_id || []});
+                         });
                        }
                      });
 
@@ -278,20 +282,11 @@ exports.review = function(req, res, next){
 
     res.format({
       html: function(){
-        var u = req.app.get('users');
-        u.findOne({_id: req.session.username}, function(err, user){
-          if (err) return next(err);
-
-          res.render('review/index', {
-            diseaseName: comps.context.disease.join('; '),
-            contextName: comps.context.name,
-            modelName: comps.process.name + ' - ' + comps.link.name,
-            context_id: comps.context._id,
-            context_followed: (user.context_id || []).indexOf(comps.context._id) !== -1
-          });
-
+        res.render('review/index', {
+          context: comps.context,
+          process: comps.process,
+          link: comps.link,
         });
-
       },
 
       json: function(){
@@ -300,7 +295,10 @@ exports.review = function(req, res, next){
           .toArray(function(err, thetas){
             if (err) return next(err);
 
-            comps.thetas = thetas;
+            comps.thetas = thetas.map(function(theta){
+              return describeTheta(theta, comps.process, comps.link);
+            });
+
             res.json({
               tpl:{ //TODO browserify...
                 control: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','control.ejs'), 'utf8'),
@@ -322,7 +320,7 @@ exports.diagnosticSummary = function(req, res, next){
   var theta_id = req.params.theta_id
     , diagnostics = req.app.get('diagnostics');
 
-  diagnostics.find({theta_id: theta_id}, {summary:true, h:true}).toArray(function(err, docs){
+  diagnostics.find({theta_id: theta_id}, {summary:true, h:true}).sort({'summary.dic':1}).toArray(function(err, docs){
     res.send(docs);
   });
 
