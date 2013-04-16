@@ -14,8 +14,21 @@
 
     <div class="span4">
 
+      <% if(locals.fail){ %>
+      <div class="alert alert-error">
+        <strong>Error:</strong> <%= fail %>
+      </div>
+      <% } %>
+
+
+      <% if(locals.validation){ %>
+      <div class="alert alert-error">
+        <strong>Error:</strong> <%= validation %>
+      </div>
+      <% } %>
+
       <form action="/register" method="POST">
-        <input name="_csrf" value="" type="hidden"/>
+        <input name="_csrf" value="<%= token %>" type="hidden"/>
 
         <p>
           <label>username:</label>

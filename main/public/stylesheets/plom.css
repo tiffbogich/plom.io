@@ -27,34 +27,33 @@ div.comment{
   font-size: 36pt;
  }
 
- #plomMain form{
-   margin-left:70px;
+#plomMain form{
+  margin-left:70px;
+}
 
- }
+#headerLogo{
+  background:url(../images/logo-large.png) no-repeat left center;
+  background-size: auto 80px;
+}
 
- #headerLogo{
-   background:url(../images/logo-large.png) no-repeat left center;
-   background-size: auto 80px;
- }
-
- #headerLogo h1, #headerLogo p{
-   margin-left: 120px;
- }
+#headerLogo h1, #headerLogo p{
+  margin-left: 120px;
+}
 
 
- .homebox h4
- {
-   text-align: center;
- }
+.homebox h4
+{
+  text-align: center;
+}
 
- .featurette h2 {
-   color: #3DAAE0;
-   font-weight: 400;
- }
+.featurette h2 {
+  color: #3DAAE0;
+  font-weight: 400;
+}
 
- .get-started{
-   margin-top:10px;
- }
+.get-started{
+  margin-top:10px;
+}
 
 #plomNav {
   float: right;
@@ -106,6 +105,7 @@ p:before{
 /* review */
 
 .social-action{
+  margin-left: 5px;
   float:right;
 }
 

@@ -6,3 +6,17 @@ body {
 a {
   color: #00B7FF;
 }
+
+#headerLogo{
+  background:url(../images/logo-large.png) no-repeat left center;
+  background-size: auto 80px;
+}
+
+#headerLogo h1, #headerLogo p{
+  margin-left: 120px;
+}
+
+#plomNav {
+  float: right;
+  margin-top: 3%;
+}

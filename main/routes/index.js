@@ -141,7 +141,7 @@ exports.index = function(req, res){
                        html: function(){
                          var u = req.app.get('users');
                          u.findOne({_id: req.session.username}, function(err, user){
-                           if (err) return next(err);                           
+                           if (err) return next(err);
                            res.render('index', {ctree:ctree, context_followed: user.context_id || []});
                          });
                        }
@@ -305,8 +305,9 @@ exports.review = function(req, res, next){
                 summaryTable: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','summary_table.ejs'), 'utf8'),
                 parameters: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','parameters.ejs'), 'utf8'),
                 ticks: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8'),
-                reviews: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','reviews.ejs'), 'utf8').replace('<%= token %>', req.session._csrf),
-                model: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','model.ejs'), 'utf8').replace('<%= token %>', req.session._csrf)
+                reviews: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','reviews.ejs'), 'utf8').replace(/<%= token %>/g, req.session._csrf),
+                model: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','model.ejs'), 'utf8').replace(/<%= token %>/g, req.session._csrf),
+                discuss: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','discuss.ejs'), 'utf8').replace(/<%= token %>/g, req.session._csrf)
               },
               comps: comps
             });

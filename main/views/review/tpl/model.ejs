@@ -1,126 +1,210 @@
 <div class="row">
   <div class="span12">
 
-    <h2>Context</h2>
-
-    Map here with movie...
-
-    <%= context.description|| '' %>
-
-    <h2>Model</h2>
-
-    <h3>Process Model</h3>
-
-    <!-- placeholder for d3 viz of compartmental model -->
-    <div id="pgraph<%= link._id %>" class="process-graph"></div>
-
-
-    <% process.model.forEach(function(r){ %>
-    <div class="row">
-      <div class="span3">
-        <% if( infector.indexOf(r.from) !== -1) { %> <span class="infector"> <%= r.from %> </span> <% } else { %> <%= r.from %> <% } %> 
-        <% if( ('tag' in r) && ('transmission' in r['tag'])) { %> <span class="infector"> &rarr; </span> <% } else { %> &rarr; <% } %> 
-        <% if( infector.indexOf(r.to) !== -1) { %> <span class="infector"> <%= r.to %> </span> <% } else { %> <%= r.to %> <% } %> 
-
-        
-      </div>
-      <div class="span9">
-        <%= r.tlt_rate %>
-
-        <button type="button" class="btn btn-mini social-action" data-toggle="collapse" data-target="#demo1">Comments</button>   
-
-      </div>
-
-      <div id="demo1" class="row collapse"> <p> comments</p> </div>
-
-      <hr/>
+    <div>
+      <h4><%= context.disease.join('; ')  + ' / ' + context.name %></h4>
+      Map here with movie...
+      <%= context.description|| '' %>
     </div>
-    <% }); %>
 
-    <h3>Observation Model</h3>
+    <div class="accordion" id="accPmodel">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accPmodel" href="#accPmodelContent">Process Model</a>
+        </div>
 
-    
-    <% link.observed.forEach(function(o){ %>
-    <%= o.id %>:
-
-    <ul>
-      <li> definition: 
-        <% if(typeof o.definition[0] === 'string'){ %>
-        
-        <%= o.definition
-            .map(function(x){
-            return (infector.indexOf(x) !== -1) ? '<span class="infector"> ' + x + ' </span>' : x; 
-            })
-            .join(' + ') %>
-
-        <% } else { %>
-
-        <%= o.definition.map(function(d){
-            var from = (infector.indexOf(d.from) !== -1) ? '<span class="infector"> ' + d.from + ' </span>' : d.from;
-            var to = (infector.indexOf(d.to) !== -1) ? '<span class="infector"> ' + d.to + ' </span>' : d.to;
-            return from + ' &rarr; ' + to;
-            })
-            .join(' + ') %>
-
-        <% } %>
-      </li>
-
-      <li>
-        mapped to: <%= o.time_series_id.map(function(x){return x.split('__').slice(0,2).join(':')}).join(' ; ') %>
-      </li>
-
-      <li>
-        model: <%= link.model[o.model_id].distribution %>
-
-        <ul>
-          <% for(var p in link.model[o.model_id]){ %>
-          <% if(p !== 'distribution' && p.split('_')[0] === 'tlt'){ %>
-          <li>
-            <%= p.split('_').slice(1).join('_') %>: <%= link.model[o.model_id][p] %>
-          </li>
-          <% } %>
-          <% } %>
-        </ul>
-      </li>
-    </ul>
+        <div id="accPmodelContent" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <!-- placeholder for d3 viz of compartmental model -->
+            <div id="pgraph<%= link._id %>" class="process-graph"></div>
 
 
-    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#demo">Comments</button>
-    
-    <div id="demo" class="collapse"> list of comments </div>
+            <% link.process_model.forEach(function(r, i){ %>
+            <div class="row" >
+              <div class="span2">
+                <% if( infector.indexOf(r.from) !== -1) { %> <span class="infector"> <%= r.from %> </span> <% } else { %> <%= r.from %> <% } %> 
+                <% if( ('tag' in r) && ('transmission' in r['tag'])) { %> <span class="infector"> &rarr; </span> <% } else { %> &rarr; <% } %> 
+                <% if( infector.indexOf(r.to) !== -1) { %> <span class="infector"> <%= r.to %> </span> <% } else { %> <%= r.to %> <% } %>                 
+              </div>
+              <div class="span3">
+                <%= r.tlt_rate %>
+              </div>
+              <div class="span5">
+                <%= r.comment || ''  %> 
+                <button type="button" class="btn btn-mini social-action" data-toggle="collapse" data-target="#discussPmodel_<%= i %>">Discuss</button>   
+              </div>
+            </div>
 
+            <!-- discussion on the process model specific reaction -->
+            <div id="discussPmodel_<%= i %>" class="row collapse">
+              <div class="span7 thread"> 
+                <% if (r.discussion && r.discussion.length){ %>
+                <ul>
+                  <% r.discussion.forEach(function(d){ %>
+                  <li><%= d.username %> on <%= d.date %></li>
+                  <li><%= d.body %></li>                
+                  <% }); %>
+                </ul>
+                <% } %>
+              </div>
 
-    <hr/>    
-    <% }); %>
+              <div class="span4">
+                <form class="discuss" action="/discuss/pmodel" method="post">
+                  <textarea rows="2" class="span4" name="body"></textarea>
+                  <input type="hidden" name="array_id" value="<%= i %>"/>
+                  <input type="hidden" name="_csrf" value="<%= token %>"/>                  
+                  <p><button class="btn" type="submit">Submit</button></p>
+                </form>               
+              </div>
+            </div>
 
-
-    <h2>Prior</h2>
-    
-    <% process.parameter.concat(process.state, link.parameter).forEach(function(par){
-       if (par.id in theta.parameter) {
-       for(var group in theta.parameter[par.id].group){ %>
-    
-      <div>
-        <a href="#" data-toggle="tooltip" title="<%= theta.parameter[par.id].comment %>"><%= par.id %>: <%= group.split('__').join('; ') %></a>                
-        <ul>
-          <li>
-            distribution: <%= theta.parameter[par.id]['group'][group]['prior']['value'] %>
-          </li>
-          <li>
-            min: <%= theta.parameter[par.id]['group'][group]['min']['value'] %>
-          </li>
-          <li>
-            max: <%= theta.parameter[par.id]['group'][group]['max']['value'] %>
-          </li>
-
-        </ul>
-
-        <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#demo1">Comments</button>
-
-
-        <hr/>
+            <hr/>
+            <% }); %>
+            
+          </div>
+        </div>
       </div>
-      <% } } }); %>
-          
+    </div> <!-- end accordion process model -->
+
+
+    <div class="accordion" id="accOmodel">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accOmodel" href="#accOmodelContent">Observation Model</a>
+        </div>
+
+        <div id="accOmodelContent" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+            <% link.observed.forEach(function(o, i){ %>
+
+            <div class="row">
+              <div class="span5">
+                <%= o.id %>:
+                <ul>
+                  <li> definition: 
+                    <% if(typeof o.definition[0] === 'string'){ %>
+                    
+                    <%= o.definition
+                        .map(function(x){
+                        return (infector.indexOf(x) !== -1) ? '<span class="infector"> ' + x + ' </span>' : x; 
+                        })
+                        .join(' + ') %>
+
+                    <% } else { %>
+
+                    <%= o.definition.map(function(d){
+                        var from = (infector.indexOf(d.from) !== -1) ? '<span class="infector"> ' + d.from + ' </span>' : d.from;
+                        var to = (infector.indexOf(d.to) !== -1) ? '<span class="infector"> ' + d.to + ' </span>' : d.to;
+                        return from + ' &rarr; ' + to;
+                        })
+                        .join(' + ') %>
+
+                    <% } %>
+                  </li>
+
+                  <li>
+                    mapped to: <%= o.time_series_id.map(function(x){return x.split('__').slice(0,2).join(':')}).join(' ; ') %>
+                  </li>
+
+                  <li>
+                    model: <%= link.model[o.model_id].distribution %>
+
+                    <ul>
+                      <% for(var p in link.model[o.model_id]){ %>
+                      <% if(p !== 'distribution' && p.split('_')[0] === 'tlt'){ %>
+                      <li>
+                        <%= p.split('_').slice(1).join('_') %>: <%= link.model[o.model_id][p] %>
+                      </li>
+                      <% } %>
+                      <% } %>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+
+
+
+              <div class="span5">
+                <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussOmodel_<%= i %>">Discuss</button>                
+
+                <!-- discussion on the process model specific reaction -->
+                <div id="discussOmodel_<%= i %>" class="collapse">
+                  <div class="thread"> 
+                    <% if (o.discussion && o.discussion.length){ %>
+                    <ul>
+                      <% o.discussion.forEach(function(d){ %>
+                      <li><%= d.username %> on <%= d.date %></li>
+                      <li><%= d.body %></li>                
+                      <% }); %>
+                    </ul>
+                    <% } %>
+                  </div>
+
+                  <div>
+                    <form class="discuss" action="/discuss/omodel" method="post">
+                      <textarea rows="2" class="span4" name="body"></textarea>
+                      <input type="hidden" name="array_id" value="<%= i %>"/>
+                      <input type="hidden" name="_csrf" value="<%= token %>"/>                  
+                      <p><button class="btn" type="submit">Submit</button></p>
+                    </form>               
+                  </div>
+
+                </div>                  
+              </div>
+                           
+            </div>
+
+            <hr/>    
+            <% }); %>
+            
+          </div>
+        </div>
+      </div>
+    </div> <!-- end accordion observation model -->
+
+
+    <div class="accordion" id="accPrior">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accPrior" href="#accPriorContent">Priors</a>
+        </div>
+
+        <div id="accPriorContent" class="accordion-body collapse">
+          <div class="accordion-inner">
+
+                <% process.parameter.concat(process.state, link.parameter).forEach(function(par){
+                   if (par.id in theta.parameter) {
+                   for(var group in theta.parameter[par.id].group){ %>
+                
+                <div class="row">
+                  <div class="span5">
+                    <a href="#" data-toggle="tooltip" title="<%= theta.parameter[par.id].comment %>"><%= par.id %>: <%= group.split('__').join('; ') %></a>                
+                    <ul>
+                      <li>
+                        distribution: <%= theta.parameter[par.id]['group'][group]['prior']['value'] %>
+                      </li>
+                      <li>
+                        min: <%= theta.parameter[par.id]['group'][group]['min']['value'] %>
+                      </li>
+                      <li>
+                        max: <%= theta.parameter[par.id]['group'][group]['max']['value'] %>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="span5">
+                    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#demo1">Discuss</button>
+                  </div>
+                </div>
+
+                <hr/>
+                
+                <% } } }); %>
+          </div>                       
+        </div>
+      </div>
+    </div> <!-- end accordion prior -->
+      
   </div>
 </div>

@@ -36,7 +36,6 @@ exports.vizbit = function(req, res, next){
       res.json(doc.vizbit);
     }
 
-
   });
 
 };
@@ -85,7 +84,7 @@ exports.postCommentTheta = function(req, res, next){
 
   var r = req.app.get('reviews');
   var comment = req.body;
-  
+
   var _id = new ObjectID(comment.review_id);
   delete comment.review_id;
   delete comment._csrf;
@@ -125,7 +124,54 @@ exports.postCommentTheta = function(req, res, next){
       if(err) return next(err);
       res.send({reviews: reviews, username: req.session.username});
     });
-    
+
+  });
+
+};
+
+
+exports.postDiscuss = function(req, res, next){
+
+  var type = req.params.type;
+
+  var c = req.app.get('components');
+  var d = req.body;
+  delete d._csrf;
+
+  d.username = req.session.username;
+  d.date = new Date();
+
+  var upd = {$push:{}};
+  upd['$push'][((type === 'pmodel') ? 'process_model.' : 'observed.') + d.array_id + '.discussion'] = d;
+
+  console.log(upd);
+  console.log(d);
+
+  c.findAndModify({_id: new ObjectID(d.link_id)}, [], upd, {safe:true, 'new':true}, function(err, doc) {
+    if (err) return next(err);
+
+    //add event
+    var mye = {
+      from: req.session.username,
+      type: (type === 'pmodel') ? 'discuss_pmodel': 'discuss_omodel',
+      name: d.name,
+      array_id: d.array_id,
+      context_id: d.context_id,
+      process_id: d.process_id,
+      link_id: d.link_id
+    };
+
+    var e = req.app.get('events');
+    e.insert(mye, function(err, docs){
+      if(err) return next(err);
+    });
+
+    if(type === 'pmodel'){
+      res.send(doc.process_model[d.array_id].discussion);
+    } else {
+      res.send(doc.observed[d.array_id].discussion);
+    }
+
   });
 
 };

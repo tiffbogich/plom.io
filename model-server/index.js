@@ -234,7 +234,7 @@ app.post('/commit', function(req, res, next){
               type: 'create',
               option: 'context',
               context_id: published.context._id,
-              name: published.context.disease.join('; ') + ' / ' +  published.context.name            
+              name: published.context.disease.join('; ') + ' / ' +  published.context.name
             }, function(err, docs){if(err) return next(err);});
           }
 
@@ -246,7 +246,8 @@ app.post('/commit', function(req, res, next){
                 context_disease: published.context.disease,
                 context_name: published.context.name,
                 process_id: published.process._id,
-                process_name: published.process.name
+                process_name: published.process.name,
+                process_model: published.process.model //used to store embedded discussion
               },
               $addToSet: {_keywords: {$each :published.context._keywords.concat(published.process._keywords)}}
             };
@@ -277,7 +278,6 @@ app.post('/commit', function(req, res, next){
             }, function(err, docs){if(err) return next(err);});
           }
 
-
           //update theta
           if (is_new_theta) {
 
@@ -295,7 +295,7 @@ app.post('/commit', function(req, res, next){
             components.update({_id: published.theta._id}, thetaUpdate, {safe:true}, function(err, cnt){
               if(err) return next(err);
             });
-            
+
             //register event
             events.insert({
               from: req.user,
