@@ -189,7 +189,9 @@ $(document).ready(function() {
         contentType : 'application/json',
         type : 'POST',
         success: function(discussion){
-          $(myid + '_' + pdata.discussion_id.replace(/:/, '___')).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
+          console.log(discussion);
+          var sel = (myid === '#discussPrior') ? pdata.discussion_id.replace(/:/, '___') : pdata.discussion_id;
+          $(myid + '_' + sel).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
         }
       });
     });
