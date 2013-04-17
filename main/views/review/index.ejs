@@ -51,26 +51,20 @@
 
           <div class="tab-pane active" id="theta">
 
+
             <div class="row">
+              <div class="span10">
+                <h4>Traces summary</h4>
+              </div>
+              <div class="span2">
                 <form>
                   <button class="btn social-action" type="submit"><i class="icon-download"></i> Fork theta</button>
                 </form>
-            </div>
-
-
-
-            <!-- Summary table (templated) -->
-            <div class="accordion" id="accSummaryTable">
-              <div class="accordion-group">
-                <div class="accordion-heading"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accSummaryTable" href="#accSummaryTableContent">Traces summary</a></div>
-
-                <div id="accSummaryTableContent" class="accordion-body collapse in">
-                  <div class="accordion-inner">
-                    <div class="row"><div class="span12" data-toggle="buttons-radio" id="summaryTable"></div></div>	      	
-                  </div>
-                </div>
               </div>
             </div>
+
+            <!-- Summary table (templated) -->
+            <div class="row"><div class="span12" data-toggle="buttons-radio" id="summaryTable"></div></div>	      	
 
             <!-- plots -->
             <div class="accordion" id="accDiagPlots">
@@ -126,17 +120,14 @@
           <div class="tab-pane" id="model">
 
             <div class="row">
-
               <div class="span10">
                 <h4><%= context.disease.join('; ')  + ' / ' + context.name %></h4>
               </div>
-
               <div class="span2">
                 <form>
                   <button class="btn social-action" type="submit"><i class="icon-download"></i> Fork model</button>
                 </form>
               </div>
-
             </div>
 
             <!-- templated -->

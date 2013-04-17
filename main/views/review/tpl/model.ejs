@@ -25,7 +25,7 @@
               </div>
               <div class="span5">
                 <%= r.comment || ''  %> 
-                <button type="button" class="btn btn-mini social-action" data-toggle="collapse" data-target="#discussPmodel_<%= i %>">Discuss</button>   
+                <button type="button" class="btn btn-mini social-action" data-toggle="collapse" data-target="#discussPmodel_<%= i %>"><i class="icon-comment"></i> Discuss</button>   
               </div>
             </div>
 
@@ -120,7 +120,7 @@
 
 
               <div class="span5">
-                <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussOmodel_<%= i %>">Discuss</button>                
+                <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussOmodel_<%= i %>"><i class="icon-comment"></i> Discuss</button>                
 
                 <!-- discussion on the observed variable -->
                 <div id="discussOmodel_<%= i %>" class="collapse">
@@ -188,7 +188,7 @@
                   </div>
 
                   <div class="span5">
-                    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussPrior_<%= par.id + '___' + group %>">Discuss</button>                
+                    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussPrior_<%= par.id + '___' + group %>"><i class="icon-comment"></i> Discuss</button>                
 
                     <!-- discussion on the observed variable -->
                     <div id="discussPrior_<%= par.id + '___' + group %>" class="collapse">
