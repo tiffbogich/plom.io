@@ -159,14 +159,14 @@ $(document).ready(function() {
       var myid;
       if(url.indexOf('pmodel') !== -1){
         myid = '#discussPmodel'
-      } else if (url.indexOf('pmodel') !== -1){
+      } else if (url.indexOf('omodel') !== -1){
         myid = '#discussOmodel'
       } else {
         myid = '#discussPrior'
       }
 
-      var discussion_id = $this.find( 'input[name="discussion_id"]' ).val();      
-      discussion_id = (myid === '#discussPrior') ? parseInt(discussion_id, 10) : discussion_id;      
+      var discussion_id = $this.find( 'input[name="discussion_id"]' ).val();
+      discussion_id = (myid !== '#discussPrior') ? parseInt(discussion_id, 10) : discussion_id;
 
       var pdata = {
         context_id: ctrl.context._id,
@@ -189,7 +189,7 @@ $(document).ready(function() {
         contentType : 'application/json',
         type : 'POST',
         success: function(discussion){
-          $(myid + '_' + pdata.discussion_id).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
+          $(myid + '_' + pdata.discussion_id.replace(/:/, '___')).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
         }
       });
     });

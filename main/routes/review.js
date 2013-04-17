@@ -141,19 +141,27 @@ exports.postDiscuss = function(req, res, next){
   d.username = req.session.username;
   d.date = new Date();
 
+  var pg; //parameter and group if type === prior
+
   var upd = {$push:{}};
-  upd['$push'][((type === 'pmodel') ? 'process_model.' : 'observed.') + d.discussion_id + '.discussion'] = d;
 
-  console.log(upd);
-  console.log(d);
+  if(type === 'pmodel'){
+    upd['$push']['process_model.' + d.discussion_id + '.discussion'] = d;
+  } else if (type === 'omodel'){
+    upd['$push']['observed.' + d.discussion_id + '.discussion'] = d;
+  } else {
+    pg = d.discussion_id.split(':');
+    upd['$push']['parameter.' + pg[0] + '.group.' + pg[1] + '.discussion'] = d;
+  }
 
-  c.findAndModify({_id: new ObjectID(d.link_id)}, [], upd, {safe:true, 'new':true}, function(err, doc) {
+
+  c.findAndModify({_id: new ObjectID(d.theta_id || d.link_id)}, [], upd, {safe:true, 'new':true}, function(err, doc) {
     if (err) return next(err);
 
     //add event
     var mye = {
       from: req.session.username,
-      type: (type === 'pmodel') ? 'discuss_pmodel': 'discuss_omodel',
+      type: 'discuss_' + type,
       name: d.name,
       discussion_id: d.discussion_id,
       context_id: d.context_id,
@@ -161,15 +169,22 @@ exports.postDiscuss = function(req, res, next){
       link_id: d.link_id
     };
 
+    if(type === 'prior'){
+      mye.theta_id = d.theta_id;
+    }
+
     var e = req.app.get('events');
     e.insert(mye, function(err, docs){
       if(err) return next(err);
     });
 
+
     if(type === 'pmodel'){
       res.send(doc.process_model[d.discussion_id].discussion);
-    } else {
+    } else if (type === 'omodel'){
       res.send(doc.observed[d.discussion_id].discussion);
+    } else {
+      res.send(doc.parameter[pg[0]].group[pg[1]].discussion);
     }
 
   });
