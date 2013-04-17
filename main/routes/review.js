@@ -151,7 +151,7 @@ exports.postDiscuss = function(req, res, next){
     upd['$push']['observed.' + d.discussion_id + '.discussion'] = d;
   } else {
     pg = d.discussion_id.split(':');
-    upd['$push']['parameter.' + pg[0] + '.group.' + pg[1] + '.discussion'] = d;
+    upd['$push']['parameter.' + pg[0] + '.group.' + pg[1] + 'prior.discussion'] = d;
   }
 
 
@@ -184,7 +184,7 @@ exports.postDiscuss = function(req, res, next){
     } else if (type === 'omodel'){
       res.send(doc.observed[d.discussion_id].discussion);
     } else {
-      res.send(doc.parameter[pg[0]].group[pg[1]].discussion);
+      res.send(doc.parameter[pg[0]].group[pg[1]].prior.discussion);
     }
 
   });

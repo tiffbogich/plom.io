@@ -193,9 +193,9 @@
                     <!-- discussion on the observed variable -->
                     <div id="discussPrior_<%= par.id + '___' + group %>" class="collapse">
                       <div class="thread">
-                        <% if (theta.parameter[par.id]['group'][group]['discussion'] && theta.parameter[par.id]['group'][group]['discussion'].length){ %>
+                        <% if (theta.parameter[par.id]['group'][group]['prior']['discussion'] && theta.parameter[par.id]['group'][group]['prior']['discussion'].length){ %>
                         <ul>
-                          <% theta.parameter[par.id]['group'][group]['discussion'].forEach(function(d){ %>
+                          <% theta.parameter[par.id]['group'][group]['prior']['discussion'].forEach(function(d){ %>
                           <li><%= d.username %> on <%= d.date %></li>
                           <li><%= d.body %></li>                
                           <% }); %>
