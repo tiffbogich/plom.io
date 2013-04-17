@@ -151,9 +151,10 @@ exports.postDiscuss = function(req, res, next){
     upd['$push']['observed.' + d.discussion_id + '.discussion'] = d;
   } else {
     pg = d.discussion_id.split(':');
-    upd['$push']['parameter.' + pg[0] + '.group.' + pg[1] + 'prior.discussion'] = d;
+    upd['$push']['parameter.' + pg[0] + '.group.' + pg[1] + '.prior.discussion'] = d;
   }
 
+  console.log(upd);
 
   c.findAndModify({_id: new ObjectID(d.theta_id || d.link_id)}, [], upd, {safe:true, 'new':true}, function(err, doc) {
     if (err) return next(err);
@@ -184,6 +185,7 @@ exports.postDiscuss = function(req, res, next){
     } else if (type === 'omodel'){
       res.send(doc.observed[d.discussion_id].discussion);
     } else {
+      console.log(doc.parameter[pg[0]].group[pg[1]].prior);
       res.send(doc.parameter[pg[0]].group[pg[1]].prior.discussion);
     }
 
