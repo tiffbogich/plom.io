@@ -69,7 +69,7 @@ Control.prototype.thetaList = function(){
     //model review
     that._tooltipify(that.link.model, that.thetas[that.i]);
     that._tooltipify(that.link.process_model, that.thetas[that.i]);
-    $('#model').html(that.compiled.model({context: that.context, process: that.process, link: that.link, theta: that.thetas[that.i], infector: that.infector}));
+    $('#modelTpl').html(that.compiled.model({context: that.context, process: that.process, link: that.link, theta: that.thetas[that.i], infector: that.infector}));
     plomGraphModel(that.process, "#pgraph"+that.link._id);
     $('a[data-toggle="tooltip"]').tooltip();
 

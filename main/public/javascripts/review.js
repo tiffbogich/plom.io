@@ -147,33 +147,49 @@ $(document).ready(function() {
 
     });
 
-
-    //pmodel discussion
+    //discussion
     $('#model').on('submit', 'form.discuss', function(e){
       e.preventDefault();
 
       var $this = $(this)
         , $body = $this.find( 'textarea[name="body"]' );
 
+      var url = $this.closest('form').attr('action');
+
+      var myid;
+      if(url.indexOf('pmodel') !== -1){
+        myid = '#discussPmodel'
+      } else if (url.indexOf('pmodel') !== -1){
+        myid = '#discussOmodel'
+      } else {
+        myid = '#discussPrior'
+      }
+
+      var discussion_id = $this.find( 'input[name="discussion_id"]' ).val();      
+      discussion_id = (myid === '#discussPrior') ? parseInt(discussion_id, 10) : discussion_id;      
+
       var pdata = {
         context_id: ctrl.context._id,
         process_id: ctrl.process._id,
         link_id: ctrl.link._id,
-        array_id: parseInt($this.find( 'input[name="array_id"]' ).val(), 10),
+        discussion_id: discussion_id,
         name: ctrl.name,
         body: $body.val(),
         _csrf: $this.find( 'input[name="_csrf"]' ).val()
       };
 
+      if(myid === '#discussPrior'){
+        pdata.theta_id = ctrl.theta._id;
+      }
+
       $body.val('');
 
-      var url = $this.closest('form').attr('action');
       $.ajax(url, {
         data : JSON.stringify(pdata),
         contentType : 'application/json',
         type : 'POST',
         success: function(discussion){
-          $(((url.indexOf('pmodel') === -1) ? '#discussOmodel_' : '#discussPmodel_')  + pdata.array_id).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
+          $(myid + '_' + pdata.discussion_id).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
         }
       });
     });

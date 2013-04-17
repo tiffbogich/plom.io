@@ -13,7 +13,7 @@ PLoM Events
       link_id:
       user_id:
       review_id:
-      array_id:
+      discussion_id:
       comment_id:
     }
 

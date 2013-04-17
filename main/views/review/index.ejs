@@ -17,6 +17,7 @@
 
   <div class="container">
 
+
     <div class="row">
       <div id="headerLogo" class="span4">
         <h1 class="muted">PLoM.io</h1>
@@ -30,42 +31,32 @@
       </ul>
     </div>
 
-    <div class="row">
-
-      <div class="social-action">
-
-        <form>
-          <button class="btn" type="submit"><i class="icon-download"></i> Fork</button>
-        </form>
-
-
-      </div>
-
-    </div>
-
 
     <div class="row">
       <div class="span12">
 
         <!-- parameter list (templated) -->
         <div class="horizontal-scroll" data-toggle="buttons-radio" id="thetaList"></div>
-
-        <hr/>
-        
-
-
+       
         <ul class="nav nav-tabs" id="reviewTab">
           <li class="active">
             <a href="#theta" data-toggle="tab">Results</a>
           </li>
           <li>
-            <a href="#model" data-toggle="tab">Context & Model</a>
+            <a href="#model" data-toggle="tab">Model</a>
           </li>
         </ul>
         
         <div class="tab-content">
 
           <div class="tab-pane active" id="theta">
+
+            <div class="row">
+                <form>
+                  <button class="btn social-action" type="submit"><i class="icon-download"></i> Fork theta</button>
+                </form>
+            </div>
+
 
 
             <!-- Summary table (templated) -->
@@ -133,7 +124,23 @@
 
           <!-- Model review -->
           <div class="tab-pane" id="model">
-            
+
+            <div class="row">
+
+              <div class="span10">
+                <h4><%= context.disease.join('; ')  + ' / ' + context.name %></h4>
+              </div>
+
+              <div class="span2">
+                <form>
+                  <button class="btn social-action" type="submit"><i class="icon-download"></i> Fork model</button>
+                </form>
+              </div>
+
+            </div>
+
+            <!-- templated -->
+            <div id="modelTpl"></div>            
 
           </div>
         </div>

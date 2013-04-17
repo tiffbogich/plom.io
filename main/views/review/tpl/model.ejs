@@ -1,12 +1,6 @@
 <div class="row">
   <div class="span12">
 
-    <div>
-      <h4><%= context.disease.join('; ')  + ' / ' + context.name %></h4>
-      Map here with movie...
-      <%= context.description|| '' %>
-    </div>
-
     <div class="accordion" id="accPmodel">
       <div class="accordion-group">
         <div class="accordion-heading">
@@ -51,7 +45,7 @@
               <div class="span4">
                 <form class="discuss" action="/discuss/pmodel" method="post">
                   <textarea rows="2" class="span4" name="body"></textarea>
-                  <input type="hidden" name="array_id" value="<%= i %>"/>
+                  <input type="hidden" name="discussion_id" value="<%= i %>"/>
                   <input type="hidden" name="_csrf" value="<%= token %>"/>                  
                   <p><button class="btn" type="submit">Submit</button></p>
                 </form>               
@@ -128,7 +122,7 @@
               <div class="span5">
                 <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussOmodel_<%= i %>">Discuss</button>                
 
-                <!-- discussion on the process model specific reaction -->
+                <!-- discussion on the observed variable -->
                 <div id="discussOmodel_<%= i %>" class="collapse">
                   <div class="thread"> 
                     <% if (o.discussion && o.discussion.length){ %>
@@ -144,13 +138,13 @@
                   <div>
                     <form class="discuss" action="/discuss/omodel" method="post">
                       <textarea rows="2" class="span4" name="body"></textarea>
-                      <input type="hidden" name="array_id" value="<%= i %>"/>
+                      <input type="hidden" name="discussion_id" value="<%= i %>"/>
                       <input type="hidden" name="_csrf" value="<%= token %>"/>                  
                       <p><button class="btn" type="submit">Submit</button></p>
                     </form>               
                   </div>
-
-                </div>                  
+                </div>  
+                
               </div>
                            
             </div>
@@ -194,8 +188,33 @@
                   </div>
 
                   <div class="span5">
-                    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#demo1">Discuss</button>
+                    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussPrior_<%= par.id + '___' + group %>">Discuss</button>                
+
+                    <!-- discussion on the observed variable -->
+                    <div id="discussPrior_<%= par.id + '___' + group %>" class="collapse">
+                      <div class="thread">
+                        <% if (theta.parameter[par.id]['group'][group]['discussion'] && theta.parameter[par.id]['group'][group]['discussion'].length){ %>
+                        <ul>
+                          <% theta.parameter[par.id]['group'][group]['discussion'].forEach(function(d){ %>
+                          <li><%= d.username %> on <%= d.date %></li>
+                          <li><%= d.body %></li>                
+                          <% }); %>
+                        </ul>
+                        <% } %>
+                      </div>
+
+                      <div>
+                        <form class="discuss" action="/discuss/prior" method="post">
+                          <textarea rows="2" class="span4" name="body"></textarea>
+                          <input type="hidden" name="discussion_id" value="<%= par.id + ':' + group %>"/>
+                          <input type="hidden" name="_csrf" value="<%= token %>"/>
+                          <p><button class="btn" type="submit">Submit</button></p>
+                        </form>
+                      </div>
+                    </div>  
+                    
                   </div>
+
                 </div>
 
                 <hr/>

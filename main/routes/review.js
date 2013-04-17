@@ -142,7 +142,7 @@ exports.postDiscuss = function(req, res, next){
   d.date = new Date();
 
   var upd = {$push:{}};
-  upd['$push'][((type === 'pmodel') ? 'process_model.' : 'observed.') + d.array_id + '.discussion'] = d;
+  upd['$push'][((type === 'pmodel') ? 'process_model.' : 'observed.') + d.discussion_id + '.discussion'] = d;
 
   console.log(upd);
   console.log(d);
@@ -155,7 +155,7 @@ exports.postDiscuss = function(req, res, next){
       from: req.session.username,
       type: (type === 'pmodel') ? 'discuss_pmodel': 'discuss_omodel',
       name: d.name,
-      array_id: d.array_id,
+      discussion_id: d.discussion_id,
       context_id: d.context_id,
       process_id: d.process_id,
       link_id: d.link_id
@@ -167,9 +167,9 @@ exports.postDiscuss = function(req, res, next){
     });
 
     if(type === 'pmodel'){
-      res.send(doc.process_model[d.array_id].discussion);
+      res.send(doc.process_model[d.discussion_id].discussion);
     } else {
-      res.send(doc.observed[d.array_id].discussion);
+      res.send(doc.observed[d.discussion_id].discussion);
     }
 
   });
