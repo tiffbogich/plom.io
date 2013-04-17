@@ -82,7 +82,7 @@ app.post('/discuss/:type', secure, csrf, review.postDiscuss);
 //social network
 app.post('/followcontext', secure, csrf, user.postFollow);
 app.post('/followuser', secure, csrf, user.postFollow);
-app.get('/:username', csrf, user.user);
+app.get('/:username', secure, csrf, user.user);
 
 
 
