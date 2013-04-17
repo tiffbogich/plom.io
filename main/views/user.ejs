@@ -14,7 +14,7 @@
 	<div class="row">
 		<div class="span4">
 			<img src="http://placehold.it/210x210" class="img-polaroid">		
-			<h3>UserName</h3>
+			<h3><%= username %></h3>
 			<hr style="width:80%">
 			<p>Joined on DATE.</p>  
 			<p>Latest posting on DATE.</p>
@@ -28,7 +28,8 @@
 					<p><strong>3</strong><small><br>Followers</small></p>
 				</div>
 				<div class="span2">
-					<p><strong>10</strong><small><br>Following</small></p>
+					<p><strong>5 
+					</strong><small><br>Following</small></p>
 				</div>
 			</div>
 
@@ -43,7 +44,7 @@
 					<h5><%= contexts.length %> <small>Created</small></h5>
 				</div>
 				<div class="span2 follow">
-					<h5>2 <small>Followed</small></h5>
+					<h5><%= user.context_id.length %> <small>Followed</small></h5>
 				</div>
 				<div class="span2 comment">
 					<h5>10 <small>Commented</small></h5>
@@ -56,7 +57,7 @@
 					<h4>Model</h4>
 				</div>
 				<div class="span2 create">
-					<h5>5 <small>Created</small></h5>
+					<h5><%= models.length %> <small>Created</small></h5>
 				</div>
 				<div class="span2 follow">
 					<h5>2 <small>Followed</small></h5>
@@ -71,7 +72,7 @@
 					<h4>Theta</h4>
 				</div>
 				<div class="span2 create">
-					<h5>5 <small>Created</small></h5>
+					<h5><%= thetas.length %> <small>Created</small></h5>
 				</div>
 				<div class="span2 follow">
 					<h5>2 <small>Followed</small></h5>
@@ -86,7 +87,7 @@
 					<h4>Review</h4>
 				</div>
 				<div class="span2 create">
-					<h5>5 <small>Created</small></h5>
+					<h5><%= reviews.length %> <small>Created</small></h5>
 				</div>
 				<div class="span2 follow">
 					<h5>2 <small>Followed</small></h5>

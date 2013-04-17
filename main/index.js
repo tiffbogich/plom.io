@@ -85,7 +85,7 @@ app.get('/issues', secure, csrf, function(req, res){res.render('issues.ejs')});
 //social network
 app.post('/followcontext', secure, csrf, user.postFollow);
 app.post('/followuser', secure, csrf, user.postFollow);
-app.get('/:username', csrf, user.user);
+app.get('/:username', secure, csrf, user.user);
 
 
 

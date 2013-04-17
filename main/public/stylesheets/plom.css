@@ -1,16 +1,19 @@
 /* user */
-div.create{
-  background-color: orange;
-  margin-top: 1px;
+div.create, div.follow, div.comment{
+  background-color: rgba(255,166,0,0.5);
+  margin: 1% 1% 1% 1%;
+  width: 10%;
+  text-align: center;
 
 }
 div.follow{
-  background-color: green;
+  background-color: rgba(0,129,0,0.5);
+  width: 12%;
 }
 div.comment{
-  background-color: purple;
+  background-color: rgba(129,0,130,0.3);
+  width: 15%;
 }
-
 
 /* welcome */
 #plomMain{
