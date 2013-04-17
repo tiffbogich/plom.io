@@ -31,7 +31,6 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     }
   };
 
-  console.log('you');
 
   data[nbpars-1][nbpars-1].cc=1;
   likdata.push([nbpars-1,nbpars-1,data[nbpars-1][nbpars-1]]);
