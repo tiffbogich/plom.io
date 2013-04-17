@@ -37,13 +37,16 @@
 
         <!-- parameter list (templated) -->
         <div class="horizontal-scroll" data-toggle="buttons-radio" id="thetaList"></div>
-       
+        
         <ul class="nav nav-tabs" id="reviewTab">
           <li class="active">
             <a href="#theta" data-toggle="tab">Results</a>
           </li>
           <li>
             <a href="#model" data-toggle="tab">Model</a>
+          </li>
+          <li>
+            <a href="#intervention" data-toggle="tab">Intervention/Forecasting</a>
           </li>
         </ul>
         
@@ -133,7 +136,16 @@
             <!-- templated -->
             <div id="modelTpl"></div>            
 
-          </div>
+          </div><!-- end div#model -->
+
+          
+          <!-- Model review -->
+          <div class="tab-pane" id="intervention">
+            <h4>Intervention/forecasting</h4>
+          </div><!-- end div#intervention -->
+
+
+
         </div>
       </div>
     </div>
