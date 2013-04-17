@@ -3,8 +3,6 @@ function plotTrace(diag, i, ind){
   tmpvect = [];
   for (var k=0;k<diag[i][i].trace.length; k++) tmpvect.push(k/diag[i][i].trace.length*diag[i][i].nbiters);
 
-  console.log(diag[i][i].trace);
-
   var data = [];
   diag[i][i].trace.forEach(function(x, k){
     data.push({

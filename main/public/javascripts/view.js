@@ -103,7 +103,6 @@ Control.prototype.summaryTable = function(){
   $('.review-trace-id').on('click', function(e){
 
     var h = parseInt($(this).val(), 10);
-
     that.updateTheta(that.thetas[that.i], that.thetas[that.i].design.cmd);
 
     $.getJSON('/diagnostic/'+ that.thetas[that.i]._id + '/' + h, function(detail) {

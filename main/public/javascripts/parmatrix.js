@@ -31,6 +31,8 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     }
   };
 
+  console.log('you');
+
   data[nbpars-1][nbpars-1].cc=1;
   likdata.push([nbpars-1,nbpars-1,data[nbpars-1][nbpars-1]]);
   
@@ -318,11 +320,12 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
   //return update function (assume that only colors change)
 
   return function(data){
+
     var dataset = [];
 
-    for (var i=0; i<data.length; i++){
+    for (var i=0; i<data.length-1; i++){
       data[i][i].cc=1;
-      for (var j=0; j<data.length; j++){
+      for (var j=0; j<data.length-1; j++){
         dataset.push([i, j, data[i][j]]);
       }
     }
