@@ -1,3 +1,9 @@
+/* issues */
+label.radio.inline.right{
+	float:right;
+	margin:1%;
+}
+
 /* user */
 div.create, div.follow, div.comment{
   display: inline-block;

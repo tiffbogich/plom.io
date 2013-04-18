@@ -5,37 +5,53 @@
 <hr>
 	<div class="row">
 		<div class="span12">
-		<h3>Context Elements</h3> 
-
+		<h3>Context Elements<button style="float:right" class="btn" type="button">Lock Context  <i class="icon-lock"></i></button></h3> 
+		<div class="row">
+			<div class="span6">
+				<p>Description of the context and a summary of the biology of the system.  If you're the originator of the context then you can also edit this short statement in case you made a mistake. <button style: "display=inline font-size=8" class="btn btn-small" type="button">Edit </button></p>
+			</div>
+		</div><br>
 			<div class="row">
-				<div class="span4">
+				<div class="span6">
 					<h4>Data</h4>
-					<p>X Time series</p>
-					<p>Y Places </p>			
+					<p>4 Time series</p>
+					<p>100 Populations </p>			
 				</div>
-				<div class="span4">
+				<div class="span6">
 					<h4>Metadata</h4>
 					<p>Population size</p>
 					<p>Birth rate</p>
 					<p>Death rate</p>
 					<p>Proportion under surveillance</p>
 				</div>
-				<div class="span4">
-				<h4>Models</h4>
-					<p>SIR</p>
-				</div>
 			</div>
 			<div class="row">
 				<div class="span12">
-					<p style="float:right">Lock Context <i class="icon-lock"></i></p> 
+					
 				</div>
 			</div>
 		
 		<hr>
 
 		<div class="row">
-			<div class="span12">
-			<h3>Issues and Requests</h3>
+			<div class="span12 right">
+			<h3>Requests <button class="btn btn-success" type="button">+</button>
+    		<label class="radio inline right">
+      			<input type="radio" name="tag"  value="Question">Question
+    		</label>
+    		<label class="radio inline right">
+      			<input type="radio" name="tag"  value="Model">Model  
+    		</label>
+    		<label class="radio inline right">
+      			<input type="radio" name="tag"  value="Metadata">Metadata
+    		</label>
+    		<label class="radio inline right">
+      			<input type="radio" name="tag"  value="Data">Data
+    		</label>
+    		<label class="radio inline right">
+      			<input type="radio" name="tag"  value="all">All
+    		</label>
+    </h3>
 <div class="accordion" id="accordion2">
   <div class="accordion-group">
     <div class="accordion-heading">
