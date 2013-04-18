@@ -1,9 +1,15 @@
 /* user */
 div.create, div.follow, div.comment{
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 4px;
+  border-radius: 2px;
   background-color: rgba(255,166,0,0.5);
-  margin: 1% 1% 1% 1%;
+  margin: 1%;
   width: 10%;
+  border: 0;
   text-align: center;
+
 
 }
 div.follow{
