@@ -334,27 +334,10 @@ exports.diagnosticDetail = function(req, res, next){
     , h = parseInt(req.params.h, 10)
     , diagnostics = req.app.get('diagnostics');
 
-  diagnostics.findOne({theta_id: theta_id, h:h}, {detail:true}, function(err, doc){
+  diagnostics.findOne({theta_id: theta_id, h:h}, {detail:true, hat:true}, function(err, doc){
     res.send(doc.detail);
   });
 }
-
-
-exports.trace = function(req, res, next){
-
-  var pngs = req.app.get('pngs')
-    , _id = new ObjectID(req.params._id);
-
-  pngs.findOne({_id: _id}, function(err, doc){
-    res.set('Content-Type', doc["content-type"]);
-    res.end(doc.data.buffer);
-  });
-
-};
-
-
-
-
 
 
 
