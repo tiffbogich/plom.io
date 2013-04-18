@@ -4,11 +4,14 @@ PLoM Issues
 {
 	from:
 	type:
-	comment: {
+    body:
+    comments: [
+      {
 		from:
 		date:
 		body:
-		}
+	  }, ...
+    ]
 	status:
 }
 
@@ -30,14 +33,19 @@ models are types of questions and can be posted to answer questions.
 data can be posted to answer a data request
 metadata can be posted to answer a metadata request
 
-comment
-=======
+body
+====
 
 This is the bulk of the issue, it contains a brief description of the request 
-and matches the selected tag.  A comment contains additional descriptors:
+and matches the selected tag. 
+
+comments
+========
+An array of comments for the issue.
+A comment contains:
 	-from, the user_id
 	-date, a timestamp of when the comment was made
-	-body, the text containing the description of the request
+	-body, the body
 	
 potentially restrict characters to keep issues as concise as possible
 
