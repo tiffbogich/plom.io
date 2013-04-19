@@ -114,7 +114,6 @@
               </div>
             </div>
 
-            <hr/>
 
           </div> <!-- end div#theta -->
 
@@ -141,7 +140,56 @@
           
           <!-- Model review -->
           <div class="tab-pane" id="intervention">
-            <h4>Intervention/forecasting</h4>
+
+
+            <div class="row">
+              <div class="span9">
+                <h4>Intervention/forecasting</h4>
+              </div>
+              <div class="span3">
+                <button id="runPredict" class="btn" type="button"><i class="icon-play"></i> Run</button>
+                <button id="stopPredict" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
+              </div>
+            </div>
+
+            <div class="row">
+
+              <div class="span9">
+                a
+              </div>
+
+              <div class="span3">
+                
+                <select id="implPred">
+                  <option value="ode">Ordinary differential equation</option>
+                  <option value="sde">Stochastic differential equation</option>
+                  <option value="psr">Poisson process</option>
+                </select>
+
+                <p>
+                  dt:
+                  <input type="text" id="sPred" class="input-small"> <span>unit</span>
+                </p>
+
+                <p>
+                  Forecast for:
+                  <select id="nExtra" class="input-small">
+                    <option value="0"> 0 years</option>
+                    <option value="1"> 1 years</option>
+                    <option value="2"> 2 years</option>
+                    <option value="3"> 3 years</option>
+                    <option value="4"> 4 years</option>
+                  </select>
+                </p>
+
+                <label class="checkbox">
+                  <input type="checkbox"> Intervention
+                </label>
+            
+                
+              </div>
+            </div>            
+
           </div><!-- end div#intervention -->
 
 
@@ -149,5 +197,7 @@
         </div>
       </div>
     </div>
+
+    <hr/>
 
     <% include ../footer %>
