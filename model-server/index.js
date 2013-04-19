@@ -15,7 +15,8 @@ var express = require('express')
   , zlib = require("zlib")
   , rimraf = require("rimraf")
   , authenticate = require('../authentification/routes/user').authenticate
-  , spawn = require('child_process').spawn;
+  , spawn = require('child_process').spawn
+  , schecksum = require('./lib/schecksum');
 
 var app = express();
 
@@ -176,8 +177,21 @@ app.post('/commit', function(req, res, next){
 
   var components = req.app.get('components');
 
+  //add semantic_id
+  [m.context, m.process].forEach(function(x){
+    x['semantic_id'] = schecksum(x);
+  });
+
+  //for link, we include the semantic id_of context and process.
+  m.link.context_semantic_id = m.context.semantic_id;
+  m.link.process_semantic_id = m.process.semantic_id;
+  m.link.semantic_id = schecksum(m.link);    
+  delete m.link.context_semantic_id;
+  delete m.link.process_semantic_id;
+
   var my_semantic_ids = [m.context.semantic_id, m.process.semantic_id, m.link.semantic_id];
   if('theta' in m){
+    m.theta.semantic_id = schecksum(m.theta);
     my_semantic_ids.push(m.theta.semantic_id);
   }
 
@@ -308,22 +322,47 @@ app.post('/commit', function(req, res, next){
               name: published.context.disease.join('; ') + ' / ' +  published.context.name + ' / ' + published.process.name + ' - ' + published.link.name
             }, function(err, docs){if(err) return next(err);});
 
-            //store traces in mongo and start diagnostic
+            //store files in mongo gridfs and start diagnostic
             if(req.files){
               var gfs = Grid(req.app.get('db'), mongodb);
-              var writestream = gfs.createWriteStream(req.body.trace_checksum)
-                , readstream = fs.createReadStream(req.files.traces.path);
+              async.mapLimit(Object.keys(req.files), 4, function(key, callback){
 
-              readstream.pipe(writestream);
+                var type_h = key.split('_');
 
-              writestream.on('close', function (file) {
-                //send the traces to diagnostic
-                var conn = net.createConnection(5000, function(){
-                  conn.end(JSON.stringify({fileId:file._id.toString(), thetaId: published.theta._id}));
-                  res.json({'success': true, 'msg': 'your results are being reviewed'});
+                var writestream = gfs.createWriteStream({
+                  _id: new ObjectID(),
+                  filename: key + '.csv.gz',
+                  mode:'w',
+                  content_type: 'application/x-gzip',   
+                  metadata: {type: type_h[0], h: parseInt(type_h[1], 10), theta_id: published.theta._id}
                 });
 
-              });
+                fs.createReadStream(req.files[key].path).pipe(writestream);
+                writestream.on('close', function(file){
+                  callback(null, file);
+                });                
+              },
+                             function(err, results){
+                               console.log(results);
+
+                               //clean up
+                               var toclean = [];
+                               for(var f in req.files){
+                                 toclean.push(req.files[f].path);
+                               }
+
+                               async.map(toclean, fs.unlink, function(err){
+                                 if (err) return next(err);
+                               });
+
+                               //send the traces to diagnostic
+                               var conn = net.createConnection(5000, function(){
+                                 conn.end(JSON.stringify({thetaId: published.theta._id}));
+                                 res.json({'success': true, 'msg': 'your results are being reviewed'});
+                               });
+
+                             });
+
             } else {
               res.json({'success': true, 'msg': 'your results are being reviewed'});
             }
