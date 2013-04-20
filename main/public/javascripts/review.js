@@ -9,6 +9,12 @@ $(document).ready(function() {
 
     var ctrl = new Control(data);
 
+
+    $.getJSON('/forecast/' + ctrl.link._id + '/' + ctrl.theta._id + '/0', function(data) {
+      console.log(data);
+    });
+
+
     ctrl.thetaList();
     ctrl.updateTheta(ctrl.theta, ctrl.theta.design.cmd);
 

@@ -12,57 +12,38 @@
   <!-- Methods -->
   <div class="tab-pane active" id="ctr-methods">
 
-    <form class="form-horizontal">
+    <form>
 
-      <div class="control-group">
-        <label class="control-label" for="algo">Method</label>
-        <div class="controls">
-          <select id="algo">
-            <option value="simul">Simulation</option>
-            <option value="smc">Sequential Monte Carlo</option>
-            <option value="kalman">Extended Kalman Filter</option>
-          </select>
-        </div>
-      </div>
 
-      <div class="control-group">
-        <label class="control-label" for="impl">Implementation</label>
-        <div class="controls">
-          <select id="impl">
-            <option value="ode">Ordinary differential equation</option>
-            <option value="sde">Stochastic differential equation</option>
-            <option value="psr">Poisson process</option>
-          </select>
-        </div>
-      </div>
+      <select id="algo">
+        <option value="simul">Simulation</option>
+        <option value="smc">Sequential Monte Carlo</option>
+        <option value="kalman">Extended Kalman Filter</option>
+      </select>
 
-      <div class="control-group">
-        <div class="controls">
-          <label class="checkbox">
-            <input type="checkbox" name="no_dem_sto" value="no_dem_sto"> discard demographic stochasticity
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" id="no_env_sto" value="no_env_sto"> discard environmental stochasticity
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" id="no_drift" value="no_drift"> discard drift
-          </label>
-        </div>
-      </div>
+      <select id="impl">
+        <option value="ode">Ordinary differential equation</option>
+        <option value="sde">Stochastic differential equation</option>
+        <option value="psr">Poisson process</option>
+      </select>
 
-      <div class="control-group">
-        <label class="control-label" for="J">Number of particles/ realisations</label>
-        <div class="controls">
-          <input type="text" id="J" class="input-small">
-        </div>
-      </div>
+      <label class="checkbox">
+        <input type="checkbox" name="no_dem_sto" value="no_dem_sto"> discard demographic stochasticity
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" id="no_env_sto" value="no_env_sto"> discard environmental stochasticity
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" id="no_drift" value="no_drift"> discard drift
+      </label>
 
-      <div class="control-group">
-        <label class="control-label" for="s">Integration time step</label>
-        <div class="controls">
-          <input type="text" id="s" class="input-small"> <span>unit</span>
-        </div>
-      </div>
+      <label class="control-label" for="J">Number of particles/ realisations</label>
+      <input type="text" id="J" class="input-small">
+
+
+
+      <label class="control-label" for="s">Integration time step</label>
+      <input type="text" id="s" class="input-small"> <span>unit</span>
 
     </form>
 
@@ -78,9 +59,6 @@
         <th>min</th>
         <th>value</th>
         <th>max</th>
-        <% if(t.status !== 'best'){ %>
-        <th>diff</th>
-        <% } %>
       </tr>
 
       <% p.parameter.concat(p.state, l.parameter).forEach(function(par){ %>
@@ -91,10 +69,6 @@
         <td><input type="text" name="<%= par.id %>___<%= group %>___min"   value="<%= t.parameter[par.id]['group'][group]['min']['value'] %>"   class="input-mini theta" /></td>
         <td><input type="text" name="<%= par.id %>___<%= group %>___guess" value="<%= t.parameter[par.id]['group'][group]['guess']['value'] %>" class="input-mini theta guess" /></td>
         <td><input type="text" name="<%= par.id %>___<%= group %>___max"   value="<%= t.parameter[par.id]['group'][group]['max']['value'] %>"   class="input-mini theta" /></td>
-
-        <% if(t.status !== 'best'){ %>
-        <td> <i class="icon-arrow-down"></td>
-        <% } %>
 
       </tr>
       <% } }; });  %>

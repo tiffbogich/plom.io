@@ -1,7 +1,7 @@
 <% thetas.forEach(function(theta, i){ %>
    <div>
      <ul>
-       <li>tbogich</li>
+       <li><a href="/<%= theta.username %>"><%= theta.username %></a></li>
        <li>DIC: <%= theta.dic %></li>
        <% if (_.last(theta.design.cmd).fit) { %>
        <li>fit: <%= _.last(theta.design.cmd).fit %></li>

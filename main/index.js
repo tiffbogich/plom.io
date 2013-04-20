@@ -69,6 +69,8 @@ app.get('/review', secure, csrf, routes.review);
 app.get('/diagnostic/:theta_id', secure, routes.diagnosticSummary);
 app.get('/diagnostic/:theta_id/:h', secure, routes.diagnosticDetail);
 
+app.get('/forecast/:link_id/:theta_id/:h', secure, routes.forecast);
+
 //review page
 app.get('/reviewstheta/:theta_id', secure, review.theta);
 app.post('/reviewtheta', secure, csrf, review.postTheta);
@@ -126,10 +128,6 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   plomWsServer.listen(server);
 
 });
-
-
-
-
 
 
 

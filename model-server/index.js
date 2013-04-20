@@ -357,7 +357,7 @@ app.post('/commit', function(req, res, next){
 
                                //send the traces to diagnostic
                                var conn = net.createConnection(5000, function(){
-                                 conn.end(JSON.stringify({thetaId: published.theta._id}));
+                                 conn.end(JSON.stringify({theta_id: published.theta._id}));
                                  res.json({'success': true, 'msg': 'your results are being reviewed'});
                                });
 

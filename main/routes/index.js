@@ -9,7 +9,10 @@ var fs = require('fs')
   , _ = require('underscore')
   , fstream = require("fstream")
   , tar = require("tar")
+  , Grid = require('gridfs-stream')
   , zlib = require("zlib")
+  , csv = require("csv")
+  , writePredictFiles = require('../lib/predict')
   , dbUtil = require('../../db-utils');
 
 
@@ -268,7 +271,9 @@ exports.review = function(req, res, next){
     , p = req.session.process
     , l = req.session.link;
 
-  //TODO check session exists
+  if(!(c && p && l)){
+    return res.redirect('/library');
+  }
 
   var components = req.app.get('components');
 
@@ -322,7 +327,7 @@ exports.diagnosticSummary = function(req, res, next){
   var theta_id = req.params.theta_id
     , diagnostics = req.app.get('diagnostics');
 
-  diagnostics.find({theta_id: theta_id}, {summary:true, h:true}).sort({'summary.dic':1}).toArray(function(err, docs){
+  diagnostics.find({theta_id: theta_id}, {summary:true, h:true}).sort({'summary.essMin':-1}).toArray(function(err, docs){
     res.send(docs);
   });
 
@@ -334,203 +339,58 @@ exports.diagnosticDetail = function(req, res, next){
     , h = parseInt(req.params.h, 10)
     , diagnostics = req.app.get('diagnostics');
 
-  diagnostics.findOne({theta_id: theta_id, h:h}, {detail:true, hat:true}, function(err, doc){
+  diagnostics.findOne({theta_id: theta_id, h:h}, {detail:true}, function(err, doc){
     res.send(doc.detail);
   });
 }
 
 
+exports.forecast = function(req, res, next){
+  var link_id = req.params.link_id
+    , theta_id = req.params.theta_id
+    , h = parseInt(req.params.h, 10);
 
+  var db = req.app.get('db');
+  var gfs = Grid(db, mongodb);
 
+  gfs.files.find({ 'metadata.theta_id': new ObjectID(theta_id), 'metadata.type': {$in: ['best', 'X', 'hat']}, 'metadata.h':h }, {_id:true, metadata:true}).toArray(function (err, files) {
+    if (err) return callback(err);
 
-//exports.play = function(req, res, next){
-//
-//  var a = req.session.tree
-//    , c = req.session.context
-//    , p = req.session.process
-//    , l = req.session.link
-//    , t = req.session.theta;
-//
-//  if('t' in req.query){
-//    t = req.query.t;
-//    req.session.theta = t;
-//  }
-//
-//  var trees = req.app.get('trees')
-//    , components = req.app.get('components');
-//
-//  components.findOne({_id: new ObjectID(c)}, function(err, cDoc){
-//    if(err) return next(err);
-//    components.findOne({_id: new ObjectID(p)}, function(err, pDoc){
-//      if(err) return next(err);
-//      components.findOne({_id: new ObjectID(l)}, function(err, lDoc){
-//        if(err) return next(err);
-//        components.findOne({_id: new ObjectID(t)}, function(err, tDoc){
-//          if(err) return next(err);
-//          trees.findOne({_id: new ObjectID(a)}, function(err, aDoc){
-//            if(err) return next(err);
-//
-//            var path_settings =  path.join(process.env.HOME, 'plom_models', c, p, l, 'settings', 'settings.json');
-//
-//            fs.readFile(path_settings, function (err, settings){
-//              if(err) return next(err);
-//
-//              settings = JSON.parse(settings);
-//
-//              //in case of intervention, remove data
-//              for(par in tDoc.value){
-//                if ('intervention' in tDoc.value[par] && tDoc.value[par]['intervention']){
-//                  settings.cst.N_DATA = 0;
-//                  if('data' in settings.data){
-//                    settings.data.data = [];
-//                  }
-//                  break;
-//                }
-//              }
-//
-//              res.format({
-//                json: function(){
-//                  res.send({settings: settings, tree: aDoc, process: pDoc, context_id: cDoc._id, link: lDoc, theta: tDoc});
-//                },
-//                html: function(){
-//                  describeTheta(tDoc, pDoc, lDoc);
-//                  res.render('play', {settings:settings, theta:tDoc});
-//                }
-//              });
-//            });
-//
-//          });
-//        });
-//      });
-//    });
-//  });
-//}
-//
-//
-//
-///**
-// * Build model (POST request)
-// */
-//exports.build = function(req, res, next){
-//
-//  var a = req.session.tree = req.body.a
-//    , c = req.session.context = req.body.c
-//    , p = req.session.process = req.body.p
-//    , l = req.session.link = req.body.l
-//    , t = req.session.theta = req.body.t;
-//
-//  var path_rendered = path.join(process.env.HOME, 'plom_models', c, p, l);
-//  fs.exists(path_rendered, function (exists) {
-//
-//    if(!exists){
-//      var components = req.app.get('components');
-//      components.findOne({_id: new ObjectID(c)}, function(err, cDoc){
-//        if(err) return next(err);
-//        components.findOne({_id: new ObjectID(p)}, function(err, pDoc){
-//          if(err) return next(err);
-//          components.findOne({_id: new ObjectID(l)}, function(err, lDoc){
-//            if(err) return next(err);
-//
-//
-//            var pmbuilder = spawn('pmbuilder', ['--input', 'stdin', '-o', path_rendered]);
-//
-//            pmbuilder.stdin.write(JSON.stringify({context: cDoc, process: pDoc, link: lDoc})+'\n', encoding="utf8");
-//            //echo
-//            //pmbuilder.stdout.on('data', function (data) {console.log('stdout: ' + data);});
-//            //pmbuilder.stderr.on('data', function (data) {console.log('stderr: ' + data);});
-//
-//            pmbuilder.on('exit', function (code) {
-//              if(code === 0) {
-//                res.json({ success: 'ready!' })
-//              } else {
-//                res.json(500, { error: 'FAIL' })
-//              }
-//            });
-//
-//          });
-//        });
-//      });
-//    } else {
-//      res.json({ success: 'ready!' })
-//    }
-//
-//  });
-//}
-//
-//
-//
-//
-//
-//
-//exports.trees = function (req, res, next) {
-//
-//  var _idString = req.query._idString;
-//
-//  if (_idString){
-//    var trees = req.app.get('trees');
-//    trees.findOne({_id: new ObjectID(_idString)}, function(err, doc){
-//      if(err) return next(err);
-//
-//      if(doc){
-//        res.json(doc);
-//      } else {
-//        res.json(500, { error: 'could not find tree' })
-//      }
-//    });
-//  } else {
-//    res.json(500, { error: 'invalid URL' });
-//  }
-//
-//};
-//
-//
-//exports.components = function (req, res, next) {
-//
-//  var _idString = req.query._idString;
-//
-//  if (_idString){
-//    var components = req.app.get('components');
-//    components.findOne({_id: new ObjectID(_idString)}, function(err, doc){
-//      if(err) return next(err);
-//
-//      if(doc){
-//        res.json(doc);
-//      } else {
-//        res.json(500, { error: 'could not find component' })
-//      }
-//    });
-//  } else {
-//    res.json(500, { error: 'invalid URL' });
-//  }
-//
-//};
-//
-//
-//exports.components_post = function (req, res, next) {
-//
-//  //insert in the db
-//  var trees = req.app.get('trees')
-//    , components = req.app.get('components');
-//  var ptrees =  new PlomTrees(components, trees);
-//
-//  //from .json file
-//  if (req.files && ('component' in req.files)){
-//    fs.readFile(req.files.component.path, function (err, data) {
-//      var component = JSON.parse(data);
-//      ptrees.insertComponentAt(component, req.body.tree_idString, req.body.parent_idString, function(err, doc){
-//        res.json(doc);
-//      });
-//    });
-//  } else { //from post
-//    ptrees.insertComponentAt(req.body.component, req.body.tree_idString, req.body.parent_idString, function(err, doc){
-//      res.json(doc);
-//    });
-//  }
-//
-//};
-//
-//
-//
+    var myFile = files.filter(function(f){return f.metadata.type === 'hat';})[0]
+      , readstream = gfs.createReadStream({_id: myFile._id})
+      , mycsv = csv()
+      , hat = [];
+
+    readstream.pipe(zlib.createUnzip()).pipe(mycsv);
+
+    mycsv
+      .transform(function(row,i){
+        if(i === 0 ){
+          return row;
+        } else {
+          return row.map(parseFloat);
+        }
+      })
+      .on('record', function(row, i){     
+        hat.push(row);
+      })
+      .on('end', function(count){        
+        var predictPath = path.join(process.env.HOME, 'built_plom_models', link_id, 'model', theta_id);
+        fs.exists(predictPath, function (exists) {
+          if(exists){
+            res.send(hat);
+          } else {
+            writePredictFiles(gfs, predictPath, files, function(err){
+              if (err) return next(err);
+              res.send(hat);              
+            })
+          }
+        }); //end fs.exists
+      }); //end on 'end'
+  }); //end toArray
+
+}
+
 //exports.test = function(req, res){
 //    var t = jade.compile(fs.readFileSync('/Users/seb/websites/simforence/simforence-web/sfr-gui//views/test.jade'))();
 ////    console.log(t);

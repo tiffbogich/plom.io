@@ -10,6 +10,6 @@
   "author": "Sebastien Ballesteros",
   "license": "GPLv3",
   "dependencies": {
-    "socket.io": "~0.9.13"
+    "socket.io": "~0.9.14"
   }
 }
