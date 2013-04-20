@@ -6,9 +6,11 @@
  * process (from process.json)
  * link (from link.json)
  * theta  (from theta.json)
+ * X (from diagnostic)
  * graphTrajId, an id for the traj plot
  * graphStateId, an id for the state variable plots
  * graphPredResId, an id for the residuals plot
+ * graphEssId, an id for the ESS plot
  */
 
 function PlomTs(options) {
@@ -37,6 +39,8 @@ function PlomTs(options) {
   });
   this.stateName = stateName;
 
+  this.tsName = this.context.time_series.map(function(x){return x.id;});  
+
   this.isDrift =  (('diffusion' in this.process) && this.process.diffusion.length);
   this.setDriftName();
 
@@ -49,12 +53,16 @@ function PlomTs(options) {
   this.setDataState();
   this.graphState = this.makeGraphState();
 
-  this.setDataPredRes();
-  this.graphPredRes = this.makeGraphPredRes();
 
-  this.setDataEss();
-  this.graphEss = this.makeGraphEss();
+  if(this.graphPredResId){
+    this.setDataPredRes();
+    this.graphPredRes = this.makeGraphPredRes();
+  }
 
+  if(this.graphEssId){
+    this.setDataEss();
+    this.graphEss = this.makeGraphEss();
+  }
 
 };
 
@@ -66,12 +74,11 @@ PlomTs.prototype.setDriftName = function(){
     this.process.diffusion.forEach(function(d){
       var p = options.theta.value[d.parameter].partition_id;
       options.theta.partition[p].group.forEach(function(g){
-        driftName.push(d.parameter + ':' + g.id);
+        driftName.push('drift:' + d.parameter + ':' + g.id);
       });
     });
   }
   this.driftName = driftName;
-
 }
 
 PlomTs.prototype.getStateNames = function(){
@@ -83,8 +90,9 @@ PlomTs.prototype.getTrajNames = function(){
 };
 
 
-PlomTs.prototype.updateTheta = function(theta){
+PlomTs.prototype.updateTheta = function(theta, X){
   this.theta = theta;
+  this.X = X;
 
   this.setDriftName();
 
@@ -93,6 +101,17 @@ PlomTs.prototype.updateTheta = function(theta){
 
   this.setDataState();
   this.graphState = this.makeGraphState();
+
+
+  if(this.graphPredResId){
+    this.setDataPredRes();
+    this.updateGraphPredRes();
+  }
+
+  if(this.graphEssId){
+    this.setDataEss();
+    this.updateGraphEss();
+  }
 };
 
 
@@ -100,40 +119,60 @@ PlomTs.prototype.setDataTraj = function(){
   //get the time series data. Data are repeated 3 times to allow for custom error bars:
   //simulation (X) and (hat) will fill the null values
 
-  this.dataTraj = [];
-  for(var i=0; i<this.data.length; i++){
-    this.dataTraj.push(new Array(1+this.N_TS*2));
-    this.dataTraj[i][0] = this.data[i][0];
+  var that = this;
 
-    for(var ts=0; ts<(this.N_TS); ts++){
-      this.dataTraj[i][ts+1] = new Array(3);
-      this.dataTraj[i][this.N_TS + ts+1] = new Array(3);
+  that.dataTraj = [];
+  for(var i=0; i<that.data.length; i++){
+    that.dataTraj.push(new Array(1+that.N_TS*2));
+    that.dataTraj[i][0] = that.data[i][0];
+
+    that.tsName.forEach(function(name, ts){
+
+      that.dataTraj[i][ts+1] = new Array(3);
+      that.dataTraj[i][that.N_TS + ts+1] = new Array(3);
+
+      //data
       for(var j=0; j<3; j++){
-        this.dataTraj[i][ts+1][j] = this.data[i][ts+1];
-        this.dataTraj[i][this.N_TS+ts+1][j] = null;
+        that.dataTraj[i][ts+1][j] = that.data[i][ts+1];
       }
-    }
+
+      //model prediction
+      if(that.X){
+        that.dataTraj[i][that.N_TS+ts+1][0] = that.X.q5['obs_mean:' + name][i];
+        that.dataTraj[i][that.N_TS+ts+1][1] = that.X.mean['obs_mean:' + name][i];
+        that.dataTraj[i][that.N_TS+ts+1][2] = that.X.q95['obs_mean:' + name][i];
+      }
+
+    });
+
   }
 };
 
 
 PlomTs.prototype.setDataState = function(){
 
-  var S = this.stateName.length + this.driftName.length;
+  var names = this.stateName.concat(this.driftName);
+  var that = this;
 
-  this.dataState = [];
-  for(var i=0; i<this.data.length; i++){
-    this.dataState.push(new Array(1+S));
-    this.dataState[i][0] = this.data[i][0];
+  that.dataState = [];
+  for(var i=0; i<that.data.length; i++){
+    that.dataState.push(new Array(1+names.length));
+    that.dataState[i][0] = that.data[i][0];
 
-    for(var s=0; s<S; s++){
-      this.dataState[i][s+1] = new Array(3);
-      for(var j=0; j<3; j++){
-        this.dataState[i][s+1][j] = null;
+    names.forEach(function(name, s){
+      that.dataState[i][s+1] = new Array(3);
+
+      if(that.X){
+        that.dataState[i][s+1][0] = that.X.q5[name][i];
+        that.dataState[i][s+1][1] = that.X.mean[name][i];
+        that.dataState[i][s+1][2] = that.X.q95[name][i];
       }
-    }
+    });
+
   }
 };
+
+
 
 PlomTs.prototype.setDataPredRes = function(){
   this.dataPredRes = [];

@@ -121,6 +121,11 @@ p:before{
 
 /* review */
 
+.plom-graph{
+  width: 900px;
+  height: 400px;
+}
+
 .social-action{
   margin-left: 5px;
   float:right;

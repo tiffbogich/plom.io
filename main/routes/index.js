@@ -339,8 +339,8 @@ exports.diagnosticDetail = function(req, res, next){
     , h = parseInt(req.params.h, 10)
     , diagnostics = req.app.get('diagnostics');
 
-  diagnostics.findOne({theta_id: theta_id, h:h}, {detail:true}, function(err, doc){
-    res.send(doc.detail);
+  diagnostics.findOne({theta_id: theta_id, h:h}, {detail:true, X:true}, function(err, doc){
+    res.send(doc);
   });
 }
 

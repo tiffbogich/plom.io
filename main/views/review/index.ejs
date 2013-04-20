@@ -1,5 +1,6 @@
 <% include ../layout %>
 
+<script src="/javascripts/PlomPred.js"></script>
 <script src="/javascripts/PlomTs.js"></script>
 <script src="/javascripts/parmatrix.js"></script>
 <script src="/javascripts/corr.js"></script>
@@ -7,7 +8,7 @@
 <script src="/javascripts/trace.js"></script>
 <script src="/javascripts/autocorr.js"></script>
 <script src="/javascripts/view.js"></script>
-<script src="/javascripts/review.js"></script>
+<script src="/javascripts/test.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/plomGraphModel.js"></script>
 
@@ -46,7 +47,7 @@
             <a href="#model" data-toggle="tab">Model</a>
           </li>
           <li>
-            <a href="#intervention" data-toggle="tab">Intervention/Forecasting</a>
+            <a href="#forecast" data-toggle="tab">Forecasting</a>
           </li>
         </ul>
         
@@ -138,59 +139,92 @@
           </div><!-- end div#model -->
 
           
-          <!-- Model review -->
-          <div class="tab-pane" id="intervention">
-
+          <!-- Forecasting -->
+          <div class="tab-pane" id="forecast">
 
             <div class="row">
-              <div class="span9">
-                <h4>Intervention/forecasting</h4>
+              <div class="span8">
+                <h4>Forecasting</h4>
               </div>
-              <div class="span3">
-                <button id="runPredict" class="btn" type="button"><i class="icon-play"></i> Run</button>
-                <button id="stopPredict" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
+              <div class="span4">
+                <form class="form-inline social-action">
+                Forecast after the data for:
+                <select id="nExtra" class="input-small">
+                  <option value="0"> 0 years</option>
+                  <option value="1"> 1 years</option>
+                  <option value="2"> 2 years</option>
+                  <option value="3"> 3 years</option>
+                  <option value="4"> 4 years</option>
+                </select>
+                </form>
               </div>
+
             </div>
 
             <div class="row">
+              <div class="span12">
 
-              <div class="span9">
-                a
+                <!-- Trajectories plot -->
+                <div class="accordion" id="plotTrajPred">
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotTrajPred" href="#plotTrajPredContent">Time series</a>
+                    </div>
+
+                    <div id="plotTrajPredContent" class="accordion-body collapse in">
+                      <div class="accordion-inner">
+                        <div id="graphTrajPred" class="plom-graph"></div>
+                        <div id="tickState" class="tickGraph horizontal-scroll"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <!-- States plot and diffusions -->
+                <div class="accordion" id="plotStatePred">
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotStatePred" href="#plotStatePredContent">State Variables</a>
+                    </div>
+
+                    <div id="plotStatePredContent" class="accordion-body collapse">
+                      <div class="accordion-inner">
+                        <div id="graphStatePred" class="plom-graph"></div>
+                        <div id="tickState" class="tickGraph horizontal-scroll"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
+            </div>
 
-              <div class="span3">
-                
-                <select id="implPred">
-                  <option value="ode">Ordinary differential equation</option>
-                  <option value="sde">Stochastic differential equation</option>
-                  <option value="psr">Poisson process</option>
-                </select>
 
-                <p>
-                  dt:
-                  <input type="text" id="sPred" class="input-small"> <span>unit</span>
-                </p>
-
-                <p>
-                  Forecast for:
-                  <select id="nExtra" class="input-small">
-                    <option value="0"> 0 years</option>
-                    <option value="1"> 1 years</option>
-                    <option value="2"> 2 years</option>
-                    <option value="3"> 3 years</option>
-                    <option value="4"> 4 years</option>
+            <div class="row">
+              <div class="span8">
+                <form class="form-inline">
+                  <select id="implPred">
+                    <option value="ode">Ordinary differential equation</option>
+                    <option value="sde">Stochastic differential equation</option>
+                    <option value="psr">Poisson process</option>
                   </select>
-                </p>
-
-                <label class="checkbox">
-                  <input type="checkbox"> Intervention
-                </label>
-            
-                
+                  Integration time step: <input type="text" id="sPred" class="input-small"> <span>unit</span>                    
+                </form>
               </div>
-            </div>            
 
-          </div><!-- end div#intervention -->
+              <div class="span4">
+                <form class="form-inline social-action">
+                  <div class="btn-group">
+                    <button id="runPred" class="btn" type="button"><i class="icon-play"></i> Run</button>
+                    <button id="stopPred" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
+                    <button id="resetPred" class="btn" type="button"><i class="icon-refresh"></i> Reset</button>
+                  </div>
+                </form>
+              </div>
+            </div>       
+
+          </div><!-- end div#forecast -->
 
 
 

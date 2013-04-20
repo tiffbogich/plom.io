@@ -400,7 +400,6 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   app.set('users', new mongodb.Collection(db, 'users'));
   app.set('events', new mongodb.Collection(db, 'events'));
   app.set('components', new mongodb.Collection(db, 'components'));
-  app.set('diag', new mongodb.Collection(db, 'diag'));
 
   //TODO ensureIndex
 

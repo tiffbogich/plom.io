@@ -11,6 +11,7 @@ function Control(data){
   this.thetas = data.comps.thetas;
   this.summaries = [];
   this.detail;
+  this.X;
 
   var infector = [];
   this.process.model.forEach(function(r){
@@ -36,10 +37,10 @@ function Control(data){
     theta: this.theta,
     graphTrajId: 'graphTraj',
     graphStateId: 'graphState',
-    graphLikeId: "graphLike",
     graphPredResId: "graphPredRes",
     graphEssId: "graphEss"
   });
+
 
   //d3 plots
   this.updateCorr1 = undefined;
@@ -75,19 +76,23 @@ Control.prototype.thetaList = function(){
 
     $.getJSON('/diagnostic/'+ that.thetas[that.i]._id, function(summaries) {
       that.summaries = summaries;
+
+      console.log(summaries);
       that.summaryTable();
 
-      $.getJSON('/diagnostic/'+ that.thetas[that.i]._id + '/'+ summaries[0].h, function(detail) {
-        that.detail = detail;
+      $.getJSON('/diagnostic/'+ that.thetas[that.i]._id + '/'+ summaries[0].h, function(diagnostic) {
+        that.detail = diagnostic.detail;
 
-        that.updateCorr1 = that.updateCorr1 || plotCorr(detail, 0, 1, 1);
-        that.updateCorr2 = that.updateCorr2 || plotCorr(detail, 1, 0, 2);
-        that.updateDensity1 = that.updateDensity1 || plotDensity(detail, 0, 1);
-        that.updateDensity2 = that.updateDensity2 || plotDensity(detail, 1, 2);
-        that.updateTrace = that.updateTrace || plotTrace(detail, 0, 1);
-        that.updateAutocorr = that.updateAutocorr || plotAutocorr(detail,0,1);
+        that.updateCorr1 = that.updateCorr1 || plotCorr(that.detail, 0, 1, 1);
+        that.updateCorr2 = that.updateCorr2 || plotCorr(that.detail, 1, 0, 2);
+        that.updateDensity1 = that.updateDensity1 || plotDensity(that.detail, 0, 1);
+        that.updateDensity2 = that.updateDensity2 || plotDensity(that.detail, 1, 2);
+        that.updateTrace = that.updateTrace || plotTrace(that.detail, 0, 1);
+        that.updateAutocorr = that.updateAutocorr || plotAutocorr(that.detail,0,1);
 
-        that.updateMat = parMatrix(detail, that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2, that.updateTrace,that.updateAutocorr);
+        that.updateMat = parMatrix(that.detail, that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2, that.updateTrace,that.updateAutocorr);
+
+        $('.review-trace-id').first().trigger('click');
       });
 
     });
@@ -103,10 +108,11 @@ Control.prototype.summaryTable = function(){
   $('.review-trace-id').on('click', function(e){
 
     var h = parseInt($(this).val(), 10);
-    that.updateTheta(that.thetas[that.i], that.thetas[that.i].design.cmd);
 
-    $.getJSON('/diagnostic/'+ that.thetas[that.i]._id + '/' + h, function(detail) {
-      that.updateMat(detail);
+    $.getJSON('/diagnostic/'+ that.thetas[that.i]._id + '/' + h, function(diagnostic) {
+      that.X = diagnostic.X;
+      that.updateMat(diagnostic.detail);
+      that.updateTheta(that.thetas[that.i], that.thetas[that.i].design.cmd);
     });
 
   });
@@ -133,7 +139,7 @@ Control.prototype.updateTheta = function(theta, cmd){
   this._theta();
 
   //replot simulation and filters
-  this.plomTs.updateTheta(this.theta);
+  this.plomTs.updateTheta(this.theta, this.X);
 };
 
 
@@ -274,7 +280,7 @@ Control.prototype._theta = function(){
   $('input.tick_traj')
     .on('change', function(){
       that.plomTs.graphTraj.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
-      that.plomTs.graphTraj.setVisibility(that.N_TS+parseInt($(this).val(), 10), $(this).is(':checked'));
+      that.plomTs.graphTraj.setVisibility(that.plomTs.N_TS+parseInt($(this).val(), 10), $(this).is(':checked'));
     })
     .trigger('change');
 
