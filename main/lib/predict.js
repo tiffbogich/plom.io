@@ -12,7 +12,7 @@ module.exports = function(gfs, predictPath, files , callback){
 
     var myFile = files.filter(function(f){return f.metadata.type === 'X';})[0]
       , readstream = gfs.createReadStream({_id: myFile._id})
-      , writestream = fs.createWriteStream(path.join(predictPath, 'X_0.csv'))
+      , writestream = fs.createWriteStream(path.join(predictPath, 'X_'+ myFile.metadata.h +'.csv'))
       , mycsv = csv()
       , mkeep = [];
 
@@ -30,7 +30,7 @@ module.exports = function(gfs, predictPath, files , callback){
         //keep only lines of best.csv where we have X.csv (mkeep)                          
         var myFile = files.filter(function(f){return f.metadata.type === 'best';})[0]
           , readstream = gfs.createReadStream({_id: myFile._id})
-          , writestream = fs.createWriteStream(path.join(predictPath, 'predict_0.csv'))
+          , writestream = fs.createWriteStream(path.join(predictPath, 'predict_'+ myFile.metadata.h +'.csv'))
           , mycsv = csv();
 
         readstream.pipe(zlib.createUnzip()).pipe(mycsv);
