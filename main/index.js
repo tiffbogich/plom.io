@@ -80,8 +80,8 @@ app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 //discussion
 app.post('/discuss/:type', secure, csrf, review.postDiscuss);
 
-//issues
-app.get('/issues', secure, csrf, function(req, res){res.render('issues.ejs')});
+//request
+app.get('/requests', secure, csrf, function(req, res){res.render('requests.ejs')});
 
 //social network
 app.post('/followcontext', secure, csrf, user.postFollow);

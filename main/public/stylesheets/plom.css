@@ -5,7 +5,7 @@ label.radio.inline.right{
 }
 
 /* user */
-div.create, div.follow, div.comment{
+div.create, div.request, div.comment{
   display: inline-block;
   font-size: 11px;
   padding: 1px 4px;
@@ -16,9 +16,8 @@ div.create, div.follow, div.comment{
   border: 0;
   text-align: center;
 
-
 }
-div.follow{
+div.request{
   background-color: rgba(0,129,0,0.5);
   width: 12%;
 }

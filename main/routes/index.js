@@ -350,44 +350,26 @@ exports.forecast = function(req, res, next){
     , theta_id = req.params.theta_id
     , h = parseInt(req.params.h, 10);
 
-  var db = req.app.get('db');
-  var gfs = Grid(db, mongodb);
+  var predictPath = path.join(process.env.HOME, 'built_plom_models', link_id, 'model', theta_id);
+  fs.exists(predictPath, function (exists) {
 
-  gfs.files.find({ 'metadata.theta_id': new ObjectID(theta_id), 'metadata.type': {$in: ['best', 'X', 'hat']}, 'metadata.h':h }, {_id:true, metadata:true}).toArray(function (err, files) {
-    if (err) return callback(err);
+    if(exists){
+      res.send({ready:true});
+    } else {
+      var db = req.app.get('db');
+      var gfs = Grid(db, mongodb);
 
-    var myFile = files.filter(function(f){return f.metadata.type === 'hat';})[0]
-      , readstream = gfs.createReadStream({_id: myFile._id})
-      , mycsv = csv()
-      , hat = [];
+      gfs.files.find({ 'metadata.theta_id': new ObjectID(theta_id), 'metadata.type': {$in: ['best', 'X']}, 'metadata.h':h }, {_id:true, metadata:true}).toArray(function (err, files) {
+        if (err) return callback(err);
+       
+        writePredictFiles(gfs, predictPath, files, function(err){
+          if (err) return next(err);
+          res.send({ready:true});
+        })
+      }); //end toArray
+    } //end else
 
-    readstream.pipe(zlib.createUnzip()).pipe(mycsv);
-
-    mycsv
-      .transform(function(row,i){
-        if(i === 0 ){
-          return row;
-        } else {
-          return row.map(parseFloat);
-        }
-      })
-      .on('record', function(row, i){     
-        hat.push(row);
-      })
-      .on('end', function(count){        
-        var predictPath = path.join(process.env.HOME, 'built_plom_models', link_id, 'model', theta_id);
-        fs.exists(predictPath, function (exists) {
-          if(exists){
-            res.send(hat);
-          } else {
-            writePredictFiles(gfs, predictPath, files, function(err){
-              if (err) return next(err);
-              res.send(hat);              
-            })
-          }
-        }); //end fs.exists
-      }); //end on 'end'
-  }); //end toArray
+  }); //end fs.exists
 
 }
 
