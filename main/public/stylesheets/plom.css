@@ -1,3 +1,9 @@
+/* general */
+
+.span39{
+  width: 280px;
+}
+
 /* issues */
 label.radio.inline.right{
 	float:right;

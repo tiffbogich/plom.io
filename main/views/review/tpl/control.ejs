@@ -14,22 +14,26 @@
 
 
   <label class="control-label" for="s">dt</label>
-  <input type="text" id="s" class="input-mini"> <span>unit</span>
+  <div class="input-append">
+    <input type="text" id="s" class="input-mini">
+    <span class="add-on">unit</span>
+  </div>
 
 
   <label class="checkbox">
-    <input type="checkbox" name="no_dem_sto" value="no_dem_sto"> no dem sto
+    <input type="checkbox" name="no_dem_sto" value="no_dem_sto"> no dem
   </label>
   <label class="checkbox">
-    <input type="checkbox" id="no_env_sto" value="no_env_sto"> no env sto
+    <input type="checkbox" id="no_env_sto" value="no_env_sto"> no env
   </label>
   <label class="checkbox">
     <input type="checkbox" id="no_drift" value="no_drift"> no drift
   </label>
 
-  <input type="text" id="J" class="input-mini">
-  <label class="control-label" for="J">particles</label>
-
+  <div class="input-append">
+    <input type="text" id="J" class="input-mini">
+    <span class="add-on">particles</span>
+  </div>
 
   <div class="btn-group pull-right">
     <button id="run" class="run btn" type="button"><i class="icon-play"></i> Run</button>

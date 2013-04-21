@@ -202,7 +202,13 @@
                     <option value="sde">Stochastic differential equation</option>
                     <option value="psr">Poisson process</option>
                   </select>
-                  Integration time step: <input type="text" id="sPred" class="input-small"> <span>unit</span>                    
+
+                  <label class="control-label" for="sPred">Integration time step: </label>
+                  <div class="input-append">
+                    <input type="text" id="sPred" class="input-mini">
+                    <span class="add-on">unit</span>
+                  </div>
+
 
                   <div class="btn-group pull-right">
                     <button id="runPred" class="btn" type="button"><i class="icon-play"></i> Run</button>
