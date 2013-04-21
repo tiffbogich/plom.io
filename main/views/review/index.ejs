@@ -94,6 +94,8 @@
             <!-- Filtering -->
             <div id="filtering"><% include filtering %></div>
 
+            <!-- Controls (templated) -->
+            <div id="control"></div>
 
             <!-- Credibility intervals / Correlation / review tabs -->
 
@@ -113,18 +115,6 @@
 
               <!-- cred -->
               <div class="tab-pane active" id="cred">
-
-
-                <!-- Controls -->
-                <div class="row">
-                  <div class="span4">
-                    <div>
-                      <button id="run" class="btn" type="button"><i class="icon-play"></i> Run</button>
-                      <button id="stop" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
-                    </div>
-                    <div id="control"></div>
-                  </div>
-                </div>
 
               </div>
 
@@ -205,7 +195,7 @@
 
 
             <div class="row">
-              <div class="span8">
+              <div class="span12">
                 <form class="form-inline">
                   <select id="implPred">
                     <option value="ode">Ordinary differential equation</option>
@@ -213,16 +203,13 @@
                     <option value="psr">Poisson process</option>
                   </select>
                   Integration time step: <input type="text" id="sPred" class="input-small"> <span>unit</span>                    
-                </form>
-              </div>
 
-              <div class="span4">
-                <form class="form-inline social-action">
-                  <div class="btn-group">
+                  <div class="btn-group pull-right">
                     <button id="runPred" class="btn" type="button"><i class="icon-play"></i> Run</button>
                     <button id="stopPred" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
                     <button id="resetPred" class="btn" type="button"><i class="icon-refresh"></i> Reset</button>
                   </div>
+
                 </form>
               </div>
             </div>       

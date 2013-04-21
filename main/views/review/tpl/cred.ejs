@@ -1,0 +1,25 @@
+<div id="ctr-theta">
+  <div id="slider" class="hidden"></div>
+
+  <table>
+    <tr>
+      <th></th>
+      <th>min</th>
+      <th>value</th>
+      <th>max</th>
+    </tr>
+
+    <% p.parameter.concat(p.state, l.parameter).forEach(function(par){ %>
+    <% if (par.id in t.parameter) { %>
+    <% for(var group in t.parameter[par.id].group){ %>
+    <tr>
+      <td><%= par.id %>: <%= group.split('__').join('; ') %></td>
+      <td><input type="text" name="<%= par.id %>___<%= group %>___min"   value="<%= t.parameter[par.id]['group'][group]['min']['value'] %>"   class="input-mini theta" /></td>
+      <td><input type="text" name="<%= par.id %>___<%= group %>___guess" value="<%= t.parameter[par.id]['group'][group]['guess']['value'] %>" class="input-mini theta guess" /></td>
+      <td><input type="text" name="<%= par.id %>___<%= group %>___max"   value="<%= t.parameter[par.id]['group'][group]['max']['value'] %>"   class="input-mini theta" /></td>
+
+    </tr>
+    <% } }; });  %>
+  </table>
+
+</div>

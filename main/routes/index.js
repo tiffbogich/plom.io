@@ -303,19 +303,27 @@ exports.review = function(req, res, next){
             comps.thetas = thetas.map(function(theta){
               return describeTheta(theta, comps.process, comps.link);
             });
+            
+            //send the templates TODO browserify...
+            async.parallel({ 
+              control: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','control.ejs'), 'utf8', cb)},
+              cred: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','cred.ejs'), 'utf8', cb)},
+              summaryTable: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','summary_table.ejs'), 'utf8', cb)},
+              parameters: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','parameters.ejs'), 'utf8', cb)},
+              ticks: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8', cb)},
+              reviews: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','reviews.ejs'), 'utf8', cb)},
+              model: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','model.ejs'), 'utf8', cb)},
+              discuss: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','discuss.ejs'), 'utf8', cb)},
+            },
+                           function(err, tpl){
+                             if(err) return next(err);
 
-            res.json({
-              tpl:{ //TODO browserify...
-                control: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','control.ejs'), 'utf8'),
-                summaryTable: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','summary_table.ejs'), 'utf8'),
-                parameters: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','parameters.ejs'), 'utf8'),
-                ticks: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8'),
-                reviews: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','reviews.ejs'), 'utf8').replace(/<%= token %>/g, req.session._csrf),
-                model: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','model.ejs'), 'utf8').replace(/<%= token %>/g, req.session._csrf),
-                discuss: fs.readFileSync(path.join(req.app.get('views'),'review', 'tpl','discuss.ejs'), 'utf8').replace(/<%= token %>/g, req.session._csrf)
-              },
-              comps: comps
-            });
+                             for(var key in tpl){
+                               tpl[key] = tpl[key].replace(/<%= token %>/g, req.session._csrf);
+                             }
+                             
+                             res.json({tpl:tpl, comps: comps});                             
+                           });
           });
       }
     });

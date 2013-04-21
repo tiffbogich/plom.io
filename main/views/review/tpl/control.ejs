@@ -1,77 +1,39 @@
-<ul class="nav nav-tabs" id="controlTab">
-  <li class="active">
-    <a href="#ctr-methods" data-toggle="tab">Methods</a>
-  </li>
-  <li>
-    <a href="#ctr-theta" data-toggle="tab">Theta</a>
-  </li>
-</ul>
+<form class="form-inline">
 
-<div class="tab-content">
+  <select id="algo" class="input-small">
+    <option value="simul">Simul</option>
+    <option value="smc">SMC</option>
+    <option value="kalman">EKF</option>
+  </select>
 
-  <!-- Methods -->
-  <div class="tab-pane active" id="ctr-methods">
-
-    <form>
+  <select id="impl" class="input-small">
+    <option value="ode">ODE</option>
+    <option value="sde">SDE</option>
+    <option value="psr">PSR</option>
+  </select>
 
 
-      <select id="algo">
-        <option value="simul">Simulation</option>
-        <option value="smc">Sequential Monte Carlo</option>
-        <option value="kalman">Extended Kalman Filter</option>
-      </select>
-
-      <select id="impl">
-        <option value="ode">Ordinary differential equation</option>
-        <option value="sde">Stochastic differential equation</option>
-        <option value="psr">Poisson process</option>
-      </select>
-
-      <label class="checkbox">
-        <input type="checkbox" name="no_dem_sto" value="no_dem_sto"> discard demographic stochasticity
-      </label>
-      <label class="checkbox">
-        <input type="checkbox" id="no_env_sto" value="no_env_sto"> discard environmental stochasticity
-      </label>
-      <label class="checkbox">
-        <input type="checkbox" id="no_drift" value="no_drift"> discard drift
-      </label>
-
-      <label class="control-label" for="J">Number of particles/ realisations</label>
-      <input type="text" id="J" class="input-small">
+  <label class="control-label" for="s">dt</label>
+  <input type="text" id="s" class="input-mini"> <span>unit</span>
 
 
+  <label class="checkbox">
+    <input type="checkbox" name="no_dem_sto" value="no_dem_sto"> no dem sto
+  </label>
+  <label class="checkbox">
+    <input type="checkbox" id="no_env_sto" value="no_env_sto"> no env sto
+  </label>
+  <label class="checkbox">
+    <input type="checkbox" id="no_drift" value="no_drift"> no drift
+  </label>
 
-      <label class="control-label" for="s">Integration time step</label>
-      <input type="text" id="s" class="input-small"> <span>unit</span>
+  <input type="text" id="J" class="input-mini">
+  <label class="control-label" for="J">particles</label>
 
-    </form>
 
+  <div class="btn-group pull-right">
+    <button id="run" class="btn" type="button"><i class="icon-play"></i> Run</button>
+    <button id="stop" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
   </div>
 
-  <!-- Parameters -->
-  <div class="tab-pane" id="ctr-theta">
-    <div id="slider" class="hidden"></div>
-
-    <table>
-      <tr>
-        <th></th>
-        <th>min</th>
-        <th>value</th>
-        <th>max</th>
-      </tr>
-
-      <% p.parameter.concat(p.state, l.parameter).forEach(function(par){ %>
-      <% if (par.id in t.parameter) { %>
-      <% for(var group in t.parameter[par.id].group){ %>
-      <tr>
-        <td><%= par.id %>: <%= group.split('__').join('; ') %></td>
-        <td><input type="text" name="<%= par.id %>___<%= group %>___min"   value="<%= t.parameter[par.id]['group'][group]['min']['value'] %>"   class="input-mini theta" /></td>
-        <td><input type="text" name="<%= par.id %>___<%= group %>___guess" value="<%= t.parameter[par.id]['group'][group]['guess']['value'] %>" class="input-mini theta guess" /></td>
-        <td><input type="text" name="<%= par.id %>___<%= group %>___max"   value="<%= t.parameter[par.id]['group'][group]['max']['value'] %>"   class="input-mini theta" /></td>
-
-      </tr>
-      <% } }; });  %>
-    </table>
-  </div>
-</div>
+</form>
