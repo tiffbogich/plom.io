@@ -128,6 +128,7 @@ Control.prototype.updateTheta = function(theta, cmd){
 
   //render
   $('#control').html(this.compiled.control({c:this.context, p:this.process, l:this.link, t:this.theta}));
+  $('#cred').html(this.compiled.cred({c:this.context, p:this.process, l:this.link, t:this.theta}));
   $('#tickTraj').html(this.compiled.ticks({'names': this.plomTs.getTrajNames() , prefix: 'traj'}));
   $('#tickState').html(this.compiled.ticks({'names': this.plomTs.getStateNames() , prefix: 'state'}));
   $('#tickPredRes').html(this.compiled.ticks({'names': this.plomTs.getTrajNames() , prefix: 'predRes'}));

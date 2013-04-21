@@ -232,11 +232,11 @@ $(document).ready(function() {
 
       });
 
-      $('#stop').click(function(){
+      $("#control").on('click', '.stop', function(){
         socket.emit('killme', true);
       });
 
-      $("#run").click(function(){
+      $("#control").on('click', '.run', function(){
         if(plomGlobal.canRun){
           plomGlobal.canRun = false;
           ctrl.plomTs.run(socket, ctrl.getMethod());
