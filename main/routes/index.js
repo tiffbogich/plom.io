@@ -364,7 +364,19 @@ exports.forecast = function(req, res, next){
        
         writePredictFiles(gfs, predictPath, files, function(err){
           if (err) return next(err);
-          res.send({ready:true});
+
+          //add theta
+          var components = req.app.get('components');
+          components.findOne({_id: new ObjectID(theta_id)}, {results:true}, function(err, theta){
+            if (err) return next(err);
+
+            theta = theta.results.filter(function(x){return x.trace_id === h})[0].theta;
+            fs.writeFile(path.join(predictPath, 'theta_'+ h +'.json'), JSON.stringify(theta), function(err){
+              if (err) return next(err);
+              res.send({ready:true});
+            });
+            
+          });
         })
       }); //end toArray
     } //end else

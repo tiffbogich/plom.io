@@ -9,6 +9,7 @@
 <script src="/javascripts/autocorr.js"></script>
 <script src="/javascripts/view.js"></script>
 <script src="/javascripts/test.js"></script>
+<script src="/javascripts/review.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/plomGraphModel.js"></script>
 
@@ -41,10 +42,10 @@
         
         <ul class="nav nav-tabs" id="reviewTab">
           <li class="active">
-            <a href="#theta" data-toggle="tab">Results</a>
+            <a href="#model" data-toggle="tab">Model</a>
           </li>
           <li>
-            <a href="#model" data-toggle="tab">Model</a>
+            <a href="#theta" data-toggle="tab">Results</a>
           </li>
           <li>
             <a href="#forecast" data-toggle="tab">Forecasting</a>
@@ -53,8 +54,28 @@
         
         <div class="tab-content">
 
-          <div class="tab-pane active" id="theta">
+          <!-- Model -->
+          <div class="tab-pane active" id="model">
 
+            <div class="row">
+              <div class="span10">
+                <h4><%= process.name  + ' - ' + link.name %></h4>
+              </div>
+              <div class="span2">
+                <form>
+                  <button class="btn social-action" type="submit"><i class="icon-download"></i> Fork model</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- templated -->
+            <div id="modelTpl"></div>            
+
+          </div><!-- end div#model -->
+
+
+          <!-- theta -->
+          <div class="tab-pane" id="theta">
 
             <div class="row">
               <div class="span10">
@@ -119,25 +140,6 @@
           </div> <!-- end div#theta -->
 
 
-          <!-- Model review -->
-          <div class="tab-pane" id="model">
-
-            <div class="row">
-              <div class="span10">
-                <h4><%= context.disease.join('; ')  + ' / ' + context.name %></h4>
-              </div>
-              <div class="span2">
-                <form>
-                  <button class="btn social-action" type="submit"><i class="icon-download"></i> Fork model</button>
-                </form>
-              </div>
-            </div>
-
-            <!-- templated -->
-            <div id="modelTpl"></div>            
-
-          </div><!-- end div#model -->
-
           
           <!-- Forecasting -->
           <div class="tab-pane" id="forecast">
@@ -150,11 +152,9 @@
                 <form class="form-inline social-action">
                 Forecast after the data for:
                 <select id="nExtra" class="input-small">
-                  <option value="0"> 0 years</option>
-                  <option value="1"> 1 years</option>
-                  <option value="2"> 2 years</option>
-                  <option value="3"> 3 years</option>
-                  <option value="4"> 4 years</option>
+                  <% for(var i=0; i<11; i++){ %>
+                  <option value="<%= i %>"> <%= i %> years</option>
+                  <% } %>
                 </select>
                 </form>
               </div>
@@ -173,7 +173,7 @@
 
                     <div id="plotTrajPredContent" class="accordion-body collapse in">
                       <div class="accordion-inner">
-                        <div id="graphTrajPred" class="plom-graph"></div>
+                        <div id="graphTrajPred" class="plom-graph-forecast"></div>
                         <div id="tickState" class="tickGraph horizontal-scroll"></div>
                       </div>
                     </div>
@@ -190,7 +190,7 @@
 
                     <div id="plotStatePredContent" class="accordion-body collapse">
                       <div class="accordion-inner">
-                        <div id="graphStatePred" class="plom-graph"></div>
+                        <div id="graphStatePred" class="plom-graph-forecast"></div>
                         <div id="tickState" class="tickGraph horizontal-scroll"></div>
                       </div>
                     </div>

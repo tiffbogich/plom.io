@@ -121,9 +121,10 @@ p:before{
 
 /* review */
 
-.plom-graph{
+.plom-graph-forecast{
   width: 900px;
   height: 400px;
+  cursor:e-resize;
 }
 
 .social-action{

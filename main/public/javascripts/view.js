@@ -41,7 +41,6 @@ function Control(data){
     graphEssId: "graphEss"
   });
 
-
   //d3 plots
   this.updateCorr1 = undefined;
   this.updateCorr2 = undefined;
@@ -89,7 +88,6 @@ Control.prototype.thetaList = function(){
         that.updateDensity2 = that.updateDensity2 || plotDensity(that.detail, 1, 2);
         that.updateTrace = that.updateTrace || plotTrace(that.detail, 0, 1);
         that.updateAutocorr = that.updateAutocorr || plotAutocorr(that.detail,0,1);
-
         that.updateMat = parMatrix(that.detail, that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2, that.updateTrace,that.updateAutocorr);
 
         $('.review-trace-id').first().trigger('click');

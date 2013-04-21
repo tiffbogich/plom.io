@@ -104,56 +104,55 @@ function dispatch(data, socket, partMsg, emitFlag){
 function handleErrUpd(prog, data, socket, partErr, updateMsg, emitFlag){
     //handles errors and updates
 
-    var dataArray;
+  var dataArray;
 
-    //we concatenate cut messages:
-    if (data[data.length-1] === '\n'){
-        data = partErr.msg + data;
-        partErr.msg = '';
+  //we concatenate cut messages:
+  if (data[data.length-1] === '\n'){
+    data = partErr.msg + data;
+    partErr.msg = '';
 
-        dataArray = data.split('\n');
-        //	console.log(dataArray);
+    dataArray = data.split('\n');
+    //	console.log(dataArray);
 
-        for(var i=0; i< dataArray.length ; i++){
-            if(dataArray[i]){
-                try{//just to be on the safe side and avoid a parsing error if the JSON string is cut
-                    var mymsg = JSON.parse(dataArray[i]);
-                    switch (mymsg.flag) {
-                    case 'err':
+    for(var i=0; i< dataArray.length ; i++){
+      if(dataArray[i]){
+        try{//just to be on the safe side and avoid a parsing error if the JSON string is cut
+          var mymsg = JSON.parse(dataArray[i]);
+          switch (mymsg.flag) {
+          case 'err':
 
-                        socket.emit(emitFlag, mymsg);
-                        break;
+            socket.emit(emitFlag, mymsg);
+            break;
 
-                    case 'upd':
+          case 'upd':
 
-                        //TODO add setTimeout to ensure that the browser is not overflowed...
-                        //			console.log('sending', JSON.stringify(updateMsg.msg));
-                        var now = new Date();
-                        if ((now - updateMsg.lastTime) > updateMsg.lag) {
-                            //console.log('now');
-                            updateMsg.lastTime = now;
-                            prog.stdin.write(JSON.stringify(updateMsg.msg)+'\n', encoding="utf8");
-                            updateMsg.msg = {}; //reset
-                        } else {
-                            updateMsg.timeoutId = setTimeout(function() {
-                                //console.log('wait');
-                                updateMsg.lastTime = new Date();
-                                prog.stdin.write(JSON.stringify(updateMsg.msg)+'\n', encoding="utf8");
-                                updateMsg.msg = {}; //reset
-                            }, updateMsg.lag);
-                        }
-
-                        break;
-
-                    }
-                }
-                catch(e){console.log(e)};
+            //console.log('sending', JSON.stringify(updateMsg.msg));
+            var now = new Date();
+            if ((now - updateMsg.lastTime) > updateMsg.lag) {
+              //console.log('now');
+              updateMsg.lastTime = now;
+              prog.stdin.write(JSON.stringify(updateMsg.msg)+'\n', encoding="utf8");
+              updateMsg.msg = {}; //reset
+            } else {
+              updateMsg.timeoutId = setTimeout(function() {
+                //console.log('wait');
+                updateMsg.lastTime = new Date();
+                prog.stdin.write(JSON.stringify(updateMsg.msg)+'\n', encoding="utf8");
+                updateMsg.msg = {}; //reset
+              }, updateMsg.lag);
             }
+
+            break;
+
+          }
         }
+        catch(e){console.log(e)};
+      }
     }
-    else{ //message is incomplete, we wait for the next part...
-        partErr.msg = partErr.msg + data;
-    }
+  }
+  else{ //message is incomplete, we wait for the next part...
+    partErr.msg = partErr.msg + data;
+  }
 
 };
 
@@ -179,6 +178,7 @@ function wsServer(server) {
                        lag: 10}; //we wait at least lag ms in between msg in order not to saturate the client with msgs
 
       if(plomProg.hasOwnProperty(whatToDo.exec.exec)){
+
         var cwd = path.join(process.env.HOME, 'built_plom_models', whatToDo.plomModelId, 'model');
         var prog = spawn(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: cwd});
         prog.stdout.setEncoding('utf8');
@@ -188,7 +188,23 @@ function wsServer(server) {
 
         console.log(plomProg[whatToDo.exec.exec]['bin'], whatToDo.exec.opt, {cwd: cwd});
         console.log(prog.pid);
-        prog.stdin.write(JSON.stringify(whatToDo.theta)+'\n', encoding="utf8");
+
+        if(whatToDo.theta){
+          prog.stdin.write(JSON.stringify(whatToDo.theta)+'\n', encoding="utf8");
+        } else { //prediction, use fit to generate a list of theta.json and pipe it to prog
+          var fitOpt = [
+            'predict', 
+            path.join(cwd, whatToDo.plomThetaId, 'theta_' + whatToDo.plomTraceId +'.json'), 
+            whatToDo.n, 
+            path.join(cwd, whatToDo.plomThetaId, 'X_' + whatToDo.plomTraceId + '.csv'), 
+            path.join(cwd, whatToDo.plomThetaId, 'predict_' + whatToDo.plomTraceId + '.csv')
+          ];
+
+          console.log(fitOpt);
+
+          var fit = spawn('fit', fitOpt, {cwd: cwd});
+          fit.stdout.pipe(prog.stdin, { end: false });
+        }
 
         prog.stderr.on('data', function (data) {
           //console.log(data.toString('utf8'));
@@ -220,7 +236,7 @@ function wsServer(server) {
         });
 
       } else {
-        socket.emit('info', {flag:'err', msg: 'Critical failure: ' + whatToDo.exec.exec + ' is not a PLoM program. This incident and your IP have been reported'});
+        socket.emit('info', {flag:'err', msg: 'Critical failure: ' + whatToDo.exec.exec + ' is not a PLoM program.'});
         socket.emit('theEnd', 'prog end');
       }
 

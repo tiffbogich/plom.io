@@ -2,12 +2,13 @@
   <div class="span12">
 
     <div class="accordion" id="accPmodel">
+      <!-- Process model -->
       <div class="accordion-group">
         <div class="accordion-heading">
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accPmodel" href="#accPmodelContent">Process Model</a>
         </div>
 
-        <div id="accPmodelContent" class="accordion-body collapse">
+        <div id="accPmodelContent" class="accordion-body collapse in">
           <div class="accordion-inner">
             <!-- placeholder for d3 viz of compartmental model -->
             <div id="pgraph<%= link._id %>" class="process-graph"></div>
@@ -57,14 +58,13 @@
             
           </div>
         </div>
-      </div>
-    </div> <!-- end accordion process model -->
+      </div> <!-- end pmodel -->
 
 
-    <div class="accordion" id="accOmodel">
+      <!-- Obervation model -->
       <div class="accordion-group">
         <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accOmodel" href="#accOmodelContent">Observation Model</a>
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accPmodel" href="#accOmodelContent">Observation Model</a>
         </div>
 
         <div id="accOmodelContent" class="accordion-body collapse">
@@ -146,7 +146,7 @@
                 </div>  
                 
               </div>
-                           
+              
             </div>
 
             <hr/>    
@@ -154,76 +154,79 @@
             
           </div>
         </div>
-      </div>
-    </div> <!-- end accordion observation model -->
+      </div>  <!-- end omodel -->
 
 
-    <div class="accordion" id="accPrior">
+
+
+      <!-- prior -->
       <div class="accordion-group">
         <div class="accordion-heading">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accPrior" href="#accPriorContent">Priors</a>
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accPmodel" href="#accPriorContent">Priors</a>
         </div>
 
         <div id="accPriorContent" class="accordion-body collapse">
           <div class="accordion-inner">
 
-                <% process.parameter.concat(process.state, link.parameter).forEach(function(par){
-                   if (par.id in theta.parameter) {
-                   for(var group in theta.parameter[par.id].group){ %>
-                
-                <div class="row">
-                  <div class="span5">
-                    <a href="#" data-toggle="tooltip" title="<%= theta.parameter[par.id].comment %>"><%= par.id %>: <%= group.split('__').join('; ') %></a>                
+            <% process.parameter.concat(process.state, link.parameter).forEach(function(par){
+               if (par.id in theta.parameter) {
+               for(var group in theta.parameter[par.id].group){ %>
+            
+            <div class="row">
+              <div class="span5">
+                <a href="#" data-toggle="tooltip" title="<%= theta.parameter[par.id].comment %>"><%= par.id %>: <%= group.split('__').join('; ') %></a>                
+                <ul>
+                  <li>
+                    distribution: <%= theta.parameter[par.id]['group'][group]['prior']['value'] %>
+                  </li>
+                  <li>
+                    min: <%= theta.parameter[par.id]['group'][group]['min']['value'] %>
+                  </li>
+                  <li>
+                    max: <%= theta.parameter[par.id]['group'][group]['max']['value'] %>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="span5">
+                <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussPrior_<%= par.id + '___' + group %>"><i class="icon-comment"></i> Discuss</button>                
+
+                <!-- discussion on the observed variable -->
+                <div id="discussPrior_<%= par.id + '___' + group %>" class="collapse">
+                  <div class="thread">
+                    <% if (theta.parameter[par.id]['group'][group]['prior']['discussion'] && theta.parameter[par.id]['group'][group]['prior']['discussion'].length){ %>
                     <ul>
-                      <li>
-                        distribution: <%= theta.parameter[par.id]['group'][group]['prior']['value'] %>
-                      </li>
-                      <li>
-                        min: <%= theta.parameter[par.id]['group'][group]['min']['value'] %>
-                      </li>
-                      <li>
-                        max: <%= theta.parameter[par.id]['group'][group]['max']['value'] %>
-                      </li>
+                      <% theta.parameter[par.id]['group'][group]['prior']['discussion'].forEach(function(d){ %>
+                      <li><%= d.username %> on <%= d.date %></li>
+                      <li><%= d.body %></li>                
+                      <% }); %>
                     </ul>
+                    <% } %>
                   </div>
 
-                  <div class="span5">
-                    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#discussPrior_<%= par.id + '___' + group %>"><i class="icon-comment"></i> Discuss</button>                
-
-                    <!-- discussion on the observed variable -->
-                    <div id="discussPrior_<%= par.id + '___' + group %>" class="collapse">
-                      <div class="thread">
-                        <% if (theta.parameter[par.id]['group'][group]['prior']['discussion'] && theta.parameter[par.id]['group'][group]['prior']['discussion'].length){ %>
-                        <ul>
-                          <% theta.parameter[par.id]['group'][group]['prior']['discussion'].forEach(function(d){ %>
-                          <li><%= d.username %> on <%= d.date %></li>
-                          <li><%= d.body %></li>                
-                          <% }); %>
-                        </ul>
-                        <% } %>
-                      </div>
-
-                      <div>
-                        <form class="discuss" action="/discuss/prior" method="post">
-                          <textarea rows="2" class="span4" name="body"></textarea>
-                          <input type="hidden" name="discussion_id" value="<%= par.id + ':' + group %>"/>
-                          <input type="hidden" name="_csrf" value="<%= token %>"/>
-                          <p><button class="btn" type="submit">Submit</button></p>
-                        </form>
-                      </div>
-                    </div>  
-                    
+                  <div>
+                    <form class="discuss" action="/discuss/prior" method="post">
+                      <textarea rows="2" class="span4" name="body"></textarea>
+                      <input type="hidden" name="discussion_id" value="<%= par.id + ':' + group %>"/>
+                      <input type="hidden" name="_csrf" value="<%= token %>"/>
+                      <p><button class="btn" type="submit">Submit</button></p>
+                    </form>
                   </div>
-
-                </div>
-
-                <hr/>
+                </div>  
                 
-                <% } } }); %>
+              </div>
+
+            </div>
+
+            <hr/>
+            
+            <% } } }); %>
           </div>                       
         </div>
       </div>
-    </div> <!-- end accordion prior -->
-      
+    </div> <!-- end  prior -->
+    
+
+
   </div>
 </div>

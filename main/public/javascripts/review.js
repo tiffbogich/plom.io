@@ -2,16 +2,11 @@ var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 
-  $('#reviewTab a[href=#theta]').tab('show');
-  $('#reviewModelTab a[href=#review-context]').tab('show');
+  $('#reviewTab a[href=#model]').tab('show');
 
   $.getJSON('/review', function(data) {
 
     var ctrl = new Control(data);
-
-    $.getJSON('/forecast/' + ctrl.link._id + '/' + ctrl.theta._id + '/0', function(data) {
-      console.log(data);
-    });
 
     ctrl.thetaList();
     ctrl.updateTheta(ctrl.theta, ctrl.theta.design.cmd);

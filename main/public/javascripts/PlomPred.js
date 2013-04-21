@@ -6,6 +6,7 @@
  * process (from process.json)
  * link (from link.json)
  * theta  (from theta.json)
+ * theta_id (from theta.json)
  * X (from diagnostic)
  * graphTrajId, an id for the traj plot
  * graphStateId, an id for the state variable plots
@@ -16,6 +17,10 @@ function PlomPred(options) {
   for(var o in options){
     this[o] = options[o];
   }
+
+
+  this.indexDataClicked = 0;
+
 
   this.N_TS = this.context.time_series.length;
   this.N_CAC = this.theta.partition['variable_population']['group'].length;
@@ -30,7 +35,6 @@ function PlomPred(options) {
   }
 
 
-
   var stateName = [];
   this.process.state.forEach(function(s){
     options.context.population.forEach(function(g){
@@ -39,10 +43,14 @@ function PlomPred(options) {
   });
   this.stateName = stateName;
 
+
+  this.setDriftName();
+
+  this.allStateName = stateName.concat(this.driftName);
+
   this.tsName = this.context.time_series.map(function(x){return x.id;});  
 
-  this.isDrift =  (('diffusion' in this.process) && this.process.diffusion.length);
-  this.setDriftName();
+
 
   this.offsetHat = 1+this.N_PAR_SV*this.N_CAC*3;
   this.offsetDriftHat = this.offsetHat+ this.N_TS*3;
@@ -50,15 +58,8 @@ function PlomPred(options) {
   this.setDataTraj(0);
   this.graphTraj = this.makeGraphTraj();
 
-  this.setDataState(0);
+  this.setDataState();
   this.graphState = this.makeGraphState();
-
-
-
-  //prediction specific
-  this.unit = this.context.frequency;
-  this.indexDataClicked = 1;
-
 
 };
 
@@ -66,7 +67,7 @@ function PlomPred(options) {
 PlomPred.prototype.setDriftName = function(){
 
   var driftName = [];
-  if(this.isDrift){
+  if((('diffusion' in this.process) && this.process.diffusion.length)){
     this.process.diffusion.forEach(function(d){
       var p = options.theta.value[d.parameter].partition_id;
       options.theta.partition[p].group.forEach(function(g){
@@ -126,38 +127,50 @@ PlomPred.prototype.setDataTraj = function(extraLength){
 
   //extend array (data, simul, prediction each an array of 3 values for confidence envelopes);
   var lastDataTimeMs = that.data[that.data.length-1][0].getTime();
-  var inc = increments[that.unit];
+  var inc = increments[that.context.frequency];
+
 
   for (var i=0; i< extraLength; i++){
-    data.push([new Date(lastDataTimeMs +(i+1)*inc)]);
+    that.dataTraj.push([new Date(lastDataTimeMs +(i+1)*inc)]);
     for(var j=0; j<(that.N_TS*3); j++){
-      data[that.data.length+i].push([null, null, null]);
+      that.dataTraj[that.data.length+i].push([null, null, null]);
     };
   }
+
+  that.tsName.forEach(function(name, ts){
+    that.dataTraj[that.indexDataClicked][2*that.N_TS+ts+1][0] = that.X.q5['obs_mean:' + name][that.indexDataClicked];
+    that.dataTraj[that.indexDataClicked][2*that.N_TS+ts+1][1] = that.X.mean['obs_mean:' + name][that.indexDataClicked];
+    that.dataTraj[that.indexDataClicked][2*that.N_TS+ts+1][2] = that.X.q95['obs_mean:' + name][that.indexDataClicked];
+  });
 
 };
 
 
 PlomPred.prototype.setDataState = function(){
 
-  var names = this.stateName.concat(this.driftName);
   var that = this;
 
   that.dataState = [];
-  for(var i=0; i<that.data.length; i++){
-    that.dataState.push(new Array(1+2*names.length));
-    that.dataState[i][0] = that.data[i][0];
+  for(var i=0; i<that.dataTraj.length; i++){
+    that.dataState.push(new Array(1+2*that.allStateName.length));
+    that.dataState[i][0] = that.dataTraj[i][0];
 
-    names.forEach(function(name, s){
+    that.allStateName.forEach(function(name, s){
       that.dataState[i][s+1] = new Array(3);
-      that.dataState[i][names.length + s + 1] = new Array(3);
+      that.dataState[i][that.allStateName.length + s + 1] = new Array(3);
       
       that.dataState[i][s+1][0] = that.X.q5[name][i];
       that.dataState[i][s+1][1] = that.X.mean[name][i];
       that.dataState[i][s+1][2] = that.X.q95[name][i];
     });
-
   }
+
+  that.allStateName.forEach(function(name, s){    
+    that.dataState[that.indexDataClicked][that.allStateName.length + s+1][0] = that.X.q5[name][that.indexDataClicked];
+    that.dataState[that.indexDataClicked][that.allStateName.length + s+1][1] = that.X.mean[name][that.indexDataClicked];
+    that.dataState[that.indexDataClicked][that.allStateName.length + s+1][2] = that.X.q95[name][that.indexDataClicked];
+  });
+
 };
 
 
@@ -207,8 +220,6 @@ PlomPred.prototype.makeGraphTraj = function(){
     while((x !== that.data[that.indexDataClicked][0].getTime()) && (that.indexDataClicked < that.data.length)){
       that.indexDataClicked++
     };
-    that.indexDataClicked++;
-
 
     var updt = { 'underlayCallback': function(canvas, area, g) { //add a vertical line...
       var loc = g.toDomCoords(x, 0); //get the position in the canvas of the point (clicked, 0)
@@ -223,7 +234,7 @@ PlomPred.prototype.makeGraphTraj = function(){
     that.graphTraj.updateOptions(updt);
     that.graphState.updateOptions(updt);
 
-//    $('#runPred').trigger('click');
+    $('#runPred').trigger('click');
   };
 
 
@@ -232,16 +243,16 @@ PlomPred.prototype.makeGraphTraj = function(){
   var cols = d3.range(this.N_TS).map(d3.scale.category10());
   g.updateOptions({'colors': cols.concat(cols, cols)});
 
+  g.resize(900, 400);
+
   return g;
 };
 
 
 PlomPred.prototype.makeGraphState = function(){
 
-  var fullLabels = ["time"].concat(this.stateName, 
-                                   this.driftName,
-                                   this.stateName.map(function(x){return 'pred. '+ x;}),
-                                   this.driftName.map(function(x){return 'pred. '+ x;})
+  var fullLabels = ["time"].concat(this.allStateName, 
+                                   this.allStateName.map(function(x){return 'pred. '+ x;})
                                   );
 
   var options={
@@ -265,9 +276,16 @@ PlomPred.prototype.makeGraphState = function(){
     }
   };
 
+  for(var i=0; i<this.allStateName.length; i++){
+    options[fullLabels[this.allStateName.length+i+1]] = {strokeWidth: 4};
+  }
+
+
   var g = new Dygraph($('#' +this.graphStateId)[0], this.dataState, options);
-  var cols = d3.range(fullLabels.length-1).map(d3.scale.category10());
+  var cols = d3.range(this.allStateName.length).map(d3.scale.category10());
   g.updateOptions({'colors': cols.concat(cols)});
+
+  g.resize(900, 400);
 
   return g;
 };
@@ -279,8 +297,10 @@ PlomPred.prototype.updateGraphs = function(){
 };
 
 PlomPred.prototype.reset = function(){
+
+  this.indexDataClicked = 0;
   this.setDataTraj(0);
-  this.setDataState(0);
+  this.setDataState();
 
   this.updateGraphs();
 
@@ -300,7 +320,7 @@ PlomPred.prototype.reset = function(){
 
 
 
-PlomPred.prototype.processMsg = function(msg, appendLog){
+PlomPred.prototype.processMsg = function(msg){
 
   switch(msg.flag){
 
@@ -334,17 +354,17 @@ PlomPred.prototype.processHat = function(msg){
   for(var j=0; j<3; j++){
     //states
     for(var s=0; s< this.stateName.length; s++){
-      this.dataState[n-1][1+s][j] = msg[1+s*3+j];
+      this.dataState[n][1+ this.allStateName.length + s][j] = msg[1+s*3+j];
     }
 
     //drift (if it exists)
     for(var i=0; i<this.driftName.length; i++){
-      this.dataState[n-1][1+this.stateName.length+i][j] = msg[this.offsetDriftHat+i*3+j];
+      this.dataState[n][1+ this.allStateName.length + this.stateName.length+i][j] = msg[this.offsetDriftHat+i*3+j];
     }
 
     //ts
     for(var ts=0; ts<this.N_TS; ts++){
-      this.dataTraj[n-1][this.N_TS+1+ts][j] = msg[this.offsetHat+ts*3+j];
+      this.dataTraj[n][2*this.N_TS+1+ts][j] = msg[this.offsetHat+ts*3+j];
     }
   }
 
@@ -362,27 +382,31 @@ PlomPred.prototype.run = function(socket, options){
 
   if(socket){
 
-    that.indexDataClicked = that.indexDataClicked || 1;
+    that.indexDataClicked = that.indexDataClicked || 0;
 
     var extraYears = parseInt($('#nExtra').val(), 10) || 0;
     //convert extraYears in timesteps
     var multiplier = {'D': 365, 'W': 365/7, 'M': 12, 'Y':1};
-    var nExtra = Math.round(extraYears * multiplier[that.unit]);
+    var nExtra = Math.round(extraYears * multiplier[that.context.frequency]);
 
     this.setDataTraj(nExtra);
-    this.setDataState(nExtra);
+    this.setDataState();
 
     var t0 = that.indexDataClicked;
     var tend = that.dataTraj.length-1;
 
-    socket.emit('start', {
-      'exec': {
+    var msg = {
+      exec: {
         exec: 'simul',
-        opt: [options.impl, '-D '+ tend, '-o '+ t0, '-t', '-b', '-P 1']
+        opt: [options.impl, '-D '+ tend, '-o '+ t0, '--predict', '--traj', '-P 1']
       }, 
-      'plomModelId': this.link._id,
-      'theta': {partition: this.theta.partition, parameter: this.theta.parameter}
-    });
+      n: t0,
+      plomModelId: this.link._id,
+      plomThetaId: this.theta_id,
+      plomTraceId: this.trace_id
+    };
+
+    socket.emit('start', msg);
 
     plomGlobal.intervalId.push(setInterval(function(){
       that.updateGraphs();
