@@ -1,4 +1,4 @@
-var plomGlobal = {canRun: true, intervalId:[]};
+//var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 

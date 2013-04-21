@@ -91,54 +91,56 @@
             <!-- Summary table (templated) -->
             <div class="row"><div class="span12" data-toggle="buttons-radio" id="summaryTable"></div></div>	      	
 
-            <!-- plots -->
-            <div class="accordion" id="accDiagPlots">
-              <div class="accordion-group">
-                <div class="accordion-heading">
-                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accDiagPlots" href="#accDiagPlotsContent">Diagnostic plots</a>
-                </div>
-
-                <div id="accDiagPlotsContent" class="accordion-body collapse">
-                  <div class="accordion-inner">
-                    <div class="row" id="diagPlots"><% include diagnostics %></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- Filtering -->
-            <div class="accordion" id="accFiltering">
-              <div class="accordion-group">
-                <div class="accordion-heading">
-                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accFiltering" href="#accFilteringContent">Simulation and filtering</a>
-                </div>
+            <div id="filtering"><% include filtering %></div>
 
-                <div id="accFilteringContent" class="accordion-body collapse">
-                  <div class="accordion-inner">
-                    <div class="row" id="filtering"><% include filtering %></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+            <!-- Credibility intervals / Correlation / review tabs -->
+
+            <ul class="nav nav-tabs" id="reviewTab">
+              <li class="active">
+                <a href="#cred" data-toggle="tab">Credibility intervals</a>
+              </li>
+              <li>
+                <a href="#corr" data-toggle="tab">Correlations</a>
+              </li>
+              <li>
+                <a href="#review" data-toggle="tab">Review</a>
+              </li>
+            </ul>
             
-            <!-- Review zone -->
-            <div class="accordion" id="accReview">
-              <div class="accordion-group">
-                <div class="accordion-heading">
-                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accReview" href="#accReviewContent">Reviews</a>
-                </div>
+            <div class="tab-content">
 
-                <div id="accReviewContent" class="accordion-body collapse">
-                  <div class="accordion-inner">
-                    <div class="row" id="rowReviewTheta"><% include theta %></div>
+              <!-- cred -->
+              <div class="tab-pane active" id="cred">
+
+
+                <!-- Controls -->
+                <div class="row">
+                  <div class="span4">
+                    <div>
+                      <button id="run" class="btn" type="button"><i class="icon-play"></i> Run</button>
+                      <button id="stop" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
+                    </div>
+                    <div id="control"></div>
                   </div>
                 </div>
-              </div>
-            </div>
 
+              </div>
+
+              <!-- corr -->
+              <div class="tab-pane" id="corr">
+                    <div class="row" id="diagPlots"><% include diagnostics %></div>
+              </div>
+
+              <!-- review -->
+              <div class="tab-pane" id="review">
+                <div class="row" id="rowReviewTheta"><% include theta %></div>
+              </div>
+
+            </div>
 
           </div> <!-- end div#theta -->
-
 
           
           <!-- Forecasting -->
@@ -160,6 +162,7 @@
               </div>
 
             </div>
+
 
             <div class="row">
               <div class="span12">

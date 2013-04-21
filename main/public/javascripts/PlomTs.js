@@ -30,7 +30,7 @@ function PlomTs(options) {
   for(var i=0; i<this.data.length; i++){
     this.data[i][0] = new Date(this.data[i][0]);
   }
-
+  
   var stateName = [];
   this.process.state.forEach(function(s){
     options.context.population.forEach(function(g){
@@ -229,7 +229,7 @@ PlomTs.prototype.makeGraphTraj = function(){
   //repeat colors so that data and simul have the same colors
   var cols = d3.range(this.N_TS).map(d3.scale.category10());
   g.updateOptions({'colors': cols.concat(cols)});
-  g.resize(500, 350);
+  g.resize(850, 400);
   return g;
 };
 
@@ -262,7 +262,7 @@ PlomTs.prototype.makeGraphState = function(){
   var g = new Dygraph($('#' +this.graphStateId)[0], this.dataState, options);
   var cols = d3.range(fullLabels.length-1).map(d3.scale.category10());
   g.updateOptions({'colors': cols});
-  g.resize(500, 350);
+  g.resize(850, 400);
   return g;
 };
 
@@ -294,7 +294,7 @@ PlomTs.prototype.makeGraphPredRes = function(){
   var g = new Dygraph($('#' +this.graphPredResId)[0], this.dataPredRes, options);
   var cols = d3.range(this.N_TS).map(d3.scale.category10());
   g.updateOptions({'colors': cols});
-  g.resize(500, 350);
+  g.resize(850, 400);
   return g;
 };
 
@@ -321,7 +321,7 @@ PlomTs.prototype.makeGraphEss = function(){
   };
 
   var g = new Dygraph($('#' +this.graphEssId)[0], this.dataEss, options);
-  g.resize(500, 350);
+  g.resize(850, 400);
   return g;
 };
 

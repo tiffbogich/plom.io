@@ -1,74 +1,37 @@
 <!-- Plots -->
-<div class="span7">
+<div class="row" id="reviewPlots">
+  <div class="span12">
 
-  <!-- Trajectories plot -->
-  <div class="accordion" id="plotTraj">
-    <div class="accordion-group">
-      <div class="accordion-heading">
-        <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotTraj" href="#plotTrajContent">Time series</a>
-      </div>
+    <div class="tabbable tabs-right">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#plotTrajContent" data-toggle="tab">Time Series</a></li>
+        <li class=""><a href="#plotStateContent" data-toggle="tab">States</a></li>
+        <li class=""><a href="#plotPredResContent" data-toggle="tab">Residuals</a></li>
+        <li class=""><a href="#plotEssContent" data-toggle="tab">ESS</a></li>
+      </ul>
 
-      <div id="plotTrajContent" class="accordion-body collapse in">
-        <div class="accordion-inner">
+      <div class="tab-content">
+        <!-- Trajectories plot -->
+        <div class="tab-pane active" id="plotTrajContent">
           <div id="graphTraj"></div>
           <div id="tickTraj" class="tickGraph horizontal-scroll"></div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- States plot and diffusions -->
-  <div class="accordion" id="plotState">
-    <div class="accordion-group">
-      <div class="accordion-heading">
-        <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotState" href="#plotStateContent">State Variables</a>
-      </div>
-
-      <div id="plotStateContent" class="accordion-body collapse">
-        <div class="accordion-inner">
+        <!-- States plot and diffusions -->
+        <div class="tab-pane" id="plotStateContent">
           <div id="graphState"></div>
           <div id="tickState" class="tickGraph horizontal-scroll"></div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- prediction residuals -->
-  <div class="accordion" id="plotPredRes">
-    <div class="accordion-group">
-      <div class="accordion-heading">
-        <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotLike" href="#plotPredResContent">Prediction residuals</a>
-      </div>
-      <div id="plotPredResContent" class="accordion-body collapse">
-        <div class="accordion-inner">
+        <!-- prediction residuals -->
+        <div class="tab-pane" id="plotPredResContent">
           <div id="graphPredRes"></div>
           <div id="tickPredRes" class="tickGraph horizontal-scroll"></div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ESS -->
-  <div class="accordion" id="plotEss">
-    <div class="accordion-group">
-      <div class="accordion-heading">
-        <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotLike" href="#plotEssContent">Effective Sample Size</a>
-      </div>
-      <div id="plotEssContent" class="accordion-body collapse">
-        <div class="accordion-inner">
+        <!-- ESS -->
+        <div class="tab-pane" id="plotEssContent">
           <div id="graphEss"></div>
         </div>
       </div>
+
     </div>
   </div>
-
-</div>
-
-<!-- Controls -->
-<div class="span4">
-  <div>
-    <button id="run" class="btn" type="button"><i class="icon-play"></i> Run</button>
-    <button id="stop" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
-  </div>
-  <div id="control"></div>
 </div>
