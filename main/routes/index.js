@@ -30,130 +30,124 @@ exports.index = function(req, res){
   var components = req.app.get('components');
 
   var q = (req.body.q) ? dbUtil.querify(req.body.q, req.body.d) : {type: 'link'};
-  console.log(q)
 
-  components.find(q, {context_id:1, process_id:1, theta_id:1, name:1, observation:1}).toArray(function(err, links){
+  //first let's get the matching contexts. The results can be large so we just get the context_id
+  components.find(q, {context_id:true}).toArray(function(err, links_context_id){
     if (err) return next(err);
 
-    //TODO pagination: restrict number of contexts (5 by 5)
+    var contexts_id = _.uniq(links_context_id.map(function(x){return x.context_id;}));
+    //TODO pagination (restrict to a subset of context)...
 
-    async.parallel({
-      context: function(callback){
-        components
-          .find({_id: {$in: _.uniq(links.map(function(x){return x.context_id;}))}})
-          .toArray(function(err, c){
-            if (err) callback(err);
+    //we have 5 context_id, let's retrieve everything for them...
+    //first the links involved in contexts_id
+    components.find({type:'link', context_id: {$in: contexts_id}}).toArray(function(err, links){
 
-            //keep only the data as opposed to the meta data
-            c.map(function(x, i){
-              var data = x.data.filter(function(d){return d.id ==='data'})[0];
-              x.data = data.source.slice(1);
+      //everything that belongs to these links..
+      async.parallel({
+        context: function(callback){
+          //do no retrieve data (will be ajax requested)
+          components
+            .find({_id: {$in: _.uniq(links.map(function(x){return x.context_id;}))}}, {data:false})
+            .toArray(callback);
+        },
+        process: function(callback){
+          components
+            .find({_id: {$in: _.uniq(links.map(function(x){return x.process_id;})) }})
+            .toArray(callback);
+        },
+        theta: function(callback){
+          components
+            .find({_id: {$in: _.uniq(_.flatten(links.map(function(x){return x.theta_id;}))) }})
+            .toArray(callback);
+        },
+        related: function(callback){
+          //all the links related to the process model of the links matching our query
+          components
+            .find({type: 'link', process_id: {$in: _.uniq(links.map(function(x){return x.process_id;}))}}, {context_disease:1, process_id:1})
+            .toArray(callback);
+        },
+
+      }, function(err, results) {
+
+        if (err) return next(err);
+
+        var obj = {};
+        for(var x in results){
+          if(x!=='related'){
+            results[x].forEach(function(comp){
+              obj[comp._id] = comp;
             });
-
-            callback(null, c);
-
-          });
-      },
-
-      process: function(callback){
-        components
-          .find({_id: {$in: _.uniq(links.map(function(x){return x.process_id;})) }})
-          .toArray(function(err, p){
-            if (err) callback(err);
-
-            callback(null, p);
-
-          });
-      },
-
-      theta: function(callback){
-        components
-          .find({_id: {$in: _.uniq(_.flatten(links.map(function(x){return x.theta_id;}))) }})
-          .toArray(function(err, t){
-            if (err) callback(err);
-
-            callback(null, t);
-
-          });
-      },
-
-      //all the links related to the process model of the links matching our query
-      related: function(callback){
-        components
-          .find({type: 'link', process_id: {$in: _.uniq(links.map(function(x){return x.process_id;}))}}, {context_disease:1, process_id:1})
-          .toArray(function(err, r){
-            if (err) callback(err);
-
-            callback(null, r);
-          });
-      },
-
-    }, function(err, results) {
-
-      if (err) return next(err);
-
-      var obj = {};
-      for(var x in results){
-        if(x!=='related'){
-          results[x].forEach(function(comp){
-            obj[comp._id] = comp;
-          });
-        }
-      }
-
-      //add related content (other diseases where the process model is also used)
-      results.related.forEach(function(r){
-        if('related' in obj[r.process_id]) {
-          //add to set of disease (TODO: optimize)
-          obj[r.process_id].related = _.unique(obj[r.process_id].related.concat(r.context_disease));
-        } else {
-          obj[r.process_id].related = r.context_disease;
-        }
-      });
-
-      //make a context tree (ctree)
-      var ctree = results.context;
-      ctree.forEach(function(c, i){
-
-        //attach models
-        c['model'] = [];
-        var mylinks = links.filter(function(x){return x.context_id.equals(c._id)});
-        mylinks.forEach(function(link){
-
-          var model = {
-            process: obj[link.process_id],
-            link: link,
-            theta: obj[link.theta_id.filter(function(x){return x in obj})[0]]
           }
-          if(model.theta){
-            describeTheta(model.theta, model.process, model.link);
+        }
+
+        //add related content (other diseases where the process model is also used)
+        results.related.forEach(function(r){
+          if('related' in obj[r.process_id]) {
+            //add to set of disease (TODO: optimize)
+            obj[r.process_id].related = _.unique(obj[r.process_id].related.concat(r.context_disease));
+          } else {
+            obj[r.process_id].related = r.context_disease;
           }
-          c.model.push(model);
         });
 
-        //TODO sort by DIC first then AICc (Bayesian methods win)
+        //make a context tree (ctree)
+        var ctree = results.context;
+        ctree.forEach(function(c, i){
 
+          //attach models
+          c['model'] = [];
+          var mylinks = links.filter(function(x){return x.context_id.equals(c._id)});
+          mylinks.forEach(function(link){
 
-      });
+            //the theta with the smallest DIC
+            var my_theta = undefined;
 
+            var my_thetas = link.theta_id
+              .filter(function(x){return x in obj})
+              .map(function(x){return obj[x];});
 
-      res.format({
-        json: function(){
-          res.send(ctree);
-        },
-        html: function(){
-          var u = req.app.get('users');
-          u.findOne({_id: req.session.username}, function(err, user){
-            if (err) return next(err);
-            res.render('index', {ctree:ctree, context_followed: user.context_id || []});
+            if(my_thetas.length){
+              var my_dic = Math.min.apply(Math, my_thetas.map(function(x){return x.dic;}));
+              my_theta = my_thetas.filter(function(x){return x.dic === my_dic;})[0];
+              //replace by the theta maximising the loglikelihood
+              my_theta = my_theta.result.filter(function(x){return x.trace_id === my_theta.trace_id;})[0].theta;
+            }
+            
+            var model = {
+              process: obj[link.process_id],
+              link: link,
+              theta: my_theta
+            }
+
+            if(model.theta){
+              describeTheta(model.theta, model.process, model.link);
+            }
+            c.model.push(model);
           });
-        }
-      });
 
+          //sort model by DIC
+          c.model.sort(function(a, b){
+            if('theta' in a && 'theta' in b){
+              return a.theta.dic - b.theta.dic;
+            } else {
+              return 1;
+            }
+          });
+
+        });
+
+        var u = req.app.get('users');
+        u.findOne({_id: req.session.username}, function(err, user){
+          if (err) return next(err);
+          res.render('index', {ctree:ctree, context_followed: user.context_id || []});
+        });
+
+      });
     });
   });
-
 };
+
+
 
 /**
  * POST request: Build model (if needed) and redirect to review

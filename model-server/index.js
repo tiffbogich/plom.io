@@ -16,8 +16,8 @@ var express = require('express')
   , rimraf = require("rimraf")
   , authenticate = require('../authentification/routes/user').authenticate
   , spawn = require('child_process').spawn
-  , priors = require('./lib/priors')
-  , schecksum = require('./lib/schecksum');
+  , ppriors = require('plom-priors')
+  , schecksum = require('plom-schecksum');
 
 var app = express();
 
@@ -180,7 +180,7 @@ app.post('/commit', function(req, res, next){
 
   //add priors to link
   if('theta' in m){
-    m.link.prior = priors(m);
+    m.link.prior = ppriors.extract(m);
   }
 
   //add semantic_id
@@ -256,11 +256,14 @@ app.post('/commit', function(req, res, next){
       updateAndLog({components:components, events:req.app.get('events')}, comps, status, req.user, function(err){
         if(err) return next(err);
 
-        commitPriors({priors:req.app.get('priors')}, comps, status, req.user, function(err, msg){
-          if(err) return next(err);          
-          if(msg) return res.json(msg);
+        if(!( ('theta' in status) && !status.theta)){ //no new theta
+          return res.json({'success': true, 'msg': 'your model has been published'});
+        }
 
-          commitTrace(req.app.get('db'), req.files, comps.theta._id, function(err, msg){
+        ppriors.commit(req.app.get('priors'), comps.link.prior, comps, req.user, function(err){
+          if(err) return next(err);          
+
+          commitTrace(req.app.get('db'), req.files, comps, req.user, function(err, msg){
             if(err) return next(err);
             res.json(msg);
           });
@@ -275,7 +278,7 @@ app.post('/commit', function(req, res, next){
 
 });
 
-function commitTrace(db, filesObj, theta_id, cb){
+function commitTrace(db, filesObj, comps, user, cb){
 
   //store files in mongo gridfs and start diagnostic
 
@@ -289,7 +292,7 @@ function commitTrace(db, filesObj, theta_id, cb){
       filename: key + '.csv.gz',
       mode:'w',
       content_type: 'application/x-gzip',   
-      metadata: {type: type_h[0], h: parseInt(type_h[1], 10), theta_id: theta_id}
+      metadata: {type: type_h[0], trace_id: parseInt(type_h[1], 10), theta_id: comps.theta._id}
     });
 
     fs.createReadStream(filesObj[key].path).pipe(writestream);
@@ -310,42 +313,18 @@ function commitTrace(db, filesObj, theta_id, cb){
 
     //send the traces to diagnostic
     var conn = net.createConnection(5000, function(){
-      conn.end(JSON.stringify({theta_id: theta_id}));
+      conn.end(JSON.stringify({
+        context_id: comps.context._id,
+        process_id: comps.process._id,
+        link_id: comps.link._id,
+        theta_id: comps.theta._id,
+        username: user
+      }));
 
       cb(null, {'success': true, 'msg': 'your results are being reviewed'});
     });
 
   });
-
-}
-
-function commitPriors (collections, comps, status, user, cb){
-
-  var priors = collections.priors;
-
-  var is_new_theta = ( ('theta' in status) && !status.theta);
-  if(is_new_theta){
-
-    //store priors
-    comps.link.prior.forEach(function(p){
-      p.username = user;
-      p.context_id = comps.context._id;
-      p.model_id = (p.type === 'observation') ?  comps.link._id : comps.process._id;
-      p.semantic_id = schecksum(p);
-    });
-    
-    //upsert
-    async.map(comps.link.prior, function(item, callback){
-      priors.update({semantic_id: item.semantic_id}, item, {safe:true, upsert:true}, function(err, count){
-        callback(err, count);
-      });
-    }, function(err, results){
-      cb(err, null);
-    });
-
-  } else {
-    cb(null, {'success': true, 'msg': 'your model has been published'});
-  }
 
 }
 
@@ -385,7 +364,6 @@ function updateAndLog (collections, comps, status, user, cb){
             context_name: comps.context.name,
             process_id: comps.process._id,
             process_name: comps.process.name,
-            process_model: comps.process.model //used to store embedded discussion
           },
           $addToSet: {_keywords: {$each :comps.context._keywords.concat(comps.process._keywords)}}
         };
