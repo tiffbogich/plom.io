@@ -67,7 +67,7 @@ Control.prototype.thetaList = function(){
     that.i = parseInt($(this).val(), 10);
 
     //model review
-    that._tooltipify(that.link.model, that.thetas[that.i]);
+    that._tooltipify(that.link.observation[0].model, that.thetas[that.i]);
     that._tooltipify(that.link.process_model, that.thetas[that.i]);
     $('#modelTpl').html(that.compiled.model({context: that.context, process: that.process, link: that.link, theta: that.thetas[that.i], infector: that.infector}));
     plomGraphModel(that.process, "#pgraph"+that.link._id);
@@ -376,15 +376,11 @@ Control.prototype._tooltipify = function(model, theta){
     });
 
   } else { //link
-
-    for(var m in model){
-      for(var p in model[m]){
-        if(p !== 'distribution' && p.split('_')[0] !== 'tlt'){
-          model[m]['tlt_' + p] = ify(model[m][p]);
-        }
+    for(var p in model){
+      if(p !== 'distribution' && p.split('_')[0] !== 'tlt'){
+        model['tlt_' + p] = ify(model[p]);
       }
     }
 
   }
-
 }

@@ -8,9 +8,10 @@
 
 <section>
 
-  <form>
+  <form action="/search" method="POST">
     <div class="input-append">
       <input type="text" name="q" id="plom-search" class="span4"/>
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
       <button type="submit" class="btn">Search</button>
     </div>
   </form>
@@ -114,7 +115,7 @@
             <div class="parameter-box">
               <% if (m.theta && m.theta.parameter) { %>
               <ul>                     
-                <% m.process.parameter.concat(m.process.state, m.link.parameter).forEach(function(par){  %>
+                <% m.process.parameter.concat(m.process.state, m.link.observation[0].parameter).forEach(function(par){  %>
                 <% if (par.id in m.theta.parameter) { %>
                 <li>
                   <a href="#" class="plom-tooltip" data-placement="left" rel="tooltip" data-original-title="<%= m.theta.parameter[par.id].comment %>"><%= par.id %></a> :

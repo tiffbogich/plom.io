@@ -62,6 +62,7 @@ app.get('/', csrf, routes.welcome);
 app.get('/about', routes.about);
 
 app.get('/library', secure, csrf, routes.index);
+app.post('/search', secure, csrf, routes.index);
 app.post('/library', secure, csrf, routes.postIndex);
 app.post('/fork', csrf, routes.postFork);
 

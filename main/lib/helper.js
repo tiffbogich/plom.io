@@ -11,7 +11,7 @@ module.exports.describeTheta = function (theta, proc, link) {
     });
   });
 
-  link.parameter.forEach(function(par){
+  link.observation[0].parameter.forEach(function(par){
     all_comments[par.id] = par.comment || '';
   });
 

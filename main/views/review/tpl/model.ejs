@@ -102,13 +102,13 @@
                   </li>
 
                   <li>
-                    model: <%= link.model[o.model_id].distribution %>
+                    model: <%= link.observation[0].model.distribution %>
 
                     <ul>
-                      <% for(var p in link.model[o.model_id]){ %>
+                      <% for(var p in link.observation[0].model){ %>
                       <% if(p !== 'distribution' && p.split('_')[0] === 'tlt'){ %>
                       <li>
-                        <%= p.split('_').slice(1).join('_') %>: <%= link.model[o.model_id][p] %>
+                        <%= p.split('_').slice(1).join('_') %>: <%= link.observation[0].model[p] %>
                       </li>
                       <% } %>
                       <% } %>
@@ -170,7 +170,7 @@
 
             <% [
                {val:process.parameter, title:'Process'},
-               {val:link.parameter, title:'Observation'},
+               {val:link.observation[0].parameter, title:'Observation'},
                {val:process.state, title: 'Initial Conditions'}
                ].forEach(function(type){ %>
 
