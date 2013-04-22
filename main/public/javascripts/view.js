@@ -75,9 +75,10 @@ Control.prototype.thetaList = function(){
 
     $.getJSON('/diagnostic/'+ that.thetas[that.i]._id, function(summaries) {
       that.summaries = summaries;
-
-      console.log(summaries);
       that.summaryTable();
+      greenlights(summaries, that.compiled.summaryTable);
+
+
 
       $.getJSON('/diagnostic/'+ that.thetas[that.i]._id + '/'+ summaries[0].h, function(diagnostic) {
         that.detail = diagnostic.detail;
@@ -99,7 +100,6 @@ Control.prototype.thetaList = function(){
 };
 
 Control.prototype.summaryTable = function(){
-  $('#summaryTable').html(this.compiled.summaryTable({summaries: this.summaries}));
 
   var that = this;
   //when user select a trace:

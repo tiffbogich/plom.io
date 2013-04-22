@@ -125,30 +125,6 @@ p:before{
 }
 
 
-/* review */
-
-.plom-graph-forecast{
-  width: 900px;
-  height: 400px;
-  cursor:e-resize;
-}
-
-.social-action{
-  margin-left: 5px;
-  float:right;
-}
-
-.social-action form{
-  float: left;
-  margin-right: 10px;
-}
-
-#thetaList{
-  margin-top:30px;
-  margin-bottom:30px;
-}
-
-
 
 
 /* index */
@@ -372,5 +348,49 @@ text.shadow {
 .badIndicator{
     font-size:small;
     color:red;
+}
+
+
+/* review */
+#summaryTableContainer{
+  height: 35px;
+}
+
+.plom-graph-forecast{
+  width: 900px;
+  height: 400px;
+  cursor:e-resize;
+}
+
+.social-action{
+  margin-left: 5px;
+  float:right;
+}
+
+.social-action form{
+  float: left;
+  margin-right: 10px;
+}
+
+#thetaList{
+  margin-top:30px;
+  margin-bottom:30px;
+}
+
+.passed:hover, .failed:hover{
+  stroke: white;
+  cursor: pointer;
+}
+
+.passed, .failed{
+  stroke-width: 2px;
+  fill-opacity: 0.7;
+  stroke-opacity: 0.7;
+}
+.passed{
+  fill: green;
+}
+.failed{
+  fill: red;
 }
 

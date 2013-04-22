@@ -4,6 +4,7 @@
 <script src="/javascripts/PlomTs.js"></script>
 <script src="/javascripts/parmatrix.js"></script>
 <script src="/javascripts/corr.js"></script>
+<script src="/javascripts/greenlights.js"></script>
 <script src="/javascripts/density.js"></script>
 <script src="/javascripts/trace.js"></script>
 <script src="/javascripts/autocorr.js"></script>
@@ -79,7 +80,7 @@
 
             <div class="row">
               <div class="span10">
-                <h4>Traces summary</h4>
+                <h4>Traces</h4>
               </div>
               <div class="span2">
                 <form>
@@ -88,8 +89,18 @@
               </div>
             </div>
 
+
+
+            <div class="row">
+              <div class="span12">
+                <div id="greenlights"></div>                
+              </div>
+            </div>
+
+
             <!-- Summary table (templated) -->
-            <div class="row"><div class="span12" data-toggle="buttons-radio" id="summaryTable"></div></div>	      	
+            <div class="row" id="summaryTableContainer"><div class="span12" data-toggle="buttons-radio" id="summaryTable"></div></div>	      	
+
 
             <!-- Filtering -->
             <div id="filtering"><% include filtering %></div>
@@ -101,10 +112,10 @@
 
             <ul class="nav nav-tabs" id="reviewTab">
               <li class="active">
-                <a href="#cred" data-toggle="tab">Credibility intervals</a>
+                <a href="#cred" data-toggle="tab">Manual parameter exploration</a>
               </li>
               <li>
-                <a href="#corr" data-toggle="tab">Correlations</a>
+                <a href="#corr" data-toggle="tab">MCMC summaries</a>
               </li>
               <li>
                 <a href="#review" data-toggle="tab">Review</a>
@@ -138,7 +149,7 @@
 
             <div class="row">
               <div class="span8">
-                <h4>Forecasting</h4>
+                <h4>Forecast</h4>
               </div>
               <div class="span4">
                 <form class="form-inline social-action">

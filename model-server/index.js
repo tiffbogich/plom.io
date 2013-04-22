@@ -16,6 +16,7 @@ var express = require('express')
   , rimraf = require("rimraf")
   , authenticate = require('../authentification/routes/user').authenticate
   , spawn = require('child_process').spawn
+  , priors = require('./lib/priors')
   , schecksum = require('./lib/schecksum');
 
 var app = express();
@@ -177,6 +178,11 @@ app.post('/commit', function(req, res, next){
 
   var components = req.app.get('components');
 
+  //add priors to link
+  if('theta' in m){
+    m.link.prior = priors(m);
+  }
+
   //add semantic_id
   [m.context, m.process].forEach(function(x){
     x['semantic_id'] = schecksum(x);
@@ -195,186 +201,281 @@ app.post('/commit', function(req, res, next){
     my_semantic_ids.push(m.theta.semantic_id);
   }
 
-  components
-    .find({semantic_id: {$in: my_semantic_ids}})
-    .toArray(function(err, docs){
-      if(err) return next(err);
-
-      var published = {
-        context: undefined,
-        process: undefined,
-        link: undefined,
-        theta: undefined
-      };
-
-      docs.forEach(function(doc){
-        published[doc.type] = doc;
-      });
-
-      if(published.theta){
-        return res.json({'success': false, 'msg': 'the design has already been published'});
+   
+  var ups = {};
+  for(var k in m){
+    ups[k] = (function(k){
+      return function(callback){  
+        components.findAndModify({semantic_id: m[k].semantic_id},[], {$set: {semantic_id: m[k].semantic_id}}, {safe:true, upsert:true}, function(err, doc){
+          callback(err, doc._id);
+        });
       }
+    })(k);
+  }
 
-      var to_be_published = [];
-      for(var key in published){
-        if(!published[key] && m[key]){
-          m[key]._keywords = dbUtil.addKeywords(m[key]);
-          m[key].username = req.user;
-          to_be_published.push(m[key]);
+  async.parallel(ups, function(err, status){
+
+    var to_be_published = []
+      , to_be_retrieved = [];
+
+    for(var key in status){
+      if(!status[key]){
+        m[key]._keywords = dbUtil.addKeywords(m[key]);
+        m[key].username = req.user;
+        to_be_published.push(m[key]);
+      } else {
+        to_be_retrieved.push(status[key]);
+      }
+    }
+
+    if(!to_be_published.length){
+      return res.json({'success': false, 'msg': 'everything has already been published'});
+    }
+
+    async.parallel({
+      retrieved: function(callback){
+        if(to_be_retrieved.length){
+          components.find({semantic_id: {$in: my_semantic_ids}}).toArray(callback);
+        } else {
+          callback(null, []);
         }
+      },
+      published: function(callback){
+        async.map(to_be_published, function(item, cb){
+          components.findAndModify({semantic_id: item.semantic_id}, [], item, {safe: true, 'new': true}, cb);
+        }, callback); 
+
       }
+    }, function(err, results){
 
-      if(to_be_published.length){
+      var comps = {};
+      results.published.concat(results.retrieved).forEach(function(comp){
+        comps[comp.type] = comp;
+      });
+      
+      updateAndLog({components:components, events:req.app.get('events')}, comps, status, req.user, function(err){
+        if(err) return next(err);
 
-        components.insert(to_be_published, {safe: true}, function(err, records){
-          if(err) return next(err);
+        commitPriors({priors:req.app.get('priors')}, comps, status, req.user, function(err, msg){
+          if(err) return next(err);          
+          if(msg) return res.json(msg);
 
-          var is_new_theta = (! published.theta) && ('theta' in m)
-            , is_new_context = (! published.context) && ('context' in m)
-            , is_new_process = (! published.process) && ('process' in m)
-            , is_new_link = (! published.link) && ('link' in m);
-
-          //simplify access
-          records.forEach(function(record){
-            published[record.type] = record;
+          commitTrace(req.app.get('db'), req.files, comps.theta._id, function(err, msg){
+            if(err) return next(err);
+            res.json(msg);
           });
 
-          var events = req.app.get('events');
+        })
 
-          //register event for context creation:
-          if(is_new_context){
-            events.insert({
-              from: req.user,
-              type: 'create',
-              option: 'context',
-              context_id: published.context._id,
-              name: published.context.disease.join('; ') + ' / ' +  published.context.name
-            }, function(err, docs){if(err) return next(err);});
-          }
-
-          //update link:
-          if(is_new_link || is_new_theta){
-            var linkUpdate = {
-              $set: {
-                context_id: published.context._id,
-                context_disease: published.context.disease,
-                context_name: published.context.name,
-                process_id: published.process._id,
-                process_name: published.process.name,
-                process_model: published.process.model //used to store embedded discussion
-              },
-              $addToSet: {_keywords: {$each :published.context._keywords.concat(published.process._keywords)}}
-            };
-
-            if (is_new_theta) {
-              linkUpdate['$push'] = {theta_id: published.theta._id};
-            }
-
-            //update link
-            components.update({_id: published.link._id}, linkUpdate, {safe:true}, function(err, cnt){
-              if(err) return next(err);
-              if(! is_new_theta){
-                res.json({'success': true, 'msg': 'your model has been published'});
-              }
-            });
-          }
-
-          //register event for link == model creation:
-          if(is_new_link || is_new_process){
-            events.insert({
-              from: req.user,
-              type: 'create',
-              option: 'model',
-              context_id: published.context._id,
-              process_id: published.process._id,
-              link_id: published.link._id,
-              name: published.context.disease.join('; ') + ' / ' +  published.context.name + ' / ' + published.process.name + ' - ' + published.link.name
-            }, function(err, docs){if(err) return next(err);});
-          }
-
-          //update theta
-          if (is_new_theta) {
-
-            var thetaUpdate = {
-              $set: {
-                context_id: published.context._id,
-                context_disease: published.context.disease,
-                context_name: published.context.name,
-                process_id: published.process._id,
-                process_name: published.process.name,
-                link_id: published.link._id,
-                link_name: published.link.name
-              }
-            };
-            components.update({_id: published.theta._id}, thetaUpdate, {safe:true}, function(err, cnt){
-              if(err) return next(err);
-            });
-
-            //register event
-            events.insert({
-              from: req.user,
-              type: 'create',
-              option: 'theta',
-              context_id: published.context._id,
-              process_id: published.process._id,
-              link_id: published.link._id,
-              theta_id: published.theta._id,
-              name: published.context.disease.join('; ') + ' / ' +  published.context.name + ' / ' + published.process.name + ' - ' + published.link.name
-            }, function(err, docs){if(err) return next(err);});
-
-            //store files in mongo gridfs and start diagnostic
-            if(req.files){
-              var gfs = Grid(req.app.get('db'), mongodb);
-              async.mapLimit(Object.keys(req.files), 4, function(key, callback){
-
-                var type_h = key.split('_');
-
-                var writestream = gfs.createWriteStream({
-                  _id: new ObjectID(),
-                  filename: key + '.csv.gz',
-                  mode:'w',
-                  content_type: 'application/x-gzip',   
-                  metadata: {type: type_h[0], h: parseInt(type_h[1], 10), theta_id: published.theta._id}
-                });
-
-                fs.createReadStream(req.files[key].path).pipe(writestream);
-                writestream.on('close', function(file){
-                  callback(null, file);
-                });                
-              },
-                             function(err, results){
-                               console.log(results);
-
-                               //clean up
-                               var toclean = [];
-                               for(var f in req.files){
-                                 toclean.push(req.files[f].path);
-                               }
-
-                               async.map(toclean, fs.unlink, function(err){
-                                 if (err) return next(err);
-                               });
-
-                               //send the traces to diagnostic
-                               var conn = net.createConnection(5000, function(){
-                                 conn.end(JSON.stringify({theta_id: published.theta._id}));
-                                 res.json({'success': true, 'msg': 'your results are being reviewed'});
-                               });
-
-                             });
-
-            } else {
-              res.json({'success': true, 'msg': 'your results are being reviewed'});
-            }
-          }
-
-        }); //end insert callback
-
-      } else { //nothing to be published
-        return res.json({'success': false, 'msg': 'everything has already been published'});
-      }
+      });
+      
     });
+
+  });
+
 });
+
+function commitTrace(db, filesObj, theta_id, cb){
+
+  //store files in mongo gridfs and start diagnostic
+
+  var gfs = Grid(db, mongodb);
+  async.mapLimit(Object.keys(filesObj), 4, function(key, callback){
+
+    var type_h = key.split('_');
+
+    var writestream = gfs.createWriteStream({
+      _id: new ObjectID(),
+      filename: key + '.csv.gz',
+      mode:'w',
+      content_type: 'application/x-gzip',   
+      metadata: {type: type_h[0], h: parseInt(type_h[1], 10), theta_id: theta_id}
+    });
+
+    fs.createReadStream(filesObj[key].path).pipe(writestream);
+    writestream.on('close', function(file){
+      callback(null, file);
+    });                
+  }, function(err, results){
+
+    //clean up
+    var toclean = [];
+    for(var f in filesObj){
+      toclean.push(filesObj[f].path);
+    }
+
+    async.map(toclean, fs.unlink, function(err){
+      if (err) return cb(err);
+    });
+
+    //send the traces to diagnostic
+    var conn = net.createConnection(5000, function(){
+      conn.end(JSON.stringify({theta_id: theta_id}));
+
+      cb(null, {'success': true, 'msg': 'your results are being reviewed'});
+    });
+
+  });
+
+}
+
+function commitPriors (collections, comps, status, user, cb){
+
+  var priors = collections.priors;
+
+  var is_new_theta = ( ('theta' in status) && !status.theta);
+  if(is_new_theta){
+
+    //store priors
+    comps.link.prior.forEach(function(p){
+      p.username = user;
+      p.context_id = comps.context._id;
+      p.model_id = (p.type === 'observation') ?  comps.link._id : comps.process._id;
+      p.semantic_id = schecksum(p);
+    });
+    
+    //upsert
+    async.map(comps.link.prior, function(item, callback){
+      priors.update({semantic_id: item.semantic_id}, item, {safe:true, upsert:true}, function(err, count){
+        callback(err, count);
+      });
+    }, function(err, results){
+      cb(err, null);
+    });
+
+  } else {
+    cb(null, {'success': true, 'msg': 'your model has been published'});
+  }
+
+}
+
+
+function updateAndLog (collections, comps, status, user, cb){
+
+  var events = collections.events
+    , components = collections.components;
+
+  var is_new_theta = ( ('theta' in status) && !status.theta);
+
+  async.series([
+    function(callback){
+      //register event for context creation:
+      if(!status.context){
+        events.insert({
+          from: user,
+          type: 'create',
+          option: 'context',
+          context_id: comps.context._id,
+          name: comps.context.disease.join('; ') + ' / ' +  comps.context.name
+        }, function(err, doc){
+          callback(err, doc);
+        });
+      } else {
+        callback(null);
+      }
+    },
+
+    function(callback){      
+      //update link:
+      if(!status.link || is_new_theta ){
+        var linkUpdate = {
+          $set: {
+            context_id: comps.context._id,
+            context_disease: comps.context.disease,
+            context_name: comps.context.name,
+            process_id: comps.process._id,
+            process_name: comps.process.name,
+            process_model: comps.process.model //used to store embedded discussion
+          },
+          $addToSet: {_keywords: {$each :comps.context._keywords.concat(comps.process._keywords)}}
+        };
+
+        if (is_new_theta) {
+          linkUpdate['$push'] = {theta_id: comps.theta._id};
+        }
+
+        components.update({_id: comps.link._id}, linkUpdate, {safe:true}, function(err, cnt){
+          callback(err, cnt);
+        });
+      } else {
+        callback(null);
+      }
+    },
+
+    function(callback){      
+      //register event for link == model creation:
+      if(!status.link || !status.process){
+        events.insert({
+          from: user,
+          type: 'create',
+          option: 'model',
+          context_id: comps.context._id,
+          process_id: comps.process._id,
+          link_id: comps.link._id,
+          name: comps.context.disease.join('; ') + ' / ' +  comps.context.name + ' / ' + comps.process.name + ' - ' + comps.link.name
+        }, function(err, doc){
+          callback(err, doc);
+        });
+      } else {
+        callback(null);
+      }
+    },
+
+    function(callback){
+      //update theta
+      if (is_new_theta) {        
+        var thetaUpdate = {
+          $set: {
+            context_id: comps.context._id,
+            context_disease: comps.context.disease,
+            context_name: comps.context.name,
+            process_id: comps.process._id,
+            process_name: comps.process.name,
+            link_id: comps.link._id,
+            link_name: comps.link.name
+          }
+        };
+        components.update({_id: comps.theta._id}, thetaUpdate, {safe:true}, function(err, cnt){
+          callback(err, cnt);
+        });
+      } else {
+        callback(null);
+      }
+    },
+
+    function(callback){      
+      //register event for theta creation
+
+      if (is_new_theta) {        
+        events.insert({
+          from: user,
+          type: 'create',
+          option: 'theta',
+          context_id: comps.context._id,
+          process_id: comps.process._id,
+          link_id: comps.link._id,
+          theta_id: comps.theta._id,
+          name: comps.context.disease.join('; ') + ' / ' +  comps.context.name + ' / ' + comps.process.name + ' - ' + comps.link.name
+        }, function(err, doc){
+          callback(err, doc);
+        });
+      } else {
+        callback(null);
+      }
+    }
+              
+  ], function(err, results){
+    cb(err);
+  });
+
+  
+};
+
+
+
+
+
+
 
 
 
@@ -400,6 +501,7 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   app.set('users', new mongodb.Collection(db, 'users'));
   app.set('events', new mongodb.Collection(db, 'events'));
   app.set('components', new mongodb.Collection(db, 'components'));
+  app.set('priors', new mongodb.Collection(db, 'priors'));
 
   //TODO ensureIndex
 

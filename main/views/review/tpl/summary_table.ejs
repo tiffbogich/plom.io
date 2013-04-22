@@ -1,31 +1,10 @@
-<table class="table table-condensed">
+<ul class="inline muted">
 
-  <thead>
-    <tr>
-      <th>#run</th>
-      <th>Geweke</th>
-      <th>Raftery</th>
-      <th>Heidelberger</th>
-      <th>ESS min</th>
-      <th>DIC</th>
-      <th></th>
-    </tr>
-  </thead>
-
-  <tbody>
-
-    <% summaries.map(function(x){return x.summary}).forEach(function(s, h) { %>
-
-    <tr class="<%= (s.passed) ? 'success': 'error' %>">
-      <td><%= summaries[h].h %></td>
-      <td><%= s.geweke %></td>
-      <td><%= (s.raftery.success) ? 'M: ' + s.raftery.M + ' N: ' + s.raftery.N + ' Nmin: ' + s.raftery.Nmin + ' I: ' + s.raftery.I : 'restart with M > ' + s.raftery.M %></td>
-      <td><%= s.heidel %></td>
-      <td><%= s.essMin %></td>
-      <td><%= s.dic %></td>
-      <td><button class="btn btn-mini review-trace-id<% if(h===0) { %> active<% } %>" type="button" value="<%= summaries[h].h %>">select</button></td>
-    </tr>
-    <% }) %>
-
-  </tbody>
-</table>
+  <li><strong>#run</strong>: <%= summaries[h].h %></li>
+  <li><strong>Geweke</strong>: <%= s.geweke %></li>
+  <li><strong>Raftery</strong>: <%= (s.raftery.success) ? 'M: ' + s.raftery.M + ' N: ' + s.raftery.N + ' Nmin: ' + s.raftery.Nmin + ' I: ' + s.raftery.I : 'restart with M > ' + s.raftery.M %></li>
+  <li><strong>Heidelberger</strong>: <%= s.heidel %></li>
+  <li><strong>ESS min</strong>: <%= s.essMin %></li>
+  <li><strong>DIC</strong>: <%= s.dic %></li>
+  <li><button class="btn btn-mini review-trace-id<% if(h===0) { %> active<% } %>" type="button" value="<%= summaries[h].h %>">select</button></li>
+</ul>
