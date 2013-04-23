@@ -1,5 +1,21 @@
 $(document).ready(function() {
 
+  $('.inlinesparkline').sparkline('html', {
+    type:'box',
+    boxLineColor:'grey',
+    boxFillColor:'grey',
+    whiskerColor: 'grey',
+    outlierLineColor: 'grey',
+    outlierFillColor: 'grey',
+    medianColor: 'red',
+    lineColor: 'grey',
+    fillColor: false,
+//    width:'100px',
+//    spotRadius: 40,
+    tooltipFormatFieldlist: ['med', 'lq', 'uq'],
+    tooltipFormatFieldlistKey: 'field'
+  }); 
+
   $('.app-folders-container').appFolders();
 
   $('.ts-picker, .followContext, .context-graph, .social-action').click(function(e){

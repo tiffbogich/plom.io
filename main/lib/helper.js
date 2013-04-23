@@ -43,7 +43,4 @@ module.exports.describeTheta = function (theta, proc, link) {
 
   return theta;
 
-
-  //TODO: tooltipify the models... (add new property rate_tlp)
-
 }

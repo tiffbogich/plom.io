@@ -13,6 +13,7 @@ var fs = require('fs')
   , zlib = require("zlib")
   , csv = require("csv")
   , writePredictFiles = require('../lib/predict')
+  , ppriors = require('plom-priors')
   , dbUtil = require('../../db-utils');
 
 
@@ -99,8 +100,8 @@ exports.index = function(req, res){
           var mylinks = links.filter(function(x){return x.context_id.equals(c._id)});
           mylinks.forEach(function(link){
 
-            //the theta with the smallest DIC
-            var my_theta = undefined;
+            //the result with the smallest DIC
+            var my_result = undefined;
 
             var my_thetas = link.theta_id
               .filter(function(x){return x in obj})
@@ -110,19 +111,20 @@ exports.index = function(req, res){
             if(my_thetas.length){
               var my_dic = Math.min.apply(Math, my_thetas.map(function(x){return x.dic;}));
               var best_theta = my_thetas.filter(function(x){return x.dic === my_dic;})[0];
-              //replace by the theta maximising the loglikelihood
-              my_theta = best_theta.result.filter(function(x){return x.trace_id === best_theta.trace_id;})[0].theta;
-              my_theta._id = best_theta._id;
+              //replace by the result maximising the loglikelihood
+              my_result = best_theta.result.filter(function(x){return x.trace_id === best_theta.trace_id;})[0];
+              my_result.theta._id = best_theta._id;
             }
             
             var model = {
               process: obj[link.process_id],
               link: link,
-              theta: my_theta
+              theta: my_result &&  my_result.theta,
+              posterior: my_result && my_result.posterior
             }
 
-            if(model.theta){
-              describeTheta(model.theta, model.process, model.link);
+            if(model.posterior){
+              model.posterior = ppriors.display(model.posterior, model);
             }
             c.model.push(model);
           });

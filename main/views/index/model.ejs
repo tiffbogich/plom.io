@@ -33,28 +33,33 @@
     </form>            
     
     <div class="parameter-box">
-      <% if (m.theta && m.theta.parameter) { %>
-      <ul>                     
-        <% m.process.parameter.concat(m.process.state, m.link.observation[0].parameter).forEach(function(par){  %>
-        <% if (par.id in m.theta.parameter) { %>
+      <% if (m.posterior) { %>
+
+
+      <% ['process', 'observation', 'state'].forEach(function(type){  %>
+      <ul>
+        <% Object.keys(m.posterior[type]).sort().forEach(function(par){  %>
         <li>
-          <a href="#" class="plom-tooltip" data-placement="left" rel="tooltip" data-original-title="<%= m.theta.parameter[par.id].comment %>"><%= par.id %></a> :
-          
-          <% if(Object.keys(m.theta.parameter[par.id]['group']).length >1 ) {%>
+          <a href="#" class="plom-tooltip" data-placement="right" rel="tooltip" data-original-title="<%= m.posterior[type][par].caption %>"><%= par %></a> :          
           <ul>
-            <% for (var group in m.theta.parameter[par.id].group) { %>
-            <li><%= group.split('__').join('; ') %>: <%= m.theta.parameter[par.id]['group'][group]['guess']['value'] %> </li>
+            <% for (var group in m.posterior[type][par]['group']) { %>
+            <li class="prior">
+              <span><%= group.split('__').join('; ') %>:</span>
+              <span><%= m.posterior[type][par]['group'][group]['min'].toPrecision(3) %></span>
+              <span class="inlinesparkline"><%= m.posterior[type][par]['group'][group]['empirical']['trace'].join(',') %></span>             
+              <span><%= m.posterior[type][par]['group'][group]['max'].toPrecision(3) %></span>
+            </li>
             <% }; %>
           </ul>
-          <% } else { %>
-          <%= m.theta.parameter[par.id]['group'][Object.keys(m.theta.parameter[par.id].group)[0]]['guess']['value'] %>
-          <% }; %>
         </li>
-        <% }; %>
-        <% }); %>
+        <% }); //end forEach par %>
       </ul>
-      <% }; %>
+
+      <% }); //forEach on type %>
+      <% } //if %>
     </div> <!-- parameter box -->
+
+
 
     Involved in:
     <div class="related-box">
