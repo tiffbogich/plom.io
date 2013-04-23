@@ -130,7 +130,6 @@ p:before{
 /* index */
 .folderContent{
   padding: 10px;
-  border-radius: 1em;
   box-shadow: 0 0 1em rgba(230,230,230,1);
 }
 

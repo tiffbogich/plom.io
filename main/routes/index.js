@@ -106,6 +106,7 @@ exports.index = function(req, res){
               .filter(function(x){return x in obj})
               .map(function(x){return obj[x];});
 
+
             if(my_thetas.length){
               var my_dic = Math.min.apply(Math, my_thetas.map(function(x){return x.dic;}));
               var best_theta = my_thetas.filter(function(x){return x.dic === my_dic;})[0];

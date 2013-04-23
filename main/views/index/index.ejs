@@ -3,7 +3,7 @@
 <script src="/lib/spsaucier-App-Folders/jquery.app-folders.js"></script>
 <script src="/javascripts/plomGraphModel.js"></script>
 <script src="/javascripts/index.js"></script>
-    
+
 <% include ../header %>
 
 
@@ -17,29 +17,31 @@
     </div>
   </form>
 
+</div> <!-- close header container-->
+
   <div class="app-folders-container"> 
 
 
     <!-- the contexts -->
     <% ctree.forEach(function(c, i){ %>
 
-    <% if ( (i%3) === 0 ){ %><div class="jaf-row jaf-container row"><% } %>
+    <% if ( (i%3) === 0 ){ %><div class="jaf-row jaf-container container"><% } %>
 
-    <div class="folder span4 context-box" id="<%= c._id %>">
-      <% include  context %>
-    </div>
+      <div class="folder span39 context-box" id="<%= c._id %>">
+        <% include  context %>
+      </div>
 
-    <% if (((i+1) %3) === 0  || i === 4){ %></div><% } %>
-
+      <% if (i === 2){ %></div><% } %>
+    
     <% }); %>
 
-    <div class="folder span4 context-box" id="addContext">
+    <div class="folder span39 context-box" id="addContext">
       <div>
         <img class="add-component" src="images/plus_grey.png"/>
       </div>
     </div>
 
-
+    <% if (ctree.length > 3){ %></div><% } %><!-- close second row-->
 
 
     <!-- the models -->
@@ -61,6 +63,7 @@
 
 </section>
 
+  <div class="container">
 
 <hr />
 <% include ../footer %>

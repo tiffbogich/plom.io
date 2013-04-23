@@ -17,6 +17,8 @@ var express = require('express')
   , authenticate = require('../authentification/routes/user').authenticate
   , spawn = require('child_process').spawn
   , ppriors = require('plom-priors')
+  , log = require('./lib/log')
+  , update = require('./lib/update')
   , schecksum = require('plom-schecksum');
 
 var app = express();
@@ -252,35 +254,61 @@ app.post('/commit', function(req, res, next){
       results.published.concat(results.retrieved).forEach(function(comp){
         comps[comp.type] = comp;
       });
+
+      var events = req.app.get('events');
       
-      updateAndLog({components:components, events:req.app.get('events')}, comps, status, req.user, function(err){
+      //update and log everything non theta related
+      async.series([
+        function(cb){
+          if(!status.context){ log.context(events, comps, req.user, cb); } else {cb(null);}
+        },
+        function(cb){
+          if(!status.link){ update.link(components, comps, cb); } else {cb(null);}          
+        },       
+        function(cb){
+          if(!status.link || !status.process){ log.link(events, comps, req.user, cb); } else {cb(null);}
+        }
+      ], function(err){
         if(err) return next(err);
 
         if(!( ('theta' in status) && !status.theta)){ //no new theta
           return res.json({'success': true, 'msg': 'your model has been published'});
         }
 
-        ppriors.commit(req.app.get('priors'), comps.link.prior, comps, req.user, function(err){
-          if(err) return next(err);          
+        //update and log theta (note that link has to be updated too...)
+        async.waterfall([
+          function(cb){
+            ppriors.commit(req.app.get('priors'), comps.link.prior, comps, req.user, cb);
+          },
+          function(priors, cb){
+            update.theta(components, comps, cb);
+          },
+          function(cnt, cb){
+            log.theta(events, comps, req.user, cb);
+          },
+          function(e, cb){
+            commitTrace(req.app.get('db'), req.files, comps, req.user, cb);            
+          }
+        ], function(err, msg){
+          if(err) return next(err);
+          res.json(msg);
 
-          commitTrace(req.app.get('db'), req.files, comps, req.user, function(err, msg){
-            if(err) return next(err);
-            res.json(msg);
-          });
+        }); //end async.waterfall
 
-        })
-
-      });
-      
+      }); //end async.series
+            
     });
 
   });
 
 });
 
-function commitTrace(db, filesObj, comps, user, cb){
 
-  //store files in mongo gridfs and start diagnostic
+/**
+ * store files in mongo gridfs and start diagnostic
+ */
+
+function commitTrace(db, filesObj, comps, user, cb){
 
   var gfs = Grid(db, mongodb);
   async.mapLimit(Object.keys(filesObj), 4, function(key, callback){
@@ -327,129 +355,6 @@ function commitTrace(db, filesObj, comps, user, cb){
   });
 
 }
-
-
-function updateAndLog (collections, comps, status, user, cb){
-
-  var events = collections.events
-    , components = collections.components;
-
-  var is_new_theta = ( ('theta' in status) && !status.theta);
-
-  async.series([
-    function(callback){
-      //register event for context creation:
-      if(!status.context){
-        events.insert({
-          from: user,
-          type: 'create',
-          option: 'context',
-          context_id: comps.context._id,
-          name: comps.context.disease.join('; ') + ' / ' +  comps.context.name
-        }, function(err, doc){
-          callback(err, doc);
-        });
-      } else {
-        callback(null);
-      }
-    },
-
-    function(callback){      
-      //update link:
-      if(!status.link || is_new_theta ){
-        var linkUpdate = {
-          $set: {
-            context_id: comps.context._id,
-            context_disease: comps.context.disease,
-            context_name: comps.context.name,
-            process_id: comps.process._id,
-            process_name: comps.process.name,
-          },
-          $addToSet: {_keywords: {$each :comps.context._keywords.concat(comps.process._keywords)}}
-        };
-
-        if (is_new_theta) {
-          linkUpdate['$push'] = {theta_id: comps.theta._id};
-        }
-
-        components.update({_id: comps.link._id}, linkUpdate, {safe:true}, function(err, cnt){
-          callback(err, cnt);
-        });
-      } else {
-        callback(null);
-      }
-    },
-
-    function(callback){      
-      //register event for link == model creation:
-      if(!status.link || !status.process){
-        events.insert({
-          from: user,
-          type: 'create',
-          option: 'model',
-          context_id: comps.context._id,
-          process_id: comps.process._id,
-          link_id: comps.link._id,
-          name: comps.context.disease.join('; ') + ' / ' +  comps.context.name + ' / ' + comps.process.name + ' - ' + comps.link.name
-        }, function(err, doc){
-          callback(err, doc);
-        });
-      } else {
-        callback(null);
-      }
-    },
-
-    function(callback){
-      //update theta
-      if (is_new_theta) {        
-        var thetaUpdate = {
-          $set: {
-            context_id: comps.context._id,
-            context_disease: comps.context.disease,
-            context_name: comps.context.name,
-            process_id: comps.process._id,
-            process_name: comps.process.name,
-            link_id: comps.link._id,
-            link_name: comps.link.name
-          }
-        };
-        components.update({_id: comps.theta._id}, thetaUpdate, {safe:true}, function(err, cnt){
-          callback(err, cnt);
-        });
-      } else {
-        callback(null);
-      }
-    },
-
-    function(callback){      
-      //register event for theta creation
-
-      if (is_new_theta) {        
-        events.insert({
-          from: user,
-          type: 'create',
-          option: 'theta',
-          context_id: comps.context._id,
-          process_id: comps.process._id,
-          link_id: comps.link._id,
-          theta_id: comps.theta._id,
-          name: comps.context.disease.join('; ') + ' / ' +  comps.context.name + ' / ' + comps.process.name + ' - ' + comps.link.name
-        }, function(err, doc){
-          callback(err, doc);
-        });
-      } else {
-        callback(null);
-      }
-    }
-              
-  ], function(err, results){
-    cb(err);
-  });
-
-  
-};
-
-
 
 
 

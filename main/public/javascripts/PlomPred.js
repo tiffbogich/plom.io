@@ -116,9 +116,9 @@ PlomPred.prototype.setDataTraj = function(extraLength){
       }
 
       //model prediction
-      that.dataTraj[i][that.N_TS+ts+1][0] = that.X.q5['obs_mean:' + name][i];
+      that.dataTraj[i][that.N_TS+ts+1][0] = that.X.lower['obs_mean:' + name][i];
       that.dataTraj[i][that.N_TS+ts+1][1] = that.X.mean['obs_mean:' + name][i];
-      that.dataTraj[i][that.N_TS+ts+1][2] = that.X.q95['obs_mean:' + name][i];
+      that.dataTraj[i][that.N_TS+ts+1][2] = that.X.upper['obs_mean:' + name][i];
 
 
     });
@@ -138,9 +138,9 @@ PlomPred.prototype.setDataTraj = function(extraLength){
   }
 
   that.tsName.forEach(function(name, ts){
-    that.dataTraj[that.indexDataClicked][2*that.N_TS+ts+1][0] = that.X.q5['obs_mean:' + name][that.indexDataClicked];
+    that.dataTraj[that.indexDataClicked][2*that.N_TS+ts+1][0] = that.X.lower['obs_mean:' + name][that.indexDataClicked];
     that.dataTraj[that.indexDataClicked][2*that.N_TS+ts+1][1] = that.X.mean['obs_mean:' + name][that.indexDataClicked];
-    that.dataTraj[that.indexDataClicked][2*that.N_TS+ts+1][2] = that.X.q95['obs_mean:' + name][that.indexDataClicked];
+    that.dataTraj[that.indexDataClicked][2*that.N_TS+ts+1][2] = that.X.upper['obs_mean:' + name][that.indexDataClicked];
   });
 
 };
@@ -159,16 +159,16 @@ PlomPred.prototype.setDataState = function(){
       that.dataState[i][s+1] = new Array(3);
       that.dataState[i][that.allStateName.length + s + 1] = new Array(3);
       
-      that.dataState[i][s+1][0] = that.X.q5[name][i];
+      that.dataState[i][s+1][0] = that.X.lower[name][i];
       that.dataState[i][s+1][1] = that.X.mean[name][i];
-      that.dataState[i][s+1][2] = that.X.q95[name][i];
+      that.dataState[i][s+1][2] = that.X.upper[name][i];
     });
   }
 
   that.allStateName.forEach(function(name, s){    
-    that.dataState[that.indexDataClicked][that.allStateName.length + s+1][0] = that.X.q5[name][that.indexDataClicked];
+    that.dataState[that.indexDataClicked][that.allStateName.length + s+1][0] = that.X.lower[name][that.indexDataClicked];
     that.dataState[that.indexDataClicked][that.allStateName.length + s+1][1] = that.X.mean[name][that.indexDataClicked];
-    that.dataState[that.indexDataClicked][that.allStateName.length + s+1][2] = that.X.q95[name][that.indexDataClicked];
+    that.dataState[that.indexDataClicked][that.allStateName.length + s+1][2] = that.X.upper[name][that.indexDataClicked];
   });
 
 };
