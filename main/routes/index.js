@@ -108,9 +108,10 @@ exports.index = function(req, res){
 
             if(my_thetas.length){
               var my_dic = Math.min.apply(Math, my_thetas.map(function(x){return x.dic;}));
-              my_theta = my_thetas.filter(function(x){return x.dic === my_dic;})[0];
+              var best_theta = my_thetas.filter(function(x){return x.dic === my_dic;})[0];
               //replace by the theta maximising the loglikelihood
-              my_theta = my_theta.result.filter(function(x){return x.trace_id === my_theta.trace_id;})[0].theta;
+              my_theta = best_theta.result.filter(function(x){return x.trace_id === best_theta.trace_id;})[0].theta;
+              my_theta._id = best_theta._id;
             }
             
             var model = {
@@ -152,7 +153,7 @@ exports.index = function(req, res){
 /**
  * POST request: Build model (if needed) and redirect to review
  */
-exports.postIndex = function(req, res, next){
+exports.build = function(req, res, next){
 
   var c = req.session.context = req.body.context
     , p = req.session.process = req.body.process
@@ -200,6 +201,27 @@ exports.postIndex = function(req, res, next){
   });
 
 };
+
+
+
+exports.component = function(req, res, next){
+  var _id = new ObjectID(req.params._id);
+  var components = req.app.get('components');
+
+  components.findOne({_id:_id}, function(err, doc){    
+    if(err) return next(err);
+
+    if(doc.type === 'context'){
+      //keep only the data as opposed to the meta data
+      var data = doc.data.filter(function(d){return d.id ==='data'})[0];
+      doc.data = data.source.slice(1); //remove header;
+    }
+    res.send(doc);
+  });
+
+};
+
+
 
 
 

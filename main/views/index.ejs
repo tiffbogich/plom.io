@@ -49,9 +49,9 @@
       </div>
 
       <!-- placeholder for timeseries plot -->
-      <div id="graphdiv<%= i %>" class="context-graph"></div>
+      <div id="graph_<%= c._id %>" class="context-graph"></div>
 
-      <select id="ts-picker-<%= i %>"  class="ts-picker">
+      <select id="tsPicker_<%= c._id %>"  class="ts-picker">
         <option value="-1">All time series</option>
         <% c.time_series.forEach(function(ts, indts){ %>
         <option value="<%= indts %>"><%= ts.id.split('__').join('; ') %></option>
@@ -84,7 +84,7 @@
             <a href="#"><%= m.process.name + ' - ' + m.link.name %></a>
 
             <!-- placeholder for d3 viz of compartmental model -->
-            <div id="pgraph<%= m.link._id %>" class="process-graph"></div>
+            <div id="pgraph_<%= m.process._id %>" class="process-graph"></div>
 
             <!-- score (DIC or AICc or rating) -->
             <% if (m.theta) { %>

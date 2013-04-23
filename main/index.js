@@ -63,7 +63,7 @@ app.get('/about', routes.about);
 
 app.get('/library', secure, csrf, routes.index);
 app.post('/search', secure, csrf, routes.index);
-app.post('/library', secure, csrf, routes.postIndex);
+app.post('/library', secure, csrf, routes.build);
 app.post('/fork', csrf, routes.postFork);
 
 app.get('/review', secure, csrf, routes.review);
@@ -71,6 +71,10 @@ app.get('/diagnostic/:theta_id', secure, routes.diagnosticSummary);
 app.get('/diagnostic/:theta_id/:h', secure, routes.diagnosticDetail);
 
 app.get('/forecast/:link_id/:theta_id/:h', secure, routes.forecast);
+
+//components (for AJAX call)
+app.get('/component/:_id', secure, routes.component);
+
 
 //review page
 app.get('/reviewstheta/:theta_id', secure, review.theta);

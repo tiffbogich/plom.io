@@ -6,49 +6,50 @@ $(document).ready(function() {
     e.stopPropagation();
   });
 
-  $.getJSON('/library', function(ctree) {
+  $('.plom-tooltip').tooltip({delay: { show: 100, hide: 100 }});
+  
 
-    ctree.forEach(function(c, indc){
+  $('.context-graph').each(function(){
+    var _id = $(this).attr('id').split('_')[1];
 
-      var data = c.data;
-
+    $.getJSON('/component/' + _id , function(data) {
+      data = data.data;
       data.forEach(function(x, i){
         x[0] = new Date(x[0]);
       });
 
-      c['graph'] = new Dygraph($("#graphdiv" + indc)[0], data,
-                               {
-                                 drawXGrid: false,
-                                 drawYGrid: false,
-                                 animatedZooms: true,
-                                 axisLineColor:'white',
-                                 drawYAxis:false,
-                                 showLabelsOnHighlight:false,
-                                 highlightSeriesOpts: {
-                                   strokeWidth: 2
-                                 },
-                                 showRoller:false,
-                                 colors:['grey']
-                               });
+      var g = new Dygraph($('#graph_' + _id)[0], data, {
+        drawXGrid: false,
+        drawYGrid: false,
+        animatedZooms: true,
+        axisLineColor:'white',
+        drawYAxis:false,
+        showLabelsOnHighlight:false,
+        highlightSeriesOpts: {
+          strokeWidth: 2
+        },
+        showRoller:false,
+        colors:['grey']
+      });
+       
+      $("#tsPicker_" + _id).on('change', function(e){
+        var val = parseInt($(this).val(), 10);
 
-      c.model.forEach(function(m){
-        plomGraphModel(m.process, "#pgraph"+m.link._id);
+        for(var i=0; i< data[0].length-1; i++){
+          g.setVisibility(i, (val!==-1 && i!==val) ? false : true);
+        };
       });
 
+    });    
+  });
+
+
+
+  $('.process-graph').each(function(){
+    var _id = $(this).attr('id').split('_')[1];
+    $.getJSON('/component/' + _id , function(process) {
+      plomGraphModel(process, "#pgraph_" + _id);
     });
-
-    $(".ts-picker").on('change', function(e){
-      var indc = parseInt($(this).attr('id').split('-')[2], 10)
-        , val = parseInt($(this).val(), 10);
-
-      for(var i=0; i< ctree[indc].data[0].length-1; i++){
-        ctree[indc].graph.setVisibility(i, (val!==-1 && i!==val) ? false : true);
-      };
-
-    });
-
-    $('.plom-tooltip').tooltip({delay: { show: 100, hide: 100 }});
-
   });
 
 
