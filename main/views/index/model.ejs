@@ -1,0 +1,72 @@
+<div class="horizontal-scroll">
+
+  <% c.model.forEach(function(m, j){ %>
+  <div class="model-box">
+    <a href="#"><%= m.process.name + ' - ' + m.link.name %></a>
+    <!-- placeholder for d3 viz of compartmental model -->
+    <div id="pgraph_<%= m.process._id %>" class="process-graph"></div>
+
+    <!-- score (DIC or AICc or rating) -->
+    <% if (m.theta) { %>
+    <div class="score">
+      <% if ('dic' in m.theta) { %>
+      DIC: <span><%= m.theta.dic %></span>
+      <% }; %>
+    </div>
+    <% }; %>
+
+    <form action="/fork" method="POST" class="explore">
+      <input type="hidden" name="context" value="<%= c._id %>" />
+      <input type="hidden" name="process" value="<%= m.process._id %>" />
+      <input type="hidden" name="link" value="<%= m.link._id %>" />
+      <input type="hidden" name="theta" value="<%= m.theta._id %>" />
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
+      <input class="btn" type="submit" value="Fork" />
+    </form>
+
+    <form action="/library" method="POST" class="explore">
+      <input type="hidden" name="context" value="<%= c._id %>" />
+      <input type="hidden" name="process" value="<%= m.process._id %>" />
+      <input type="hidden" name="link" value="<%= m.link._id %>" />
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
+      <input class="btn" type="submit" value="Review" />
+    </form>            
+    
+    <div class="parameter-box">
+      <% if (m.theta && m.theta.parameter) { %>
+      <ul>                     
+        <% m.process.parameter.concat(m.process.state, m.link.observation[0].parameter).forEach(function(par){  %>
+        <% if (par.id in m.theta.parameter) { %>
+        <li>
+          <a href="#" class="plom-tooltip" data-placement="left" rel="tooltip" data-original-title="<%= m.theta.parameter[par.id].comment %>"><%= par.id %></a> :
+          
+          <% if(Object.keys(m.theta.parameter[par.id]['group']).length >1 ) {%>
+          <ul>
+            <% for (var group in m.theta.parameter[par.id].group) { %>
+            <li><%= group.split('__').join('; ') %>: <%= m.theta.parameter[par.id]['group'][group]['guess']['value'] %> </li>
+            <% }; %>
+          </ul>
+          <% } else { %>
+          <%= m.theta.parameter[par.id]['group'][Object.keys(m.theta.parameter[par.id].group)[0]]['guess']['value'] %>
+          <% }; %>
+        </li>
+        <% }; %>
+        <% }); %>
+      </ul>
+      <% }; %>
+    </div> <!-- parameter box -->
+
+    Involved in:
+    <div class="related-box">
+      <ul>
+        <% m.process.related.forEach(function(x){ %>
+        <li><a href="#"><%= x %></a></li>
+        <% }); %>
+      </ul>
+    </div> <!-- related box -->
+
+  </div>  <!-- model box -->
+  <% }); %>
+
+
+</div>  <!-- horizontal scroll -->

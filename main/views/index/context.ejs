@@ -1,0 +1,29 @@
+<a href="#"><%= c.disease.join('; ') + ' / ' + c.name %></a>
+
+<div>
+  <%= c.model.length %> model<%= (c.model.length > 1) ? 's': ''%>
+  <form class="followContext social-action" action="/followcontext" method="post">
+    <input type="hidden" name="_csrf" value="<%= token %>"/>
+    <input type="hidden" name="context_id" value="<%= c._id %>"/>
+    <input type="hidden" name="name" value="<%= c.disease.join('; ') + ' / ' +  c.name %>"/>
+
+    <% var is_followed = (context_followed.indexOf(c._id.toString()) !== -1); %>
+    <button class="btn btn-mini" type="submit" name="action" value="<%= (is_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (is_followed) ? 'Unfollow': 'Follow' %></span></button>
+  </form>
+
+  <a href="/discuss" class="btn btn-mini social-action"><i class="icon-bullhorn"></i> Requests </a>
+</div>
+
+<!-- placeholder for timeseries plot -->
+<div id="graph_<%= c._id %>" class="context-graph"></div>
+
+
+<select id="tsPicker_<%= c._id %>"  class="ts-picker">
+  <option value="-1">All time series</option>
+  <% c.time_series.forEach(function(ts, indts){ %>
+  <option value="<%= indts %>"><%= ts.id.split('__').join('; ') %></option>
+  <% }); %>
+</select>
+
+<!--<p><%=: c.description | truncate:30 %></p>-->
+

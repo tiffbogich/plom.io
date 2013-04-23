@@ -1,7 +1,7 @@
 /*
- * jQuery App Folders Plugin 0.1
+ * jQuery App Folders Plugin 0.2
  * www.app-folders.com/
- * Copyright 2012, Stephen Saucier
+ * Copyright 2013, Stephen Saucier
  * Free to use under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
  */
@@ -15,11 +15,12 @@
       marginTopAdjust: false, 				// Adjust the margin-top for the folder area based on row selected?
       marginTopBase: '0px', 					// If margin-top-adjust is "true", the natural margin-top for the area
       marginTopFirst: '0px', 					// If margin-top-adjust is "true", the natural margin-top for the area
-      marginTopIncrement: '100px',			// If margin-top-adjust is "true", the increment of margin-top per row
+      marginTopIncrement: '-100px',			// If margin-top-adjust is "true", the increment of margin-top per row
       animationSpeed: 200,					// Time (in ms) for transition
       URLrewrite: false, 						// Use URL rewriting?
       URLbase: "",							// If URL rewrite is enabled, the URL base of the page where used
-      internalLinkSelector: '.jaf-internal a'	// a jQuery selector containing links to content within a jQuery App Folder
+      internalLinkSelector: '.jaf-internal a',// a jQuery selector containing links to content within a jQuery App Folder
+      instaSwitch: false
     }, options);
     
     //Do work on each selector
@@ -36,21 +37,21 @@
       //and toggle all folder / app icon that is not the one clicked.
       //and toggle the folder content panel
       $(".folder").click(function(event) {
+
 	var openFolder = $(this).attr('id');
 	var folderContent = $('.folderContent.' + openFolder);
 	var folderContentShown = $(folderContent).css("display") != "none";
 	var clickedFolder = $(this);
-
-        $('html, body').animate({
-          scrollTop: $(this).offset().top
-        }, settings.animationSpeed);
-
 	
-	
+        // Auto-scroll to the folder being clicked
+        if( settings.marginTopAdjust == false) {
+ 	  $('html, body').animate({
+ 	    scrollTop: $(this).offset().top
+ 	  }, settings.animationSpeed);
+        }
+
 	//If there is no currently displayed content area...
-	if ($(" .jaf-container .active-tool").length == 0){
-
-
+	if ($(" .jaf-container .active-tool").length === 0){
 	  var row = clickedFolder.parent(".jaf-row");
 	  $(row).after(folderContent);
 	  
@@ -65,27 +66,26 @@
 	      $(this).animate({ opacity: 1.00 }, settings.animationSpeed);
 	    }
 	  });
+
 	  
 	  
           // ==============
           // ! Shift Rows (margin-top-adjust)   
           // ==============
-	  if( settings.marginTopAdjust == false) {
+	  if( settings.marginTopAdjust === false) {
 	    return false;
 	    //if no margin-top adjustment, leave it alone
 	  } else {
 	    // To enable shifting of the rows' top margin on click (works best with overflow: hidden):
-	    // For Row 2, default -50px top-margin (change below and line 133)
 	    var $i = $(this).parent().index('.jaf-row');
 	    var marTop = settings.marginTopBase - (settings.marginTopIncrement * ($i))
 	    $(this).parent().parent().animate({ marginTop: marTop }, settings.animationSpeed );
-
 	  }
 
 
           //--Add the id to the URL but change it temporarily
           //--to keep it from scrolling to it
-	  hash = $(clickedFolder).attr('id');
+	  var hash = $(clickedFolder).attr('id');
 	  var node = $( '#' + hash );
 	  if ( node.length ) {
 	    node.attr( 'id', '' );
@@ -113,41 +113,100 @@
 		$(this).animate({ opacity: 1.00 }, settings.animationSpeed);
 	      }
 	    });
+
+	    document.location.hash = '';
 	    
 	    //Reset the margin-top for the container
 	    $(this).parent().parent().animate({ marginTop: settings.marginTopBase }, settings.animationSpeed );
-	  }
-	  else {
-	    //Inactive icon was clicked
-	    $('.folderContent').slideUp(settings.animationSpeed);
-	    $('.active-tool').removeClass('active-tool');
-	    $(' .jaf-container .folder').animate({ opacity: 1.00 }, settings.animationSpeed);
 	    
-	    //Reset the margin-top for the container
-	    $(this).parent().parent().animate({ marginTop: settings.marginTopBase }, settings.animationSpeed );
-	  }
-	  
-	  // Set the URL Title to match the opened folder.
-	  // Pushstate only works in modern browsers, but it works with browser history as well.
-	  // This is optional and removes the trailing hash (#) from the URL.
-	  window.location.hash="";
-	  if (settings.URLrewrite != false) {
-	    window.history.pushState("object or string","Title" , settings.URLbase);
+	  } else {
+
+	    if (settings.instaSwitch !== false) {
+
+
+	      var speed = settings.animationSpeed;
+
+	      if ($(this).parent().find('.active-tool').length !== 0){
+		speed = 0;
+	      }
+
+	      //Inactive icon was clicked
+	      $('.folderContent').slideUp(speed);
+	      $('.active-tool').removeClass('active-tool');
+	      $(' .jaf-container .folder').animate({ opacity: 1.00 }, speed);
+
+	      //Open clicked icon
+	      var row = clickedFolder.parent(".jaf-row");
+	      $(row).after(folderContent);
+	      
+	      $(this).addClass('active-tool', speed);
+	      $(folderContent).slideToggle(speed);
+	      
+	      $(" .jaf-container").find(".folder").not(clickedFolder).each(function() {
+		if (!folderContentShown) {
+		  $(this).animate({ opacity: settings.opacity }, speed);
+		}
+		else {
+		  $(this).animate({ opacity: 1.00 }, speed);
+		}
+	      });
+
+	      var hash = $(clickedFolder).attr('id');
+	      var node = $( '#' + hash );
+
+	      document.location.hash = hash;
+	      if ( node.length ) {
+		node.attr( 'id', hash );
+	      }
+
+	      // Set the margin top to the correct value for the newly clicked folder - See line 69
+	      if( settings.marginTopAdjust === false) {
+		return false;
+		//if no margin-top adjustment, leave it alone
+	      } else {
+		// To enable shifting of the rows' top margin on click (works best with overflow: hidden):
+		var $i = $(this).parent().index('.jaf-row');
+		var marTop = settings.marginTopBase - (settings.marginTopIncrement * ($i))
+		$(this).parent().parent().animate({ marginTop: marTop }, settings.animationSpeed );
+	      }
+
+	    } else {
+
+	      //Inactive icon was clicked
+	      $('.folderContent').slideUp(settings.animationSpeed);
+	      $('.active-tool').removeClass('active-tool');
+	      $('.jaf-container .folder').animate({ opacity: 1.00 }, settings.animationSpeed);
+	      
+	      //Reset the margin-top for the container
+	      $(this).parent().parent().animate({ marginTop: settings.marginTopBase }, settings.animationSpeed );
+
+	    }
 	  }
 	}
 	
 	event.preventDefault();
+	return false;
+      });
+
+      // close button
+      $('.jaf-close').click(function(){
+
+	$(".folder").removeClass("active-tool");
+	$(this).parent().slideToggle(settings.animationSpeed);
+	
+	//Reset the margin-top for the container
+	$(this).parent().parent().animate({ marginTop: settings.marginTopBase }, settings.animationSpeed );
       });
       
       
       // ==============
       // ! OPEN SECTION BY URL HASH on load   
       // ==============
-      var clickedFolder = $(window.location.hash);
-      var openFolder = $(clickedFolder).attr('id');
-      var folderContent = $('.' + openFolder);
-      var folderContentShown = $(folderContent).css("display") != "none";
-      var row = clickedFolder.parent(".jaf-row");
+      var clickedFolder = $(window.location.hash),
+      openFolder = $(clickedFolder).attr('id'),
+      folderContent = $('.' + openFolder),
+      folderContentShown = $(folderContent).css("display") != "none",
+      row = clickedFolder.parent(".jaf-row");
       
       $(row).after(folderContent);
       

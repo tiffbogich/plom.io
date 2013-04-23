@@ -1,0 +1,66 @@
+<% include ../layout %>
+
+<script src="/lib/spsaucier-App-Folders/jquery.app-folders.js"></script>
+<script src="/javascripts/plomGraphModel.js"></script>
+<script src="/javascripts/index.js"></script>
+    
+<% include ../header %>
+
+
+<section>
+
+  <form action="/search" method="POST">
+    <div class="input-append">
+      <input type="text" name="q" id="plom-search" class="span4"/>
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
+      <button type="submit" class="btn">Search</button>
+    </div>
+  </form>
+
+  <div class="app-folders-container"> 
+
+
+    <!-- the contexts -->
+    <% ctree.forEach(function(c, i){ %>
+
+    <% if ( (i%3) === 0 ){ %><div class="jaf-row jaf-container row"><% } %>
+
+    <div class="folder span4 context-box" id="<%= c._id %>">
+      <% include  context %>
+    </div>
+
+    <% if (((i+1) %3) === 0  || i === 4){ %></div><% } %>
+
+    <% }); %>
+
+    <div class="folder span4 context-box" id="addContext">
+      <div>
+        <img class="add-component" src="images/plus_grey.png"/>
+      </div>
+    </div>
+
+
+
+
+    <!-- the models -->
+    <% ctree.forEach(function(c, i){ %>
+    <div class="folderContent <%= c._id %>">
+      <div class="jaf-container"><% include model %></div>
+    </div>
+    <% }); %>
+
+    <div class="folderContent addContext">
+      <div class="jaf-container">
+        <p>add</p>
+      </div>
+    </div>
+
+
+
+  </div> <!-- app folder -->
+
+</section>
+
+
+<hr />
+<% include ../footer %>

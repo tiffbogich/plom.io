@@ -6,8 +6,8 @@
 
 /* issues */
 label.radio.inline.right{
-	float:right;
-	margin:1%;
+  float:right;
+  margin:1%;
 }
 
 /* user */
@@ -128,7 +128,6 @@ p:before{
 
 
 /* index */
-
 .folderContent{
   padding: 10px;
   border-radius: 1em;
@@ -136,15 +135,30 @@ p:before{
 }
 
 .context-box{
-  display: inline-block;
-  width:300px;
   height:240px;
 }
+
+.add-component{
+  margin-left: 70px;
+  margin-top: 75px;
+  text-align: center;
+  padding:10px;
+  opacity:0.4;
+  cursor: pointer;
+}
+
+.add-component:hover{
+  opacity:1;
+}
+
+
 
 .context-graph{
   width:200px;
   height:120px;
 }
+
+
 
 .process-graph{
   width:200px;

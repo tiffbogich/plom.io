@@ -140,7 +140,7 @@ exports.index = function(req, res){
         var u = req.app.get('users');
         u.findOne({_id: req.session.username}, function(err, user){
           if (err) return next(err);
-          res.render('index', {ctree:ctree, context_followed: user.context_id || []});
+          res.render('index/index', {ctree:ctree, context_followed: user.context_id || []});
         });
 
       });
