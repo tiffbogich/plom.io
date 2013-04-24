@@ -6,7 +6,6 @@
   "dependencies": {
     "jadevu": "0.0.10",
     "ejs": "~0.8.3",
-    "validator": "~0.4.19",
     "jade": "~0.28.2",
     "mongodb": "~1.2.13",
     "socket.io": "~0.9.13",
@@ -17,6 +16,7 @@
     "tar": "~0.1.17",
     "gridfs-stream": "~0.4.0",
     "csv": "~0.3.0",
-    "plom-priors": "*"
+    "plom-priors": "*",
+    "validator": "~1.1.0"
   }
 }

@@ -2,18 +2,100 @@ var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 
-  $('#reviewTab a[href=#model]').tab('show');
+  $('#reviewTab a[href=#review]').tab('show');
 
   $('a[data-toggle="tooltip"]').tooltip();
 
-
-
   $.getJSON('/review', function(data) {
 
-    var comps = data.comps;
+    var comps = data.comps
+      , tpl = data.tpl;
+
+    comps.theta = comps.thetas[0];
+
     plomGraphModel(comps.process, "#pgraph"+ comps.link._id);
 
-//
+    var reviewer = _.template(tpl['reviewer']);
+
+    $('#formReviewTheta').on('submit', function(e){
+      e.preventDefault();
+
+      var $this = $(this)
+        , $body = $this.find( 'textarea[name="body"]' );
+
+      var pdata = {
+        type:'theta',
+        context_id: comps.context._id,
+        process_id: comps.process._id,
+        link_id: comps.link._id,
+        theta_id: comps.theta._id,
+        name: comps.name,
+        decision: $this.find( 'input[name="decision"]:checked' ).val(),
+        body: $body.val(),
+        _csrf: $this.find( 'input[name="_csrf"]' ).val(),
+      };
+
+
+      console.log(comps.theta);
+
+      var vdata = comps.vizBit;
+      if(vdata && 'theta' in vdata){
+        pdata.vizbit = {theta:vdata.theta, method:vdata.method};
+      }
+
+      var url = $this.closest('form').attr('action');
+      $.ajax(url, {
+        data : JSON.stringify(pdata),
+        contentType : 'application/json',
+        type : 'POST',
+        success: function(reviews){
+          $body.val('');
+          $('#reviewThread').html(reviewer(reviews));
+        }
+      });
+
+    });
+
+
+    //post comments
+    $('#reviewThread').on('submit', 'form', function(e){
+      e.preventDefault();
+
+      var $this = $(this)
+        , $body = $this.find( 'textarea[name="body"]' );
+
+      var pdata = {
+        review_id: $this.find( 'input[name="review_id"]' ).val(),
+        decision: $this.find( 'input[name="decision"]:checked' ).val(),
+        change: $this.find( 'input[name="change"]:checked' ).val(),
+        body: $body.val(),
+        _csrf: $this.find( 'input[name="_csrf"]' ).val()
+      };
+
+      $body.val('');
+
+      var vdata = comps.vizBit;
+      if(vdata && 'theta' in vdata){
+        pdata.vizbit = {theta: vdata.theta, method:vdata.method};
+      }
+
+      var url = $this.closest('form').attr('action');
+      $.ajax(url, {
+        data : JSON.stringify(pdata),
+        contentType : 'application/json',
+        type : 'POST',
+        success: function(reviews){
+          $('#reviewThread').html(comps.compiled.reviews(reviews));
+        }
+      });
+
+    });
+
+
+
+
+
+
 //    var ctrl = new Control(data);
 //
 //    ctrl.thetaList();
@@ -76,83 +158,6 @@ $(document).ready(function() {
 //    ////////
 //    //social
 //    ////////
-//    $.get('/reviewstheta/'+ ctrl.theta._id, function(reviews) {
-//      $('#reviewThread').html(ctrl.compiled.reviews(reviews));
-//    });
-//
-//
-//    $('#formReviewTheta').on('submit', function(e){
-//      e.preventDefault();
-//
-//      var $this = $(this)
-//        , $body = $this.find( 'textarea[name="body"]' );
-//
-//      var pdata = {
-//        context_id: ctrl.context._id,
-//        process_id: ctrl.process._id,
-//        link_id: ctrl.link._id,
-//        theta_id: ctrl.theta._id,
-//        name: ctrl.name,
-//        decision: $this.find( 'input[name="decision"]:checked' ).val(),
-//        body: $body.val(),
-//        _csrf: $this.find( 'input[name="_csrf"]' ).val(),
-//      };
-//
-//      $body.val('');
-//
-//      var vdata = ctrl.vizBit;
-//      if(vdata && 'theta' in vdata){
-//        pdata.vizbit = {theta:vdata.theta, method:vdata.method};
-//      }
-//
-//      var url = $this.closest('form').attr('action');
-//      $.ajax(url, {
-//        data : JSON.stringify(pdata),
-//        contentType : 'application/json',
-//        type : 'POST',
-//        success: function(reviews){
-//          $('#reviewThread').html(ctrl.compiled.reviews(reviews));
-//        }
-//      });
-//
-//    });
-//
-//
-//
-//
-//    //post comments
-//    $('#reviewThread').on('submit', 'form', function(e){
-//      e.preventDefault();
-//
-//      var $this = $(this)
-//        , $body = $this.find( 'textarea[name="body"]' );
-//
-//      var pdata = {
-//        review_id: $this.find( 'input[name="review_id"]' ).val(),
-//        decision: $this.find( 'input[name="decision"]:checked' ).val(),
-//        change: $this.find( 'input[name="change"]:checked' ).val(),
-//        body: $body.val(),
-//        _csrf: $this.find( 'input[name="_csrf"]' ).val()
-//      };
-//
-//      $body.val('');
-//
-//      var vdata = ctrl.vizBit;
-//      if(vdata && 'theta' in vdata){
-//        pdata.vizbit = {theta: vdata.theta, method:vdata.method};
-//      }
-//
-//      var url = $this.closest('form').attr('action');
-//      $.ajax(url, {
-//        data : JSON.stringify(pdata),
-//        contentType : 'application/json',
-//        type : 'POST',
-//        success: function(reviews){
-//          $('#reviewThread').html(ctrl.compiled.reviews(reviews));
-//        }
-//      });
-//
-//    });
 //
 //    //discussion
 //    $('#model').on('submit', 'form.discuss', function(e){

@@ -5,6 +5,7 @@ var fs = require('fs')
   , ObjectID = require('mongodb').ObjectID
   , writePredictFiles = require('../lib/predict')
   , ppriors = require('plom-priors')
+  , xreview = require('../lib/review')
   , path = require('path');
 
 
@@ -35,15 +36,22 @@ exports.index = function(req, res, next){
       comps.infectors = ppriors.tooltipify(comps);
       comps.link.prior = ppriors.display(comps.link.prior, comps);
 
+      comps.thetas = comps.thetas.map(function(theta){
+        ppriors.getCaptions(comps, theta);
+        return theta;
+      });
+
+      comps.theta = thetas[0];
+
       res.format({
         html: function(){
-          res.render('review/index', comps);
+          xreview.get(req.app.get('reviews'), undefined, comps, function(err, reviews){            
+            comps.reviews = reviews;
+            res.render('review/index', comps);            
+          });
         },
 
         json: function(){
-          comps.thetas = comps.thetas.map(function(theta){
-            return ppriors.getCaptions(comps, theta);
-          });
 
           //send the templates TODO browserify...
           async.parallel({ 
@@ -51,7 +59,7 @@ exports.index = function(req, res, next){
             cred: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','cred.ejs'), 'utf8', cb)},
             summaryTable: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','summary_table.ejs'), 'utf8', cb)},
             ticks: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8', cb)},
-            reviews: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','reviews.ejs'), 'utf8', cb)},
+            reviewer: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','reviewer.ejs'), 'utf8', cb)},
             discuss: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','discuss.ejs'), 'utf8', cb)},
           }, function(err, tpl){
             if(err) return next(err);
@@ -70,6 +78,20 @@ exports.index = function(req, res, next){
 
   });
 };
+
+
+exports.post = function(req, res, next){
+
+  var review = req.body;
+
+  xreview.post(req.app.get('reviews'), req.app.get('events'), review, req.session.username, function(err, reviews){
+    res.send({reviews:reviews, username:req.session.username});
+  });
+
+}
+
+
+
 
 
 exports.diagnosticSummary = function(req, res, next){
@@ -133,20 +155,6 @@ exports.forecast = function(req, res, next){
   }); //end fs.exists
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 exports.theta = function(req, res, next){

@@ -73,14 +73,15 @@ app.get('/component/:_id', secure, routes.component);
 
 //review page
 app.get('/review', secure, csrf, review.index);
+app.post('/review', secure, csrf, review.post);
+
 app.get('/diagnostic/:theta_id', secure, review.diagnosticSummary);
 app.get('/diagnostic/:theta_id/:h', secure, review.diagnosticDetail);
 
 app.get('/forecast/:link_id/:theta_id/:h', secure, review.forecast);
 
-//review page
 app.get('/reviewstheta/:theta_id', secure, review.theta);
-app.post('/reviewtheta', secure, csrf, review.postTheta);
+
 app.post('/commentreviewtheta', secure, csrf, review.postCommentTheta);
 app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 

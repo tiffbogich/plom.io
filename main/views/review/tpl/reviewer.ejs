@@ -5,7 +5,7 @@
 
       <li><a href="/<%= review.username %>"><%= review.username %></a></li>
 
-      <li>on <%= review._id.date || '2013-04-10' %></li>
+      <li>on <%= review._id.date %></li>
 
       <li><span class="label label-<%= (review.decision === 'validated') ? 'success': 'important' %>"><%= (review.decision === 'validated') ? 'validated': 'rejected' %></span></li>
 
