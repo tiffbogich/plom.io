@@ -28,7 +28,7 @@ exports.get = function(collection, l, model, callback){
     q = {
       type: 'observed',
       link_id: model.link._id,
-      reaction_id: {$in: l.map(function(x){return x.id;})}
+      observed_id: {$in: l.map(function(x){return x.id;})}
     };
     id_key = 'observed_id';
   } else if ('posterior' in l[0] && l[0].posterior){
@@ -88,7 +88,7 @@ exports.post = function(collection, events, review, username, callback){
       from: username,
       type: review.type,
       name: review.name,
-      option: review.decision,
+      option: review.status,
       review_id: review._id
     };
 
@@ -140,7 +140,7 @@ function update(collection, review, callback){
   } else if(type === 'observed') {
     q =  { 
       link_id: review.link_id,
-      reaction_id: review.reaction_id
+      observed_id: review.observed_id
     };
   }
   
@@ -148,7 +148,6 @@ function update(collection, review, callback){
 
   //retrieve latest reviews
   collection.find(q).sort({_id: 1}).toArray(callback);
-
 }
 
 
@@ -165,19 +164,19 @@ exports.comment = function(collection, events, comment, username, callback){
   comment.username = username;
   comment.date = new Date();
 
-  var update = {$push: {comments: comment}};
+  var upd = {$push: {comments: comment}};
   if(comment.change){
-    update['$set'] = {decision: comment.change};
+    upd['$set'] = {status: comment.change};
   }
 
-  r.findAndModify({_id:_id}, [], update, {safe:true, 'new':true}, function(err, review){
+  collection.findAndModify({_id:_id}, [], upd, {safe:true, 'new':true}, function(err, review){
     if(err) return next(err);
 
     //add event
     var mye = {
       from: username,
       type: 'review',
-      option: (comment.change) ? 'revised_': ((comment.decision) ? 'contested_' + comment.decision : 'commented'),
+      option: (comment.change) ? 'revised_': ((comment.status) ? 'contested_' + comment.status : 'commented'),
       review_id: review._id,
       comment_id: review.comments.length-1,
       name: review.name

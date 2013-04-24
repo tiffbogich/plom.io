@@ -7,7 +7,7 @@
 
       <li>on <%= review._id.date %></li>
 
-      <li><span class="label label-<%= (review.decision === 'validated') ? 'success': 'important' %>"><%= (review.decision === 'validated') ? 'validated': 'rejected' %></span></li>
+      <li><span class="label label-<%= (review.status === 'validated') ? 'success': 'important' %>"><%= (review.status === 'validated') ? 'validated': 'rejected' %></span></li>
 
       <% if (review.vizbit){ %>
       <li><a class="vizbitFetch" href="/vizbit/<%= review._id %>" data-view="#filtering">run</a></li>
@@ -28,8 +28,8 @@
           <li><%= comment.username %></li>
           <li>on <%= comment.date %></li>
 
-          <% if(comment.decision){ %>
-          <li>Requested to set status to: <span class="label label-<%= (comment.decision === 'validated') ? 'success': 'important' %>"><%= (comment.decision === 'validated') ? 'validated': 'rejected' %></span></li>
+          <% if(comment.status){ %>
+          <li>Requested to set status to: <span class="label label-<%= (comment.status === 'validated') ? 'success': 'important' %>"><%= (comment.status === 'validated') ? 'validated': 'rejected' %></span></li>
           <% } %>
 
           <% if(comment.change){ %>
@@ -43,35 +43,43 @@
           <% if(comment.body){ %>
           <li><%= comment.body %></li>      
           <% } %>
-
         </ul>
 
       </div>
     </div>
     <% })}; %>
     
-    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#review_<%= i %>"><i class="icon-comment"></i> Discuss</button>
 
-    <div id="review_<%= i %>" class="collapse">
+    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= review._id %>"><i class="icon-comment"></i> Discuss</button>
+
+    <div id="<%= review._id %>" class="collapse">
       
-      <form class="comment-review-theta" action="/commentreviewtheta" method="post">
+      <form class="post" action="/comment" method="post">
 
         <% if(username !== review.username){ %>
         <label class="checkbox">
-          <input type="checkbox" name="decision" value="<%= (review.decision === 'validated') ? 'rejected': 'validated' %>"/> Ask the reviewer to change its status to <%= (review.decision === 'validated') ? 'rejected': 'validated' %>
+          <input type="checkbox" name="status" value="<%= (review.status === 'validated') ? 'rejected': 'validated' %>"/> Ask the reviewer to change its status to <%= (review.status === 'validated') ? 'rejected': 'validated' %>
         </label>
         <% } else { %>
         <label class="checkbox">
-          <input type="checkbox" name="change" value="<%= (review.decision === 'validated') ? 'rejected': 'validated' %>"/> Change the status of my review to <%= (review.decision === 'validated') ? 'rejected': 'validated' %>
+          <input type="checkbox" name="change" value="<%= (review.status === 'validated') ? 'rejected': 'validated' %>"/> Change the status of my review to <%= (review.status === 'validated') ? 'rejected': 'validated' %>
         </label>
-        <% } %>        
+        <% } %>
 
-        <button class="vizbit btn btn-mini"><i class="icon-file"></i> Attach run</button> 
-        <a class="vizbitLink" href="#filtering"></a>
-        <a class="vizbitRemove hidden" href="#"><i class="icon-remove"></i></a>
+        <% if(review.type === 'theta'){ %>
+        <!-- vizbit -->
+        <p>
+          <button class="vizbit btn btn-mini"><i class="icon-file"></i> Attach run</button> 
+          <a class="vizbitLink" href="#filtering"></a>
+          <a class="vizbitRemove hidden" href="#"><i class="icon-remove"></i></a>
+        </p>
+        <% } %>
 
         <textarea rows="3" class="span5" name="body"></textarea>
         <input type="hidden" name="review_id" value="<%= review._id %>"/>
+        <input type="hidden" name="type" value="<%= review.type %>"/>
+        <% if ('parameter' in review.name) { %><input type="hidden" name="parameter" value="<%= review.name.parameter %>"/><% } %>
+        <% if ('group' in review.name) { %><input type="hidden" name="group" value="<%= review.name.group %>"/><% } %>
         <input type="hidden" name="_csrf" value="<%= token %>"/>
         
         <p>
@@ -84,3 +92,4 @@
   </div>
 </div>
 <% }); %>
+

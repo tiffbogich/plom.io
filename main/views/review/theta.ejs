@@ -1,31 +1,31 @@
 <div class="span8">
   <h3>Reviews</h3>
-  <div id="reviewThread"><% include tpl/reviewer %></div>
+  <div id="threadTheta"><% include tpl/reviewer %></div>
 </div>
 
 <div class="span39">
   <h3>Submit a new review</h3>
 
-  <form id="formReviewTheta" action="/review" method="post">
-
+  <form id="formReviewTheta" class="post" action="/review" method="post">
     <label for="reviewTheta">Review the methods and the parameter values</label>
 
     <!-- vizbit -->
     <p>
-    <button class="vizbit btn btn-mini"><i class="icon-file"></i> Attach run</button> 
-    <a class="vizbitLink" href="#filtering"></a>
-    <a class="vizbitRemove hidden" href="#"><i class="icon-remove"></i></a>
+      <button class="vizbit btn btn-mini"><i class="icon-file"></i> Attach run</button> 
+      <a class="vizbitLink" href="#filtering"></a>
+      <a class="vizbitRemove hidden" href="#"><i class="icon-remove"></i></a>
     </p>
 
     <textarea id="reviewTheta" rows="5" name="body", class="span4"></textarea>
 
     <input type="hidden" name="_csrf" value="<%= token %>"/>
+    <input type="hidden" name="type" value="theta"/>
 
     <label class="radio inline">
-      <input type="radio" name="decision" value="validated">Validate
+      <input type="radio" name="status" value="validated">Validate
     </label>
     <label class="radio inline">
-      <input type="radio" name="decision"  value="rejected">Reject
+      <input type="radio" name="status"  value="rejected">Reject
     </label>
     <button class="btn" type="submit">Submit</button>
   </form>

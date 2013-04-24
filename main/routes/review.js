@@ -87,8 +87,19 @@ exports.post = function(req, res, next){
   xreview.post(req.app.get('reviews'), req.app.get('events'), review, req.session.username, function(err, reviews){
     res.send({reviews:reviews, username:req.session.username});
   });
+}
+
+exports.comment = function(req, res, next){
+
+  var comment = req.body;
+
+  xreview.comment(req.app.get('reviews'), req.app.get('events'), comment, req.session.username, function(err, reviews){
+    res.send({reviews:reviews, username:req.session.username});
+  });
 
 }
+
+
 
 
 

@@ -10,7 +10,10 @@ exports.context = function (collection, comps, user, callback){
     type: 'create',
     option: 'context',
     context_id: comps.context._id,
-    name: comps.context.disease.join('; ') + ' / ' +  comps.context.name
+    name: {
+      disease: comps.context.disease,
+      context: comps.context.name      
+    }
   }, callback);
 
 };
@@ -28,7 +31,12 @@ exports.link = function(collection, comps, user, callback){
     context_id: comps.context._id,
     process_id: comps.process._id,
     link_id: comps.link._id,
-    name: comps.context.disease.join('; ') + ' / ' +  comps.context.name + ' / ' + comps.process.name + ' - ' + comps.link.name
+    name: {
+      disease: comps.context.disease,
+      context: comps.context.name,
+      process: comps.process.name,
+      link: comps.link.name
+    }
   }, callback);
 
 };
@@ -46,7 +54,12 @@ exports.theta = function(collection, comps, user, callback){
     process_id: comps.process._id,
     link_id: comps.link._id,
     theta_id: comps.theta._id,
-    name: comps.context.disease.join('; ') + ' / ' +  comps.context.name + ' / ' + comps.process.name + ' - ' + comps.link.name
+    name: {
+      disease: comps.context.disease,
+      context: comps.context.name,
+      process: comps.process.name,
+      link: comps.link.name
+    }
   }, callback);
 
 };
