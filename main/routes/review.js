@@ -3,6 +3,7 @@ var fs = require('fs')
   , check = require('validator').check
   , mongodb = require('mongodb')
   , ObjectID = require('mongodb').ObjectID
+  , writePredictFiles = require('../lib/predict')
   , ppriors = require('plom-priors')
   , path = require('path');
 
@@ -222,6 +223,9 @@ exports.postTheta = function(req, res, next){
   });
 
 };
+
+
+
 
 exports.postCommentTheta = function(req, res, next){
 

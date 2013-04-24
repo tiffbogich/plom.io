@@ -11,7 +11,6 @@ var fs = require('fs')
   , Grid = require('gridfs-stream')
   , zlib = require("zlib")
   , csv = require("csv")
-  , writePredictFiles = require('../lib/predict')
   , ppriors = require('plom-priors')
   , dbUtil = require('../../db-utils');
 

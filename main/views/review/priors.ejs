@@ -225,6 +225,16 @@
                   <textarea rows="2" class="span4" name="body"></textarea>
                   <input type="hidden" name="id" value="<%= i %>"/>
                   <input type="hidden" name="_csrf" value="<%= token %>"/>                  
+
+                  <p>
+                  <label class="radio inline">
+                    <input type="radio" name="decision" value="validated">Validate
+                  </label>
+                  <label class="radio inline">
+                    <input type="radio" name="decision"  value="rejected">Reject
+                  </label>
+                  </p>
+
                   <p><button class="btn" type="submit">Submit</button></p>
                 </form>               
               </div>
