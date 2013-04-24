@@ -61,20 +61,22 @@ app.configure('production', function(){
 app.get('/', csrf, routes.welcome);
 app.get('/about', routes.about);
 
+//index page
 app.get('/library', secure, csrf, routes.index);
 app.post('/search', secure, csrf, routes.index);
 app.post('/library', secure, csrf, routes.build);
 app.post('/fork', csrf, routes.postFork);
 
-app.get('/review', secure, csrf, routes.review);
-app.get('/diagnostic/:theta_id', secure, routes.diagnosticSummary);
-app.get('/diagnostic/:theta_id/:h', secure, routes.diagnosticDetail);
-
-app.get('/forecast/:link_id/:theta_id/:h', secure, routes.forecast);
-
 //components (for AJAX call)
 app.get('/component/:_id', secure, routes.component);
 
+
+//review page
+app.get('/review', secure, csrf, review.index);
+app.get('/diagnostic/:theta_id', secure, review.diagnosticSummary);
+app.get('/diagnostic/:theta_id/:h', secure, review.diagnosticDetail);
+
+app.get('/forecast/:link_id/:theta_id/:h', secure, review.forecast);
 
 //review page
 app.get('/reviewstheta/:theta_id', secure, review.theta);
@@ -84,6 +86,10 @@ app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 
 //discussion
 app.post('/discuss/:type', secure, csrf, review.postDiscuss);
+
+
+
+
 
 //request
 app.get('/requests/:id', secure, csrf, function(req, res){res.render('requests.ejs')});

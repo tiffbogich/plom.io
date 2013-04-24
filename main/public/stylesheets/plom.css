@@ -395,9 +395,8 @@ text.shadow {
   margin-right: 10px;
 }
 
-#thetaList{
+#reviewTab{
   margin-top:30px;
-  margin-bottom:30px;
 }
 
 .passed:hover, .failed:hover{

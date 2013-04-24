@@ -1,0 +1,15 @@
+<% thetas.forEach(function(theta, i){ %>
+   <div class="model-box">
+     <ul>
+       <li><a href="/<%= theta.username %>"><%= theta.username %></a></li>
+       <% var cmd = theta.design.cmd[theta.design.cmd.length-1] ; %>
+       <li>DIC: <%= theta.dic %></li>
+       <% if (cmd.fit) { %>
+       <li>fit: <%= cmd.fit %></li>
+       <% } %>
+       <li><%= cmd.algorithm %></li>
+     </ul>
+
+     <button class="btn btn-mini review-theta" type="button" value="<%= i %>">review</button>
+   </div>
+<% }); %>

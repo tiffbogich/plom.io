@@ -16,10 +16,9 @@
 
 </head>
 
-<body onload="prettyPrint()">
+<body>
 
   <div class="container">
-
 
     <div class="row">
       <div id="headerLogo" class="span4">
@@ -34,19 +33,18 @@
       </ul>
     </div>
 
-
     <div class="row">
       <div class="span12">
-
-        <!-- parameter list (templated) -->
-        <div class="horizontal-scroll" data-toggle="buttons-radio" id="thetaList"></div>
         
         <ul class="nav nav-tabs" id="reviewTab">
           <li class="active">
-            <a href="#model" data-toggle="tab">Model</a>
+            <a href="#priors" data-toggle="tab">Priors</a>
           </li>
           <li>
-            <a href="#theta" data-toggle="tab">Results</a>
+            <a href="#review" data-toggle="tab">Review</a>
+          </li>
+          <li>
+            <a href="#posteriors" data-toggle="tab">Posteriors</a>
           </li>
           <li>
             <a href="#forecast" data-toggle="tab">Forecasting</a>
@@ -56,7 +54,7 @@
         <div class="tab-content">
 
           <!-- Model -->
-          <div class="tab-pane active" id="model">
+          <div class="tab-pane active" id="priors">
 
             <div class="row">
               <div class="span10">
@@ -69,14 +67,20 @@
               </div>
             </div>
 
-            <!-- templated -->
-            <div id="modelTpl"></div>            
+            <div class="row">
+              <div class="span12"><% include priors %></div>
+            </div>
+
 
           </div><!-- end div#model -->
 
 
           <!-- theta -->
-          <div class="tab-pane" id="theta">
+          <div class="tab-pane" id="review">
+
+            <!-- parameter list -->
+            <div class="horizontal-scroll" data-toggle="buttons-radio" id="thetaList"><% include thetalist %></div>
+            <hr/>
 
             <div class="row">
               <div class="span10">
@@ -142,6 +146,12 @@
             </div>
 
           </div> <!-- end div#theta -->
+
+
+          <!-- Forecasting -->
+          <div class="tab-pane" id="posteriors">
+
+          </div>
 
           
           <!-- Forecasting -->

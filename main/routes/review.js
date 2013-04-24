@@ -1,8 +1,151 @@
 var fs = require('fs')
+  , async = require('async')
   , check = require('validator').check
   , mongodb = require('mongodb')
   , ObjectID = require('mongodb').ObjectID
+  , ppriors = require('plom-priors')
   , path = require('path');
+
+
+exports.index = function(req, res, next){
+
+  var c = req.session.context
+    , p = req.session.process
+    , l = req.session.link;
+
+  if(!(c && p && l)){
+    return res.redirect('/library');
+  }
+
+  var components = req.app.get('components');
+
+  components.find({_id: {$in: [c, p, l].map(function(x){return new ObjectID(x);})}}).toArray(function(err, docs){
+    if (err) return next(err);
+
+    var comps = {};
+    docs.forEach(function(x){
+      comps[x.type] = x;
+    });
+
+    components.find({_id: {$in: comps.link.theta_id}}).toArray(function(err, thetas){
+      if (err) return next(err);
+
+      comps.thetas = thetas;
+      comps.infectors = ppriors.tooltipify(comps);
+      comps.link.prior = ppriors.display(comps.link.prior, comps);
+
+      res.format({
+        html: function(){
+          res.render('review/index', comps);
+        },
+
+        json: function(){
+          comps.thetas = comps.thetas.map(function(theta){
+            return ppriors.getCaptions(comps, theta);
+          });
+
+          //send the templates TODO browserify...
+          async.parallel({ 
+            control: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','control.ejs'), 'utf8', cb)},
+            cred: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','cred.ejs'), 'utf8', cb)},
+            summaryTable: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','summary_table.ejs'), 'utf8', cb)},
+            ticks: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8', cb)},
+            reviews: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','reviews.ejs'), 'utf8', cb)},
+            discuss: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','discuss.ejs'), 'utf8', cb)},
+          }, function(err, tpl){
+            if(err) return next(err);
+
+            for(var key in tpl){
+              tpl[key] = tpl[key].replace(/<%= token %>/g, req.session._csrf);
+            }
+            
+            res.json({tpl:tpl, comps: comps});                             
+          });
+        }
+
+      });      
+
+    });
+
+  });
+};
+
+
+exports.diagnosticSummary = function(req, res, next){
+  var theta_id = req.params.theta_id
+    , diagnostics = req.app.get('diagnostics');
+
+  diagnostics.find({theta_id: theta_id}, {summary:true, h:true}).sort({'summary.essMin':-1}).toArray(function(err, docs){
+    res.send(docs);
+  });
+
+}
+
+
+exports.diagnosticDetail = function(req, res, next){
+  var theta_id = req.params.theta_id
+    , h = parseInt(req.params.h, 10)
+    , diagnostics = req.app.get('diagnostics');
+
+  diagnostics.findOne({theta_id: theta_id, h:h}, {detail:true, X:true}, function(err, doc){
+    res.send(doc);
+  });
+}
+
+
+exports.forecast = function(req, res, next){
+  var link_id = req.params.link_id
+    , theta_id = req.params.theta_id
+    , h = parseInt(req.params.h, 10);
+
+  var predictPath = path.join(process.env.HOME, 'built_plom_models', link_id, 'model', theta_id);
+  fs.exists(predictPath, function (exists) {
+
+    if(exists){
+      res.send({ready:true});
+    } else {
+      var db = req.app.get('db');
+      var gfs = Grid(db, mongodb);
+
+      gfs.files.find({ 'metadata.theta_id': new ObjectID(theta_id), 'metadata.type': {$in: ['best', 'X']}, 'metadata.h':h }, {_id:true, metadata:true}).toArray(function (err, files) {
+        if (err) return callback(err);
+       
+        writePredictFiles(gfs, predictPath, files, function(err){
+          if (err) return next(err);
+
+          //add theta
+          var components = req.app.get('components');
+          components.findOne({_id: new ObjectID(theta_id)}, {results:true}, function(err, theta){
+            if (err) return next(err);
+
+            theta = theta.results.filter(function(x){return x.trace_id === h})[0].theta;
+            fs.writeFile(path.join(predictPath, 'theta_'+ h +'.json'), JSON.stringify(theta), function(err){
+              if (err) return next(err);
+              res.send({ready:true});
+            });
+            
+          });
+        })
+      }); //end toArray
+    } //end else
+
+  }); //end fs.exists
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 exports.theta = function(req, res, next){

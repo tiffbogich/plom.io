@@ -60,18 +60,13 @@ function Control(data){
 
 
 Control.prototype.thetaList = function(){
-  $('#thetaList').html(this.compiled.parameters({thetas: this.thetas}));
-
   var that = this;
   $('.review-theta').on('click', function(e){
     that.i = parseInt($(this).val(), 10);
 
     //model review
-    that._tooltipify(that.link.observation[0].model, that.thetas[that.i]);
-    that._tooltipify(that.link.process_model, that.thetas[that.i]);
-    $('#modelTpl').html(that.compiled.model({context: that.context, process: that.process, link: that.link, theta: that.thetas[that.i], infector: that.infector}));
     plomGraphModel(that.process, "#pgraph"+that.link._id);
-    $('a[data-toggle="tooltip"]').tooltip();
+
 
     $.getJSON('/diagnostic/'+ that.thetas[that.i]._id, function(summaries) {
       that.summaries = summaries;
@@ -345,7 +340,6 @@ Control.prototype._parseRate = function(rate){
     } else {
       s += rate[i];
     }
-
   }
 
   if (s.length){

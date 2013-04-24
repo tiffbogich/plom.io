@@ -11,7 +11,7 @@
     <button class="btn btn-mini" type="submit" name="action" value="<%= (is_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (is_followed) ? 'Unfollow': 'Follow' %></span></button>
   </form>
 
-  <a href="/requests/<%c._id %>" class="btn btn-mini social-action"><i class="icon-bullhorn"></i> Requests </a>
+  <a href="/requests/<%= c._id %>" class="btn btn-mini social-action"><i class="icon-bullhorn"></i> Requests </a>
 </div>
 
 <!-- placeholder for timeseries plot -->

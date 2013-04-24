@@ -1,0 +1,246 @@
+<div class="accordion" id="accPmodel">
+
+
+  <!-- prior -->
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accPmodel" href="#accPriorContent">Priors</a>
+    </div>
+
+    <div id="accPriorContent" class="accordion-body collapse in">
+      <div class="accordion-inner">
+
+        <% [
+           {val: link.prior.process, title:'Process'},
+           {val: link.prior.observation, title:'Observation'},
+           {val: link.prior.state, title: 'Initial Conditions'}
+           ].forEach(function(type){ %>
+
+        <div class="span39">
+
+          <h4><%= type.title %></h4>
+
+          <% for(var par in type.val){ 
+             for(var group in type.val[par]['group']){ 
+             var caption = type.val[par]['caption']
+             var p = type.val[par]['group'][group] 
+             %>
+
+
+          <div class="row">
+            <div class="span5">
+              <a href="#" data-toggle="tooltip" title="<%= caption %>"><%= par %>: <%= group.split('__').join('; ') %></a>                
+              <ul>
+                <li>distribution: <%= p.distribution %></li>
+                <li>min: <%= p.min %></li>
+                <li>max: <%= p.max %></li>
+              </ul>
+            </div>
+
+            <div class="span5">
+
+
+              <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= p.semantic_id %>"><i class="icon-comment"></i> Discuss</button>                
+
+              <!-- discussion on the observed variable -->
+              <div id="<%= p.semantic_id %>" class="collapse">
+                <div class="thread">
+                  <% if (p.discussion && p.discussion.length){ %>
+                  <ul>
+                    <% p.discussion.forEach(function(d){ %>
+                    <li><%= d.username %> on <%= d.date %></li>
+                    <li><%= d.body %></li>                
+                    <% }); %>
+                  </ul>
+                  <% } %>
+                </div>
+
+                <div>
+                  <form class="discuss" action="/discuss/prior" method="post">
+                    <textarea rows="2" class="span3" name="body"></textarea>
+                    <input type="hidden" name="id" value="<%= p.semantic_id %>"/>
+                    <input type="hidden" name="_csrf" value="<%= token %>"/>
+                    <p><button class="btn" type="submit">Submit</button></p>
+                  </form>
+                </div>
+              </div>  
+              
+            </div>
+
+          </div> <!-- end row -->
+
+          <hr/>
+          
+
+          <%  } }; %>
+
+
+        </div>
+
+        <% }); %>
+
+      </div>                     
+    </div>
+  </div>
+
+
+
+
+
+  <!-- Process model -->
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accPmodel" href="#accPmodelContent">Process Model</a>
+    </div>
+
+    <div id="accPmodelContent" class="accordion-body collapse">
+      <div class="accordion-inner">
+        <!-- placeholder for d3 viz of compartmental model -->
+        <div id="pgraph<%= link._id %>" class="process-graph"></div>
+
+
+        <% process.model.forEach(function(r, i){ %>
+        <div class="row" >
+          <div class="span2">
+            <% if( infectors.indexOf(r.from) !== -1) { %> <span class="infector"> <%= r.from %> </span> <% } else { %> <%= r.from %> <% } %> 
+            <% if( ('tag' in r) && ('transmission' in r['tag'])) { %> <span class="infector"> &rarr; </span> <% } else { %> &rarr; <% } %> 
+            <% if( infectors.indexOf(r.to) !== -1) { %> <span class="infector"> <%= r.to %> </span> <% } else { %> <%= r.to %> <% } %>                 
+          </div>
+          <div class="span3">
+            <%- r.tlt_rate %>
+          </div>
+          <div class="span5">
+            <%= r.comment || ''  %> 
+            <button type="button" class="btn btn-mini social-action" data-toggle="collapse" data-target="#<%= i %>"><i class="icon-comment"></i> Discuss</button>   
+          </div>
+        </div>
+
+        <!-- discussion on the process model specific reaction -->
+        <div id="<%= i %>" class="row collapse">
+          <div class="span7 thread"> 
+            <% if (r.discussion && r.discussion.length){ %>
+            <ul>
+              <% r.discussion.forEach(function(d){ %>
+              <li><%= d.username %> on <%= d.date %></li>
+              <li><%= d.body %></li>                
+              <% }); %>
+            </ul>
+            <% } %>
+          </div>
+
+          <div class="span4">
+            <form class="discuss" action="/discuss/pmodel" method="post">
+              <textarea rows="2" class="span4" name="body"></textarea>
+              <input type="hidden" name="id" value="<%= i %>"/>
+              <input type="hidden" name="_csrf" value="<%= token %>"/>                  
+              <p><button class="btn" type="submit">Submit</button></p>
+            </form>
+          </div>
+        </div>
+
+        <hr/>
+        <% }); %>
+        
+      </div>
+    </div>
+  </div> <!-- end pmodel -->
+
+
+  <!-- Obervation model -->
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accPmodel" href="#accOmodelContent">Observation Model</a>
+    </div>
+
+    <div id="accOmodelContent" class="accordion-body collapse">
+      <div class="accordion-inner">
+
+        <% link.observed.forEach(function(o, i){ %>
+
+        <div class="row">
+          <div class="span5">
+            <%= o.id %>:
+            <ul>
+              <li> definition: 
+                <% if(typeof o.definition[0] === 'string'){ %>
+                
+                <%- o.definition
+                    .map(function(x){
+                    return (infectors.indexOf(x) !== -1) ? '<span class="infectors"> ' + x + ' </span>' : x; 
+                    })
+                    .join(' + ') %>
+
+                <% } else { %>
+
+                <%- o.definition.map(function(d){
+                    var from = (infectors.indexOf(d.from) !== -1) ? '<span class="infector"> ' + d.from + ' </span>' : d.from;
+                    var to = (infectors.indexOf(d.to) !== -1) ? '<span class="infector"> ' + d.to + ' </span>' : d.to;
+                    return from + ' &rarr; ' + to;
+                    })
+                    .join(' + ') %>
+
+                <% } %>
+              </li>
+
+              <li>
+                mapped to: <%= o.time_series_id.map(function(x){return x.split('__').slice(0,2).join(':')}).join(' ; ') %>
+              </li>
+
+              <li>
+                model: <%= link.observation[0].model.distribution %>
+
+                <ul>
+                  <% for(var p in link.observation[0].model){ %>
+                  <% if(p !== 'distribution' && p.split('_')[0] === 'tlt'){ %>
+                  <li>
+                    <%= p.split('_').slice(1).join('_') %>: <%- link.observation[0].model[p] %>
+                  </li>
+                  <% } %>
+                  <% } %>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+
+
+          <div class="span5">
+            <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= o.id %>"><i class="icon-comment"></i> Discuss</button>                
+
+            <!-- discussion on the observed variable -->
+            <div id="<%= o.id %>" class="collapse">
+              <div class="thread"> 
+                <% if (o.discussion && o.discussion.length){ %>
+                <ul>
+                  <% o.discussion.forEach(function(d){ %>
+                  <li><%= d.username %> on <%= d.date %></li>
+                  <li><%= d.body %></li>                
+                  <% }); %>
+                </ul>
+                <% } %>
+              </div>
+
+              <div>
+                <form class="discuss" action="/discuss/omodel" method="post">
+                  <textarea rows="2" class="span4" name="body"></textarea>
+                  <input type="hidden" name="id" value="<%= i %>"/>
+                  <input type="hidden" name="_csrf" value="<%= token %>"/>                  
+                  <p><button class="btn" type="submit">Submit</button></p>
+                </form>               
+              </div>
+            </div>  
+            
+          </div>
+          
+        </div>
+
+        <hr/>    
+        <% }); %>
+        
+      </div>
+    </div>
+  </div>  <!-- end omodel -->
+
+
+</div> <!-- end  accordion -->
+
