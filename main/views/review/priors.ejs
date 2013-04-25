@@ -1,6 +1,5 @@
 <div class="accordion" id="accPmodel">
 
-
   <!-- prior -->
   <div class="accordion-group">
     <div class="accordion-heading">
@@ -26,65 +25,57 @@
              var p = type.val[par]['group'][group] 
              %>
 
-
           <div class="row">
-            <div class="span5">
+            <div class="span39">
               <a href="#" data-toggle="tooltip" data-placement="right" title="<%= caption %>"><%= par %>: <%= group.split('__').join('; ') %></a>                
               <ul>
                 <li>distribution: <%= p.distribution %></li>
                 <li>min: <%= p.min %></li>
                 <li>max: <%= p.max %></li>
               </ul>
-            </div>
 
-            <div class="span5">
-
-
+              <!-- collapsible discussion on the priors -->
               <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= p.semantic_id %>"><i class="icon-comment"></i> Discuss</button>                
-
-              <!-- discussion on the observed variable -->
               <div id="<%= p.semantic_id %>" class="collapse">
-                <div class="thread">
-                  <% if (p.discussion && p.discussion.length){ %>
-                  <ul>
-                    <% p.discussion.forEach(function(d){ %>
-                    <li><%= d.username %> on <%= d.date %></li>
-                    <li><%= d.body %></li>                
-                    <% }); %>
-                  </ul>
-                  <% } %>
+
+                <div class="thread" id="threadPrior<%= p.semantic_id %>">
+                  <% var reviews = p.reviews || []; %>
+                  <% include tpl/reviewer %>
                 </div>
 
-                <div>
-                  <form class="discuss" action="/discuss/prior" method="post">
-                    <textarea rows="2" class="span3" name="body"></textarea>
-                    <input type="hidden" name="id" value="<%= p.semantic_id %>"/>
-                    <input type="hidden" name="_csrf" value="<%= token %>"/>
-                    <p><button class="btn" type="submit">Submit</button></p>
-                  </form>
-                </div>
-              </div>  
-              
-            </div>
+                <form class="post" action="/review" method="post">
+                  <textarea rows="2" name="body", class="span3"></textarea>
+                  <input type="hidden" name="_csrf" value="<%= token %>"/>
+                  <input type="hidden" name="id" value="<%= p.semantic_id %>"/>
+                  <input type="hidden" name="type" value="prior"/>
 
+                  <p>
+                    <label class="radio inline">
+                      <input type="radio" name="status" value="validated">Validate
+                    </label>
+                    <label class="radio inline">
+                      <input type="radio" name="status"  value="rejected">Reject
+                    </label>
+                  </p>
+
+                  <button class="btn" type="submit">Submit</button>
+                </form>         
+
+              </div> <!-- end collapse -->
+            </div>        
           </div> <!-- end row -->
 
           <hr/>
           
-
           <%  } }; %>
 
-
-        </div>
+        </div> <!-- end span39 -->
 
         <% }); %>
 
       </div>                     
     </div>
   </div>
-
-
-
 
 
   <!-- Process model -->

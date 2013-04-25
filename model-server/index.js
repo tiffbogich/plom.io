@@ -118,9 +118,20 @@ app.post('/clone', function(req, res, next){
  **/
 app.post('/build', function(req, res, next){
 
-  var buildPath = path.join('builds', req.body.link.semantic_id, 'model');
+  var model = req.body;
 
-  var model = JSON.stringify(req.body);
+  //compute semantic_id for the path
+  [model.context, model.process].forEach(function(x){
+    x['semantic_id'] = schecksum(x);
+  });
+  //for link, we include the semantic id_of context and process.
+  model.link.context_semantic_id = m.context.semantic_id;
+  model.link.process_semantic_id = m.process.semantic_id;
+  model.link.semantic_id = schecksum(m.link);    
+
+  var buildPath = path.join('builds', model.link.semantic_id, 'model');
+
+  var model = JSON.stringify(model);
 
   function streamModel (res){
     res.statusCode = 200;
@@ -202,6 +213,11 @@ app.post('/commit', function(req, res, next){
     m.theta.semantic_id = schecksum(m.theta);
     my_semantic_ids.push(m.theta.semantic_id);
   }
+
+  //add id to reactions
+  m.process.model.forEach(function(r, id){
+    r.id = id;
+  });
 
    
   var ups = {};

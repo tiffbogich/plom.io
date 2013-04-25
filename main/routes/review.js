@@ -8,12 +8,11 @@ var fs = require('fs')
   , xreview = require('../lib/review')
   , path = require('path');
 
-
 exports.index = function(req, res, next){
 
-  var c = req.session.context
-    , p = req.session.process
-    , l = req.session.link;
+  var c = req.session.context_id
+    , p = req.session.process_id
+    , l = req.session.link_id;
 
   if(!(c && p && l)){
     return res.redirect('/library');
@@ -29,53 +28,40 @@ exports.index = function(req, res, next){
       comps[x.type] = x;
     });
 
+    //store names and disease in session
+    req.session.disease = comps.context.disease;
+    req.session.context_name = comps.context.name;
+    req.session.process_name = comps.process.name;
+    req.session.link_name = comps.link.name;
+
+
     components.find({_id: {$in: comps.link.theta_id}}).toArray(function(err, thetas){
       if (err) return next(err);
 
-      comps.thetas = thetas;
-      comps.infectors = ppriors.tooltipify(comps);
-      comps.link.prior = ppriors.display(comps.link.prior, comps);
+      //sort by DIC
+      thetas.sort(function(a, b){return a.dic - b.dic;});      
+      //we need the posteriors:
+      //get the best result object (containing theta and the posteriors)
 
-      comps.thetas = comps.thetas.map(function(theta){
-        ppriors.getCaptions(comps, theta);
-        return theta;
+      var best = thetas[0].result.filter(function(x){return x.trace_id === thetas[0].trace_id;})[0];
+      best.theta._id = thetas[0]._id;
+
+      comps.thetas = thetas;
+      comps.best = best;
+
+      //add the reviews to comps
+      xreview.stats(req.app.get('reviews'), comps, function(err, comps_reviewed){
+        if(err) return next(err);
+        
+        //tooltipify
+        comps.infectors = ppriors.tooltipify(comps);
+        comps.link.prior = ppriors.display(comps.link.prior, comps);
+        comps.best.posterior = ppriors.display(comps.best.posterior, comps);
+        
+        res.render('review/index', comps);
       });
 
-      comps.theta = thetas[0];
-
-      res.format({
-        html: function(){
-          xreview.get(req.app.get('reviews'), undefined, comps, function(err, reviews){            
-            comps.reviews = reviews;
-            res.render('review/index', comps);            
-          });
-        },
-
-        json: function(){
-
-          //send the templates TODO browserify...
-          async.parallel({ 
-            control: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','control.ejs'), 'utf8', cb)},
-            cred: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','cred.ejs'), 'utf8', cb)},
-            summaryTable: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','summary_table.ejs'), 'utf8', cb)},
-            ticks: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8', cb)},
-            reviewer: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','reviewer.ejs'), 'utf8', cb)},
-            discuss: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','discuss.ejs'), 'utf8', cb)},
-          }, function(err, tpl){
-            if(err) return next(err);
-
-            for(var key in tpl){
-              tpl[key] = tpl[key].replace(/<%= token %>/g, req.session._csrf);
-            }
-            
-            res.json({tpl:tpl, comps: comps});                             
-          });
-        }
-
-      });      
-
     });
-
   });
 };
 
@@ -84,7 +70,7 @@ exports.post = function(req, res, next){
 
   var review = req.body;
 
-  xreview.post(req.app.get('reviews'), req.app.get('events'), review, req.session.username, function(err, reviews){
+  xreview.post(req.app.get('reviews'), req.app.get('events'), req.session, review , function(err, reviews){
     res.send({reviews:reviews, username:req.session.username});
   });
 }
@@ -93,16 +79,20 @@ exports.comment = function(req, res, next){
 
   var comment = req.body;
 
-  xreview.comment(req.app.get('reviews'), req.app.get('events'), comment, req.session.username, function(err, reviews){
+  xreview.comment(req.app.get('reviews'), req.app.get('events'), req.session, comment, function(err, reviews){
     res.send({reviews:reviews, username:req.session.username});
   });
-
 }
 
 
+exports.get = function(req, res, next){
 
+  xreview.get(req.app.get('reviews'), req.session, req.params, function(err, reviews){
+    if(err) return next(err);    
+    res.send({reviews: reviews, username: req.session.username});
+  });
 
-
+};
 
 
 exports.diagnosticSummary = function(req, res, next){
@@ -168,17 +158,6 @@ exports.forecast = function(req, res, next){
 }
 
 
-exports.theta = function(req, res, next){
-
-  var r = req.app.get('reviews');
-
-  r.find({theta_id: req.params.theta_id}).sort({_id: 1}).toArray(function(err, reviews){
-    if(err) return next(err);
-    res.send({reviews: reviews, username: req.session.username});
-  });
-
-};
-
 
 
 exports.vizbit = function(req, res, next){
@@ -203,158 +182,3 @@ exports.vizbit = function(req, res, next){
 
 };
 
-
-exports.postTheta = function(req, res, next){
-
-  var r = req.app.get('reviews');
-  var review = req.body;
-  delete review._csrf;
-
-  review.username = req.session.username;
-  review.date = new Date();
-
-  r.insert(review, function(err, review){
-    if(err) return next(err);
-
-    //add event
-    var mye = {
-      from: req.session.username,
-      type: 'review',
-      name: review[0].name,
-      option: review[0].decision,
-      review_id: review[0]._id,
-      context_id: review[0].context_id,
-      process_id: review[0].process_id,
-      link_id: review[0].link_id,
-      theta_id: review[0].theta_id
-    };
-
-    var e = req.app.get('events');
-    e.insert(mye, function(err, docs){
-      if(err) return next(err);
-    });
-
-    r.find({theta_id: review[0].theta_id}).sort({_id: 1}).toArray(function(err, reviews){
-      if(err) return next(err);
-      res.send({reviews: reviews, username: req.session.username});
-    });
-
-  });
-
-};
-
-
-
-
-exports.postCommentTheta = function(req, res, next){
-
-  var r = req.app.get('reviews');
-  var comment = req.body;
-
-  var _id = new ObjectID(comment.review_id);
-  delete comment.review_id;
-  delete comment._csrf;
-
-  comment.username = req.session.username;
-  comment.date = new Date();
-
-  var update = {$push: {comments: comment}};
-  if(comment.change){
-    update['$set'] = {decision: comment.change};
-  }
-
-  r.findAndModify({_id:_id},[], update, {safe:true, 'new':true}, function(err, review){
-    if(err) return next(err);
-
-    //add event
-    var mye = {
-      from: req.session.username,
-      type: 'review',
-      option: (comment.change) ? 'revised_': ((comment.decision) ? 'contested_' + comment.decision : 'commented'),
-      review_id: review._id,
-      comment_id: review.comments.length-1,
-      context_id: review.context_id,
-      process_id: review.process_id,
-      link_id: review.link_id,
-      theta_id: review.theta_id,
-      user_id: review.username,
-      name: review.name
-    };
-
-    var e = req.app.get('events');
-    e.insert(mye, function(err, docs){
-      if(err) return next(err);
-    });
-
-    r.find({theta_id: review.theta_id}).sort({_id: 1}).toArray(function(err, reviews){
-      if(err) return next(err);
-      res.send({reviews: reviews, username: req.session.username});
-    });
-
-  });
-
-};
-
-
-exports.postDiscuss = function(req, res, next){
-
-  var type = req.params.type;
-
-  var c = req.app.get('components');
-  var d = req.body;
-  delete d._csrf;
-
-  d.username = req.session.username;
-  d.date = new Date();
-
-  var pg; //parameter and group if type === prior
-
-  var upd = {$push:{}};
-
-  if(type === 'pmodel'){
-    upd['$push']['process_model.' + d.discussion_id + '.discussion'] = d;
-  } else if (type === 'omodel'){
-    upd['$push']['observed.' + d.discussion_id + '.discussion'] = d;
-  } else {
-    pg = d.discussion_id.split(':');
-    upd['$push']['parameter.' + pg[0] + '.group.' + pg[1] + '.prior.discussion'] = d;
-  }
-
-  console.log(upd);
-
-  c.findAndModify({_id: new ObjectID(d.theta_id || d.link_id)}, [], upd, {safe:true, 'new':true}, function(err, doc) {
-    if (err) return next(err);
-
-    //add event
-    var mye = {
-      from: req.session.username,
-      type: 'discuss_' + type,
-      name: d.name,
-      discussion_id: d.discussion_id,
-      context_id: d.context_id,
-      process_id: d.process_id,
-      link_id: d.link_id
-    };
-
-    if(type === 'prior'){
-      mye.theta_id = d.theta_id;
-    }
-
-    var e = req.app.get('events');
-    e.insert(mye, function(err, docs){
-      if(err) return next(err);
-    });
-
-
-    if(type === 'pmodel'){
-      res.send(doc.process_model[d.discussion_id].discussion);
-    } else if (type === 'omodel'){
-      res.send(doc.observed[d.discussion_id].discussion);
-    } else {
-      console.log(doc.parameter[pg[0]].group[pg[1]].prior);
-      res.send(doc.parameter[pg[0]].group[pg[1]].prior.discussion);
-    }
-
-  });
-
-};

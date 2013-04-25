@@ -152,18 +152,17 @@ exports.index = function(req, res){
 
 
 /**
- * POST request: Build model (if needed) and redirect to review
+ * POST request: store session and Build model (if needed) and redirect to review
  */
 exports.build = function(req, res, next){
 
-  var c = req.session.context = req.body.context
-    , p = req.session.process = req.body.process
-    , l = req.session.link = req.body.link;
+  var c = req.session.context_id = req.body.context_id
+    , p = req.session.process_id = req.body.process_id
+    , l = req.session.link_id = req.body.link_id;
 
   var buildPath = path.join(process.env.HOME, 'built_plom_models', l, 'model');
 
   fs.exists(buildPath, function(exists){
-
     if (exists) {
       res.redirect('/review');
     } else {
@@ -204,7 +203,6 @@ exports.build = function(req, res, next){
 };
 
 
-
 exports.component = function(req, res, next){
   var _id = new ObjectID(req.params._id);
   var components = req.app.get('components');
@@ -223,18 +221,15 @@ exports.component = function(req, res, next){
 };
 
 
-
-
-
 /**
  * POST request: send a model to client
  */
 exports.postFork = function(req, res, next){
 
-  var c = req.body.context
-    , p = req.body.process
-    , l = req.body.link
-    , t = req.body.theta;
+  var c = req.body.context_id
+    , p = req.body.process_id
+    , l = req.body.link_id
+    , t = req.body.theta_id;
 
   var downloadPath = path.join(process.env.HOME, 'download_plom_models', l);
 
