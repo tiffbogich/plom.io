@@ -1,5 +1,11 @@
 function Reviewer(tpl){
-  this.render = _.template(tpl);
+  this.tpl = _.template(tpl);
+
+  var that = this;
+
+  $.subscribe('theta', function(e, theta_id, trace_id){
+    $.getJSON('/review/theta/'+ theta_id, that.render.bind(that));
+  });
 };
 
 /**
@@ -18,6 +24,15 @@ Reviewer.prototype.threadId = function(review){
   } else if (review.type === 'observed'){
     return '#threadObserved' + review.observed_id;
   }
+
+};
+
+Reviewer.prototype.render = function(reviews){
+
+    var threadId = this.threadId(reviews.reviews[0]);
+    console.log(threadId);
+    console.log(reviews.reviews);
+    $(threadId).html(this.tpl(reviews));
 
 };
 
@@ -54,10 +69,7 @@ Reviewer.prototype.post = function($form){
     type : 'POST',
     success: function(reviews){
       $body.val('');
-      var threadId = that.threadId(reviews.reviews[0]);
-      console.log(threadId);
-      console.log(reviews.reviews);
-      $(threadId).html(that.render(reviews));
+      that.render(reviews);
     }
   });  
 };

@@ -380,6 +380,21 @@ text.shadow {
   height: 35px;
 }
 
+.post{
+  margin-top:10px;
+  margin-left:4px;
+}
+
+
+.thread{
+  margin-top:10px;
+}
+
+.offset05{
+  margin-left: 40px;
+}
+
+
 .plom-graph-forecast{
   width: 900px;
   height: 400px;

@@ -16,10 +16,11 @@
       <a class="vizbitRemove hidden" href="#"><i class="icon-remove"></i></a>
     </p>
 
-    <textarea id="reviewTheta" rows="5" name="body", class="span4"></textarea>
+    <textarea id="reviewTheta" rows="5" name="body", class="span39"></textarea>
 
     <input type="hidden" name="_csrf" value="<%= token %>"/>
     <input type="hidden" name="type" value="theta"/>
+    <input id="idReviewTheta" type="hidden" name="id" value="<%= best.theta._id %>"/>
 
     <label class="radio inline">
       <input type="radio" name="status" value="validated">Validate

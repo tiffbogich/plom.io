@@ -39,8 +39,6 @@
               <div id="<%= p.id %>" class="collapse">
 
                 <div class="thread" id="threadPrior<%= p.id %>">
-                  <% var reviews = p.reviews || []; %>
-                  <% include tpl/reviewer %>
                 </div>
 
                 <form class="post" action="/review" method="post">
@@ -56,9 +54,10 @@
                     <label class="radio inline">
                       <input type="radio" name="status"  value="rejected">Reject
                     </label>
+                    <button class="btn" type="submit">Submit</button>
                   </p>
 
-                  <button class="btn" type="submit">Submit</button>
+
                 </form>         
 
               </div> <!-- end collapse -->

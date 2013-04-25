@@ -1,13 +1,15 @@
 <% reviews.forEach(function(review, i){ %>
 <div class="row">
-  <div class="span5">
+  <div class="span6">
     <ul>
 
-      <li><a href="/<%= review.username %>"><%= review.username %></a></li>
+      <li>
+        <a href="/<%= review.username %>"><%= review.username %></a> 
+        <span class="label label-<%= (review.status === 'validated') ? 'success': 'important' %>"><%= (review.status === 'validated') ? 'validated': 'rejected' %></span> 
+        <span class="muted"><%= new Date(review.date).toDateString() %></span>
+      </li>
 
-      <li>on <%= review._id.date %></li>
 
-      <li><span class="label label-<%= (review.status === 'validated') ? 'success': 'important' %>"><%= (review.status === 'validated') ? 'validated': 'rejected' %></span></li>
 
       <% if (review.vizbit){ %>
       <li><a class="vizbitFetch" href="/vizbit/<%= review._id %>" data-view="#filtering">run</a></li>
@@ -19,37 +21,42 @@
 
     </ul>
     
+    <div class="offset05">
 
-    <% if(review.comments) { review.comments.forEach(function(comment, j){ %>
-    <div class="row">
-      <div class="span4 offset1">
+      <% if(review.comments) { review.comments.forEach(function(comment, j){ %>
+      <ul>
 
-        <ul>
-          <li><%= comment.username %></li>
-          <li>on <%= comment.date %></li>
+        <li>
+          <a href="/<%= review.username %>"><%= comment.username %></a>
+          <span class="muted"><%= new Date(comment.date).toDateString() %></span>
+        </li>
 
-          <% if(comment.status){ %>
-          <li>Requested to set status to: <span class="label label-<%= (comment.status === 'validated') ? 'success': 'important' %>"><%= (comment.status === 'validated') ? 'validated': 'rejected' %></span></li>
-          <% } %>
+        <% if(comment.status){ %>
+        <li>
+          Requested to set status to: 
+          <span class="label label-<%= (comment.status === 'validated') ? 'success': 'important' %>"><%= (comment.status === 'validated') ? 'validated': 'rejected' %></span>
+        </li>
+        <% } %>
 
-          <% if(comment.change){ %>
-          <li>Changed status to: <span class="label label-<%= (comment.change === 'validated') ? 'success': 'important' %>"><%= (comment.change === 'validated') ? 'validated': 'rejected' %></span></li>
-          <% } %>
+        <% if(comment.change){ %>
+        <li>
+          Changed status to: 
+          <span class="label label-<%= (comment.change === 'validated') ? 'success': 'important' %>"><%= (comment.change === 'validated') ? 'validated': 'rejected' %></span>
+        </li>
+        <% } %>
 
-          <% if (comment.vizbit){ %>
-          <li><a class="vizbitFetch" href="/vizbit/<%= review._id %>/<%= j %>" data-view="#filtering">run</a></li>
-          <% } %>
+        <% if (comment.vizbit){ %>
+        <li><a class="vizbitFetch" href="/vizbit/<%= review._id %>/<%= j %>" data-view="#filtering">run</a></li>
+        <% } %>
 
-          <% if(comment.body){ %>
-          <li><%= comment.body %></li>      
-          <% } %>
-        </ul>
+        <% if(comment.body){ %>
+        <li><%= comment.body %></li>      
+        <% } %>
+      </ul>
+      <% })}; %>
 
-      </div>
     </div>
-    <% })}; %>
     
-
     <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= review._id %>"><i class="icon-comment"></i> Discuss</button>
 
     <div id="<%= review._id %>" class="collapse">
@@ -75,7 +82,7 @@
         </p>
         <% } %>
 
-        <textarea rows="3" class="span5" name="body"></textarea>
+        <textarea rows="2" class="span3" name="body"></textarea>
         <input type="hidden" name="review_id" value="<%= review._id %>"/>
         <input type="hidden" name="type" value="<%= review.type %>"/>
         <% if ('parameter' in review.name) { %><input type="hidden" name="parameter" value="<%= review.name.parameter %>"/><% } %>
@@ -83,13 +90,15 @@
         <input type="hidden" name="_csrf" value="<%= token %>"/>
         
         <p>
-          <button class="btn" type="submit">Submit</button>
+          <button class="btn btn-mini" type="submit">Submit</button>
         </p>
       </form>
 
     </div>
 
+<hr />
   </div>
+
 </div>
 <% }); %>
 

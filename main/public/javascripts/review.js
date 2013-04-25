@@ -3,6 +3,8 @@ var plomGlobal = {canRun: true, intervalId:[]};
 $(document).ready(function() {
 
   $('#reviewTab a[href=#review]').tab('show');
+  $('#review a[href=#reviewReview]').tab('show');
+
 
   $('a[data-toggle="tooltip"]').tooltip();
 
@@ -47,7 +49,7 @@ $(document).ready(function() {
         });
 
 
-        $.subscribe('trace', function(_, theta_id, trace_id) {
+        $.subscribe('trace', function(e, theta_id, trace_id) {
           // Skip the first argument (event object)
 
           //TODO: update function for greenlights (add/remove dots...)
@@ -66,7 +68,9 @@ $(document).ready(function() {
         $('.review-theta').on('click', function(e){
           var theta_id = $(this).val();
           var trace_id = model.thetas.filter(function(x){return x.theta_id === theta_id})[0].trace_id;
+          $('#idReviewTheta').val(theta_id);
           $.publish('trace', [theta_id, trace_id]);
+          $.publish('theta', [theta_id, trace_id]);
         })
           .first()
           .trigger('click');
