@@ -1,7 +1,5 @@
 function greenlights(summaries, ftpl, callback){
 
-  summaries[1].summary.passed=true;
-
   var essMax = Math.max.apply(Math, summaries.map(function(x){return x.summary.essMin;}));
 
   $('#greenlights svg').remove();

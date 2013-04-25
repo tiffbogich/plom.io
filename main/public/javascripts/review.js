@@ -18,17 +18,19 @@ $(document).ready(function() {
       reviewer.post($(this));
     });
 
-
     $.getJSON('/diagnostic/'+ model.result.theta._id, function(summaries) {
       $.getJSON('/diagnostic/'+ model.result.theta._id + '/'+ model.result.theta.trace_id, function(diagnostic) {
-        var updateCorr1 = plotCorr(diagnostic.detail, 0, 1, 1);
-        var updateCorr2 = plotCorr(diagnostic.detail, 1, 0, 2);
-        var updateDensity1 = plotDensity(diagnostic.detail, 0, 1);
-        var updateDensity2 = plotDensity(diagnostic.detail, 1, 2);
-        var updateTrace = plotTrace(diagnostic.detail, 0, 1);
-        var updateAutocorr = plotAutocorr(diagnostic.detail,0,1);
-        var updateMat = parMatrix(diagnostic.detail, updateCorr1, updateCorr2, updateDensity1, updateDensity2, updateTrace, updateAutocorr);
+        var updateCorr1 = plotCorr(diagnostic.detail, 0, 1, 1)
+          , updateCorr2 = plotCorr(diagnostic.detail, 1, 0, 2)
+          , updateDensity1 = plotDensity(diagnostic.detail, 0, 1)
+          , updateDensity2 = plotDensity(diagnostic.detail, 1, 2)
+          , updateTrace = plotTrace(diagnostic.detail, 0, 1)
+          , updateAutocorr = plotAutocorr(diagnostic.detail,0,1)
+          , updateMat = parMatrix(diagnostic.detail, updateCorr1, updateCorr2, updateDensity1, updateDensity2, updateTrace, updateAutocorr);
 
+        greenlights(summaries, ctrl.compiled.summaryCoda, function(summary, i){
+          $.publish('trace', [summary.theta_id, summary.trace_id]);
+        });
 
         var plomTs = new PlomTs({
           context: model.context,
@@ -44,10 +46,10 @@ $(document).ready(function() {
 
         var ctrl = new Control(data, plomTs);
 
-        var theta_id = model.result.theta._id;
+        $.subscribe('trace', function(_, theta_id, trace_id) {
+          // Skip the first argument (event object)
 
-        $.subscribe('trace', function(_, trace_id) {
-          // Skip the first argument (event object) but log the name and other args.
+          //TODO: update function for greenlights (add/remove dots...)
 
           $.getJSON('/diagnostic/'+ theta_id + '/'+ trace_id, function(diagnostic) {
             updateMat(diagnostic.detail);
@@ -57,18 +59,18 @@ $(document).ready(function() {
             });
           });
 
-
         });
 
-        greenlights(summaries, ctrl.compiled.summaryCoda, function(summary, i){
-          $.publish('trace', summary.trace_id);
-        });
+        //start !
+        $('.review-theta').on('click', function(e){
+          var theta_id = $(this).val();
+          var trace_id = model.thetas.filter(function(x){return x.theta_id === theta_id})[0].trace_id;
+          $.publish('trace', [theta_id, trace_id]);
+        })
+          .first()
+          .trigger('click');
+        
 
-        $.publish('trace', model.result.theta.trace_id);
-
-
-
-//
 //    ////////
 //    //vizbit
 //    ////////
@@ -119,62 +121,8 @@ $(document).ready(function() {
 //      });
 //
 //    });
-//
-//
-//    ////////
-//    //social
-//    ////////
-//
-//    //discussion
-//    $('#model').on('submit', 'form.discuss', function(e){
-//      e.preventDefault();
-//
-//      var $this = $(this)
-//        , $body = $this.find( 'textarea[name="body"]' );
-//
-//      var url = $this.closest('form').attr('action');
-//
-//      var myid;
-//      if(url.indexOf('pmodel') !== -1){
-//        myid = '#discussPmodel'
-//      } else if (url.indexOf('omodel') !== -1){
-//        myid = '#discussOmodel'
-//      } else {
-//        myid = '#discussPrior'
-//      }
-//
-//      var discussion_id = $this.find( 'input[name="discussion_id"]' ).val();
-//      discussion_id = (myid !== '#discussPrior') ? parseInt(discussion_id, 10) : discussion_id;
-//
-//      var pdata = {
-//        context_id: ctrl.context._id,
-//        process_id: ctrl.process._id,
-//        link_id: ctrl.link._id,
-//        discussion_id: discussion_id,
-//        name: ctrl.name,
-//        body: $body.val(),
-//        _csrf: $this.find( 'input[name="_csrf"]' ).val()
-//      };
-//
-//      if(myid === '#discussPrior'){
-//        pdata.theta_id = ctrl.theta._id;
-//      }
-//
-//      $body.val('');
-//
-//      $.ajax(url, {
-//        data : JSON.stringify(pdata),
-//        contentType : 'application/json',
-//        type : 'POST',
-//        success: function(discussion){
-//          console.log(discussion);
-//          var sel = (myid === '#discussPrior') ? pdata.discussion_id.replace(/:/, '___') : pdata.discussion_id;
-//          $(myid + '_' + sel).find('.thread').html(ctrl.compiled.discuss({discussion:discussion}));
-//        }
-//      });
-//    });
-//
-//
+
+
         ///////////
         //websocket
         ///////////

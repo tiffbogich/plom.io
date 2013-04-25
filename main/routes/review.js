@@ -88,7 +88,7 @@ exports.index = function(req, res, next){
                 process: comps.process, 
                 link: comps.link, 
                 result: result,  //the best theta (used for forecasting)
-                thetas_id: comps.thetas.map(function(x){return x._id;}) //sorted theta_id (used to make ajax call)
+                thetas: comps.thetas.map(function(x){return {theta_id: x._id, trace_id: x.trace_id};}) //sorted theta_id, trace_id (used to make ajax call)
               },
               tpl:tpl
             });
@@ -136,7 +136,7 @@ exports.diagnosticSummary = function(req, res, next){
   var theta_id = req.params.theta_id
     , diagnostics = req.app.get('diagnostics');
 
-  diagnostics.find({theta_id: theta_id}, {summary:true, trace_id:true}).sort({'summary.essMin':-1}).toArray(function(err, docs){
+  diagnostics.find({theta_id: theta_id}, {summary:true, trace_id:true, theta_id:true}).sort({'summary.essMin':-1}).toArray(function(err, docs){
     res.send(docs);
   });
 
