@@ -1,9 +1,4 @@
-<div class="span8">
-  <h3>Reviews</h3>
-  <div id="threadTheta"></div>
-</div>
-
-<div class="span39">
+<div>
   <h3>Submit a new review</h3>
 
   <form class="post" action="/review" method="post">
@@ -22,12 +17,15 @@
     <input type="hidden" name="type" value="theta"/>
     <input id="idReviewTheta" type="hidden" name="id" value="<%= best.theta._id %>"/>
 
-    <label class="radio inline">
-      <input type="radio" name="status" value="validated">Validate
-    </label>
-    <label class="radio inline">
-      <input type="radio" name="status"  value="rejected">Reject
-    </label>
-    <button class="btn" type="submit">Submit</button>
+    <p>
+      <label class="radio inline">
+        <input type="radio" name="status" value="validated">Validate
+      </label>
+      <label class="radio inline">
+        <input type="radio" name="status"  value="rejected">Reject
+      </label>
+      <button class="btn" type="submit">Submit</button>
+    </p>
+
   </form>
 </div>

@@ -36,17 +36,15 @@
 
               <!-- collapsible discussion on the priors -->
               <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= p.id %>"><i class="icon-comment"></i> Discuss</button>                
-              <div id="<%= p.id %>" class="collapse">
+              <div id="<%= p.id %>" class="collapse prior">
 
-                <div class="thread" id="threadPrior<%= p.id %>">
-                </div>
+                <div class="thread" id="threadPrior<%= p.id %>"></div>
 
                 <form class="post" action="/review" method="post">
                   <textarea rows="2" name="body", class="span3"></textarea>
                   <input type="hidden" name="_csrf" value="<%= token %>"/>
                   <input type="hidden" name="id" value="<%= p.id %>"/>
                   <input type="hidden" name="type" value="prior"/>
-
                   <p>
                     <label class="radio inline">
                       <input type="radio" name="status" value="validated">Validate
@@ -56,22 +54,15 @@
                     </label>
                     <button class="btn" type="submit">Submit</button>
                   </p>
-
-
                 </form>         
-
               </div> <!-- end collapse -->
+
             </div>        
           </div> <!-- end row -->
-
-          <hr/>
-          
+          <hr/>          
           <%  } }; %>
-
         </div> <!-- end span39 -->
-
         <% }); %>
-
       </div>                     
     </div>
   </div>
@@ -105,28 +96,26 @@
           </div>
         </div>
 
-        <!-- discussion on the process model specific reaction -->
-        <div id="<%= r.id %>" class="row collapse">
-          <div class="span7 thread"> 
-            <% if (r.discussion && r.discussion.length){ %>
-            <ul>
-              <% r.discussion.forEach(function(d){ %>
-              <li><%= d.username %> on <%= d.date %></li>
-              <li><%= d.body %></li>                
-              <% }); %>
-            </ul>
-            <% } %>
-          </div>
+        <!-- collapsible discussion on the process model specific reaction -->
+        <div id="<%= r.id %>" class="collapse reaction">
+          <div class="thread" id="threadReaction<%= r.id %>"></div>
 
-          <div class="span4">
-            <form class="discuss" action="/discuss/pmodel" method="post">
-              <textarea rows="2" class="span4" name="body"></textarea>
-              <input type="hidden" name="id" value="<%= r.id %>"/>
-              <input type="hidden" name="_csrf" value="<%= token %>"/>                  
-              <p><button class="btn" type="submit">Submit</button></p>
-            </form>
-          </div>
-        </div>
+          <form class="post" action="/review" method="post">
+            <textarea rows="2" name="body", class="span3"></textarea>
+            <input type="hidden" name="_csrf" value="<%= token %>"/>
+            <input type="hidden" name="id" value="<%= r.id %>"/>
+            <input type="hidden" name="type" value="reaction"/>
+            <p>
+              <label class="radio inline">
+                <input type="radio" name="status" value="validated">Validate
+              </label>
+              <label class="radio inline">
+                <input type="radio" name="status"  value="rejected">Reject
+              </label>
+              <button class="btn" type="submit">Submit</button>
+            </p>
+          </form>         
+        </div> <!-- end collapse -->
 
         <hr/>
         <% }); %>
@@ -193,42 +182,28 @@
           </div>
 
 
-
           <div class="span5">
             <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= o.id %>"><i class="icon-comment"></i> Discuss</button>                
+            <!-- collapsible discussion on the on the observed variable -->
+            <div id="<%= o.id %>" class="collapse observed">
+              <div class="thread" id="threadObserved<%= o.id %>"></div>
 
-            <!-- discussion on the observed variable -->
-            <div id="<%= o.id %>" class="collapse">
-              <div class="thread"> 
-                <% if (o.discussion && o.discussion.length){ %>
-                <ul>
-                  <% o.discussion.forEach(function(d){ %>
-                  <li><%= d.username %> on <%= d.date %></li>
-                  <li><%= d.body %></li>                
-                  <% }); %>
-                </ul>
-                <% } %>
-              </div>
-
-              <div>
-                <form class="discuss" action="/discuss/omodel" method="post">
-                  <textarea rows="2" class="span4" name="body"></textarea>
-                  <input type="hidden" name="id" value="<%= i %>"/>
-                  <input type="hidden" name="_csrf" value="<%= token %>"/>                  
-
-                  <p>
+              <form class="post" action="/review" method="post">
+                <textarea rows="2" name="body", class="span3"></textarea>
+                <input type="hidden" name="_csrf" value="<%= token %>"/>
+                <input type="hidden" name="id" value="<%= o.id %>"/>
+                <input type="hidden" name="type" value="observed"/>
+                <p>
                   <label class="radio inline">
-                    <input type="radio" name="decision" value="validated">Validate
+                    <input type="radio" name="status" value="validated">Validate
                   </label>
                   <label class="radio inline">
-                    <input type="radio" name="decision"  value="rejected">Reject
+                    <input type="radio" name="status"  value="rejected">Reject
                   </label>
-                  </p>
-
-                  <p><button class="btn" type="submit">Submit</button></p>
-                </form>               
-              </div>
-            </div>  
+                  <button class="btn" type="submit">Submit</button>
+                </p>
+              </form>         
+            </div> <!-- end collapse -->
             
           </div>
           

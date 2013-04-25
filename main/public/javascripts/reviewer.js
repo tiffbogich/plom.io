@@ -2,39 +2,46 @@ function Reviewer(tpl){
   this.tpl = _.template(tpl);
 
   var that = this;
-
-  $.subscribe('theta', function(e, theta_id, trace_id){
-    $.getJSON('/review/theta/'+ theta_id, that.render.bind(that));
+  //suscribe
+  ['theta', 'prior', 'posterior', 'reaction', 'observed'].forEach(function(type){
+    $.subscribe(type, function(e, id){
+      $.getJSON('/review/' + type + '/' + id, that.render.bind(that));
+    });
   });
+
 };
 
 /**
  * get thread id
  */
-Reviewer.prototype.threadId = function(review){
+Reviewer.prototype.threadId = function(type, id){
 
-  if(review.type === 'theta'){
+  if(type === 'theta'){
     return '#threadTheta';
-  } else if (review.type === 'prior'){    
-    return '#threadPrior' + review.prior_id;
-  } else if (review.type === 'posterior'){
-    return '#threadPosterior' + review.prior_id;
-  } else if (review.type === 'reaction'){
-    return '#threadReaction' + review.reaction_id;
-  } else if (review.type === 'observed'){
-    return '#threadObserved' + review.observed_id;
+  } else if (type === 'prior'){    
+    return '#threadPrior' + id;
+  } else if (type === 'posterior'){
+    return '#threadPosterior' + id;
+  } else if (type === 'reaction'){
+    return '#threadReaction' + id;
+  } else if (type === 'observed'){
+    return '#threadObserved' + id;
   }
 
 };
 
 Reviewer.prototype.render = function(reviews){
-
-    var threadId = this.threadId(reviews.reviews[0]);
-    console.log(threadId);
-    console.log(reviews.reviews);
+  if(reviews.reviews.length){
+    var threadId = this.threadId(reviews.reviews[0].type, reviews.reviews[0].id);
     $(threadId).html(this.tpl(reviews));
 
+    $('.collapse-comment').on("show",function(e){
+      e.stopPropagation();
+    });
+
+  }
 };
+
 
 Reviewer.prototype.post = function($form){
   var that = this;

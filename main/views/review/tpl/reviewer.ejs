@@ -9,8 +9,6 @@
         <span class="muted"><%= new Date(review.date).toDateString() %></span>
       </li>
 
-
-
       <% if (review.vizbit){ %>
       <li><a class="vizbitFetch" href="/vizbit/<%= review._id %>" data-view="#filtering">run</a></li>
       <% } %>
@@ -57,9 +55,9 @@
 
     </div>
     
-    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= review._id %>"><i class="icon-comment"></i> Discuss</button>
+    <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= review._id %>"><% if(review.type === 'theta'){ %><i class="icon-comment"></i> <% } %>Comment</button>
 
-    <div id="<%= review._id %>" class="collapse">
+    <div id="<%= review._id %>" class="collapse collapse-comment">
       
       <form class="post" action="/comment" method="post">
 

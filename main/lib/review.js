@@ -79,7 +79,7 @@ exports.get = function(collection, session, params, callback){
   
   var q = {
     type: type,
-    id: id
+    id: (type === 'reaction') ? parseInt(id, 10) : id
   };
 
   if(type === 'theta'){
@@ -93,8 +93,8 @@ exports.get = function(collection, session, params, callback){
     q.process_id = session.process_id;
   } else if(type === 'observed') {
     q.link_id = session.link_id;
-  }
-  
+  } 
+
   //retrieve latest reviews
   collection.find(q).sort({_id: 1}).toArray(callback);
 };
@@ -134,10 +134,12 @@ exports.post = function(collection, events, session, review, callback){
     delete review.group;
   }
 
+  review.disease = session.disease;
   review.context_id = session.context_id;
   review.process_id = session.process_id;
   review.link_id = session.link_id;
 
+  review.id = (review.type === 'reaction') ? parseInt(review.id, 10) : review.id;
 
   collection.insert(review, function(err, review){
     if(err) return callback(err);

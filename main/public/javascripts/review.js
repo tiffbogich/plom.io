@@ -2,8 +2,10 @@ var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 
-  $('#reviewTab a[href=#review]').tab('show');
-  $('#review a[href=#reviewReview]').tab('show');
+
+
+  $('#reviewTab a[href=#prior]').tab('show');
+//  $('#review a[href=#reviewReview]').tab('show');
 
 
   $('a[data-toggle="tooltip"]').tooltip();
@@ -15,10 +17,19 @@ $(document).ready(function() {
     plomGraphModel(model.process, "#pgraph"+ model.link._id);
 
     var reviewer = new Reviewer(tpl['reviewer']);
+
     $('#priors, #review, #posterior').on('submit', '.post', function(e){
       e.preventDefault();     
       reviewer.post($(this));
     });
+
+    ['prior', 'posterior', 'reaction', 'observed'].forEach(function(type){
+      $('.' + type).on("show",function(e){
+        e.stopPropagation();
+        $.publish(type, $(this).attr('id'));
+      });
+    });
+
 
     $.getJSON('/diagnostic/'+ model.result.theta._id, function(summaries) {
       $.getJSON('/diagnostic/'+ model.result.theta._id + '/'+ model.result.theta.trace_id, function(diagnostic) {
