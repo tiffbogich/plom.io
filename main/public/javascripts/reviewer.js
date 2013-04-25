@@ -5,7 +5,14 @@ function Reviewer(tpl){
   //suscribe
   ['theta', 'prior', 'posterior', 'reaction', 'observed'].forEach(function(type){
     $.subscribe(type, function(e, id){
-      $.getJSON('/review/' + type + '/' + id, that.render.bind(that));
+      $.getJSON('/review/' + type + '/' + id, function(reviews){
+        var threadId = that.threadId(type, id);
+        if(reviews.reviews.length){
+          that.render(reviews);
+        } else{ //needed for theta: otherwise in case of empty review for on theta, and not for another one, the non empty remains..
+          $(threadId).empty();
+        }       
+      });
     });
   });
 

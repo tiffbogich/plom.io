@@ -2,9 +2,7 @@ var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 
-
-
-  $('#reviewTab a[href=#prior]').tab('show');
+  $('#reviewTab a[href=#review]').tab('show');
 //  $('#review a[href=#reviewReview]').tab('show');
 
 
@@ -53,12 +51,65 @@ $(document).ready(function() {
           graphEssId: "graphEss"
         });
 
+        var plomPred =  new PlomPred({
+          context: data.model.context,
+          process: data.model.process,
+          link: data.model.link,
+          X: diagnostic.X,
+          theta: data.model.result.theta,
+          theta_id: data.model.result.theta._id,
+          trace_id: data.model.result.theta.trace_id,
+          graphTrajId: 'graphTrajPred',
+          graphStateId: 'graphStatePred'
+        });
+
+        var ticker = _.template(data.tpl.ticks);
+        $('#tickTrajPred').html(ticker({'names': plomPred.getTrajNames() , suffix: 'traj-pred'}));
+        $('#tickStatePred').html(ticker({'names': plomPred.getStateNames() , suffix: 'state-pred'}));
+        //graph visibility
+        $('input.tick_traj-pred')
+          .on('change', function(){
+            plomPred.graphTraj.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+            plomPred.graphTraj.setVisibility(plomPred.N_TS+parseInt($(this).val(), 10), $(this).is(':checked'));
+            plomPred.graphTraj.setVisibility(2*plomPred.N_TS+parseInt($(this).val(), 10), $(this).is(':checked'));
+          })
+          .trigger('change');
+
+        $('input.tick_state-pred')
+          .on('change', function(){
+            plomPred.graphState.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+            plomPred.graphState.setVisibility(plomPred.allStateName.length + parseInt($(this).val(), 10), $(this).is(':checked'));
+          })
+          .trigger('change');
+
+        //colors tick boxs:
+        var cols = d3.scale.category10();
+        ['input.tick_traj-pred', 'input.tick_state-pred'].forEach(function(el){
+          $(el).parent().each(function(i){
+            $(this).css('color', cols(i));
+          });
+        });
+
+        $("#resetPred").on('click', function(){
+          $("#stopPred").trigger('click');
+          plomPred.reset();
+        });
+
+
+
+
+
         var ctrl = new Control(data, plomTs);
 
-        greenlights(summaries, ctrl.compiled.summaryCoda, function(summary, i){
+        var updateGreenlights = greenlights(summaries, ctrl.compiled.summaryCoda, function(summary, i){
           $.publish('trace', [summary.theta_id, summary.trace_id]);
         });
 
+        $.subscribe('theta', function(e, theta_id) {
+          $.getJSON('/diagnostic/'+ theta_id, function(summaries) {
+            updateGreenlights(summaries);
+          });
+        });
 
         $.subscribe('trace', function(e, theta_id, trace_id) {
           // Skip the first argument (event object)
@@ -157,7 +208,11 @@ $(document).ready(function() {
           socket.on('connect', function () {
 
             socket.on('filter', function (msg) {
-              ctrl.plomTs.processMsg(msg);
+              plomTs.processMsg(msg);
+            });
+
+            socket.on('simul', function (msg) {
+              plomPred.processMsg(msg);
             });
 
             socket.on('info', function (msg) {
@@ -169,7 +224,8 @@ $(document).ready(function() {
               for(var i=0; i<plomGlobal.intervalId.length; i++){
                 clearInterval(plomGlobal.intervalId.pop());
               }
-              ctrl.plomTs.updateGraphs();
+              plomTs.updateGraphs();
+              plomPred.updateGraphs();
               plomGlobal.canRun = true;
             });
 
@@ -182,7 +238,18 @@ $(document).ready(function() {
           $("#control").on('click', '.run', function(){
             if(plomGlobal.canRun){
               plomGlobal.canRun = false;
-              ctrl.plomTs.run(socket, ctrl.getMethod());
+              plomTs.run(socket, ctrl.getMethod());
+            }
+          });
+
+          $('#stopPred').click(function(){
+            socket.emit('killme', true);
+          });
+
+          $("#runPred").click(function(){
+            if(plomGlobal.canRun){
+              plomGlobal.canRun = false;
+              plomPred.run(socket, {impl:'ode'});
             }
           });
 
