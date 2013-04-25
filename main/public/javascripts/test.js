@@ -2,26 +2,29 @@
 
 $(document).ready(function() {
 
-//  $('#reviewTab a[href=#forecast]').tab('show');
+  $('#reviewTab a[href=#forecast]').tab('show');
 
   $.getJSON('/review', function(data) {
-    $.getJSON('/diagnostic/'+ data.comps.thetas[0]._id + '/'+ data.comps.thetas[0].trace_id, function(diagnostic) {
-      $.getJSON('/forecast/'+ data.comps.link._id + '/'+ data.comps.thetas[0]._id + '/'+ data.comps.thetas[0].trace_id, function(forecast) {
-        console.log('/forecast/'+ data.comps.link._id + '/'+ data.comps.thetas[0]._id + '/'+ data.comps.thetas[0].trace_id);
+
+    console.log('/diagnostic/'+ data.model.theta._id + '/'+ data.model.theta.trace_id);
+    $.getJSON('/diagnostic/'+ data.model.theta._id + '/'+ data.model.theta.trace_id, function(diagnostic) {
+
+      $.getJSON('/forecast/'+ data.model.link._id + '/'+ data.model.theta._id + '/'+ data.model.theta.trace_id, function(forecast) {
+        console.log('/forecast/'+ data.model.link._id + '/'+ data.model.theta._id + '/'+ data.model.theta.trace_id);
+
+        console.log(diagnostic);
 
         var plomPred =  new PlomPred({
-          context: data.comps.context,
-          process: data.comps.process,
-          link: data.comps.link,
+          context: data.model.context,
+          process: data.model.process,
+          link: data.model.link,
           X: diagnostic.X,
-          theta: data.comps.thetas[0],
-          theta_id: data.comps.thetas[0]._id,
-          trace_id: data.comps.thetas[0].trace_id,
+          theta: data.model.theta,
+          theta_id: data.model.theta._id,
+          trace_id: data.model.theta.trace_id,
           graphTrajId: 'graphTrajPred',
           graphStateId: 'graphStatePred'
         });
-
-
 
         $("#resetPred").on('click', function(){
           plomPred.reset();

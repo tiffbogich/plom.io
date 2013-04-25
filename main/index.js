@@ -82,9 +82,9 @@ app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 
 
 app.get('/diagnostic/:theta_id', secure, review.diagnosticSummary);
-app.get('/diagnostic/:theta_id/:h', secure, review.diagnosticDetail);
+app.get('/diagnostic/:theta_id/:trace_id', secure, review.diagnosticDetail);
 
-app.get('/forecast/:link_id/:theta_id/:h', secure, review.forecast);
+app.get('/forecast/:link_id/:theta_id/:trace_id', secure, review.forecast);
 
 //request
 app.get('/requests/:id', secure, csrf, function(req, res){res.render('requests.ejs')});

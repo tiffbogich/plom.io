@@ -35,10 +35,10 @@
               </ul>
 
               <!-- collapsible discussion on the priors -->
-              <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= p.semantic_id %>"><i class="icon-comment"></i> Discuss</button>                
-              <div id="<%= p.semantic_id %>" class="collapse">
+              <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= p.id %>"><i class="icon-comment"></i> Discuss</button>                
+              <div id="<%= p.id %>" class="collapse">
 
-                <div class="thread" id="threadPrior<%= p.semantic_id %>">
+                <div class="thread" id="threadPrior<%= p.id %>">
                   <% var reviews = p.reviews || []; %>
                   <% include tpl/reviewer %>
                 </div>
@@ -46,7 +46,7 @@
                 <form class="post" action="/review" method="post">
                   <textarea rows="2" name="body", class="span3"></textarea>
                   <input type="hidden" name="_csrf" value="<%= token %>"/>
-                  <input type="hidden" name="id" value="<%= p.semantic_id %>"/>
+                  <input type="hidden" name="id" value="<%= p.id %>"/>
                   <input type="hidden" name="type" value="prior"/>
 
                   <p>
@@ -102,12 +102,12 @@
           </div>
           <div class="span5">
             <%= r.comment || ''  %> 
-            <button type="button" class="btn btn-mini social-action" data-toggle="collapse" data-target="#<%= i %>"><i class="icon-comment"></i> Discuss</button>   
+            <button type="button" class="btn btn-mini social-action" data-toggle="collapse" data-target="#<%= r.id %>"><i class="icon-comment"></i> Discuss</button>   
           </div>
         </div>
 
         <!-- discussion on the process model specific reaction -->
-        <div id="<%= i %>" class="row collapse">
+        <div id="<%= r.id %>" class="row collapse">
           <div class="span7 thread"> 
             <% if (r.discussion && r.discussion.length){ %>
             <ul>
@@ -122,7 +122,7 @@
           <div class="span4">
             <form class="discuss" action="/discuss/pmodel" method="post">
               <textarea rows="2" class="span4" name="body"></textarea>
-              <input type="hidden" name="id" value="<%= i %>"/>
+              <input type="hidden" name="id" value="<%= r.id %>"/>
               <input type="hidden" name="_csrf" value="<%= token %>"/>                  
               <p><button class="btn" type="submit">Submit</button></p>
             </form>

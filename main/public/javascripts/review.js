@@ -6,22 +6,22 @@ $(document).ready(function() {
 
   $('a[data-toggle="tooltip"]').tooltip();
 
-  $.getJSON('/review', function(data) {
-
-    var comps = data.comps
-      , tpl = data.tpl;
-
-    comps.theta = comps.thetas[0];
-
-    plomGraphModel(comps.process, "#pgraph"+ comps.link._id);
-
-    var reviewer = new Reviewer(tpl['reviewer'], comps, comps.theta);
-
-    $('#priors, #review, #posterior').on('submit', '.post', function(e){
-      e.preventDefault();     
-      reviewer.post($(this));
-    });
-
+//  $.getJSON('/review', function(data) {
+//
+//    var comps = data.comps
+//      , tpl = data.tpl;
+//
+//    comps.theta = comps.thetas[0];
+//
+//    plomGraphModel(comps.process, "#pgraph"+ comps.link._id);
+//
+//    var reviewer = new Reviewer(tpl['reviewer'], comps, comps.theta);
+//
+//    $('#priors, #review, #posterior').on('submit', '.post', function(e){
+//      e.preventDefault();     
+//      reviewer.post($(this));
+//    });
+//
 //    var ctrl = new Control(data);
 //
 //    ctrl.thetaList();
@@ -184,6 +184,6 @@ $(document).ready(function() {
 //
 //    } //if socket
 //
-  }); //AJAX review
+//  }); //AJAX review
 
 });

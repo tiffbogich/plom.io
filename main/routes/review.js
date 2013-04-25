@@ -3,6 +3,7 @@ var fs = require('fs')
   , check = require('validator').check
   , mongodb = require('mongodb')
   , ObjectID = require('mongodb').ObjectID
+  , Grid = require('gridfs-stream')
   , writePredictFiles = require('../lib/predict')
   , ppriors = require('plom-priors')
   , xreview = require('../lib/review')
@@ -45,26 +46,33 @@ exports.index = function(req, res, next){
 
       var best = thetas[0].result.filter(function(x){return x.trace_id === thetas[0].trace_id;})[0];
       best.theta._id = thetas[0]._id;
+      best.theta.trace_id = thetas[0].trace_id;
 
       comps.thetas = thetas;
       comps.best = best;
 
-      //add the reviews to comps
-      xreview.stats(req.app.get('reviews'), comps, function(err, comps_reviewed){
-        if(err) return next(err);
-        
-        //tooltipify
-        comps.infectors = ppriors.tooltipify(comps);
-        comps.link.prior = ppriors.display(comps.link.prior, comps);
-        comps.best.posterior = ppriors.display(comps.best.posterior, comps);
-        
-        res.render('review/index', comps);
+      res.format({
+        html: function(){
+          //add the reviews to comps
+          xreview.stats(req.app.get('reviews'), comps, function(err, comps_reviewed){
+            if(err) return next(err);
+            
+            //tooltipify
+            comps.infectors = ppriors.tooltipify(comps);
+            comps.link.prior = ppriors.display(comps.link.prior, comps);
+            comps.best.posterior = ppriors.display(comps.best.posterior, comps);
+            
+            res.render('review/index', comps);
+          });
+        },
+        json: function(){
+          res.send({model: {context: comps.context, process: comps.process, link:comps.link, theta: comps.best.theta}});
+        }
       });
 
     });
   });
 };
-
 
 exports.post = function(req, res, next){
 
@@ -99,19 +107,18 @@ exports.diagnosticSummary = function(req, res, next){
   var theta_id = req.params.theta_id
     , diagnostics = req.app.get('diagnostics');
 
-  diagnostics.find({theta_id: theta_id}, {summary:true, h:true}).sort({'summary.essMin':-1}).toArray(function(err, docs){
+  diagnostics.find({theta_id: theta_id}, {summary:true, trace_id:true}).sort({'summary.essMin':-1}).toArray(function(err, docs){
     res.send(docs);
   });
 
 }
 
-
 exports.diagnosticDetail = function(req, res, next){
   var theta_id = req.params.theta_id
-    , h = parseInt(req.params.h, 10)
+    , trace_id = parseInt(req.params.trace_id, 10)
     , diagnostics = req.app.get('diagnostics');
 
-  diagnostics.findOne({theta_id: theta_id, h:h}, {detail:true, X:true}, function(err, doc){
+  diagnostics.findOne({theta_id: theta_id, trace_id: trace_id}, {detail:true, X:true}, function(err, doc){
     res.send(doc);
   });
 }
@@ -120,7 +127,7 @@ exports.diagnosticDetail = function(req, res, next){
 exports.forecast = function(req, res, next){
   var link_id = req.params.link_id
     , theta_id = req.params.theta_id
-    , h = parseInt(req.params.h, 10);
+    , trace_id = parseInt(req.params.trace_id, 10);
 
   var predictPath = path.join(process.env.HOME, 'built_plom_models', link_id, 'model', theta_id);
   fs.exists(predictPath, function (exists) {
@@ -131,7 +138,7 @@ exports.forecast = function(req, res, next){
       var db = req.app.get('db');
       var gfs = Grid(db, mongodb);
 
-      gfs.files.find({ 'metadata.theta_id': new ObjectID(theta_id), 'metadata.type': {$in: ['best', 'X']}, 'metadata.h':h }, {_id:true, metadata:true}).toArray(function (err, files) {
+      gfs.files.find({ 'metadata.theta_id': new ObjectID(theta_id), 'metadata.type': {$in: ['best', 'X']}, 'metadata.trace_id':trace_id }, {_id:true, metadata:true}).toArray(function (err, files) {
         if (err) return callback(err);
        
         writePredictFiles(gfs, predictPath, files, function(err){
@@ -139,11 +146,11 @@ exports.forecast = function(req, res, next){
 
           //add theta
           var components = req.app.get('components');
-          components.findOne({_id: new ObjectID(theta_id)}, {results:true}, function(err, theta){
+          components.findOne({_id: new ObjectID(theta_id)}, {result: true}, function(err, theta){
             if (err) return next(err);
 
-            theta = theta.results.filter(function(x){return x.trace_id === h})[0].theta;
-            fs.writeFile(path.join(predictPath, 'theta_'+ h +'.json'), JSON.stringify(theta), function(err){
+            theta = theta.result.filter(function(x){return x.trace_id === trace_id})[0].theta;
+            fs.writeFile(path.join(predictPath, 'theta_'+ trace_id +'.json'), JSON.stringify(theta), function(err){
               if (err) return next(err);
               res.send({ready:true});
             });
