@@ -28,10 +28,6 @@ $(document).ready(function() {
           , updateAutocorr = plotAutocorr(diagnostic.detail,0,1)
           , updateMat = parMatrix(diagnostic.detail, updateCorr1, updateCorr2, updateDensity1, updateDensity2, updateTrace, updateAutocorr);
 
-        greenlights(summaries, ctrl.compiled.summaryCoda, function(summary, i){
-          $.publish('trace', [summary.theta_id, summary.trace_id]);
-        });
-
         var plomTs = new PlomTs({
           context: model.context,
           process: model.process,
@@ -45,6 +41,11 @@ $(document).ready(function() {
         });
 
         var ctrl = new Control(data, plomTs);
+
+        greenlights(summaries, ctrl.compiled.summaryCoda, function(summary, i){
+          $.publish('trace', [summary.theta_id, summary.trace_id]);
+        });
+
 
         $.subscribe('trace', function(_, theta_id, trace_id) {
           // Skip the first argument (event object)

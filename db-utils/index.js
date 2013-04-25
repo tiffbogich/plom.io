@@ -5,21 +5,26 @@ var _ = require('underscore')
  * returns a mongo query object efficient to match the user search string searchString
  */
 
-exports.querify = function(searchString, diseaseList){
+exports.querify = function(searchString, disease){
 
-  var qstemmed = natural.PorterStemmer.tokenizeAndStem(searchString);
+  if(!Array.isArray(disease) && typeof disease === 'string' && disease){
+    disease = [disease];
+  }
 
-  //mongo query object
-  var qobj = {
-    $or: [
+  var qobj = {type: 'link'};
+
+  if(disease && disease.length){
+    qobj['context_disease'] = {$all: disease, $size: disease.length};
+  }
+  
+  if(searchString){
+    var qstemmed = natural.PorterStemmer.tokenizeAndStem(searchString);
+
+    //mongo query object
+    qobj['$or'] =  [
       {name: searchString},
       {_keywords: {$in: qstemmed } }
-    ],
-    type: 'link'
-  };
-
-  if(diseaseList && diseaseList.length){
-    qobj['context_disease'] = {$all: diseaseList, $size: diseaseList.length};
+    ];   
   }
 
   return qobj;

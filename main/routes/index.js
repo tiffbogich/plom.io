@@ -27,9 +27,16 @@ exports.index = function(req, res){
 
   var components = req.app.get('components');
 
-  var q = (req.body.q) ? dbUtil.querify(req.body.q, req.body.d) : {type: 'link'};
+  var q;
+  if(req.body.q){
+    q = dbUtil.querify(req.body.q, req.body.d);
+  } else if (req.query.d || req.query.c){
+    q = dbUtil.querify(req.query.c, req.query.d);
+  } else {
+    q = {type: 'link'};
+  }
 
-  //first let's get the matching contexts. The results can be large so we just get the context_id
+  //first let's get the matching contexts by searching the links. The results can be large so we just get the context_id
   components.find(q, {context_id:true}).toArray(function(err, links_context_id){
     if (err) return next(err);
 
