@@ -2,7 +2,6 @@ function Reviewer(tpl){
   this.render = _.template(tpl);
 };
 
-
 /**
  * get thread id
  */

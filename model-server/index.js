@@ -210,8 +210,19 @@ app.post('/commit', function(req, res, next){
 
   var my_semantic_ids = [m.context.semantic_id, m.process.semantic_id, m.link.semantic_id];
   if('theta' in m){
+    //for link, we include the semantic id_of context, process and link.
+    m.theta.context_semantic_id = m.context.semantic_id;
+    m.theta.process_semantic_id = m.process.semantic_id;
+    m.theta.link_semantic_id = m.link.semantic_id;
+
     m.theta.semantic_id = schecksum(m.theta);
     my_semantic_ids.push(m.theta.semantic_id);
+
+    //add captions
+    ppriors.getCaptions(m, m.theta);
+    for(var r=0; r<m.theta.result.length; r++){
+      ppriors.getCaptions(m, m.theta.result[r].theta);
+    }    
   }
 
   //add id to reactions

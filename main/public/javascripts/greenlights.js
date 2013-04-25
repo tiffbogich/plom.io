@@ -12,6 +12,7 @@ function greenlights(summaries, ftpl, callback){
   var g = svg.selectAll("g")
     .data(summaries)
     .enter().append("g")
+    .classed('trace-selected', function(d,i){ return i===0;})
     .attr("transform", function(d, i) { return "translate(" + (i*60+40) + "," + (34) + ")"; });
 
   var circle = g.append("circle")
@@ -24,18 +25,16 @@ function greenlights(summaries, ftpl, callback){
     .text(function(d){return Math.round(d.summary.essMin);});
 
   circle.on('mouseover', function(d, i){
-    console.log(d);
-    $('#summaryTable').html(ftpl({s:d.summary, summaries:summaries, h:i})).show();;
+    $('#summaryTable').html(ftpl({s: d.summary, summaries: summaries, trace_id: i})).show();;
   })
   circle.on('mouseout', function(d, i){
     $('#summaryTable').hide();
   })
 
-
-  circle.on('click', function(d, i){
-
+  g.on('click', function(d, i){
+    d3.select('g.trace-selected').classed('trace-selected', false);
+    d3.select(this).classed('trace-selected', true);
     callback(d, i);
-
   })
 
 }

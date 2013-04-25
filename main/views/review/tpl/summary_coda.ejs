@@ -1,10 +1,8 @@
 <ul class="inline muted">
-
-  <li><strong>#run</strong>: <%= summaries[h].h %></li>
+  <li><strong>#run</strong>: <%= summaries[trace_id].trace_id %></li>
   <li><strong>Geweke</strong>: <%= s.geweke %></li>
   <li><strong>Raftery</strong>: <%= (s.raftery.success) ? 'M: ' + s.raftery.M + ' N: ' + s.raftery.N + ' Nmin: ' + s.raftery.Nmin + ' I: ' + s.raftery.I : 'restart with M > ' + s.raftery.M %></li>
   <li><strong>Heidelberger</strong>: <%= s.heidel %></li>
   <li><strong>ESS min</strong>: <%= s.essMin %></li>
   <li><strong>DIC</strong>: <%= s.dic %></li>
-  <li><button class="btn btn-mini review-trace-id<% if(h===0) { %> active<% } %>" type="button" value="<%= summaries[h].h %>">select</button></li>
 </ul>

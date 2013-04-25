@@ -1,139 +1,48 @@
-function Control(data){
+function Control(data, plomTs){
 
   this.compiled = {};
   for(var k in data.tpl){
     this.compiled[k] = _.template(data.tpl[k]);
   }
 
-  this.context = data.comps.context;
-  this.process = data.comps.process;
-  this.link = data.comps.link;
-  this.thetas = data.comps.thetas;
+  this.context = data.model.context;
+  this.process = data.model.process;
+  this.link = data.model.link;
+  this.thetas = data.model.thetas;
   this.summaries = [];
   this.detail;
-  this.X;
 
-  var infector = [];
-  this.process.model.forEach(function(r){
-    if( ('tag' in r) && ('transmission' in r['tag']) ){
-      infector = infector.concat(r['tag']['transmission']['by']);
-    }
-  });
-  this.infector = infector;
+  this.theta = $.extend(true, {}, this.theta); //this.theta will be mutated so we always work on a copy
 
-  this.thetas.forEach(function(x){
-    delete x.diagnostic;
-  })
-
-  this.i = 0; //the selected theta (among thetas)
-  this.theta = $.extend(true, {}, this.thetas[this.i]); //this.theta will be mutated so we always work on a copy
-
-  this.name = this.context.disease.join('; ') + ' / ' +  this.context.name + ' / ' + this.process.name + ' - ' + this.link.name;
-
-  this.plomTs = new PlomTs({
-    context: this.context,
-    process: this.process,
-    link: this.link,
-    theta: this.theta,
-    graphTrajId: 'graphTraj',
-    graphStateId: 'graphState',
-    graphPredResId: "graphPredRes",
-    graphEssId: "graphEss"
-  });
-
-  //d3 plots
-  this.updateCorr1 = undefined;
-  this.updateCorr2 = undefined;
-  this.updateDensity1 = undefined;
-  this.updateDensity2 = undefined;
-  this.updateTrace = undefined;
-  this.updateAutocorr = undefined;
-
-  this.updateMat = undefined;
+  this.plomTs = plomTs;
 
   this.ONE_YEAR_IN_DATA_UNIT = {D:365.0, W:365.0/7.0, M:12.0, Y:1.0 };
   this.fhr = {D: 'days', W: 'weeks', M: 'months', Y: 'years'};
   this.algo2filter = {mif: 'smc', kalman: 'kalman', kmcmc: 'kalman', smc: 'smc', pmcmc: 'smc', simul: 'simul', simplex: 'smc', ksimplex: 'kalman'};
-
-  this.op = ['+', '-', '*', '/', ',', '(', ')'];
 };
 
 
-Control.prototype.thetaList = function(){
-  var that = this;
-  $('.review-theta').on('click', function(e){
-    that.i = parseInt($(this).val(), 10);
+Control.prototype.update = function(result){
 
-    //model review
-    plomGraphModel(that.process, "#pgraph"+that.link._id);
-
-
-    $.getJSON('/diagnostic/'+ that.thetas[that.i]._id, function(summaries) {
-      that.summaries = summaries;
-      that.summaryTable();
-      greenlights(summaries, that.compiled.summaryTable);
-
-
-
-      $.getJSON('/diagnostic/'+ that.thetas[that.i]._id + '/'+ summaries[0].h, function(diagnostic) {
-        that.detail = diagnostic.detail;
-
-        that.updateCorr1 = that.updateCorr1 || plotCorr(that.detail, 0, 1, 1);
-        that.updateCorr2 = that.updateCorr2 || plotCorr(that.detail, 1, 0, 2);
-        that.updateDensity1 = that.updateDensity1 || plotDensity(that.detail, 0, 1);
-        that.updateDensity2 = that.updateDensity2 || plotDensity(that.detail, 1, 2);
-        that.updateTrace = that.updateTrace || plotTrace(that.detail, 0, 1);
-        that.updateAutocorr = that.updateAutocorr || plotAutocorr(that.detail,0,1);
-        that.updateMat = parMatrix(that.detail, that.updateCorr1, that.updateCorr2, that.updateDensity1, that.updateDensity2, that.updateTrace,that.updateAutocorr);
-
-        $('.review-trace-id').first().trigger('click');
-      });
-
-    });
-  });
-
-};
-
-Control.prototype.summaryTable = function(){
-
-  var that = this;
-  //when user select a trace:
-  $('.review-trace-id').on('click', function(e){
-
-    var h = parseInt($(this).val(), 10);
-
-    $.getJSON('/diagnostic/'+ that.thetas[that.i]._id + '/' + h, function(diagnostic) {
-      that.X = diagnostic.X;
-      that.updateMat(diagnostic.detail);
-      that.updateTheta(that.thetas[that.i], that.thetas[that.i].design.cmd);
-    });
-
-  });
-};
-
-
-Control.prototype.updateTheta = function(theta, cmd){
-
-  if('_id' in theta){
-    this.theta = $.extend(true, {}, theta);
+  if('_id' in result.theta){
+    this.theta = $.extend(true, {}, result.theta);
   } else { //theta comes from vizbit: preserve metadata but replace parameter and partition
-    this.theta.parameter = $.extend(true, {}, theta.parameter);
-    this.theta.partition = $.extend(true, {}, theta.partition);
+    this.theta.parameter = $.extend(true, {}, result.theta.parameter);
+    this.theta.partition = $.extend(true, {}, result.theta.partition);
   }
-
+  
   //render
   $('#control').html(this.compiled.control({c:this.context, p:this.process, l:this.link, t:this.theta}));
-  $('#cred').html(this.compiled.cred({c:this.context, p:this.process, l:this.link, t:this.theta}));
-  $('#tickTraj').html(this.compiled.ticks({'names': this.plomTs.getTrajNames() , prefix: 'traj'}));
-  $('#tickState').html(this.compiled.ticks({'names': this.plomTs.getStateNames() , prefix: 'state'}));
-  $('#tickPredRes').html(this.compiled.ticks({'names': this.plomTs.getTrajNames() , prefix: 'predRes'}));
+  $('#cred').html(this.compiled.cred(result));
+  $('a[data-toggle="tooltip"]').tooltip();
+  $('#tickTraj').html(this.compiled.ticks({'names': this.plomTs.getTrajNames() , suffix: 'traj'}));
+  $('#tickState').html(this.compiled.ticks({'names': this.plomTs.getStateNames() , suffix: 'state'}));
+  $('#tickPredRes').html(this.compiled.ticks({'names': this.plomTs.getTrajNames() , suffix: 'predRes'}));
+  $('#tickEss').html(this.compiled.ticks({'names': ['ESS'] , suffix: 'ess'}));
 
   //attach listeners
-  this._method(cmd);
+  this._method();
   this._theta();
-
-  //replot simulation and filters
-  this.plomTs.updateTheta(this.theta, this.X);
 };
 
 
@@ -152,9 +61,10 @@ Control.prototype.getMethod = function(){
 /**
  * cmd is either an array  (design.cmd) or a method object as returned by this.getMethod()
  */
-Control.prototype._method = function(cmd){
+Control.prototype._method = function(){
 
   var method = {};
+  var cmd = this.theta.design.cmd;
 
   if(_.isArray(cmd)){
     cmd = _.last(cmd);
@@ -290,6 +200,12 @@ Control.prototype._theta = function(){
     })
     .trigger('change');
 
+  $('input.tick_ess')
+    .on('change', function(){
+      that.plomTs.graphEss.setVisibility(parseInt($(this).val(), 10), $(this).is(':checked'));
+    })
+    .trigger('change');
+
   //colors tick boxs:
   var cols = d3.scale.category10();
   ['input.tick_traj', 'input.tick_state', 'input.tick_predRes'].forEach(function(el){
@@ -309,72 +225,3 @@ Control.prototype.setVizBit = function(){
   };
 
 };
-
-
-
-
-
-
-
-/**
- * Transform the rate into an array:
- *
- * example: 'r0*2*correct_rate(v)' ->
- * ['r0', '*', '2', 'correct_rate', '(', 'v', ')']
- */
-
-Control.prototype._parseRate = function(rate){
-
-  rate = rate.replace(/\s+/g, '');
-
-  var s = ''
-    , l = [];
-
-  for (var i = 0; i< rate.length; i++){
-    if (this.op.indexOf(rate[i]) !== -1){
-      if(s.length){
-        l.push(s);
-        s = '';
-      }
-      l.push(rate[i]);
-    } else {
-      s += rate[i];
-    }
-  }
-
-  if (s.length){
-    l.push(s);
-  }
-
-  return l;
-}
-
-
-Control.prototype._tooltipify = function(model, theta){
-  var that = this;
-
-  var ify = function(rate){
-    rate = that._parseRate(rate);
-    rate.forEach(function(r, j){
-      if(r in theta.parameter){
-        rate[j] = '<a href="#" data-toggle="tooltip" title="' + theta.parameter[r].comment + '">' + r + '</a>'
-      }
-    });
-    return rate.join('');
-  };
-
-  if(_.isArray(model)) { //process model
-
-    model.forEach(function(reaction, i){
-      model[i].tlt_rate = ify(reaction.rate);
-    });
-
-  } else { //link
-    for(var p in model){
-      if(p !== 'distribution' && p.split('_')[0] !== 'tlt'){
-        model['tlt_' + p] = ify(model[p]);
-      }
-    }
-
-  }
-}

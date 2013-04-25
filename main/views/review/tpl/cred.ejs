@@ -2,11 +2,10 @@
 
 <div class="row">
 
-
   <% [
-     {val:p.parameter, title:'Process'},
-     {val:l.observation[0].parameter, title:'Observation'},
-     {val:p.state, title: 'Initial Conditions'}
+     {val: posterior.process, title:'Process'},
+     {val: posterior.observation, title:'Observation'},
+     {val: posterior.state, title: 'Initial Conditions'}
      ].forEach(function(type){ %>
 
   <div class="span4">
@@ -16,22 +15,25 @@
     <table>
       <tr>
         <th></th>
-        <th>q5</th>
+        <th>lower</th>
         <th>value</th>
-        <th>q95</th>
+        <th>upper</th>
       </tr>
 
-      <% type.val.forEach(function(par){ %>
-      <% if (par.id in t.parameter) { %>
-      <% for(var group in t.parameter[par.id].group){ %>
-      <tr>
-        <td><%= par.id %>: <%= group.split('__').join('; ') %></td>
-        <td><input type="text" readonly="readonly" name="<%= par.id %>___<%= group %>___min"   value="<%= t.parameter[par.id]['group'][group]['min']['value'] %>"   class="input-mini theta" /></td>
-        <td><input type="text" name="<%= par.id %>___<%= group %>___guess" value="<%= t.parameter[par.id]['group'][group]['guess']['value'] %>" class="input-mini theta guess" /></td>
-        <td><input type="text" readonly="readonly" name="<%= par.id %>___<%= group %>___max"   value="<%= t.parameter[par.id]['group'][group]['max']['value'] %>"   class="input-mini theta" /></td>
+      <% for(var par in type.val){ 
+         var caption = type.val[par].caption;
+         for(var group in type.val[par]['group']){ 
+         var p = type.val[par]['group'][group] 
+         %>
+
+      <tr>       
+        <td><a href="#" data-toggle="tooltip" data-placement="top" title="<%= caption %>"><%= par %>: <%= group.split('__').join('; ') %></a></td>
+        <td><input type="text" readonly="readonly" name="<%= par %>___<%= group %>___min"   value="<%= p.min %>"   class="input-mini theta" /></td>
+        <td><input type="text" name="<%= par %>___<%= group %>___guess" value="<%= theta.parameter[par]['group'][group]['guess']['value'] %>" class="input-mini theta guess" /></td>
+        <td><input type="text" readonly="readonly" name="<%= par %>___<%= group %>___max"   value="<%= p.max %>"   class="input-mini theta" /></td>
 
       </tr>
-      <% } }; });  %>
+      <%  } }; %>
     </table>
 
   </div>

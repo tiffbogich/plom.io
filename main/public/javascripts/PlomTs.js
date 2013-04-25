@@ -19,6 +19,10 @@ function PlomTs(options) {
     this[o] = options[o];
   }
 
+
+  this.width = 800;
+  this.height = 350;
+
   this.N_TS = this.context.time_series.length;
   this.N_CAC = this.theta.partition['variable_population']['group'].length;
 
@@ -90,7 +94,7 @@ PlomTs.prototype.getTrajNames = function(){
 };
 
 
-PlomTs.prototype.updateTheta = function(theta, X){
+PlomTs.prototype.update = function(theta, X){
   this.theta = theta;
   this.X = X;
 
@@ -138,9 +142,9 @@ PlomTs.prototype.setDataTraj = function(){
 
       //model prediction
       if(that.X){
-        that.dataTraj[i][that.N_TS+ts+1][0] = that.X.q5['obs_mean:' + name][i];
+        that.dataTraj[i][that.N_TS+ts+1][0] = that.X.lower['obs_mean:' + name][i];
         that.dataTraj[i][that.N_TS+ts+1][1] = that.X.mean['obs_mean:' + name][i];
-        that.dataTraj[i][that.N_TS+ts+1][2] = that.X.q95['obs_mean:' + name][i];
+        that.dataTraj[i][that.N_TS+ts+1][2] = that.X.upper['obs_mean:' + name][i];
       }
 
     });
@@ -163,9 +167,9 @@ PlomTs.prototype.setDataState = function(){
       that.dataState[i][s+1] = new Array(3);
 
       if(that.X){
-        that.dataState[i][s+1][0] = that.X.q5[name][i];
+        that.dataState[i][s+1][0] = that.X.lower[name][i];
         that.dataState[i][s+1][1] = that.X.mean[name][i];
-        that.dataState[i][s+1][2] = that.X.q95[name][i];
+        that.dataState[i][s+1][2] = that.X.upper[name][i];
       }
     });
 
@@ -229,7 +233,7 @@ PlomTs.prototype.makeGraphTraj = function(){
   //repeat colors so that data and simul have the same colors
   var cols = d3.range(this.N_TS).map(d3.scale.category10());
   g.updateOptions({'colors': cols.concat(cols)});
-  g.resize(850, 400);
+  g.resize(this.width, this.height);
   return g;
 };
 
@@ -262,7 +266,7 @@ PlomTs.prototype.makeGraphState = function(){
   var g = new Dygraph($('#' +this.graphStateId)[0], this.dataState, options);
   var cols = d3.range(fullLabels.length-1).map(d3.scale.category10());
   g.updateOptions({'colors': cols});
-  g.resize(850, 400);
+  g.resize(this.width, this.height);
   return g;
 };
 
@@ -294,7 +298,7 @@ PlomTs.prototype.makeGraphPredRes = function(){
   var g = new Dygraph($('#' +this.graphPredResId)[0], this.dataPredRes, options);
   var cols = d3.range(this.N_TS).map(d3.scale.category10());
   g.updateOptions({'colors': cols});
-  g.resize(850, 400);
+  g.resize(this.width, this.height);
   return g;
 };
 
@@ -321,7 +325,7 @@ PlomTs.prototype.makeGraphEss = function(){
   };
 
   var g = new Dygraph($('#' +this.graphEssId)[0], this.dataEss, options);
-  g.resize(850, 400);
+  g.resize(this.width, this.height);
   return g;
 };
 

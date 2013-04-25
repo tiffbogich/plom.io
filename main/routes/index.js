@@ -203,18 +203,37 @@ exports.build = function(req, res, next){
 
 
 exports.component = function(req, res, next){
-  var _id = new ObjectID(req.params._id);
+  var _id = new ObjectID(req.params._id)
+    , id = req.params.id;
+
   var components = req.app.get('components');
 
   components.findOne({_id:_id}, function(err, doc){    
     if(err) return next(err);
 
     if(doc.type === 'context'){
+
       //keep only the data as opposed to the meta data
       var data = doc.data.filter(function(d){return d.id ==='data'})[0];
       doc.data = data.source.slice(1); //remove header;
+      return res.send(doc);
+    } else if(doc.type === 'theta' && (typeof id !== 'undefined')){
+
+      //send result object (theta + posterior)
+      var trace_id = parseInt(id, 10);
+      //return theta from result array;
+      var myresult = doc.result.filter(function(x){return x.trace_id === trace_id;})[0];
+      myresult.theta._id = doc._id;
+      myresult.theta.trace_id = trace_id;
+      myresult.theta.design = doc.design;
+      myresult.posterior = ppriors.display(myresult.posterior, {theta: myresult.theta});
+      
+      return res.send(myresult);
+
+    } else {      
+      res.send(doc);
     }
-    res.send(doc);
+
   });
 
 };

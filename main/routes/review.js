@@ -35,7 +35,6 @@ exports.index = function(req, res, next){
     req.session.process_name = comps.process.name;
     req.session.link_name = comps.link.name;
 
-
     components.find({_id: {$in: comps.link.theta_id}}).toArray(function(err, thetas){
       if (err) return next(err);
 
@@ -61,18 +60,48 @@ exports.index = function(req, res, next){
             comps.infectors = ppriors.tooltipify(comps);
             comps.link.prior = ppriors.display(comps.link.prior, comps);
             comps.best.posterior = ppriors.display(comps.best.posterior, comps);
-            
             res.render('review/index', comps);
           });
         },
         json: function(){
-          res.send({model: {context: comps.context, process: comps.process, link:comps.link, theta: comps.best.theta}});
+
+          //send the templates TODO browserify...
+          async.parallel({ 
+            control: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','control.ejs'), 'utf8', cb)},
+            cred: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','cred.ejs'), 'utf8', cb)},
+            summaryCoda: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','summary_coda.ejs'), 'utf8', cb)},
+            ticks: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8', cb)},
+            reviewer: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','reviewer.ejs'), 'utf8', cb)},
+            discuss: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','discuss.ejs'), 'utf8', cb)},
+          }, function(err, tpl){
+            if(err) return next(err);
+
+            for(var key in tpl){
+              tpl[key] = tpl[key].replace(/<%= token %>/g, req.session._csrf);
+            }
+
+            var result = comps.best;
+            result.posterior = ppriors.display(result.posterior, comps);
+            res.send({
+              model: {
+                context: comps.context,
+                process: comps.process, 
+                link: comps.link, 
+                result: result,  //the best theta (used for forecasting)
+                thetas_id: comps.thetas.map(function(x){return x._id;}) //sorted theta_id (used to make ajax call)
+              },
+              tpl:tpl
+            });
+
+          });
+
         }
       });
 
     });
   });
 };
+
 
 exports.post = function(req, res, next){
 

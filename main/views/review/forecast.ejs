@@ -1,0 +1,82 @@
+<div class="row">
+  <div class="span8">
+    <h4>Forecast</h4>
+  </div>
+  <div class="span4">
+    <form class="form-inline social-action">
+      Forecast after the data for:
+      <select id="nExtra" class="input-small">
+        <% for(var i=0; i<11; i++){ %>
+           <option value="<%= i %>"> <%= i %> years</option>
+           <% } %>
+      </select>
+    </form>
+  </div>
+
+</div>
+
+
+<div class="row">
+  <div class="span12">
+
+    <!-- Trajectories plot -->
+    <div class="accordion" id="plotTrajPred">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotTrajPred" href="#plotTrajPredContent">Time series</a>
+        </div>
+
+        <div id="plotTrajPredContent" class="accordion-body collapse in">
+          <div class="accordion-inner">
+            <div id="graphTrajPred" class="plom-graph-forecast"></div>
+            <div id="tickTrajPred" class="tickGraph horizontal-scroll"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- States plot and diffusions -->
+    <div class="accordion" id="plotStatePred">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#plotStatePred" href="#plotStatePredContent">State Variables</a>
+        </div>
+
+        <div id="plotStatePredContent" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <div id="graphStatePred" class="plom-graph-forecast"></div>
+            <div id="tickStatePred" class="tickGraph horizontal-scroll"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+    <form class="form-inline">
+      <select id="implPred">
+        <option value="ode">Ordinary differential equation</option>
+        <option value="sde">Stochastic differential equation</option>
+        <option value="psr">Poisson process</option>
+      </select>
+
+      <label class="control-label" for="sPred">Integration time step: </label>
+      <div class="input-append">
+        <input type="text" id="sPred" class="input-mini">
+        <span class="add-on"><%= context.frequency %></span>
+      </div>
+
+      <div class="btn-group pull-right">
+        <button id="runPred" class="btn" type="button"><i class="icon-play"></i> Run</button>
+        <button id="stopPred" class="btn" type="button"><i class="icon-remove"></i> Stop</button>
+        <button id="resetPred" class="btn" type="button"><i class="icon-refresh"></i> Reset</button>
+      </div>
+
+    </form>
+  </div>
+</div>       

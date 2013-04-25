@@ -67,24 +67,22 @@ app.post('/search', secure, csrf, routes.index);
 app.post('/library', secure, csrf, routes.build);
 app.post('/fork', csrf, routes.postFork);
 
-//components (for AJAX call)
-app.get('/component/:_id', secure, routes.component);
 
 //review page
 app.get('/review', secure, csrf, review.index); //returns a social model (i.e with everything reviewed)
-
 app.post('/review', secure, csrf, review.post); //post review
 app.post('/comment', secure, csrf, review.comment); //post comment to a review
 
-app.get('/review/:type/:id', secure, csrf, review.get); //get specific reviews (AJAX)
 
+app.get('/review/:type/:id', secure, csrf, review.get);  //get specific reviews (AJAX)
+app.get('/diagnostic/:theta_id', secure, review.diagnosticSummary); 
+app.get('/diagnostic/:theta_id/:trace_id', secure, review.diagnosticDetail);
+app.get('/forecast/:link_id/:theta_id/:trace_id', secure, review.forecast);
 app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 
 
-app.get('/diagnostic/:theta_id', secure, review.diagnosticSummary);
-app.get('/diagnostic/:theta_id/:trace_id', secure, review.diagnosticDetail);
-
-app.get('/forecast/:link_id/:theta_id/:trace_id', secure, review.forecast);
+//general
+app.get('/component/:_id/:id?', secure, routes.component); //components (for AJAX call)
 
 //request
 app.get('/requests/:id', secure, csrf, function(req, res){res.render('requests.ejs')});

@@ -360,6 +360,7 @@ text.shadow {
 
 
 .tickGraph div{
+  height:40px;
   display:table-cell; 
   padding-right: 20px; 
 }
@@ -398,17 +399,28 @@ text.shadow {
 #reviewTab{
   margin-top:30px;
 }
-re
+
 .passed:hover, .failed:hover{
   stroke: white;
   cursor: pointer;
 }
+
+.trace-selected{
+  stroke: white;  
+  fill:  grey;
+}
+
+.trace-selected circle{
+  stroke: white;  
+}
+
 
 .passed, .failed{
   stroke-width: 2px;
   fill-opacity: 0.7;
   stroke-opacity: 0.7;
 }
+
 .passed{
   fill: green;
 }

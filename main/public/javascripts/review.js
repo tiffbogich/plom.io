@@ -2,32 +2,72 @@ var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 
-  $('#reviewTab a[href=#prior]').tab('show');
+  $('#reviewTab a[href=#review]').tab('show');
 
   $('a[data-toggle="tooltip"]').tooltip();
 
-//  $.getJSON('/review', function(data) {
-//
-//    var comps = data.comps
-//      , tpl = data.tpl;
-//
-//    comps.theta = comps.thetas[0];
-//
-//    plomGraphModel(comps.process, "#pgraph"+ comps.link._id);
-//
-//    var reviewer = new Reviewer(tpl['reviewer'], comps, comps.theta);
-//
-//    $('#priors, #review, #posterior').on('submit', '.post', function(e){
-//      e.preventDefault();     
-//      reviewer.post($(this));
-//    });
-//
-//    var ctrl = new Control(data);
-//
-//    ctrl.thetaList();
-//    ctrl.updateTheta(ctrl.theta, ctrl.theta.design.cmd);
-//
-//    $('.review-theta').first().trigger('click');
+  $.getJSON('/review', function(data) {
+    var model = data.model
+      , tpl = data.tpl;
+
+    plomGraphModel(model.process, "#pgraph"+ model.link._id);
+
+    var reviewer = new Reviewer(tpl['reviewer']);
+    $('#priors, #review, #posterior').on('submit', '.post', function(e){
+      e.preventDefault();     
+      reviewer.post($(this));
+    });
+
+
+    $.getJSON('/diagnostic/'+ model.result.theta._id, function(summaries) {
+      $.getJSON('/diagnostic/'+ model.result.theta._id + '/'+ model.result.theta.trace_id, function(diagnostic) {
+        var updateCorr1 = plotCorr(diagnostic.detail, 0, 1, 1);
+        var updateCorr2 = plotCorr(diagnostic.detail, 1, 0, 2);
+        var updateDensity1 = plotDensity(diagnostic.detail, 0, 1);
+        var updateDensity2 = plotDensity(diagnostic.detail, 1, 2);
+        var updateTrace = plotTrace(diagnostic.detail, 0, 1);
+        var updateAutocorr = plotAutocorr(diagnostic.detail,0,1);
+        var updateMat = parMatrix(diagnostic.detail, updateCorr1, updateCorr2, updateDensity1, updateDensity2, updateTrace, updateAutocorr);
+
+
+        var plomTs = new PlomTs({
+          context: model.context,
+          process: model.process,
+          link: model.link,
+          theta: model.result.theta,
+          X: diagnostic.X,
+          graphTrajId: 'graphTraj',
+          graphStateId: 'graphState',
+          graphPredResId: "graphPredRes",
+          graphEssId: "graphEss"
+        });
+
+        var ctrl = new Control(data, plomTs);
+
+        var theta_id = model.result.theta._id;
+
+        $.subscribe('trace', function(_, trace_id) {
+          // Skip the first argument (event object) but log the name and other args.
+
+          $.getJSON('/diagnostic/'+ theta_id + '/'+ trace_id, function(diagnostic) {
+            updateMat(diagnostic.detail);
+            $.getJSON('/component/'+ theta_id + '/'+ trace_id, function(result) {
+              plomTs.update(result.theta, diagnostic.X);
+              ctrl.update(result);
+            });
+          });
+
+
+        });
+
+        greenlights(summaries, ctrl.compiled.summaryCoda, function(summary, i){
+          $.publish('trace', summary.trace_id);
+        });
+
+        $.publish('trace', model.result.theta.trace_id);
+
+
+
 //
 //    ////////
 //    //vizbit
@@ -135,55 +175,56 @@ $(document).ready(function() {
 //    });
 //
 //
-//    ///////////
-//    //websocket
-//    ///////////
-//    try{
-//      var socket = io.connect();
-//      console.log("websocket OK !");
-//    }
-//    catch(e){
-//      console.log("Can't connect to the websocket server !!");
-//      var socket = null;
-//    };
-//
-//    if(socket) {
-//
-//      //set all callbacks
-//      socket.on('connect', function () {
-//
-//        socket.on('filter', function (msg) {
-//          ctrl.plomTs.processMsg(msg);
-//        });
-//
-//        socket.on('info', function (msg) {
-//          console.log(msg.msg);
-//        });
-//
-//        socket.on('theEnd', function (msg) {
-//          //remove actions set with setInterval
-//          for(var i=0; i<plomGlobal.intervalId.length; i++){
-//            clearInterval(plomGlobal.intervalId.pop());
-//          }
-//          ctrl.plomTs.updateGraphs();
-//          plomGlobal.canRun = true;
-//        });
-//
-//      });
-//
-//      $("#control").on('click', '.stop', function(){
-//        socket.emit('killme', true);
-//      });
-//
-//      $("#control").on('click', '.run', function(){
-//        if(plomGlobal.canRun){
-//          plomGlobal.canRun = false;
-//          ctrl.plomTs.run(socket, ctrl.getMethod());
-//        }
-//      });
-//
-//    } //if socket
-//
-//  }); //AJAX review
+        ///////////
+        //websocket
+        ///////////
+        try{
+          var socket = io.connect();
+          console.log("websocket OK !");
+        }
+        catch(e){
+          console.log("Can't connect to the websocket server !!");
+          var socket = null;
+        };
 
+        if(socket) {
+
+          //set all callbacks
+          socket.on('connect', function () {
+
+            socket.on('filter', function (msg) {
+              ctrl.plomTs.processMsg(msg);
+            });
+
+            socket.on('info', function (msg) {
+              console.log(msg.msg);
+            });
+
+            socket.on('theEnd', function (msg) {
+              //remove actions set with setInterval
+              for(var i=0; i<plomGlobal.intervalId.length; i++){
+                clearInterval(plomGlobal.intervalId.pop());
+              }
+              ctrl.plomTs.updateGraphs();
+              plomGlobal.canRun = true;
+            });
+
+          });
+
+          $("#control").on('click', '.stop', function(){
+            socket.emit('killme', true);
+          });
+
+          $("#control").on('click', '.run', function(){
+            if(plomGlobal.canRun){
+              plomGlobal.canRun = false;
+              ctrl.plomTs.run(socket, ctrl.getMethod());
+            }
+          });
+
+        } //if socket
+
+      }); //AJAX review
+    })
+  })
 });
