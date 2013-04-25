@@ -125,9 +125,9 @@ app.post('/build', function(req, res, next){
     x['semantic_id'] = schecksum(x);
   });
   //for link, we include the semantic id_of context and process.
-  model.link.context_semantic_id = m.context.semantic_id;
-  model.link.process_semantic_id = m.process.semantic_id;
-  model.link.semantic_id = schecksum(m.link);    
+  model.link.context_semantic_id = model.context.semantic_id;
+  model.link.process_semantic_id = model.process.semantic_id;
+  model.link.semantic_id = schecksum(model.link);    
 
   var buildPath = path.join('builds', model.link.semantic_id, 'model');
 
