@@ -11,15 +11,41 @@
       nisi vulputate fringilla. Donec lacinia congue felis in
       faucibus.</p>
 
+
     <div class="media">
       <a class="pull-left" href="#">
         <img class="media-object" data-src="holder.js/64x64">
       </a>
       <div class="media-body">
-        <h4 class="media-heading">Media heading</h4>
         <p>wfwfw</p>
       </div>
     </div>
+
+
+    <div class="media">
+      <a class="pull-left" href="#">
+        <img class="media-object" data-src="holder.js/64x64">
+      </a>
+      <div class="media-body">
+        <p>wfwfw</p>
+      </div>
+    </div>
+
+
+
+    <form class="post" action="/comment" method="post">
+      <textarea rows="2" class="span6" name="body"></textarea>
+      <input type="hidden" name="review_id" value="review_id"/>
+      <input type="hidden" name="type" value="request"/>
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
+      
+      <p>
+        <label class="checkbox inline">
+          <input type="checkbox" name="status" value="closed"/> close / reopen 
+        </label>
+        <button class="btn" type="submit">Submit</button>
+      </p>
+    </form>
 
   </div>
 </div>

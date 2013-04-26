@@ -88,21 +88,21 @@
 <div class="row">
   <div class="span10 offset2">
 
-    <form class="form-horizontal">
+    <form action="/requests" class="form-horizontal" method="post">
       <p>
-        <input type="text" class="span8" id="inputEmail" placeholder="Title">
+        <input name="title" type="text" class="span8" id="inputEmail" placeholder="Title">
       </p>
 
       <p>
-        <textarea rows="5" class="span8" placeholder="My request"></textarea>
+        <textarea name="body" rows="5" class="span8" placeholder="My request"></textarea>
       </p>
 
-      <select>
-        <option>Data</option>
-        <option>Prior</option>
-        <option>Model</option>
-        <option>Metadata</option>
-        <option>Review</option>
+      <select name="id">
+        <option value="data">Data</option>
+        <option value="prior">Prior</option>
+        <option value="model">Model</option>
+        <option value="metadata">Metadata</option>
+        <option value="review">Review</option>
       </select>
 
       <button type="submit" class="btn">Request</button>

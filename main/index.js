@@ -15,7 +15,9 @@ var express = require('express')
   , plomAuth = require('../authentification/app')
   , csrf = require('../authentification/lib/middleware').csrf
   , is_logged_in = require('../authentification/lib/middleware').is_logged_in
-  , secure = require('../authentification/lib/middleware').secure;
+  , secure = require('../authentification/lib/middleware').secure
+  , exposeReqParams = require('./lib/middleware').exposeReqParams;
+
 
 var app = express();
 
@@ -91,7 +93,7 @@ app.get('/requests/:context_id', secure, csrf, requests.index);
 //social network
 app.post('/followcontext', secure, csrf, user.postFollow);
 app.post('/followuser', secure, csrf, user.postFollow);
-app.get('/:username', secure, csrf, user.user);
+app.get('/:username', secure, csrf, exposeReqParams, user.user);
 
 
 

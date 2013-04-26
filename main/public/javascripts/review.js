@@ -116,6 +116,11 @@ $(document).ready(function() {
 
           //TODO: update function for greenlights (add/remove dots...)
 
+          $.getJSON('/forecast/'+ model.link._id + '/'+ theta_id + '/'+ trace_id, function(forecast) {
+            //TODO freeze prediction interface untill ready
+            console.log(forecast);
+          });
+
           $.getJSON('/diagnostic/'+ theta_id + '/'+ trace_id, function(diagnostic) {
             updateMat(diagnostic.detail);
             $.getJSON('/component/'+ theta_id + '/'+ trace_id, function(result) {

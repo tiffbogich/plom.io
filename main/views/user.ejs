@@ -2,18 +2,21 @@
 
 <% include header %>
 
-
 <hr>
-<div class="social-action">
+
+<% if(username !== params.username) { %>
+<div class="pull-right">
     <form id="FollowedUser" action="/Followeduser" method="post">
     <input type="hidden" name="_csrf" value="<%= token %>"/>
     <button class="btn" type="submit" name="action" value="unFollowed"><i class="icon-eye-open"></i> <span>Followed</span></button>
     </form>
 </div>
+<% } %>
+
 <div class="container">	
 	<div class="row">
 		<div class="span4">
-			<img src="http://placehold.it/210x210" class="img-polaroid">		
+			<img src="holder.js/210x210" class="img-polaroid">		
 			<h3><%= username %></h3>
 			<hr style="width:80%">
 			<p>Joined on DATE.</p>  
