@@ -1,0 +1,163 @@
+<% include ../layout %>
+
+<script src="/javascripts/requests.js"></script>
+
+<% include ../header %>
+
+<hr>
+
+<div class="row">
+  <div class="span8">
+    <h3><%= context.disease.join('; ') + ' / ' + context.name %></h3> 
+  </div>
+  <div class="span4">
+
+    <form id="followContext" class="social-action" action="/followcontext" method="post">
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
+      <input type="hidden" name="context_id" value="<%= context._id %>"/>
+      <input type="hidden" name="name" value="<%= context.disease.join('; ') + ' / ' +  context.name %>"/>
+
+      <% var is_followed = (context_followed.indexOf(context._id.toString()) !== -1); %>
+      <button class="btn" type="submit" name="action" value="<%= (is_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (is_followed) ? 'Unfollow': 'Follow' %></span></button>
+
+    </form>
+    <form>
+      <button class="btn pull-right"  type="submit"><i class="icon-lock"></i> Lock  </button>
+    </form>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span6">
+    <form>
+      <%= context.description %>
+      <button class="btn btn-small" type="button">Edit </button>
+    </form>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span4">
+    <h4>Time series</h4>
+    
+    <ul>
+      <% context.time_series.forEach(function(ts){ %>
+      <% var d = ts.id.split('__') %>
+      <li><span class="label <%= (d[2] === 'inc') ? 'label-inverse' : '' %>"><%= (d[2] === 'inc') ? 'incidence' : 'prevalence' %></span> <%= d.slice(0,2).join('; ') %> </li>
+      <% }) %>
+    </ul>
+  </div>
+
+  <div class="span4">
+    <h4>Populations</h4>
+    <ul>
+      <% context.population.forEach(function(p){ %>
+      <li><%= p.id.split('__').join('; ')%></li>
+      <% }) %>
+    </ul>
+  </div>
+
+  <div class="span4">
+    <h4>Metadata</h4>
+
+    <ul>
+      <% context.data.filter(function(d){return d.id !== 'data';}).forEach(function(d){ %>
+      <li><%= d.id %></li>
+      <% }) %>
+    </ul>
+    
+  </div>
+</div>
+
+<hr>
+
+<div class="row">
+  <div class="span12">
+    <h3>Requests <button class="btn btn-success" type="button" data-toggle="collapse" data-target="#add">+</button></h3>
+  </div>
+</div>
+
+
+</div> <!-- break container -->
+<div id="add" class="collapse">
+<hr/>
+
+<div class="container">
+<div class="row">
+  <div class="span10 offset2">
+
+    <form class="form-horizontal">
+      <p>
+        <input type="text" class="span8" id="inputEmail" placeholder="Title">
+      </p>
+
+      <p>
+        <textarea rows="5" class="span8" placeholder="My request"></textarea>
+      </p>
+
+      <select>
+        <option>Data</option>
+        <option>Prior</option>
+        <option>Model</option>
+        <option>Metadata</option>
+        <option>Review</option>
+      </select>
+
+      <button type="submit" class="btn">Request</button>
+    </form>
+
+  </div>
+</div>  
+</div>
+
+<hr/>
+</div>
+<div class="container">
+
+<div class="row">
+  <div class="span12">
+
+    <ul class="nav nav-tabs" id="requests">
+      <li class="active">
+        <a href="#open" data-toggle="tab">Open</a>
+      </li>
+      <li>
+        <a href="#closed" data-toggle="tab">Closed</a>
+      </li>
+    </ul>
+
+    <div class="well">
+      <label class="radio inline">
+        <input type="radio" name="id" value="all" checked="checked">All
+      </label>
+      <label class="radio inline">
+        <input type="radio" name="id" value="Prior">Prior  
+      </label>
+      <label class="radio inline">
+        <input type="radio" name="id" value="Data">Data
+      </label>
+      <label class="radio inline">
+        <input type="radio" name="id" value="Model">Model  
+      </label>
+      <label class="radio inline">
+        <input type="radio" name="id" value="Metadata">Metadata
+      </label>
+      <label class="radio inline">
+        <input type="radio" name="id" value="Review">Review
+      </label>
+    </div>
+    
+    <div class="tab-content">
+      <div class="tab-pane active" id="open"><% include threads %></div>
+      <div class="tab-pane active" id="closed">0 closed.</div>
+    </div>
+
+  </div>
+</div>
+
+
+<hr>
+
+<% include ../footer %>

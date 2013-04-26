@@ -131,8 +131,10 @@ $(document).ready(function() {
           var theta_id = $(this).val();
           var trace_id = model.thetas.filter(function(x){return x.theta_id === theta_id})[0].trace_id;
           $('#idReviewTheta').val(theta_id);
-          $.publish('trace', [theta_id, trace_id]);
           $.publish('theta', [theta_id, trace_id]);
+          setTimeout(function(){
+            $.publish('trace', [theta_id, trace_id]);
+          }, 600);
         })
           .first()
           .trigger('click');

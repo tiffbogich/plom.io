@@ -5,6 +5,7 @@
 var express = require('express')
   , routes = require('./routes')
   , review = require('./routes/review')
+  , requests = require('./routes/requests')
   , user = require('./routes/user')
   , fs = require('fs')
   , path = require('path')
@@ -85,7 +86,7 @@ app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 app.get('/component/:_id/:id?', secure, routes.component); //components (for AJAX call)
 
 //request
-app.get('/requests/:id', secure, csrf, function(req, res){res.render('requests.ejs')});
+app.get('/requests/:context_id', secure, csrf, requests.index);
 
 //social network
 app.post('/followcontext', secure, csrf, user.postFollow);

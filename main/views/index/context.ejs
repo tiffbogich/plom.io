@@ -2,15 +2,6 @@
 
 <div>
   <%= c.model.length %> model<%= (c.model.length > 1) ? 's': ''%>
-  <form class="followContext social-action" action="/followcontext" method="post">
-    <input type="hidden" name="_csrf" value="<%= token %>"/>
-    <input type="hidden" name="context_id" value="<%= c._id %>"/>
-    <input type="hidden" name="name" value="<%= c.disease.join('; ') + ' / ' +  c.name %>"/>
-
-    <% var is_followed = (context_followed.indexOf(c._id.toString()) !== -1); %>
-    <button class="btn btn-mini" type="submit" name="action" value="<%= (is_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (is_followed) ? 'Unfollow': 'Follow' %></span></button>
-  </form>
-
   <a href="/requests/<%= c._id %>" class="btn btn-mini social-action"><i class="icon-bullhorn"></i> Requests </a>
 </div>
 
