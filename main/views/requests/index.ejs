@@ -1,5 +1,7 @@
 <% include ../layout %>
 
+<script src="/javascripts/d3_horizon.js"></script>
+<script src="/javascripts/horizon.js"></script>
 <script src="/javascripts/requests.js"></script>
 
 <% include ../header %>
@@ -39,37 +41,68 @@
 
 
 <div class="row">
-  <div class="span4">
-    <h4>Time series</h4>
-    
-    <ul>
-      <% context.time_series.forEach(function(ts){ %>
-      <% var d = ts.id.split('__') %>
-      <li><span class="label <%= (d[2] === 'inc') ? 'label-inverse' : '' %>"><%= (d[2] === 'inc') ? 'incidence' : 'prevalence' %></span> <%= d.slice(0,2).join('; ') %> </li>
-      <% }) %>
-    </ul>
+
+  <div class="span6">
+
+        <div id="horizonGraph"></div>
+
+        <div id="horizonControl">
+          <div class="btn-toolbar">
+            <div data-toggle="buttons-checkbox" class="btn-group">
+              <button type="button" class="btn btn-small" id="substactMedian">Substract median</button>
+            </div>
+
+            <div id="changeMode" data-toggle="buttons-radio" class="btn-group">
+              <button class="btn btn-small">Mirror</button>
+              <button class="btn btn-small">Offset</button>
+            </div>
+
+            <div id="addBand" class="btn-group">
+              <button class="btn btn-small">Add band</button>
+              <button class="btn btn-small">Remove band</button>
+            </div>
+          </div>
+        </div>
+
   </div>
 
-  <div class="span4">
-    <h4>Populations</h4>
-    <ul>
-      <% context.population.forEach(function(p){ %>
-      <li><%= p.id.split('__').join('; ')%></li>
-      <% }) %>
-    </ul>
+  <div class="span6">
+    <div class="row">
+
+      <div class="span2">
+        <h4>Time series</h4>        
+        <ul>
+          <% context.time_series.forEach(function(ts){ %>
+          <% var d = ts.id.split('__') %>
+          <li><span class="label <%= (d[2] === 'inc') ? 'label-inverse' : '' %>"><%= d[2] %></span> <%= d.slice(0,2).join('; ') %> </li>
+          <% }) %>
+        </ul>
+      </div>
+
+      <div class="span2">
+        <h4>Populations</h4>
+        <ul>
+          <% context.population.forEach(function(p){ %>
+          <li><%= p.id.split('__').join('; ')%></li>
+          <% }) %>
+        </ul>
+      </div>
+
+      <div class="span2">
+        <h4>Metadata</h4>
+        <ul>
+          <% context.data.filter(function(d){return d.id !== 'data';}).forEach(function(d){ %>
+          <li><%= d.id %></li>
+          <% }) %>
+        </ul>        
+      </div>
+
+    </div>
   </div>
 
-  <div class="span4">
-    <h4>Metadata</h4>
-
-    <ul>
-      <% context.data.filter(function(d){return d.id !== 'data';}).forEach(function(d){ %>
-      <li><%= d.id %></li>
-      <% }) %>
-    </ul>
-    
-  </div>
 </div>
+
+
 
 <hr>
 
@@ -120,12 +153,8 @@
   <div class="span12">
 
     <ul class="nav nav-tabs" id="requests">
-      <li class="active">
-        <a href="#open" data-toggle="tab">Open</a>
-      </li>
-      <li>
-        <a href="#closed" data-toggle="tab">Closed</a>
-      </li>
+      <li class="active"><a href="#open" data-toggle="tab">Open</a></li>
+      <li><a href="#closed" data-toggle="tab">Closed</a></li>
     </ul>
 
     <div class="well">
@@ -151,7 +180,7 @@
     
     <div class="tab-content">
       <div class="tab-pane active" id="open"><% include threads %></div>
-      <div class="tab-pane active" id="closed">0 closed.</div>
+      <div class="tab-pane" id="closed">0 closed.</div>
     </div>
 
   </div>

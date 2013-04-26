@@ -205,13 +205,26 @@ exports.build = function(req, res, next){
 };
 
 
+/**
+ * Return a component. If req.params._id is context_id, process_id, link_id or
+ * theta_id return the component whose _id is stored in the session
+ */
+
 exports.component = function(req, res, next){
-  var _id = new ObjectID(req.params._id)
+  var _id = req.params._id
     , id = req.params.id;
+
+  if(['context_id', 'process_id', 'link_id', 'theta_id'].indexOf(_id) !== -1){
+    if (_id in req.session) {
+      _id = req.session[_id];    
+    } else {
+      return next(new Error('invalid session'));
+    }
+  };
 
   var components = req.app.get('components');
 
-  components.findOne({_id:_id}, function(err, doc){    
+  components.findOne({_id: new ObjectID(_id)}, function(err, doc){    
     if(err) return next(err);
 
     if(doc.type === 'context'){
@@ -220,6 +233,7 @@ exports.component = function(req, res, next){
       var data = doc.data.filter(function(d){return d.id ==='data'})[0];
       doc.data = data.source.slice(1); //remove header;
       return res.send(doc);
+
     } else if(doc.type === 'theta' && (typeof id !== 'undefined')){
 
       //send result object (theta + posterior)

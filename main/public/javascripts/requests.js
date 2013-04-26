@@ -1,6 +1,18 @@
 $(document).ready(function() {
 
   $('#requests a:first').tab('show');
+  $('a[href="#summary"]').tab('show');
+
+
+  $.getJSON('/component/context_id', function(context){
+    var data = [];
+    for(var col=1; col< context.data[0].length; col++){
+      data.push(context.data.map(function(row) {return [new Date(row[0]), row[col]] }));
+    }
+    plomHorizon(data);
+  });
+
+
 
   $('#followContext').on('submit', function(e){
     e.preventDefault();

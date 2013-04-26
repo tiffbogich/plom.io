@@ -7,8 +7,6 @@
 <% include ../header %>
 
 
-<section>
-
   <form action="/search" method="POST">
     <div class="input-append">
       <input type="text" name="q" id="plom-search" class="span4"/>
@@ -21,6 +19,8 @@
 
   <div class="app-folders-container"> 
 
+
+    <% if (!ctree.length) { %><div class="jaf-row jaf-container container"><% } %>
 
     <!-- the contexts -->
     <% ctree.forEach(function(c, i){ %>
@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <% if (ctree.length > 3){ %></div><% } %><!-- close second row-->
+    <% if (ctree.length > 3 || ctree.length === 0 ){ %></div><% } %><!-- close second row or first if ctree was empty -->
 
 
     <!-- the models -->
@@ -60,8 +60,6 @@
 
 
   </div> <!-- app folder -->
-
-</section>
 
   <div class="container">
 
