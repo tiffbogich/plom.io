@@ -52,8 +52,22 @@
     <% }); %>
 
     <div class="folderContent addContext">
-      <div class="jaf-container">
-        <p>add</p>
+      <div class="jaf-container container">
+        <div class="row">
+          <div class="span6 offset4">
+            <h3>Add a context</h3>
+
+            <form action="/component" method="post" enctype="multipart/form-data">
+              <label for="file">Upload your context.json</label>
+              <input id="file" type="file" name="component"/>
+              <input type="hidden" name="_csrf" value="<%= token %>"/>
+              <p>
+                <button type="submit" class="btn"><i class="icon-arrow-up"></i> Upload</button>            
+              </p>
+            </form>
+
+          </div>
+        </div>
       </div>
     </div>
 

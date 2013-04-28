@@ -14,14 +14,18 @@
   </div>
   <div class="span4">
 
-    <form id="followContext" class="social-action" action="/followcontext" method="post">
+    <form id="follow" class="social-action" action="/follow/context" method="post">
       <input type="hidden" name="_csrf" value="<%= token %>"/>
-      <input type="hidden" name="context_id" value="<%= context._id %>"/>
-      <input type="hidden" name="name" value="<%= context.disease.join('; ') + ' / ' +  context.name %>"/>
-
       <% var is_followed = (context_followed.indexOf(context._id.toString()) !== -1); %>
-      <button class="btn" type="submit" name="action" value="<%= (is_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (is_followed) ? 'Unfollow': 'Follow' %></span></button>
+      <input type="hidden" name="action" value="<%= (is_followed) ? 'unfollow': 'follow' %>"/>
+      <button class="btn" type="submit"><i class="icon-eye-open"></i> <span><%= (is_followed) ? 'Unfollow': 'Follow' %></span></button>
     </form>
+
+    <form action="/fork/context" method="POST"  class="social-action">
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
+      <button class="btn" type="submit" value="Fork"><i class="icon-download"></i> Fork</button>
+    </form>
+
   </div>
 </div>
 

@@ -90,9 +90,9 @@ exports.postFollow = function(req, res, next){
 
   var update = {}
     , key = (req.body.action === 'follow') ? '$addToSet' : '$pull'
-    , what = (req.route.path.indexOf('context') === -1) ? 'user' : 'context';
+    , what = req.params.what;
 
-  update[key] = (what === 'user') ? {user_id: req.body.user_id}: {context_id: req.body.context_id};
+  update[key] = (what === 'user') ? {user_id: req.body.user_id}: {context_id: req.session.context_id};
 
   u.update({_id: req.session.username}, update, {safe:true}, function(err){
     if(err) {
@@ -103,12 +103,16 @@ exports.postFollow = function(req, res, next){
       //insert event
       var mye = {
         from: req.session.username,
-        type: req.body.action + '_' + what
+        type: req.body.action,
+        option: what
       };
 
       if(what === 'context'){
-        mye.context_id = req.body.context_id;
-        mye.name = req.body.name;
+        mye.context_id = req.session.context_id;
+        mye.name =  {
+          disease: req.session.disease,
+          context: req.session.context_name
+        };
       } else {
         mye.user_id = req.body.user_id;
       }

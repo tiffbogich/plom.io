@@ -9,12 +9,12 @@ exports.index = function(req, res, next){
   var components = req.app.get('components')
     , users = req.app.get('users');
 
-  var context_id = req.params.context_id;
+  var context_id = new ObjectID(req.params.context_id);
 
   users.findOne({_id: req.session.username}, function(err, user){
     if (err) return next(err);
 
-    components.findOne({_id: new ObjectID(context_id)}, function(err, context){
+    components.findOne({_id: context_id}, function(err, context){
       if(err) return next(err);
       req.session.context_id = context._id;
       req.session.disease = context.disease;
@@ -39,12 +39,12 @@ function getRequests(requests, components, session, context_id, type, callback){
 
     //get extra info
     if(type !== 'prior'){
-      var extras = {};
+      var extras = {};      
       if(!type || type === 'results'){
-        extras.links = function(cb){components.find({username: session.username, context_id: context_id, type: 'link'}).toArray(cb);};
+        extras.links = function(cb){components.find({username: session.username, context_id: new ObjectID(context_id), type: 'link'}).toArray(cb);};
       }
       if(!type || type === 'fork'){
-        extras.contexts = function(cb){components.find({username: session.username, _id: context_id, type: 'context'}).toArray(cb);};
+        extras.contexts = function(cb){components.find({username: session.username, _id: new ObjectID(context_id), type: 'context'}).toArray(cb);};
       }
       
       async.series(extras, function(err, extras){
@@ -138,7 +138,7 @@ exports.resolve = function(req, res, next){
   var requests = req.app.get('requests');
   var comment = req.body;
 
-  var _id = comment.request_id;
+  var _id = new ObjectID(comment.request_id);
   delete comment.request_id;
   delete comment._csrf;
 
@@ -147,7 +147,7 @@ exports.resolve = function(req, res, next){
 
   var upd = {$push: {comments: comment}};
 
-  requests.findAndModify({_id: new ObjectID(_id)}, [], upd, {safe:true, 'new':true}, function(err, request){
+  requests.findAndModify({_id: _id}, [], upd, {safe:true, 'new':true}, function(err, request){
     if(err) return next(err);
 
     //commit prior

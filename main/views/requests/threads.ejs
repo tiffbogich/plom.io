@@ -8,7 +8,11 @@
     <h4 class="media-heading">
       <a href="/<%= request.username %>"><%= request.username %></a>
       on <span class="muted"><%= request.date.toDateString() %></span> 
-      <%=: request | nameRequest %>
+      <% if (request.type === 'prior') { %>
+      <%= request.parameter + ((request.description) ? ' (' +request.description + ')' : '') %>
+      <% } else { %>
+      <%= request.title %>
+      <%  } %>
     </h4>
 
     <p><%= request.body %></p>
@@ -18,13 +22,12 @@
     
     <div class="media">
       <a class="pull-left" href="#">
-        <img class="media-object" data-src="holder.js/64x64">
+        <img class="media-object" src="http://placehold.it/24x24">
       </a>
       <div class="media-body">
         <h5 class="media-heading">
           <a href="/<%= comment.username %>"><%= comment.username %></a>
           on <span class="muted"><%= request.date.toDateString() %></span> 
-          <%=: request | nameRequest %>
         </h5>
 
         <p><%= comment.body %></p>
@@ -53,7 +56,9 @@
 
     <p>
       <button class="btn resolve" data-target="#comment_<%= i %>">Comment</button>
+      <% if( (request.type === 'results' && links.length) || (request.type === 'fork' && contexts.length)  ){ %>
       <button class="btn resolve" data-target="#resolve_<%= i %>">Resolve</button>
+      <% } %>
     </p>
 
     <div id="comment_<%= i %>" class="collapse">
@@ -105,11 +110,14 @@
 
         <% } else if(request.type === 'results') { %>
 
-        <select name="attachment[link_id]" class="span2">
+        <% if (links.length) { %>
+        <select name="attachment[link_id]" class="span6">
           <% links.forEach(function(link) { %>
           <option value="<%= link._id %>"><%=: link | nameLink %></option>
           <% }) %>
         </select>
+        <% } %>
+
         <p><textarea rows="2" class="span6" name="body" placeholder="comment"></textarea></p>
         <p>
           <button class="btn" type="submit">Submit</button>
@@ -117,11 +125,14 @@
 
         <% } else if(request.type === 'fork') { %>
 
-        <select name="attachment[context_id]" class="span2">
+        <% if (contexts.length) { %>
+        <select name="attachment[context_id]" class="span6">
           <% contexts.forEach(function(context) { %>
           <option value="<%= context._id %>"><%=: context | nameContext %></option>
           <% }) %>>
         </select>
+        <% } %>
+
         <p><textarea rows="2" class="span6" name="body" placeholder="comment"></textarea></p>
         <p>
           <button class="btn" type="submit">Submit</button>

@@ -22,7 +22,9 @@ var express = require('express')
 
 
 //add custom ejs filters
-ejs.filters.nameRequest = name.request;
+ejs.filters.nameContext = name.context;
+ejs.filters.nameLink = name.link;
+ejs.filters.nameEvent = name.event;
 
 var app = express();
 
@@ -73,7 +75,8 @@ app.get('/about', routes.about);
 app.get('/library', secure, csrf, routes.index);
 app.post('/search', secure, csrf, routes.index);
 app.post('/library', secure, csrf, routes.build);
-app.post('/fork', csrf, routes.postFork);
+app.post('/fork/model', csrf, routes.postFork);
+//app.post('/fork/context', csrf, routes.postFork);
 
 //review page
 app.get('/review/:link_id?', secure, csrf, review.index); //returns a social model (i.e with everything reviewed)
@@ -97,8 +100,7 @@ app.post('/requests', secure, csrf, requests.post);
 app.post('/resolve', secure, csrf, requests.resolve);
 
 //social network
-app.post('/followcontext', secure, csrf, user.postFollow);
-app.post('/followuser', secure, csrf, user.postFollow);
+app.post('/follow/:what', secure, csrf, user.postFollow);
 app.get('/:username', secure, csrf, exposeReqParams, user.user);
 
 
