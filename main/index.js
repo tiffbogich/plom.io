@@ -3,6 +3,8 @@
  */
 
 var express = require('express')
+  , ejs = require('ejs')
+  , name = require('./lib/name')
   , routes = require('./routes')
   , review = require('./routes/review')
   , requests = require('./routes/requests')
@@ -18,6 +20,9 @@ var express = require('express')
   , secure = require('../authentification/lib/middleware').secure
   , exposeReqParams = require('./lib/middleware').exposeReqParams;
 
+
+//add custom ejs filters
+ejs.filters.nameRequest = name.request;
 
 var app = express();
 
@@ -70,12 +75,10 @@ app.post('/search', secure, csrf, routes.index);
 app.post('/library', secure, csrf, routes.build);
 app.post('/fork', csrf, routes.postFork);
 
-
 //review page
-app.get('/review', secure, csrf, review.index); //returns a social model (i.e with everything reviewed)
+app.get('/review/:link_id?', secure, csrf, review.index); //returns a social model (i.e with everything reviewed)
 app.post('/review', secure, csrf, review.post); //post review
 app.post('/comment', secure, csrf, review.comment); //post comment to a review
-
 
 app.get('/review/:type/:id', secure, csrf, review.get);  //get specific reviews (AJAX)
 app.get('/diagnostic/:theta_id', secure, review.diagnosticSummary); 
@@ -83,12 +86,15 @@ app.get('/diagnostic/:theta_id/:trace_id', secure, review.diagnosticDetail);
 app.get('/forecast/:link_id/:theta_id/:trace_id', secure, review.forecast);
 app.get('/vizbit/:review_id/:comment_id?', review.vizbit);
 
-
 //general
 app.get('/component/:_id/:id?', secure, routes.component); //components (for AJAX call)
 
+
 //request
+app.get('/requests/threads/:type?', secure, csrf, requests.get);
 app.get('/requests/:context_id', secure, csrf, requests.index);
+app.post('/requests', secure, csrf, requests.post);
+app.post('/resolve', secure, csrf, requests.resolve);
 
 //social network
 app.post('/followcontext', secure, csrf, user.postFollow);
@@ -122,7 +128,9 @@ MongoClient.connect("mongodb://localhost:27017/plom", function(err, db) {
   app.set('users',  new mongodb.Collection(db, 'users'));
   app.set('events',  new mongodb.Collection(db, 'events'));
   app.set('components',  new mongodb.Collection(db, 'components'));
+  app.set('priors',  new mongodb.Collection(db, 'priors'));
   app.set('reviews',  new mongodb.Collection(db, 'reviews'));
+  app.set('requests',  new mongodb.Collection(db, 'requests'));
   app.set('diagnostics',  new mongodb.Collection(db, 'diagnostics'));
 
   //TODO ensureIndex

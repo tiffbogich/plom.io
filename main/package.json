@@ -17,6 +17,7 @@
     "gridfs-stream": "~0.4.0",
     "csv": "~0.3.0",
     "plom-priors": "*",
-    "validator": "~1.1.0"
+    "validator": "~1.1.0",
+    "plom-schecksum": "*"
   }
 }

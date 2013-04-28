@@ -2,7 +2,7 @@ var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 
-  $('#reviewTab a[href=#review]').tab('show');
+//  $('#reviewTab a[href=#review]').tab('show');
 //  $('#review a[href=#reviewReview]').tab('show');
 
 

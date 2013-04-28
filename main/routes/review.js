@@ -77,8 +77,7 @@ exports.index = function(req, res, next){
             cred: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','cred.ejs'), 'utf8', cb)},
             summaryCoda: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','summary_coda.ejs'), 'utf8', cb)},
             ticks: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','ticks.ejs'), 'utf8', cb)},
-            reviewer: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','reviewer.ejs'), 'utf8', cb)},
-            discuss: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','discuss.ejs'), 'utf8', cb)},
+            reviewer: function(cb) {fs.readFile(path.join(req.app.get('views'),'review', 'tpl','reviewer.ejs'), 'utf8', cb)}
           }, function(err, tpl){
             if(err) return next(err);
 

@@ -1,51 +1,138 @@
-<div class="media">
+<% requests.forEach(function(request, i) { %>
+<div class="media request" id="review_id">
   <a class="pull-left" href="#">
-    <img class="media-object" data-src="holder.js/64x64">
+    <img class="media-object" src="http://placehold.it/64x64">
   </a>
   <div class="media-body">
-    <h4 class="media-heading">Media heading</h4>
 
-    <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus
-      scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum
-      in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac
-      nisi vulputate fringilla. Donec lacinia congue felis in
-      faucibus.</p>
+    <h4 class="media-heading">
+      <a href="/<%= request.username %>"><%= request.username %></a>
+      on <span class="muted"><%= request.date.toDateString() %></span> 
+      <%=: request | nameRequest %>
+    </h4>
 
+    <p><%= request.body %></p>
 
+    <% if (request.comments){
+       request.comments.forEach(function(comment) { %>
+    
     <div class="media">
       <a class="pull-left" href="#">
         <img class="media-object" data-src="holder.js/64x64">
       </a>
       <div class="media-body">
-        <p>wfwfw</p>
+        <h5 class="media-heading">
+          <a href="/<%= comment.username %>"><%= comment.username %></a>
+          on <span class="muted"><%= request.date.toDateString() %></span> 
+          <%=: request | nameRequest %>
+        </h5>
+
+        <p><%= comment.body %></p>
+
+        <% if (comment.attachment){ 
+           var att = comment.attachment;
+           %>
+
+        <% if (request.type === 'prior'){ %>
+        <ul>
+          <li>distribution: <%= att.distribution %></li>
+          <li>min: <%= att.min %></li>
+          <li>max: <%= att.max %></li>
+        </ul>
+        <% } else if (request.type === 'result'){ %>
+        <a href="/review/<%= att.link_id %>">see results</a>
+        <% } else if (request.type === 'fork'){ %>
+        <a href="/requests/<%= att.context_id %>">see fork</a>
+        <% } %>
+        <% } %>
+
       </div>
     </div>
+    <% })
+       } %>
 
+    <p>
+      <button class="btn resolve" data-target="#comment_<%= i %>">Comment</button>
+      <button class="btn resolve" data-target="#resolve_<%= i %>">Resolve</button>
+    </p>
 
-    <div class="media">
-      <a class="pull-left" href="#">
-        <img class="media-object" data-src="holder.js/64x64">
-      </a>
-      <div class="media-body">
-        <p>wfwfw</p>
-      </div>
+    <div id="comment_<%= i %>" class="collapse">
+      <form action="/resolve" class="post" method="post">
+        <input type="hidden" name="request_id" value="<%= request._id %>"/>
+        <input type="hidden" name="_csrf" value="<%= token %>"/>      
+        <textarea rows="2" class="span6" name="body"></textarea>
+        <p>
+          <button class="btn" type="submit">Submit</button>
+        </p>
+      </form>
     </div>
 
+    <div id="resolve_<%= i %>" class="collapse">
 
+      <form action="/resolve" class="post" method="post">
 
-    <form class="post" action="/comment" method="post">
-      <textarea rows="2" class="span6" name="body"></textarea>
-      <input type="hidden" name="review_id" value="review_id"/>
-      <input type="hidden" name="type" value="request"/>
-      <input type="hidden" name="_csrf" value="<%= token %>"/>
-      
-      <p>
-        <label class="checkbox inline">
-          <input type="checkbox" name="status" value="closed"/> close / reopen 
-        </label>
-        <button class="btn" type="submit">Submit</button>
-      </p>
-    </form>
+        <% if(request.type === 'prior'){ %>
+
+        <input type="hidden" name="request_id" value="<%= request._id %>"/>
+        <input type="hidden" name="_csrf" value="<%= token %>"/>      
+        <p>
+          <select name="attachment[distribution]" class="span2">
+            <option value="normal">normal</option>
+            <option value="uniform">uniform</option>
+          </select>
+        </p>
+        <p>
+          <select name="attachment[unit]" class="span2">
+            <option value="P">proportion</option>
+            <option value="N">number</option>
+            <option value="D">days</option>
+            <option value="W">week</option>
+            <option value="M">month</option>
+            <option value="Y">year</option>
+          </select>
+          <label class="checkbox">
+            <input type="checkbox" name="attachment[type]" value="rate_as_duration">
+            rate as duration
+          </label>
+        </p>
+        <p><input name="attachment[min]" type="number" class="span2" placeholder="min"></p>
+        <p><input name="attachment[max]" type="number" class="span2" placeholder="max"></p>
+        <p><input name="attachment[reference]" type="text" class="span6" placeholder="reference"></p>
+        <textarea rows="2" class="span6" name="body" placeholder="comment"></textarea>
+        <p>
+          <button class="btn" type="submit">Submit</button>
+        </p>
+
+        <% } else if(request.type === 'results') { %>
+
+        <select name="attachment[link_id]" class="span2">
+          <% links.forEach(function(link) { %>
+          <option value="<%= link._id %>"><%=: link | nameLink %></option>
+          <% }) %>
+        </select>
+        <p><textarea rows="2" class="span6" name="body" placeholder="comment"></textarea></p>
+        <p>
+          <button class="btn" type="submit">Submit</button>
+        </p>
+
+        <% } else if(request.type === 'fork') { %>
+
+        <select name="attachment[context_id]" class="span2">
+          <% contexts.forEach(function(context) { %>
+          <option value="<%= context._id %>"><%=: context | nameContext %></option>
+          <% }) %>>
+        </select>
+        <p><textarea rows="2" class="span6" name="body" placeholder="comment"></textarea></p>
+        <p>
+          <button class="btn" type="submit">Submit</button>
+        </p>
+
+        <% } %>
+
+      </form>
+
+    </div>
 
   </div>
 </div>
+<% }) %>

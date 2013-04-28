@@ -21,10 +21,6 @@
 
       <% var is_followed = (context_followed.indexOf(context._id.toString()) !== -1); %>
       <button class="btn" type="submit" name="action" value="<%= (is_followed) ? 'unfollow': 'follow' %>"><i class="icon-eye-open"></i> <span><%= (is_followed) ? 'Unfollow': 'Follow' %></span></button>
-
-    </form>
-    <form>
-      <button class="btn pull-right"  type="submit"><i class="icon-lock"></i> Lock  </button>
     </form>
   </div>
 </div>
@@ -76,7 +72,7 @@
           <% var d = ts.id.split('__') %>
           <li><span class="label <%= (d[2] === 'inc') ? 'label-inverse' : '' %>"><%= d[2] %></span> <%= d.slice(0,2).join('; ') %> </li>
           <% }) %>
-        </ul>
+       </ul>
       </div>
 
       <div class="span2">
@@ -106,83 +102,98 @@
 
 <hr>
 
-<div class="row">
+<div class="row" id="addRequest">
   <div class="span12">
-    <h3>Requests <button class="btn btn-success" type="button" data-toggle="collapse" data-target="#add">+</button></h3>
+  <h3>Requests</h3>
+    <button class="btn" data-target="#addPrior"><i class="icon-plus"></i> Request a prior</button>
+    <button class="btn" data-target="#addResults"><i class="icon-plus"></i> Request results</button>
+    <button class="btn" data-target="#addFork"><i class="icon-plus"></i> Request a context fork</button>
   </div>
 </div>
 
 
 </div> <!-- break container -->
-<div id="add" class="collapse">
-<hr/>
 
-<div class="container">
-<div class="row">
-  <div class="span10 offset2">
+<div id="addPrior" class="collapse">
+  <hr/>
+  <div class="container"><div class="row"><div class="span10 offset2">
+        <form class="post" action="/requests" class="form-horizontal" method="post">
+          <input type="hidden" name="_csrf" value="<%= token %>"/>
+          <input type="hidden" name="type" value="prior"/>
 
-    <form action="/requests" class="form-horizontal" method="post">
-      <p>
-        <input name="title" type="text" class="span8" id="inputEmail" placeholder="Title">
-      </p>
-
-      <p>
-        <textarea name="body" rows="5" class="span8" placeholder="My request"></textarea>
-      </p>
-
-      <select name="id">
-        <option value="data">Data</option>
-        <option value="prior">Prior</option>
-        <option value="model">Model</option>
-        <option value="metadata">Metadata</option>
-        <option value="review">Review</option>
-      </select>
-
-      <button type="submit" class="btn">Request</button>
-    </form>
-
-  </div>
-</div>  
+          <p>
+            <input name="parameter" type="text" class="span2" placeholder="Parameter name">
+            <select name="par_type" class="span2">
+              <option value="process">process</option>
+              <option value="state">state</option>
+              <option value="observation">observation</option>
+            </select>
+          </p>
+          <p><input name="description" type="text" rows="5" class="span8" placeholder="Parameter description"></input></p>
+          <p><select name="population_id" class="span2">
+              <% context.population.forEach(function(p){ %>
+              <option value="<%= p.id %>"><%= p.id.split('__').join('; ')%></option>
+              <% }) %>
+          </select></p>
+          <p><textarea name="body" rows="5" class="span8" placeholder="My request"></textarea></p>
+          <button type="submit" class="btn">Request</button>
+        </form>
+  </div></div></div>
+  <hr/>
 </div>
 
-<hr/>
+<div id="addResults" class="collapse">
+  <hr/>
+  <div class="container"><div class="row"><div class="span10 offset2">
+        <form class="post" action="/requests" class="form-horizontal" method="post">
+          <input type="hidden" name="_csrf" value="<%= token %>"/>
+          <input type="hidden" name="type" value="results"/>
+
+          <p><input name="title" type="text" class="span8" placeholder="Title"></p>
+          <p><textarea name="body" rows="5" class="span8" placeholder="My request"></textarea></p>
+          <button type="submit" class="btn">Request</button>
+        </form>
+  </div></div></div>
+  <hr/>
 </div>
+
+<div id="addFork" class="collapse">
+  <hr/>
+  <div class="container"><div class="row"><div class="span10 offset2">
+        <form class="post" action="/requests" class="form-horizontal" method="post">
+          <input type="hidden" name="_csrf" value="<%= token %>"/>
+          <input type="hidden" name="type" value="fork"/>
+
+          <p><input name="title" type="text" class="span8" placeholder="Title"></p>
+          <p><textarea name="body" rows="5" class="span8" placeholder="My request"></textarea></p>
+          <button type="submit" class="btn">Request</button>
+        </form>
+  </div></div></div>
+  <hr/>
+</div>
+
 <div class="container">
 
 <div class="row">
   <div class="span12">
 
-    <ul class="nav nav-tabs" id="requests">
-      <li class="active"><a href="#open" data-toggle="tab">Open</a></li>
-      <li><a href="#closed" data-toggle="tab">Closed</a></li>
-    </ul>
-
-    <div class="well">
+    <div class="well well-small">
       <label class="radio inline">
-        <input type="radio" name="id" value="all" checked="checked">All
+        <input type="radio" name="type" value="all" checked="checked">All
       </label>
       <label class="radio inline">
-        <input type="radio" name="id" value="Prior">Prior  
+        <input type="radio" name="type" value="prior">Prior  
       </label>
       <label class="radio inline">
-        <input type="radio" name="id" value="Data">Data
+        <input type="radio" name="type" value="results">Results
       </label>
       <label class="radio inline">
-        <input type="radio" name="id" value="Model">Model  
-      </label>
-      <label class="radio inline">
-        <input type="radio" name="id" value="Metadata">Metadata
-      </label>
-      <label class="radio inline">
-        <input type="radio" name="id" value="Review">Review
+        <input type="radio" name="type" value="fork">Fork
       </label>
     </div>
     
-    <div class="tab-content">
-      <div class="tab-pane active" id="open"><% include threads %></div>
-      <div class="tab-pane" id="closed">0 closed.</div>
-    </div>
-
+    <div class="tab-pane active" id="threads"></div>
+    
   </div>
 </div>
 
