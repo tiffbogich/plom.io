@@ -18,8 +18,8 @@
 
       <ul id="plomNav" class="nav nav-pills">
         <li><a href="/<%= username %>"><%= username %></a></li>
-        <li><a href="/library?<%= dquery %>"><%= context.disease.join('; ') %></a></li>
-        <li class="active"><a href="/library?<%= cquery %>"><%= context.name %></a></li>
+        <li><a href="<%=: context | dhref %>"><%= context.disease.join('; ') %></a></li>
+        <li class="active"><a href="<%=: context | chref %>"><%= context.name %></a></li>
       </ul>
     </div>
 
@@ -33,7 +33,7 @@
 
         <form id="follow" class="social-action" action="/follow/context" method="post">
           <input type="hidden" name="_csrf" value="<%= token %>"/>
-          <% var is_followed = (context_followed.indexOf(context._id.toString()) !== -1); %>
+          <% var is_followed = (context_followed.map(function(x){return x.toString();}).indexOf(context._id.toString()) !== -1); %>
           <input type="hidden" name="action" value="<%= (is_followed) ? 'unfollow': 'follow' %>"/>
           <button class="btn" type="submit"><i class="icon-eye-open"></i> <span><%= (is_followed) ? 'Unfollow': 'Follow' %></span></button>
         </form>

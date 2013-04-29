@@ -32,7 +32,7 @@
         <% if(comment.status){ %>
         <li>
           Requested to set status to: 
-          <span class="label label-<%= (comment.status === 'validated') ? 'success': 'important' %>"><%= (comment.status === 'validated') ? 'validated': 'rejected' %></span>
+          <span class="label label-<%= (comment.status === 'rejected') ? 'success': 'important' %>"><%= (comment.status === 'validated') ? 'rejected': 'validated' %></span>
         </li>
         <% } %>
 
@@ -63,7 +63,7 @@
 
         <% if(username !== review.username){ %>
         <label class="checkbox">
-          <input type="checkbox" name="status" value="<%= (review.status === 'validated') ? 'rejected': 'validated' %>"/> Ask the reviewer to change its status to <%= (review.status === 'validated') ? 'rejected': 'validated' %>
+          <input type="checkbox" name="status" value="<%= review.status %>"/> Ask the reviewer to change its status to <%= (review.status === 'validated') ? 'rejected': 'validated' %>
         </label>
         <% } else { %>
         <label class="checkbox">
@@ -83,8 +83,8 @@
         <textarea rows="2" class="span3" name="body"></textarea>
         <input type="hidden" name="review_id" value="<%= review._id %>"/>
         <input type="hidden" name="type" value="<%= review.type %>"/>
-        <% if ('parameter' in review.name) { %><input type="hidden" name="parameter" value="<%= review.name.parameter %>"/><% } %>
-        <% if ('group' in review.name) { %><input type="hidden" name="group" value="<%= review.name.group %>"/><% } %>
+        <% if ('parameter' in review) { %><input type="hidden" name="parameter" value="<%= review.parameter %>"/><% } %>
+        <% if ('group' in review) { %><input type="hidden" name="group" value="<%= review.group %>"/><% } %>
         <input type="hidden" name="_csrf" value="<%= token %>"/>
         
         <p>

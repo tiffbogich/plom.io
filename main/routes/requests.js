@@ -1,5 +1,4 @@
 var ObjectID = require('mongodb').ObjectID
-  , querystring = require('querystring')
   , async = require('async')
   , _ = require('underscore')
   , schecksum = schecksum = require('plom-schecksum');
@@ -23,10 +22,7 @@ exports.index = function(req, res, next){
       req.session.disease = context.disease;
       req.session.context_name = context.name;
 
-      var dquery = querystring.stringify({d:context.disease})
-        , cquery = querystring.stringify({d:context.disease, c:context.name});
-
-      res.render('requests/index', {cquery: cquery, dquery: dquery, context: context, context_followed: user.context_id || []});
+      res.render('requests/index', {context: context, context_followed: user.context_id || []});
     });
 
   });
@@ -103,24 +99,23 @@ exports.post = function(req, res, next){
     request = request[0];
     var events = req.app.get('events');
 
-    var name = {
-      disease: request.disease,
-      context: req.session.context_name
-    };
-    if('parameter' in request){
-      name.parameter = request.parameter; 
-    }
 
     //add event
     var mye = {
       from: req.session.username,
-      type: 'request',
-      name: name,
-      option: request.type,
+      category: 'request',
+      verb: 'requested',
+      type: request.type,
       request_id: request._id,
       username: request.username,
-      context_id: request.context_id
+      context_id: request.context_id,
+      disease: request.disease,
+      context_name: req.session.context_name
     };
+
+    if('parameter' in request){
+      mye.parameter = request.parameter; 
+    }
 
     events.insert(mye, function(err){
       if(err) return callback(err);
@@ -129,7 +124,7 @@ exports.post = function(req, res, next){
         if (err) return next(err);    
         res.render('requests/threads', ctx);
       });
-
+      
     });
   });
 };
@@ -191,14 +186,20 @@ exports.resolve = function(req, res, next){
     //add event
     var mye = {
       from: req.session.username,
-      type: 'request',
-      option: (('attachment' in request) ? 'resolved': 'commented') + '_' + request.type,
+      category: 'request',
+      type: request.type,
       request_id: request._id,
       comment_id: request.comments.length-1,
-      name: request.name,
       username: request.username, 
-      context_id: request.context_id
+      context_id: request.context_id,
+      disease: request.disease,
+      context_name: req.context_name,
+      verb: ('attachment' in request) ? 'added to request': 'commented'
     };
+
+    if('parameter' in request){
+      mye.parameter = request.parameter; 
+    }
     
     events.insert(mye, function(err){
       if(err) return callback(err);

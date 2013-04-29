@@ -28,8 +28,8 @@
 
       <ul id="plomNav" class="nav nav-pills">
         <li><a href="/<%= username %>"><%= username %></a></li>
-        <li><a href="/library?<%= dquery %>"><%= context.disease.join('; ') %></a></li>
-        <li><a href="/library?<%= cquery %>"><%= context.name %></a></li>
+        <li><a href="<%=: context | dhref %>"><%= context.disease.join('; ') %></a></li>
+        <li><a href="<%=: context | chref %>"><%= context.name %></a></li>
         <li class="active"><a href="#"><%= process.name + ' - ' + link.name %></a></li>
       </ul>
     </div>

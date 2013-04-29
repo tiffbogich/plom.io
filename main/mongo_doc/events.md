@@ -34,10 +34,12 @@ type and option
     - contested_accepted (contested to accepted)
     - contested_rejected
     - commented
-- follow_user
-- follow_context
-- unfollow_user
-- unfollow_context
+- follow
+    - user
+    - context
+- unfollow
+    - user
+    - context
 - fork (an user clicked on the fork button. He might not have done anything then). If the user do something with his fork, a create event will be triggered
 - create
     - context

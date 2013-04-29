@@ -7,13 +7,12 @@ exports.context = function (collection, comps, user, callback){
 
   collection.insert({
     from: user,
-    type: 'create',
-    option: 'context',
+    category: 'library',
+    type: 'context',
+    verb: 'added',
     context_id: comps.context._id,
-    name: {
-      disease: comps.context.disease,
-      context: comps.context.name      
-    }
+    disease: comps.context.disease,
+    context_name: comps.context.name      
   }, callback);
 
 };
@@ -26,17 +25,16 @@ exports.link = function(collection, comps, user, callback){
 
   collection.insert({
     from: user,
-    type: 'create',
-    option: 'model',
+    verb: 'added',
+    category: 'library',
+    type: 'model',
     context_id: comps.context._id,
     process_id: comps.process._id,
     link_id: comps.link._id,
-    name: {
-      disease: comps.context.disease,
-      context: comps.context.name,
-      process: comps.process.name,
-      link: comps.link.name
-    }
+    disease: comps.context.disease,
+    context_name: comps.context.name,
+    process_name: comps.process.name,
+    link_name: comps.link.name
   }, callback);
 
 };
@@ -48,18 +46,17 @@ exports.theta = function(collection, comps, user, callback){
 
   collection.insert({
     from: user,
-    type: 'create',
-    option: 'theta',
+    verb: 'added',
+    category: 'library',
+    type: 'results',
     context_id: comps.context._id,
     process_id: comps.process._id,
     link_id: comps.link._id,
     theta_id: comps.theta._id,
-    name: {
-      disease: comps.context.disease,
-      context: comps.context.name,
-      process: comps.process.name,
-      link: comps.link.name
-    }
+    disease: comps.context.disease,
+    context_name: comps.context.name,
+    process_name: comps.process.name,
+    link_name: comps.link.name
   }, callback);
 
 };

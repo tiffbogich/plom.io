@@ -1,6 +1,5 @@
 var fs = require('fs')
   , async = require('async')
-  , querystring = require('querystring')
   , check = require('validator').check
   , mongodb = require('mongodb')
   , ObjectID = require('mongodb').ObjectID
@@ -61,10 +60,6 @@ exports.index = function(req, res, next){
             comps.infectors = ppriors.tooltipify(comps);
             comps.link.prior = ppriors.display(comps.link.prior, comps);
             comps.best.posterior = ppriors.display(comps.best.posterior, comps);
-
-            //querystrings
-            comps.dquery = querystring.stringify({d:comps.context.disease});
-            comps.cquery = querystring.stringify({d:comps.context.disease, c:comps.context.name});
 
             res.render('review/index', comps);
           });

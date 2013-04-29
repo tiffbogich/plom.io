@@ -71,7 +71,7 @@ Reviewer.prototype.post = function($form){
   } else {
     data.id = $form.find( 'input[name="id"]' ).val();
 
-    if(data.type !== 'theta'){
+    if(data.type === 'prior' || data.type === 'posterior'){
       data.parameter = $form.find( 'input[name="parameter"]' ).val();
       data.group = $form.find( 'input[name="group"]' ).val();
     }

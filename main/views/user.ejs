@@ -49,38 +49,60 @@
 
   <div class="span8 offset1">
     <h3>Interest</h3>
+    <% if (interests && interests.length) { %>
     <ul>
       <% interests.forEach(function(disease){ %>
-      <li><a href=/library?d=<%= disease %>><%= disease %></a></li>
-      <% }) %>
+      <li><a href="<%=: disease | dhref %>"><%= disease %></a></li>
+      <% }) %>           
     </ul>
+    <% } else { %>    
+    <p>0 context followed.</p>
+    <% } %>
   </div>
   
   <div class="span8 offset1">
     <h3>Activity</h3>
     <ul class="nav nav-tabs" id="socTabs">
       <li class="active"><a href="#events" data-toggle="tab">Events</a></li>
-      <li><a href="#context" data-toggle="tab">Context</a></li>
-      <li><a href="#models" data-toggle="tab">Models</a></li>
-      <li><a href="#results" data-toggle="tab">Results</a></li>
-      <li><a href="#reviews" data-toggle="tab">Reviews</a></li>
+      <li><a href="#context" data-toggle="tab">Context (<%= contexts.length || 0 %>)</a></li>
+      <li><a href="#models" data-toggle="tab">Models (<%= models.length || 0 %>)</a></li>
+      <li><a href="#results" data-toggle="tab">Results (<%= thetas.length || 0 %>)</a></li>
+      <li><a href="#reviews" data-toggle="tab">Reviews (<%= reviews.length || 0 %>)</a></li>
     </ul>
     
     <div class="tab-content">
 
       <div class="tab-pane active" id="events">
-	<% if(events && events.length){ %>
+	<% if(events.length){ %>
 	<% events.forEach(function(e, i){ %>
 
-	<a href="/<%= e.from %>"><%= e.from %></a>
-	
-	<%= e.type %> 
+        <span class="<%=: e | elabel %>"><%= e.category %></span>
 
-	<%= e.option %> 
+	<a href="/<%= e.from %>"><%= e.from %></a> <%= e.verb %> 
 
-	<a href="#"><%= e.name %></a>
-        
-	<span class="muted"><%= e._id.getTimestamp().toDateString() %></span>
+        <% if(e.type !== 'user'){ %>
+        <%= e.type %>
+        <% } else { %>
+        <a href="/<%= e.username %>"><%= e.username %></a>
+        <% } %>
+
+        <% if('parameter' in e){ %><%= e.parameter %><% } %>
+
+        <% if('disease' in e){ %>
+        <a href="<%=: e | dhref %>"><%= e.disease.join('; ') %></a>
+        <% } %>
+
+        <% if ('context_name' in e){ %>
+        / <a href="<%=: e | chref %>"> <%= e.context_name %></a>
+        <% } %>
+
+        <% if('link_name' in e){ %>
+        / <a href="<%=: e | lhref %>">
+          <%= e.process_name %> - <%= e.link_name %> 
+        </a>
+        <% } %>
+
+       	<span class="muted"><%= e._id.getTimestamp().toDateString() %></span>
 
 	<hr/>    
 
@@ -92,15 +114,17 @@
 
       <div class="tab-pane" id="context">
 	
-	<% if(contexts && contexts.length){ %>
-	
-	<% contexts.forEach(function(context){ %>
-	
-	<%= context.disease.join('; ') + ' / ' +  context.name %>
+	<% if(contexts.length){ %>
 
-	<span class="muted"><%= context._id.getTimestamp().toDateString() %></span>
-	
+	<ul>
+	<% contexts.forEach(function(context){ %>	
+        <li>
+          <a href="<%=: context | dhref %>"><%= context.disease.join('; ') %></a>
+          / <a href="<%=: context | chref %>"> <%= context.name %></a>
+	  <span class="muted"><%= context._id.getTimestamp().toDateString() %></span>
+	</li>
 	<% }); %>        
+        </ul>
 	
 	<% } else { %>
 	0 context.
@@ -108,15 +132,17 @@
       </div>
 
       <div class="tab-pane" id="models">
-	<% if(models && models.length){ %>
-	
-	<% models.forEach(function(model){ %>
-	
-	<%= model.context_disease.join('; ') + ' / ' +  model.context_name + ' / ' + model.process_name + ' - ' + model.name %>
-	<span class="muted"><%= model._id.getTimestamp().toDateString() %></span>
-
-	
-	<% }); %>
+	<% if(models.length){ %>
+	<ul>
+	  <% models.forEach(function(model){ %>
+          <li>
+            <a href="<%=: model | dhref %>"><%= model.context_disease.join('; ') %></a>
+            / <a href="<%=: model | chref %>"> <%= model.context_name %></a>
+            / <a href="<%=: model | lhref %>"><%= model.process_name %> - <%= model.name %></a>
+	    <span class="muted"><%= model._id.getTimestamp().toDateString() %></span>
+	  </li>
+	  <% }); %>
+        </ul>
 	
 	<% } else { %>
 	0 models.
@@ -124,15 +150,17 @@
       </div>
 
       <div class="tab-pane" id="results">
-	<% if(thetas && thetas.length){ %>
-	
-	<% thetas.forEach(function(theta){ %>
-	
-	<%= theta.context_disease.join('; ') + ' / ' +  theta.context_name + ' / ' + theta.process_name + ' - ' + theta.link_name %>
-	<span class="muted"><%= theta._id.getTimestamp().toDateString() %></span>
-	
-	<% }); %>        
-	
+	<% if(thetas.length){ %>
+	<ul>
+	  <% thetas.forEach(function(theta){ %>
+          <li>
+            <a href="<%=: theta | dhref %>"><%= theta.context_disease.join('; ') %></a>
+            / <a href="<%=: theta | chref %>"> <%= theta.context_name %></a>
+            / <a href="<%=: theta | lhref %>"><%= theta.process_name %> - <%= theta.link_name %></a>
+	    <span class="muted"><%= theta._id.getTimestamp().toDateString() %></span>
+	  </li>
+	  <% }); %>        
+	</ul>
 	<% } else { %>
 	0 results.
 	<% } %>
@@ -140,14 +168,23 @@
 
       <div class="tab-pane" id="reviews">
 	
-	<% if(reviews && reviews.length){ %>
-	
+	<% if(reviews.length){ %>
+
+	<ul>
 	<% reviews.forEach(function(review){ %>
-	
-	<%= review.name %>
-	<span class="muted"><%= review._id.getTimestamp().toDateString() %></span>	 
+	<li>
+	  <%= (review.type === 'theta') ? 'results' : review.type  %>
+          
+          <% if('parameter' in review){ %><%= review.parameter %><% } %>
+
+            <a href="<%=: review | dhref %>"><%= review.disease.join('; ') %></a>
+            / <a href="<%=: review | chref %>"> <%= review.context_name %></a>
+            / <a href="<%=: review | lhref %>"><%= review.process_name %> - <%= review.link_name %></a>
+
+	  <span class="muted"><%= review._id.getTimestamp().toDateString() %></span>	 
+        </li>
 	<% }); %>
-	
+        </ul>	
 	<% } else { %>
 	0 reviews.
 	<% } %>

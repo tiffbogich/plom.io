@@ -4,7 +4,7 @@
 
 var express = require('express')
   , ejs = require('ejs')
-  , name = require('./lib/name')
+  , filters = require('./lib/filters')
   , routes = require('./routes')
   , review = require('./routes/review')
   , requests = require('./routes/requests')
@@ -22,9 +22,7 @@ var express = require('express')
 
 
 //add custom ejs filters
-ejs.filters.nameContext = name.context;
-ejs.filters.nameLink = name.link;
-ejs.filters.nameEvent = name.event;
+filters.add(ejs);
 
 var app = express();
 

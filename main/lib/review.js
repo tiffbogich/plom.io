@@ -118,21 +118,9 @@ exports.post = function(collection, events, session, review, callback){
   review.username = session.username;
   review.date = new Date();
 
-  review.name = {
-    disease: session.disease,
-    context: session.context_name,
-    process: session.process_name,
-    link: session.link_name
-  };
-
-  if('parameter' in review){   
-    review.name.parameter = review.parameter;
-    delete review.parameter;
-  }
-  if('group' in review){   
-    review.name.group = review.group;
-    delete review.group;
-  }
+  review.context_name = session.context_name;
+  review.process_name = session.process_name;
+  review.link_name = session.link_name;
 
   review.disease = session.disease;
   review.context_id = session.context_id;
@@ -149,9 +137,9 @@ exports.post = function(collection, events, session, review, callback){
     //add event
     var mye = {
       from: session.username,
-      type: review.type,
-      name: review.name,
-      option: review.status,
+      category: 'review',
+      type: (review.type === 'theta') ? 'results': review.type,
+      verb: review.status,
       review_id: review._id
     };
 
@@ -159,6 +147,13 @@ exports.post = function(collection, events, session, review, callback){
     ['username', 'context_id', 'process_id', 'link_id', 'id'].forEach(function(id){
       if(id in review){
         mye[id] = review[id];
+      }
+    });
+
+    //add all _name
+    ['disease', 'context_name', 'process_name', 'link_name', 'parameter', 'group'].forEach(function(name){
+      if(name in review){
+        mye[name] = review[name];
       }
     });
 
@@ -197,17 +192,31 @@ exports.comment = function(collection, events, session, comment, callback){
     //add event
     var mye = {
       from: session.username,
-      type: 'review',
-      option: (comment.change) ? 'revised_': ((comment.status) ? 'contested_' + comment.status : 'commented'),
+      category: 'review',
+      type: (review.type === 'theta') ? 'results': review.type,
       review_id: review._id,
-      comment_id: review.comments.length-1,
-      name: review.name
+      comment_id: review.comments.length-1
     };
+
+    if(comment.change){
+      mye.verb = comment.change + ' after revision';
+    } else if (comment.status){
+      mye.verb = 'contested ' + comment.status;
+    } else {
+      mye.verb = 'discussed';
+    }
 
     //add all _id
     ['username', 'context_id', 'process_id', 'link_id', 'id'].forEach(function(id){
       if(id in review){
         mye[id] = review[id];
+      }
+    });
+
+    //add all _name
+    ['disease', 'context_name', 'process_name', 'link_name', 'parameter', 'group'].forEach(function(name){
+      if(name in review){
+        mye[name] = review[name];
       }
     });
     
@@ -218,5 +227,4 @@ exports.comment = function(collection, events, session, comment, callback){
     });
 
   });
-
 };

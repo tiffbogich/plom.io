@@ -43,19 +43,19 @@ exports.user = function(req, res, next){
       },
 
       contexts: function(callback){
-        c.find({type:'context', username: req.session.username}, {disease:true, name:true, _id:true}).sort({_id:-1}).toArray(callback);
+        c.find({type:'context', username: username}, {disease:true, name:true, _id:true}).sort({_id:-1}).toArray(callback);
       },
 
       models: function(callback){
-        c.find({type:'link', username: req.session.username}, {context_disease:true, context_name:true, process_name:true, name:true, _id:true}).sort({_id:-1}).toArray(callback);
+        c.find({type:'link', username: username}, {context_disease:true, context_name:true, process_name:true, name:true, _id:true}).sort({_id:-1}).toArray(callback);
       },
 
       thetas: function(callback){
-        c.find({type:'theta', username: req.session.username}, {context_disease:true, context_name:true, process_name:true, link_name:true, name:true, _id:true, link_id:true}).sort({_id:-1}).toArray(callback);
+        c.find({type:'theta', username: username}, {context_disease:true, context_name:true, process_name:true, link_name:true, name:true, _id:true, link_id:true}).sort({_id:-1}).toArray(callback);
       },
 
       reviews: function(callback){
-        r.find({username: req.session.username}).sort({_id:-1}).toArray(callback);
+        r.find({username: username}).sort({_id:-1}).toArray(callback);
       },
 
       interests: function(callback){
@@ -63,7 +63,6 @@ exports.user = function(req, res, next){
       }
     },
                    function(err, results) {
-                     console.log(results.interests);
                      results.user = user;                     
                      res.render('user', results);                    
                    });
@@ -94,16 +93,15 @@ exports.postFollow = function(req, res, next){
       //insert event
       var mye = {
         from: req.session.username,
-        type: req.body.action,
-        option: what
+        category: 'follow',
+        verb: req.body.action + 'ed',
+        type: what
       };
 
       if(what === 'context'){
         mye.context_id = req.session.context_id;
-        mye.name =  {
-          disease: req.session.disease,
-          context: req.session.context_name
-        };
+        mye.disease = req.session.disease;
+        mye.context_name = req.session.context_name;
       } else {
         mye.username = req.body.username;
       }

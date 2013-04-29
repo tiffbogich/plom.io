@@ -7,13 +7,13 @@
 <% include ../header %>
 
 
-  <form action="/search" method="POST">
-    <div class="input-append">
-      <input type="text" name="q" id="plom-search" placeholder="Search for diseases, context or models" class="span4"/>
-      <input type="hidden" name="_csrf" value="<%= token %>"/>
-      <button type="submit" class="btn">Search</button>
-    </div>
-  </form>
+<form action="/search" method="POST">
+  <div class="input-append">
+    <input type="text" name="q" id="plom-search" placeholder="Search for diseases, context or models" class="span4"/>
+    <input type="hidden" name="_csrf" value="<%= token %>"/>
+    <button type="submit" class="btn">Search</button>
+  </div>
+</form>
 
 </div> <!-- close header container-->
 
