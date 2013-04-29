@@ -156,7 +156,7 @@ exports.post = function(collection, events, session, review, callback){
     };
 
     //add all _id
-    ['context_id', 'process_id', 'link_id', 'id'].forEach(function(id){
+    ['username', 'context_id', 'process_id', 'link_id', 'id'].forEach(function(id){
       if(id in review){
         mye[id] = review[id];
       }

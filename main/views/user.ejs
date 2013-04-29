@@ -28,8 +28,12 @@ $('#socTabs a:first').tab('show');
     <h3><%= params.username %></h3>
 
     <hr>
-    <p>Joined on DATE.</p>  
-    <p>Latest activity on DATE.</p>
+    <p>Joined on <%= user.date.toDateString() %></p>  
+    <% if(events && events.length){ %>
+    <p>Latest activity on <%= events[0]._id.getTimestamp().toDateString() %></p>
+    <% } else { %>
+    <p>No activity.</p>
+    <% } %>
     <hr>
 
     <div class="row">
@@ -48,7 +52,7 @@ $('#socTabs a:first').tab('show');
   	<li class="active"><a href="#events" data-toggle="tab">Events</a></li>
   	<li><a href="#context" data-toggle="tab">Context</a></li>
   	<li><a href="#models" data-toggle="tab">Models</a></li>
-  	<li><a href="#thetas" data-toggle="tab">Thetas</a></li>
+  	<li><a href="#results" data-toggle="tab">Results</a></li>
   	<li><a href="#reviews" data-toggle="tab">Reviews</a></li>
       </ul>
       
@@ -88,7 +92,7 @@ $('#socTabs a:first').tab('show');
 	  <% }); %>        
 	  
 	  <% } else { %>
-	  0 context published
+	  0 context.
 	  <% } %>			
 	</div>
 
@@ -103,11 +107,11 @@ $('#socTabs a:first').tab('show');
 	  <% }); %>
 	  
 	  <% } else { %>
-	  0 model published
+	  0 models.
 	  <% } %>
 	</div>
 
-	<div class="tab-pane" id="thetas">
+	<div class="tab-pane" id="results">
 	  <% if(thetas && thetas.length){ %>
 	  
 	  <% thetas.forEach(function(theta){ %>
@@ -118,7 +122,7 @@ $('#socTabs a:first').tab('show');
 	  <% }); %>        
 	  
 	  <% } else { %>
-	  0 theta published
+	  0 results.
 	  <% } %>
 	</div>
 
@@ -134,7 +138,7 @@ $('#socTabs a:first').tab('show');
 	  <% }); %>
 	  
 	  <% } else { %>
-	  0 review published
+	  0 reviews.
 	  <% } %>
 	  
 	</div>

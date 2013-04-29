@@ -4,6 +4,11 @@
   width: 280px;
 }
 
+.http-error img{
+  display: block;
+  margin: auto;
+}
+
 /* requests */
 
 #addRequest{

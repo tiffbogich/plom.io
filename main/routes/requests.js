@@ -1,4 +1,5 @@
 var ObjectID = require('mongodb').ObjectID
+  , querystring = require('querystring')
   , async = require('async')
   , _ = require('underscore')
   , schecksum = schecksum = require('plom-schecksum');
@@ -16,11 +17,16 @@ exports.index = function(req, res, next){
 
     components.findOne({_id: context_id}, function(err, context){
       if(err) return next(err);
+      if(!context) return next();
+
       req.session.context_id = context._id;
       req.session.disease = context.disease;
       req.session.context_name = context.name;
 
-      res.render('requests/index', {context: context, context_followed: user.context_id || []});
+      var dquery = querystring.stringify({d:context.disease})
+        , cquery = querystring.stringify({d:context.disease, c:context.name});
+
+      res.render('requests/index', {cquery: cquery, dquery: dquery, context: context, context_followed: user.context_id || []});
     });
 
   });
@@ -112,6 +118,7 @@ exports.post = function(req, res, next){
       name: name,
       option: request.type,
       request_id: request._id,
+      username: request.username,
       context_id: request.context_id
     };
 
@@ -189,8 +196,8 @@ exports.resolve = function(req, res, next){
       request_id: request._id,
       comment_id: request.comments.length-1,
       name: request.name,
-      context_id: request.context_id,
-      username: request.username
+      username: request.username, 
+      context_id: request.context_id
     };
     
     events.insert(mye, function(err){

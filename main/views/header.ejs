@@ -11,13 +11,24 @@
       </div>
 
       <ul id="plomNav" class="nav nav-pills">
+        <% if (is_logged_in && locals.username){ %>
+        <li><a href="/<%= username %>"><%= username %></a></li>
+        <% } else { %>
         <li><a href="/">Home</a></li>
+        <% } %>
         <li><a href="/library">Library</a></li>
+
+        <% if (is_logged_in){ %>        
+        <li><a href="/doc">Documentation</a></li>
+        <% } else { %>
         <li><a href="/about">About us</a></li>
+        <% } %>
+
         <% if(locals.is_logged_in) { %>
         <li> <a href="/logout">Logout</a> </li>
         <% } else { %>
         <li> <a href="/login">Login</a> </li>
         <% } %>
+
       </ul>
     </div>

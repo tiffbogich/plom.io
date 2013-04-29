@@ -5,16 +5,17 @@ var fs = require('fs')
   , ObjectID = require('mongodb').ObjectID
   , path = require('path');
 
-
 /**
  * Get the user events and components
  */
 exports.user = function(req, res, next){
 
   var u = req.app.get('users');
+  var username = req.params.username;
 
-  u.findOne({_id: req.params.username}, function(err, user){
+  u.findOne({_id: username}, function(err, user){
     if(err) return next(err);
+    if(!user) return next();
 
     var e = req.app.get('events')
       , c = req.app.get('components')
@@ -25,8 +26,8 @@ exports.user = function(req, res, next){
       events: function(callback){
         var q = {
           $or: [
-            {from: req.params.username},
-            {user_id: req.params.username}
+            {from: username},
+            {user_id: username}
           ]};
 
         if(user.context_id && user.context_id.length){
