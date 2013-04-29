@@ -59,16 +59,12 @@ $(document).ready(function() {
     });    
   });
 
-
-
   $('.process-graph').each(function(){
-    var _id = $(this).attr('id').split('_')[1];
-    $.getJSON('/component/' + _id , function(process) {
-      plomGraphModel(process, "#pgraph_" + _id);
+    var id = $(this).attr('id');
+    $.getJSON('/component/' + id.split('_')[2] , function(process) {
+      plomGraphModel(process, "#" + id);
     });
   });
-
-
 
 
 });

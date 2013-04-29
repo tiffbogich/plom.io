@@ -4,7 +4,7 @@
   <div class="model-box">
     <a href="#"><%= m.process.name + ' - ' + m.link.name %></a>
     <!-- placeholder for d3 viz of compartmental model -->
-    <div id="pgraph_<%= m.process._id %>" class="process-graph"></div>
+    <div id="pgraph_<%= c._id %>_<%= m.process._id %>" class="process-graph"></div>
 
     <!-- score (DIC or AICc or rating) -->
     <% if (m.theta) { %>
@@ -34,7 +34,6 @@
     
     <div class="parameter-box">
       <% if (m.posterior) { %>
-
 
       <% ['process', 'observation', 'state'].forEach(function(type){  %>
       <ul>
