@@ -203,6 +203,7 @@ function wsServer(server) {
           console.log(fitOpt);
 
           var fit = spawn('fit', fitOpt, {cwd: cwd});
+          fit.stderr.destroy(); //see https://github.com/joyent/node/issues/4510
           fit.stdout.pipe(prog.stdin, { end: false });
         }
 
