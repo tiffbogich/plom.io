@@ -1,0 +1,63 @@
+<div class="row">
+  <% [
+     {val: best.posterior.process, title:'Process'},
+     {val: best.posterior.observation, title:'Observation'},
+     {val: best.posterior.state, title: 'Initial Conditions'}
+     ].forEach(function(type){ %>
+
+  <div class="span4">
+
+    <h4><%= type.title %></h4>
+
+    <ul class="thumbnails">
+
+      <% for(var par in type.val){ 
+         for(var group in type.val[par]['group']){ 
+         var caption = type.val[par]['caption']
+         var p = type.val[par]['group'][group] 
+         %>
+
+      <li class="span4">
+        <div class="thumbnail">
+          <img data-src="holder.js/300x200" alt="">
+          <h5><a href="#" data-toggle="tooltip" data-placement="right" title="<%= caption %>"><%= par %>: <%= group.split('__').join('; ') %></a></h5>
+          
+          <ul>
+            <li><%= p.min %> - <%= p.max %></li>
+          </ul>
+
+          <!-- collapsible discussion on the priors -->
+          <p>
+            <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= p.id %>"><i class="icon-comment"></i> Discuss</button>                
+          </p>
+          <div id="<%= p.id %>" class="collapse posterior">
+            <div class="thread" id="threadPosterior<%= p.id %>"></div>
+
+            <form class="post" action="/review" method="post">
+              <textarea rows="2" name="body", class="span3"></textarea>
+              <input type="hidden" name="_csrf" value="<%= token %>"/>
+              <input type="hidden" name="id" value="<%= p.id %>"/>
+              <input type="hidden" name="type" value="posterior"/>
+              <input type="hidden" name="parameter" value="<%= par %>"/>
+              <input type="hidden" name="group" value="<%= group %>"/>
+              <p>
+                <label class="radio inline">
+                  <input type="radio" name="status" value="validated">Validate
+                </label>
+                <label class="radio inline">
+                  <input type="radio" name="status"  value="rejected">Reject
+                </label>
+                <button class="btn" type="submit">Submit</button>
+              </p>
+            </form>         
+          </div> <!-- end collapse -->
+
+        </div>
+      </li>
+      
+      <%  } }; %>
+    </ul>
+  </div> <!-- end span4 -->
+
+  <% }); %>
+</div>                     

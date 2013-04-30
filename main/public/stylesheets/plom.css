@@ -365,6 +365,15 @@ text.shadow {
   height: 35px;
 }
 
+
+#subPriors .active a{
+  background-color: rgb(208,208,208);
+}
+
+#subPriors li.active:focus{
+  background-color:red;
+}
+
 .post{
   margin-top:10px;
   margin-left:4px;
@@ -376,7 +385,7 @@ text.shadow {
 }
 
 .offset05{
-  margin-left: 40px;
+  margin-left: 20px;
 }
 
 

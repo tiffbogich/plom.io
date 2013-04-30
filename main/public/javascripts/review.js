@@ -2,7 +2,8 @@ var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 
-//  $('#reviewTab a[href=#review]').tab('show');
+  $('#reviewTab a[href=#posteriors]').tab('show');
+
 //  $('#review a[href=#reviewReview]').tab('show');
 
 
@@ -16,7 +17,7 @@ $(document).ready(function() {
 
     var reviewer = new Reviewer(tpl['reviewer']);
 
-    $('#priors, #review, #posterior').on('submit', '.post', function(e){
+    $('#priors, #review, #posteriors').on('submit', '.post', function(e){
       e.preventDefault();     
       reviewer.post($(this));
     });

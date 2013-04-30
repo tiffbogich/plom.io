@@ -12,8 +12,8 @@ exports.stats = function(collection, model, callback){
   var match = {
     reaction: {type: 'reaction', disease: {'$all': model.context.disease, '$size': model.context.disease.length}, process_id: model.process._id},
     observed: {type: 'observed', link_id: model.link._id, id: {$in: model.link.observed.map(function(x){return x.id;})}},
-    posterior: {type: 'posterior', link_id: model.link._id, id: {$in: model.best.posterior.map(function(x){return x.semantic_id;})}},
-    prior: {type: 'prior', context_id: model.context._id, id: {$in: model.link.prior.map(function(x){return x.semantic_id;})}}
+    posterior: {type: 'posterior', link_id: model.link._id, id: {$in: model.best.posterior.map(function(x){return x.id;})}},
+    prior: {type: 'prior', context_id: model.context._id, id: {$in: model.link.prior.map(function(x){return x.id;})}}
   };
 
   var group = {
@@ -93,7 +93,7 @@ exports.get = function(collection, session, params, callback){
     q.process_id = session.process_id;
   } else if(type === 'observed') {
     q.link_id = session.link_id;
-  } 
+  }
 
   //retrieve latest reviews
   collection.find(q).sort({_id: 1}).toArray(callback);
