@@ -59,10 +59,17 @@ exports.user = function(req, res, next){
       },
 
       interests: function(callback){
-        c.distinct('disease', {_id: {$in: user.context_id}}, callback);
+	  if(user.context_id && user.context_id.length){
+              c.distinct('disease', {_id: {$in: user.context_id}}, callback);
+	  } else {
+	      callback(null, []);
+	  }
       }
     },
                    function(err, results) {
+		       console.log(err);
+		       console.log(results);
+
                      results.user = user;                     
                      res.render('user', results);                    
                    });
