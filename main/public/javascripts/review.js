@@ -34,8 +34,15 @@ $(document).ready(function() {
     });
 
 
+
     $.getJSON('/diagnostic/'+ model.result.theta._id, function(summaries) {
       $.getJSON('/diagnostic/'+ model.result.theta._id + '/'+ model.result.theta.trace_id, function(diagnostic) {
+
+        diagnostic.detail.forEach(function(x, i){
+          plotDensity(diagnostic.detail, i, diagnostic.detail[i][i].par + diagnostic.detail[i][i].group, 260, 200);
+        });
+
+
         var updateCorr1 = plotCorr(diagnostic.detail, 0, 1, 1)
           , updateCorr2 = plotCorr(diagnostic.detail, 1, 0, 2)
           , updateDensity1 = plotDensity(diagnostic.detail, 0, 1)
@@ -118,8 +125,6 @@ $(document).ready(function() {
 
         $.subscribe('trace', function(e, theta_id, trace_id) {
           // Skip the first argument (event object)
-
-          //TODO: update function for greenlights (add/remove dots...)
 
           $.getJSON('/forecast/'+ model.link._id + '/'+ theta_id + '/'+ trace_id, function(forecast) {
             //TODO freeze prediction interface untill ready

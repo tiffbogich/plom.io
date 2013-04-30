@@ -82,6 +82,7 @@ exports.index = function(req, res, next){
 
             var result = comps.best;
             result.posterior = ppriors.display(result.posterior, comps);
+
             res.send({
               model: {
                 context: comps.context,

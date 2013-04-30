@@ -1,4 +1,7 @@
-function plotDensity(diag, i, ind){
+function plotDensity(diag, i, ind, width, height){
+  
+  width = width || 220;
+  height = height || 220;
 
   var data = [];
   diag[i][i].posterior.x.forEach(function(x, k){
@@ -11,9 +14,9 @@ function plotDensity(diag, i, ind){
 
   var xlabel = diag[i][i].par + ':' + diag[i][i].group;
 
-  var margin = {top: 25, right: 30, bottom: 35, left: 40}
-    , width = 220 - margin.left - margin.right
-    , height = 220 - margin.top - margin.bottom;
+  var margin = {top: 25, right: 30, bottom: 35, left: 40};  
+  width = width - margin.left - margin.right;
+  height = height - margin.top - margin.bottom;
 
   var x = d3.scale.linear()
     .range([0, width])

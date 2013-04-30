@@ -13,13 +13,16 @@
 
       <% for(var par in type.val){ 
          for(var group in type.val[par]['group']){ 
-         var caption = type.val[par]['caption']
-         var p = type.val[par]['group'][group] 
+         var caption = type.val[par]['caption'];
+         var p = type.val[par]['group'][group];
+         var i=0;
          %>
 
       <li class="span4">
         <div class="thumbnail">
-          <img data-src="holder.js/300x200" alt="">
+
+          <div id="density<%= par %><%= group %>"></div>
+
           <h5><a href="#" data-toggle="tooltip" data-placement="right" title="<%= caption %>"><%= par %>: <%= group.split('__').join('; ') %></a></h5>
           
           <ul>
