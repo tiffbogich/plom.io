@@ -5,7 +5,7 @@ function greenlights(summaries, ftpl, callback){
   $('#greenlights svg').remove();
   var svg = d3.select("#greenlights").append("svg")
     .attr("width", 900)
-    .attr("height", 60);  
+    .attr("height", 60);
 
   var g = svg.selectAll("g")
     .data(summaries)
@@ -72,7 +72,8 @@ function greenlights(summaries, ftpl, callback){
     g.select("circle")
       .transition()
       .duration(400)
-      .attr("r", function(d){return d.summary.essMin/essMax*20 +5 ;});
+      .attr("r", function(d){return d.summary.essMin/essMax*20 +5;})
+      .attr("class", function(d){return (d.summary.passed) ?  'passed': 'failed';});
 
     g.select("text")
       .text(function(d){return Math.round(d.summary.essMin);});
@@ -97,5 +98,3 @@ function greenlights(summaries, ftpl, callback){
 
 
 }
-
-
