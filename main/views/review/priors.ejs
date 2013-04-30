@@ -11,6 +11,7 @@
   <!-- ====== -->
 
   <div class="tab-pane active" id="pillPriors">
+
     <% [
        {val: link.prior.process, title:'Process'},
        {val: link.prior.observation, title:'Observation'},
@@ -22,7 +23,6 @@
       <h4><%= type.title %></h4>
 
       <ul class="thumbnails">
-
         <% for(var par in type.val){ 
            for(var group in type.val[par]['group']){ 
            var caption = type.val[par]['caption']
@@ -32,16 +32,14 @@
         <li class="span39">
           <div class="thumbnail">
             <!--<img data-src="holder.js/240x200" alt="">-->
-            <h5><a href="#" data-toggle="tooltip" data-placement="right" title="<%= caption %>"><%= par %>: <%= group.split('__').join('; ') %></a></h5>
-
-            
+            <h5><a href="#" data-toggle="tooltip" data-placement="right" title="<%= caption %>"><%= par %>: <%= group.split('__').join('; ') %></a></h5>            
             <ul>
               <li><%= p.distribution %></li>
               <li><%= p.min %> - <%= p.max %></li>
             </ul>
 
             <!-- collapsible discussion on the priors -->
-            <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= p.id %>"><i class="icon-comment"></i> Discuss</button>                
+            <button type="button" class="btn btn-mini social" data-toggle="collapse" data-target="#<%= p.id %>"><i class="icon-comment"></i> Discuss</button>
             <div id="<%= p.id %>" class="collapse prior">
 
               <div class="thread" id="threadPrior<%= p.id %>"></div>
@@ -53,6 +51,7 @@
                 <input type="hidden" name="type" value="prior"/>
                 <input type="hidden" name="parameter" value="<%= par %>"/>
                 <input type="hidden" name="group" value="<%= group %>"/>
+
                 <p>
                   <label class="radio inline">
                     <input type="radio" name="status" value="validated">Validate
@@ -63,156 +62,162 @@
                   <button class="btn" type="submit">Submit</button>
                 </p>
               </form>
-
+              
             </div>
-        </li>
-        
+          </div>
+        </li>        
         <%  } }; %>
       </ul>
-      </div> <!-- end span39 -->
-      <% }); %>
-    </div>
 
+    </div> <!-- end span39 -->
 
-    <!-- ============= -->
-    <!-- Process model -->
-    <!-- ============= -->
-
-    <div class="tab-pane" id="pillProcess">
-
-      <!-- placeholder for d3 viz of compartmental model -->
-      <div id="pgraph<%= link._id %>" class="process-graph"></div>
-
-
-      <% process.model.forEach(function(r, i){ %>
-      <div class="row" >
-        <div class="span2">
-          <% if( infectors.indexOf(r.from) !== -1) { %> <span class="infector"> <%= r.from %> </span> <% } else { %> <%= r.from %> <% } %> 
-          <% if( ('tag' in r) && ('transmission' in r['tag'])) { %> <span class="infector"> &rarr; </span> <% } else { %> &rarr; <% } %> 
-          <% if( infectors.indexOf(r.to) !== -1) { %> <span class="infector"> <%= r.to %> </span> <% } else { %> <%= r.to %> <% } %>                 
-        </div>
-        <div class="span3">
-          <%- r.tlt_rate %>
-        </div>
-        <div class="span5">
-          <%= r.comment || ''  %> 
-          <button type="button" class="btn btn-mini social-action" data-toggle="collapse" data-target="#<%= r.id %>"><i class="icon-comment"></i> Discuss</button>   
-        </div>
-      </div>
-
-      <!-- collapsible discussion on the process model specific reaction -->
-      <div id="<%= r.id %>" class="collapse reaction">
-        <div class="thread" id="threadReaction<%= r.id %>"></div>
-
-        <form class="post" action="/review" method="post">
-          <textarea rows="2" name="body", class="span3"></textarea>
-          <input type="hidden" name="_csrf" value="<%= token %>"/>
-          <input type="hidden" name="id" value="<%= r.id %>"/>
-          <input type="hidden" name="type" value="reaction"/>
-          <p>
-            <label class="radio inline">
-              <input type="radio" name="status" value="validated">Validate
-            </label>
-            <label class="radio inline">
-              <input type="radio" name="status"  value="rejected">Reject
-            </label>
-            <button class="btn" type="submit">Submit</button>
-          </p>
-        </form>         
-      </div> <!-- end collapse -->
-
-      <hr/>
-      <% }); %>      
-
-    </div>
-
-
-    <!-- ================= -->
-    <!-- Observation model -->
-    <!-- ================= -->
-
-    <div class="tab-pane" id="pillObservation">
-
-      <% link.observed.forEach(function(o, i){ %>
-
-      <div class="row">
-        <div class="span5">
-          <%= o.id %>:
-          <ul>
-            <li> definition: 
-              <% if(typeof o.definition[0] === 'string'){ %>
-              
-              <%- o.definition
-                  .map(function(x){
-                  return (infectors.indexOf(x) !== -1) ? '<span class="infectors"> ' + x + ' </span>' : x; 
-                  })
-                  .join(' + ') %>
-
-              <% } else { %>
-
-              <%- o.definition.map(function(d){
-                  var from = (infectors.indexOf(d.from) !== -1) ? '<span class="infector"> ' + d.from + ' </span>' : d.from;
-                  var to = (infectors.indexOf(d.to) !== -1) ? '<span class="infector"> ' + d.to + ' </span>' : d.to;
-                  return from + ' &rarr; ' + to;
-                  })
-                  .join(' + ') %>
-
-              <% } %>
-            </li>
-
-            <li>
-              mapped to: <%= o.time_series_id.map(function(x){return x.split('__').slice(0,2).join(':')}).join(' ; ') %>
-            </li>
-
-            <li>
-              model: <%= link.observation[0].model.distribution %>
-
-              <ul>
-                <% for(var p in link.observation[0].model){ %>
-                <% if(p !== 'distribution' && p.split('_')[0] === 'tlt'){ %>
-                <li>
-                  <%= p.split('_').slice(1).join('_') %>: <%- link.observation[0].model[p] %>
-                </li>
-                <% } %>
-                <% } %>
-              </ul>
-            </li>
-          </ul>
-        </div>
-
-        <div class="span5">
-          <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= o.id %>"><i class="icon-comment"></i> Discuss</button>                
-          <!-- collapsible discussion on the on the observed variable -->
-          <div id="<%= o.id %>" class="collapse observed">
-            <div class="thread" id="threadObserved<%= o.id %>"></div>
-
-            <form class="post" action="/review" method="post">
-              <textarea rows="2" name="body", class="span3"></textarea>
-              <input type="hidden" name="_csrf" value="<%= token %>"/>
-              <input type="hidden" name="id" value="<%= o.id %>"/>
-              <input type="hidden" name="type" value="observed"/>
-              <p>
-                <label class="radio inline">
-                  <input type="radio" name="status" value="validated">Validate
-                </label>
-                <label class="radio inline">
-                  <input type="radio" name="status"  value="rejected">Reject
-                </label>
-                <button class="btn" type="submit">Submit</button>
-              </p>
-            </form>         
-          </div> <!-- end collapse -->
-          
-        </div>
-        
-      </div>
-
-      <hr/>    
-      <% }); %>
-
-
-    </div>
+    <% }); %>      
   </div>
 
+
+
+  <!-- ============= -->
+  <!-- Process model -->
+  <!-- ============= -->
+
+  <div class="tab-pane" id="pillProcess">
+
+    <!-- placeholder for d3 viz of compartmental model -->
+    <div id="pgraph<%= link._id %>" class="process-graph"></div>
+
+    <% process.model.forEach(function(r, i){ %>
+    <div class="row" >
+      <div class="span2">
+        <% if( infectors.indexOf(r.from) !== -1) { %> <span class="infector"> <%= r.from %> </span> <% } else { %> <%= r.from %> <% } %> 
+        <% if( ('tag' in r) && ('transmission' in r['tag'])) { %> <span class="infector"> &rarr; </span> <% } else { %> &rarr; <% } %> 
+        <% if( infectors.indexOf(r.to) !== -1) { %> <span class="infector"> <%= r.to %> </span> <% } else { %> <%= r.to %> <% } %>                 
+      </div>
+      <div class="span3">
+        <%- r.tlt_rate %>
+      </div>
+      <div class="span3">
+        <%= r.comment || ''  %> 
+      </div>
+
+      <div class="span4">
+        <button type="button" class="btn btn-mini social" data-toggle="collapse" data-target="#<%= r.id %>"><i class="icon-comment"></i> Discuss</button> 
+        <!-- collapsible discussion on the process model specific reaction -->
+        <div id="<%= r.id %>" class="collapse reaction">
+
+          <div class="thread" id="threadReaction<%= r.id %>"></div>
+
+          <form class="post" action="/review" method="post">
+            <textarea rows="2" name="body", class="span3"></textarea>
+            <input type="hidden" name="_csrf" value="<%= token %>"/>
+            <input type="hidden" name="id" value="<%= r.id %>"/>
+            <input type="hidden" name="type" value="reaction"/>
+            <p>
+              <label class="radio inline">
+                <input type="radio" name="status" value="validated">Validate
+              </label>
+              <label class="radio inline">
+                <input type="radio" name="status"  value="rejected">Reject
+              </label>
+              <button class="btn" type="submit">Submit</button>
+            </p>
+          </form>         
+
+        </div> <!-- end collapse -->
+      </div>
+    </div>
+
+    <hr/>
+    <% }); %>      
+
+  </div>
+
+
+  <!-- ================= -->
+  <!-- Observation model -->
+  <!-- ================= -->
+
+  <div class="tab-pane" id="pillObservation">
+
+    <% link.observed.forEach(function(o, i){ %>
+
+    <div class="row">
+      <div class="span8">
+        <%= o.id %>:
+        <ul>
+          <li> definition: 
+            <% if(typeof o.definition[0] === 'string'){ %>
+            
+            <%- o.definition
+                .map(function(x){
+                return (infectors.indexOf(x) !== -1) ? '<span class="infectors"> ' + x + ' </span>' : x; 
+                })
+                .join(' + ') %>
+
+            <% } else { %>
+
+            <%- o.definition.map(function(d){
+                var from = (infectors.indexOf(d.from) !== -1) ? '<span class="infector"> ' + d.from + ' </span>' : d.from;
+                var to = (infectors.indexOf(d.to) !== -1) ? '<span class="infector"> ' + d.to + ' </span>' : d.to;
+                return from + ' &rarr; ' + to;
+                })
+                .join(' + ') %>
+
+            <% } %>
+          </li>
+
+          <li>
+            mapped to: <%= o.time_series_id.map(function(x){return x.split('__').slice(0,2).join(':')}).join(' ; ') %>
+          </li>
+
+          <li>
+            model: <%= link.observation[0].model.distribution %>
+
+            <ul>
+              <% for(var p in link.observation[0].model){ %>
+              <% if(p !== 'distribution' && p.split('_')[0] === 'tlt'){ %>
+              <li>
+                <%= p.split('_').slice(1).join('_') %>: <%- link.observation[0].model[p] %>
+              </li>
+              <% } %>
+              <% } %>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="span4">
+
+        <button type="button" class="btn btn-mini social" data-toggle="collapse" data-target="#<%= o.id %>"><i class="icon-comment"></i> Discuss</button>
+        <!-- collapsible discussion on the on the observed variable -->
+        <div id="<%= o.id %>" class="collapse observed">
+          <div class="thread" id="threadObserved<%= o.id %>"></div>
+
+          <form class="post" action="/review" method="post">
+            <textarea rows="2" name="body", class="span3"></textarea>
+            <input type="hidden" name="_csrf" value="<%= token %>"/>
+            <input type="hidden" name="id" value="<%= o.id %>"/>
+            <input type="hidden" name="type" value="observed"/>
+            <p>
+              <label class="radio inline">
+                <input type="radio" name="status" value="validated">Validate
+              </label>
+              <label class="radio inline">
+                <input type="radio" name="status"  value="rejected">Reject
+              </label>
+              <button class="btn" type="submit">Submit</button>
+            </p>
+          </form>         
+        </div> <!-- end collapse -->
+        
+      </div>
+      
+    </div>
+
+    <hr/>    
+    <% }); %>
+  </div>
+
+
+</div>
 
 

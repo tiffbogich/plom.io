@@ -2,7 +2,11 @@ var plomGlobal = {canRun: true, intervalId:[]};
 
 $(document).ready(function() {
 
-  $('#reviewTab a[href=#posteriors]').tab('show');
+//  $('#reviewTab a[href=#posteriors]').tab('show');
+
+  $('body').on('click', '.social', function(e){
+    $(this).toggleClass('active');
+  });
 
 //  $('#review a[href=#reviewReview]').tab('show');
 

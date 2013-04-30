@@ -28,7 +28,7 @@
 
           <!-- collapsible discussion on the priors -->
           <p>
-            <button type="button" class="btn btn-mini" data-toggle="collapse" data-target="#<%= p.id %>"><i class="icon-comment"></i> Discuss</button>                
+            <button type="button" class="btn btn-mini social" data-toggle="collapse" data-target="#<%= p.id %>"><i class="icon-comment"></i> Discuss</button>                
           </p>
           <div id="<%= p.id %>" class="collapse posterior">
             <div class="thread" id="threadPosterior<%= p.id %>"></div>
@@ -53,8 +53,7 @@
           </div> <!-- end collapse -->
 
         </div>
-      </li>
-      
+      </li>      
       <%  } }; %>
     </ul>
   </div> <!-- end span4 -->
