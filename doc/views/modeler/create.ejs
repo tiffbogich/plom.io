@@ -65,7 +65,7 @@
 <img src="/images/sneeze_big.png" class="sfr-img-center" alt="model illustration"/>
 
   <div class="span4">
-    <h3>The good old SIR model</h3>
+    <h3>The good old SIR model,</h3>
 
     <p>
       It always starts with the <a href="http://en.wikipedia.org/wiki/Epidemic_model#The_SIR_Model">SIR model</a>.
@@ -75,18 +75,17 @@
 
 
   <div class="span4">
-    <h3>With Extra features</h3>
+    <h3 > with extra features, </h3>
 
     <p>
       To depart a bit from Kermack and McKendrick's 1927 legacy,
-      let's add birth and death processes, Erlang distributed duration
-      of infection, and some noise on the transmission term.
+      let's add birth and death processes, and some noise on the transmission term.
     </p>
 
   </div>
 
   <div class="span4">
-    <h3>In JSON</h3>
+    <h3 > in JSON.</h3>
 
     <p>
       In PLoM, your model is represented
@@ -119,7 +118,8 @@
 <pre class="prettyprint">
 {
  "name": "SIR",
- "description": "SIR process model with birth and death processes, Erlang distributed duration of infection and noise on the transmission term",
+ "description": "SIR model with birth and death processes, and noise on the 
+ 		transmission term",
 
  "state": [{"id": "S", "comment": "Susceptible"},
            {"id": "I", "comment": "Infectious"}],
@@ -130,24 +130,20 @@
                {"id": "mu_b", "comment": "birth rate"},
                {"id": "mu_d", "comment": "death rate"}],
 
- "model": [
-   {"comment":"birth",
-    "from": "U", "to": "S", "rate": "mu_b*N"},
+ "model": [{"from": "U", "to": "S",  "rate": "mu_b*N", "comment":"birth"},
+           {"from": "S", "to": "I",  "rate": "r0/N*v*I",
+	    "tag": {"transmission": {"by":["I"]}}, "comment":"infection"},
+           {"from": "I", "to": "DU", "rate": "correct_rate(v)",
+	    "comment":"recovery"},
+           {"from": "S", "to": "U",  "rate": "mu_d", "comment":"death"},
+           {"from": "I", "to": "U",  "rate": "mu_d", "comment":"death"}],
 
-   {"comment":"infection with noise on r0", 
-    "from": "S", "to": "I", "rate": "noise__trans(sto)*r0/N*v*I",
-    "tag":[{"id": "transmission", "by":["I"]}]},
-
-   {"comment":"recovery",
-    "from": "I", "to": "DU", "rate": "v"},
-   {"comment":"erlang waiting time using the method of stages"
-    "from": "I", "to": "I",  "rate": "v", 
-    "tag": [{"id": "erlang", "shape":2}]},
-
-   {"comment":"death", 
-    "from": "S", "to": "U",  "rate": "mu_d"},
-   {"comment":"death",
-    "from": "I", "to": "U",  "rate": "mu_d"}],
+ "white_noise": [
+   {
+     "reaction": [{"from":"S", "to": "I"}],
+     "sd": "sto"
+   }
+ ],
 
  "pop_size_eq_sum_sv": false
 }
@@ -158,50 +154,44 @@
 
 
   <div class="span4">
-    <h3>In text</h3>
-
+    <h3>And in plain text?</h3>
+  
     <p>The model definition contains:</p>
-
     <h4>Meta information</h4>
-    <ul>
-      <li>
-        <code>name</code>: The name of the process model (optional).
-      </li>
-      <li>
-        <code>description</code>: A description.
-      </li>
-    </ul>
+    <p> Start by defining the <code>name</code> (optional) and <code>description</code> of your process.</p>
 
     <h4>State variable and parameters</h4>
-    <ul>
-      <li>
-        <code>state</code>: A list of the state variables.
-      </li>
-      <li>
-        <code>parameter</code>: A list of the process model parameters.
-      </li>
+    <ul class="no-bullets">
+    	<li>  <code>state</code>:
+ state variables.</li>
+        <li> <code>parameter</code>: process model parameters.</li>
     </ul>
 
-
     <h4>Process model definition</h4>
-    <ul>
-      <li>
-        <code>model</code>: The process model defined by
+    <ul class="no-bullets">
+	<li> <code>model</code>: the process model defined by
         a list of <em>reactions</em>, each reaction specifying:
         <ul>
-          <li>a transition <code>from</code> one state <code>to</code> another.</li>
-          <li><code>rate</code>: the rate of transition.</li>
-          <li><code>tag</code>: an optional list of <strong>tags.</strong></li>
+          <li class="compact-list">transitions go <code>from</code> one state <code>to</code> another.</li>
+          <li class="compact-list"><code>rate</code>: the rate of transition.</li>
+          <li class="compact-list"><code>tag</code>: an optional list of <strong>tags.</strong></li>
         </ul>
-      </li>
-      <li>
-        <code>pop_size_eq_sum_sv</code>: A boolean variable indicating
+	</li>
+	<li>
+        <code>pop_size_eq_sum_sv</code>: boolean variable indicating
         if, at any time, the sum of the state variables equals the
         population size.
       </li>
-
     </ul>
 
+    <h4>Environmental stochasticity</h4>
+    In order to balance model oversimplifications, PLoM allows 
+    to add all sorts of noise to the model skeleton. This can be done through
+    <code>white_noise</code>, or using <code>diffusion</code> models over potentially
+    time-varying parameters.
+
+    <br>
+    <br>
     <p>Note: All the <code>comment</code> properties are optional.</p>
   </div>
 
@@ -239,33 +229,6 @@
   </div>
 
   <div class="span4">
-    <h3>noise__?</h3>
-
-    <p>
-      In order to balance model oversimplifications, PLoM allows us
-      to add all sorts of noise to the model skeleton. For instance, here
-      we add noise on the transmission term by implementing the
-      function <code>noise__trans(sto)</code>, using the following
-      semantical structure:
-      <ul>
-        <li>
-          <code>noise__</code> A reserved keyword that will trigger
-          a random noise. A double-underscore follows "noise"
-        </li>
-        <li>
-          <code>trans</code> The name that you're giving to uniquely
-          identify the function (any name you choose!) </li>
-        <li>
-          <code>sto</code> The argument, one of the elements/parameters of
-          the list <code>parameter</code> specifying the intensity of the
-          noise.
-        </li>
-      </ul>
-    </p>
-    
-
-  </div>
-  <div class="span4">
     <h3>rates?</h3>
 
     <p>
@@ -284,10 +247,8 @@
 
   </div>
 
-</div>
 
-<div class="row">
-  <div class="span8">
+  <div class="span4">
     <h3>tag?</h3>
 
     <p>
@@ -299,15 +260,44 @@
       tag will be used by PLoM to bind a context to the model.
     </p>
 
+  </div>
+
+
+
+
+
+</div>
+
+<div class="row">
+  
+    <div class="span4">
+    <h3>white_noise?</h3>
+
     <p>
-      The Erlang distributed duration of infection specified with the
-      tag :<code>{"id":"erlang", "shape":2}</code>. Erlang distributed
-      waiting time are implemented using the method of stages
-      (i.e. multiplying the number of compartments by the shape of the
-      Erlang distribution).
+      White noise can be added to a given <code>reaction</code>. The  <code>sd</code> field 
+      determines the intensity of the noise. In this example, this intensity is simply a 
+      parameter of the model, <code>sto</code>.
     </p>
+    <p>
+      Correlated white noise can be incorporated by specifying in the <code>reaction</code>
+      field a list of reactions instead of a single one.
+    </p>
+    
 
   </div>
+
+    <div class="span4">
+    <h3>diffusion?</h3>
+
+    <p>
+      To explore potential variations in time of a given parameter, it is possible to capture
+      its dynamics through a diffusion process. For each diffusion model, specify the corresponding 
+      <code>parameter</code>, <code>drift</code> and <code>volatility</code>. See the corresponding tutorial
+      for an illustration.
+    
+
+  </div>
+
 
   <div class="span4">
     <h3>Get a template</h3>
@@ -376,9 +366,13 @@ var m = {
   parameter: ["r0", "v", "sto", "mu_b", "mu_d"].map(function(X){return {id:X}}),
   model: [
     {"from": "U", "to": "S", "rate": "mu_b*N"},
-    {"from": "S", "to": "I", "rate": "noise__trans(sto)*r0/N*v*I", "tag":[{"id": "transmission", "by":["I"]}]},
-    {"from": "I", "to": "DU", "rate": "v"},
-    {"from": "I", "to": "I", "rate": "v", "tag":[{"id": "erlang", "shape":2}]}
+    {"from": "S", "to": "I", "rate": "r0/N*v*I", "tag":[{"id": "transmission", "by":["I"]}]},
+    {"from": "I", "to": "DU", "rate": "v"}
+  ],
+  white_noise: [
+    {"reaction": [{"from":"S","to":"I"}],
+     "sd":"sto"
+    }
   ],
   pop_size_eq_sum_sv: false
 };
@@ -414,10 +408,9 @@ m = {}
 m["state"] = [{"id": X} for X in ["S", "I"]]
 m["parameter"] = [{"id": x} for x in ["r0", "v", "sto", "mu_b", "mu_d"]] 
 m["model"]= [{"from": "U", "to": "S",  "rate": "mu_b*N"},
-             {"from": "S", "to": "I",  "rate": "noise__trans(sto)*r0/N*v*I", "tag":[{"id": "transmission", "by":["I"]}]},
-             {"from": "I", "to": "DU", "rate": "v"},
-             {"from": "I", "to": "I",  "rate": "v", "tag":[{"id": "erlang", "shape":2}]}]
-
+             {"from": "S", "to": "I",  "rate": "r0/N*v*I", "tag":[{"id": "transmission", "by":["I"]}]},
+             {"from": "I", "to": "DU", "rate": "v"}]
+m["white_noise"]=[{"reaction": [{"from":"S", "to": "I"}], "sd":"sto"}]
 
 #add death reactions
 for X in m["state"]:
@@ -450,11 +443,10 @@ m <- list()
 
 m$state <- lapply(c("S", "I"), function(x){return(list(id=x))})
 m$parameter <- lapply(c("r0", "v", "sto", "mu_b", "mu_d"), function(x){return(list(id=x))})
-
 m$model <- list(list("from"="U", "to"="S", "rate"="mu_b*N"),
-                list("from"="S", "to"="I", "rate"="noise__trans(sto)*r0/N*v*I", list("tag"="transmission", "by"=list("I"))),
-                list("from"="I", "to"="DU", "rate"="v"),
-                list("from"="I", "to"="I", "rate"="v", list("tag"="Erlang", "shape"=2)) )
+                list("from"="S", "to"="I", "rate"="r0/N*v*I", list("tag"="transmission", "by"=list("I"))),
+                list("from"="I", "to"="DU", "rate"="v"))
+m$white_noise <- list("reaction"=list("from"="S", "to"="I"), "sd"="sto")
 
 ##add death reactions
 for(X in m$state){
@@ -525,18 +517,18 @@ write(toJSON(m, collapse=''), file="process.json")
     <p>
       4 time series with <em>weekly</em> values:
       <ul>
-        <li>
+        <li class="compact-list">
           <strong>Aggregated incidence</strong> observed in the 2 cities by the CDC
           reported when the individuals recover.
         </li>
-        <li>
+        <li  class="compact-list">
           <strong>Prevalence</strong> observed in city1 by the CDC.
         </li>
-        <li>
+        <li class="compact-list">
           <strong>Incidence</strong> observed in city2 by the CDC, reported when the
           individuals are just infected.
         </li>
-        <li>
+        <li class="compact-list">
           <strong>Aggregated incidence</strong> observed in the 2
           cities, as reported by the number of searches for the disease
           symptoms terms collected by Google.
@@ -551,16 +543,16 @@ write(toJSON(m, collapse=''), file="process.json")
 
     <p>
       <ul>
-        <li>On the <strong>populations</strong>:
+        <li  class="compact-list">On the <strong>populations</strong>:
           <ul>  
-            <li>Population sizes</li>
-            <li>Birth rates</li>
-            <li>Death rates</li>
+            <li  class="compact-list">Population sizes</li>
+            <li  class="compact-list">Birth rates</li>
+            <li  class="compact-list">Death rates</li>
           </ul>
         </li>
-        <li>On the <strong>surveillance systems</strong>:
+        <li  class="compact-list">On the <strong>surveillance systems</strong>:
           <ul>
-            <li>Proportion of the population under surveillance for each
+            <li  class="compact-list">Proportion of the population under surveillance for each
               time series</li>
           </ul>
         </li>
@@ -575,11 +567,11 @@ write(toJSON(m, collapse=''), file="process.json")
     <p>
       We also <strong>know</strong> that these 2 cities:
       <ul>
-        <li>
+        <li  class="compact-list">
           contain populations whose contact pattern is not affected by age
           classes.
         </li>
-        <li>
+        <li  class="compact-list">
           receive frequent infections from international travelers
           temporarily visiting the cities.
         </li>
@@ -590,11 +582,11 @@ write(toJSON(m, collapse=''), file="process.json")
     <p>
       We therefore <strong>decided</strong> to:
       <ul>
-        <li>
+        <li  class="compact-list">
           Neglect <strong>age</strong> structure (so we
           consider <em>all</em> the age classes together).
         </li>
-        <li>
+        <li  class="compact-list">
           Use a simple <strong>spatial model</strong> consisting of
           random external introduction of the diseases occuring at a
           constant rate.
@@ -621,39 +613,37 @@ write(toJSON(m, collapse=''), file="process.json")
     </p>
 
       <h4>Diseases</h4>
-      <ul>
+      <ul class="no-bullets">
         <li>
-          <code>disease</code>: A list of diseases involved.
+          <code>disease</code>: list of diseases involved.
         </li>
       </ul>      
 
       <h4>Where it takes place</h4>
 
-      <ul>
+      <ul class="no-bullets">
         <li>
-          <code>population</code>: a list of populations (cities, age
-          classes, ...) where the epidemiological process model takes
-          place.
+          <code>population</code>: list of populations (cities, age
+          classes, ...) identified in the model.
           <ul>
-            <li><code>id</code>: A unique id for the population named
+            <li><code>id</code>: unique id for the population named
               with the convention: <code>cityName<strong>__</strong>ageClassName</code></li>
-            <li><code>size_t0</code>: The initial population size</li>
           </ul>
         </li>
       </ul>
 
       <h4>The aggregation level of the data</h4>
-      <ul>
+      <ul class="no-bullets">
         <li>
-          <code>time_series</code>: The observed time series:
+          <code>time_series</code>: observed time series:
           <ul>
-            <li><code>id</code>: A unique id for the time series named with the convention:
+            <li><code>id</code>:unique id for the time series named with the convention:
               <code>timeSeriesName<strong>__</strong>dataStream<strong>__</strong>type</code>
               where type is incidence (<code>inc</code>) or prevalence
               (<code>prev</code>)
             </li>
             <li>
-              <code>population_id</code>: A list of population <code>id</code> detailing
+              <code>population_id</code>: list of population <code>id</code> detailing
               the population(s) observed by the time series
             </li>
           </ul>
@@ -662,7 +652,7 @@ write(toJSON(m, collapse=''), file="process.json")
 
       <h4>Model</h4>
 
-      <ul>
+      <ul class="no-bullets">
         <li>
           <code>model</code>:
           <ul>
@@ -677,16 +667,16 @@ write(toJSON(m, collapse=''), file="process.json")
       </ul>
 
 
-      <h4>Data</h4>
+      <h4>Data / Metadata</h4>
 
-      <ul>
+      <ul class="no-bullets">
         <li>
           <code>frequency</code>: highest frequency of data collection
         </li>
 
 
         <li>
-          <code>data</code>: A list of data
+          <code>data</code>: list of datasets
           <ul>
             <li>
               <code>id</code>: An unique id defining the data
@@ -718,56 +708,53 @@ write(toJSON(m, collapse=''), file="process.json")
 
 <pre class="prettyprint">
 {
- "name": "An explicit name",
- "description": "An explicit description",
+ "name": "an explicit name",
+ "description": "an explicit description",
+
  "disease": ["measles"],
- 
+
  "population": [{"id": "city1__all",
-                 "size_t0": 1e6,
                  "comment": "city 1, all age classes"},
                 {"id": "city2__all",
-                 "size_t0": 1e5,
                  "comment": "city 2, all age classes"}],
- 
+
  "time_series": [{"id": "all__CDC__inc",
                   "population_id": ["city1__all", "city2__all"],
                   "comment": ""},
-                 {"id": "city1__CDC__prev",
-                  "population_id": ["city1__all"],
+                 {"id": "all__google__inc",
+                  "population_id": ["city1__all", "city2__all"],
                   "comment": ""},
                  {"id": "city2__CDC__inc",
                   "population_id": ["city2__all"],
                   "comment": ""},
-                 {"id": "all__google__inc",
-                  "population_id": ["city1__all", "city2__all"],
+                 {"id": "city1__CDC__prev",
+                  "population_id": ["city1__all"],
                   "comment": ""}],
 
- 
- "model": {"space": {"type": ["external"]},
-           "age": {}},
- 
-
-
-
  "frequency": "W",
- 
- "data": [{"id": "data",
-           "source": "data/data.csv",
-           "comment": "my data"},
- 
-          {"id": "prop",
-           "source": "data/prop.csv",
-           "comment": "proportion of the population under surveillance"},
-          
-          {"id": "N",
-           "source": "data/N.csv",
-           "comment": "population size"},
-          {"id": "mu_b",
-           "source": "data/mu_b.csv",
-           "comment": "birth rates"},
-          {"id": "mu_d",
-           "source": "data/mu_d.csv",
-           "comment": "death rates"}]
+
+ "data": [
+   {"id": "data",
+    "source": "data/data.csv",
+    "comment": "my data"},
+   
+   {"id": "prop",
+    "source": "data/prop.csv",
+    "comment": "proportion of the population under surveillance"}
+ ],
+
+  "metadata": [
+    {"id": "N",
+     "source": "data/N.csv",
+     "comment": "population size"},
+    {"id": "mu_b",
+     "source": "data/mu_b.csv",
+     "comment": "birth rates"},
+    {"id": "mu_d",
+     "source": "data/mu_d.csv",
+     "comment": "death rates"}
+  ]
+
 }
 </pre>
 
@@ -819,43 +806,44 @@ write(toJSON(m, collapse=''), file="process.json")
     <div class="span4">
       <h3>Anatomy of a link</h3>
 
-      <h4>Observed Variables</h4>
+      <h4>Observed Variables: <code>observed</code></h4>
 
-      <ul>
+      <ul class="no-bullets">
         <li>
-          <code>observed</code>: The observed quantities. Either:
+          Either:
 
           <ul>
-            <li><strong>Incidences</strong> (number of new cases during some time period)</li>
-            <li><strong>Prevalences</strong> (number of cases)</li>
+            <li class="compact-list"><strong>Incidences</strong> (number of new cases during some time period)</li>
+            <li class="compact-list"><strong>Prevalences</strong> (number of cases)</li>
           </ul>
         </li>
       </ul>
-
+      <br>
       <p>Each observed quantities has:</p>
-      <ul>        
+      <ul class="no-bullets">        
         <li>
           <code>id</code>: A unique id
         </li>
         
         <li>
-          <code>definition</code>: A list of definition of the
+          <code>definition</code>: list of definitions of the
           observed variables. The list element will
           be <em>summed-up</em>.
         </li>
         <li>
-          <code>time_series_id</code>: The <strong>list</strong> of times series being observed by the observed variable
+          <code>time_series_id</code>: <strong>list</strong> of times series being observed by the observed variable
         </li>
         <li>
-          <code>model_id</code>: The <code>id</code> of the
+          <code>observation_id</code>: <code>id</code> of the
           observation model used to observe this time-series.
         </li>
 
       </ul>
+      <br>
 
-      <h4>Observation Model</h4>
+      <h4>Observation Model: <code>observation</code></h4>
 
-      <ul>
+       <ul class="no-bullets">
         <li>
           <code>parameter</code>: The parameter of the observation
           model. Here again, parameters whose <code>id</code> are
@@ -872,8 +860,8 @@ write(toJSON(m, collapse=''), file="process.json")
           Here, we specify an over-dispersed binomial distribution
           defined as a discretized normal random variable with:
           <ul>
-            <li>mean = rep2 * rep1 * x</li>
-            <li>variance = rep2 * (1.0-rep2) * rep1 * x + (rep2 * phi * rep1 * x) * * 2</li>
+            <li class="compact-list">mean = rep2 * rep1 * x</li>
+            <li class="compact-list">variance = rep2 * (1.0-rep2) * rep1 * x + (rep2 * phi * rep1 * x) * * 2</li>
           </ul>
 
         </li>
@@ -886,35 +874,44 @@ write(toJSON(m, collapse=''), file="process.json")
 
 <pre class="prettyprint">
 {
- "id": "SIR+my_fake_context",
- "comment": "hopefully this can be templated",
+  "name": "SIR+corresponding_context",
+  "description": "an explicit description",
 
- "observed": [
-    {"id": "prev", "comment":"prevalence",
-     "definition": ["I"],
-     "time_series_id": ["city1__CDC__prev"],
-     "model_id": "common"}
+  "observed": [
+    {
+      "id": "prev", "comment":"prevalence",
+      "definition": ["I"],
+      "time_series_id": ["city1__CDC__prev"],
+      "observation_id": "common"
+    },
+    {
+      "id": "inc_out", "comment":"incidence (including death) measured at recovery time",
+      "definition": [{"from":"I", "to":"DU"}, {"from":"I", "to":"U"}],
+      "time_series_id": ["all__CDC__inc", "all__google__inc"],
+      "observation_id": "common"
+    },
+    {
+      "id": "inc_in", "comment":"incidence measured at infection time",
+      "definition": [{"from":"S", "to":"I"}],
+      "time_series_id": ["city2__CDC__inc"],
+      "observation_id": "common"
+    }
+  ],
 
-    {"id": "inc_out", "comment":"incidence measured at recovery time",
-     "definition": [{"from":"I", "to":"DU"}, {"from":"I", "to":"U"}],
-     "time_series_id": ["all__CDC__inc", "all__google__inc"],
-     "model_id": "common"},
-
-    {"id": "inc_in", "comment":"incidence measured at infection time",
-     "definition": [{"from":"S", "to":"I"}],
-     "time_series_id": ["city2__CDC__inc"],
-     "model_id": "common"}],
-
- "parameter": [
-         {"id": "rep", "comment": "reporting rate"},
-         {"id": "phi", "comment": "over-dispertion of the reporting rate"}],
-
- "model": {
-   "common": {
-     "distribution": "discretized_normal",
-     "mean": "prop*rep*x",
-     "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"
-   }}
+  "observation": [
+    {
+      "id": "common", 
+      "parameter": [
+        {"id": "rep", "comment": "reporting rate"},
+        {"id": "phi",  "comment": "over-dispertion"}
+      ],
+      "model": {
+        "distribution": "discretized_normal",
+        "mean": "rep*prop*x",
+        "var": "rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2"
+      }
+    }
+  ]
 }
 </pre>
 
@@ -945,7 +942,7 @@ write(toJSON(m, collapse=''), file="process.json")
 
 <div class="row">
 
-  <img src="/images/theta_large.png" class="sfr-img-center" alt="theta"/>
+  <img src="/images/theta_large.png" class="sfr-img-center" alt="theta" height="120" width="120"/>
 
     <div class="span4">
 
@@ -958,7 +955,7 @@ write(toJSON(m, collapse=''), file="process.json")
             function is an easy way to ensure these constraints.
           </li>
           <li>
-            <code>unit</code>, <code>type</code>: If a parameter is a rate,
+            <code>unit</code>, <code>type</code>: if a parameter is a rate,
             its unit has to be specified using the <code>unit</code>
             property. For user convenience, rates can be parametrized as
             duration (i.e. providing values for 1/rate instead of rate) by
@@ -978,11 +975,12 @@ write(toJSON(m, collapse=''), file="process.json")
     <div class="span8">
       <h4>theta.json</h4>
 
-<pre class="prettyprint">{
+<pre class="prettyprint">
+{
 "name": "an explicit name",
 "description": "an explicit description",
 
-"value": {
+"parameter": {
   "S":   {"transformation": "logit",
           "min":0.01, "guess": 0.07, "max": 0.1, "sd_transf": 0.0},
   "I":   {"transformation":"logit",
@@ -1086,45 +1084,145 @@ write(toJSON(m, collapse=''), file="process.json")
 
 <pre class="prettyprint">
 {
-"name": "an explicit name",
-"description": "an explicit description",
+  "name": "an explicit name",
+  "description": "an explicit descriptions",
 
-"partition": {
-   "data_stream": {
+  "partition": {
+    "data_stream": {
       "group": [
-         {"id": "CDC",    "time_series_id": ["all__CDC__inc", "city1__CDC__prev", "city2__CDC__inc"]},
-         {"id": "google", "time_series_id": ["all__google__inc"]}],
-      "comment": "group by data stream (CDC and google)"}},
+        {
+          "id": "CDC",
+          "time_series_id": ["all__CDC__inc", "city1__CDC__prev", "city2__CDC__inc"]
+        },
+        {
+          "id": "google", 
+          "time_series_id": ["all__google__inc"]
+        }
+      ],
+      "comment": "split by data stream"
+    }
+  },
 
-"value": {
-  "S":   {"partition_id": "variable_population", "transformation": "logit",
-          "min":   {"city1__all": 0.01, "city2__all": 0.01},
-          "guess": {"city1__all": 0.06, "city2__all": 0.07},
-          "max":   {"city1__all": 0.1,  "city2__all": 0.1},
-          "sd_transf":   {"city1__all": 0.0,  "city2__all": 0.0}},
-  "I":   {"partition_id": "identical_population", "transformation":"logit",
-          "min": 7e-7, "guess": 1e-05, "max": 1e-3,
-          "sd_transf": 3e-6},
- 
-  "r0":  {"partition_id": "variable_population", "transformation": "log",
-          "min": 10.0, "guess": 20.0, "max": 30.0,
-          "sd_transf": 0.02},
-  "v":   {"partition_id": "identical_population", "transformation": "log", "unit": "D", "type": "rate_as_duration",
-          "min": 5, "guess": 11, "max": 20,
-          "sd_transf": 0.5},
-  "sto": {"partition_id": "identical_population", "transformation": "log",
-          "min": 0.05, "guess": 0.1, "max": 0.2,
-          "sd_transf": 0.0},
- 
-  "rep": {"partition_id":"identical_time_series", "transformation": "logit",
-          "min": 0.2, "guess":0.6, "max": 0.9,
-          "sd_transf": 0.0},
-  "phi": {"partition_id": "data_stream", "transformation":"log",
-           "min":   {"CDC": 0.1, "google": 0.1},
-           "guess": {"CDC": 0.1, "google": 0.2},
-           "max":   {"CDC": 0.3, "google": 0.3},
-           "sd_transf": {"CDC": 0.02, "google": 0.02}}
- }
+  "parameter": {
+    "S": {
+      "partition_id": "variable_population",
+      "transformation": "logit",
+      "group": {
+        "city1__all": {
+          "min": {
+            "value": 0.07
+          },
+          "max": {
+            "value": 0.07
+          },
+          "guess": {
+            "value": 0.07
+          },
+          "sd_transf": {
+            "value": 0.0
+          }
+        },
+        "city2__all": {
+          "min": {
+            "value": 0.07
+          },
+          "max": {
+            "value": 0.07
+	              },
+          "guess": {
+            "value": 0.07
+          },
+          "sd_transf": {
+            "value": 0.0
+          }
+        }           
+      }
+    },
+    
+    "I": {
+      "partition_id": "identical_population",
+      "transformation":"logit",
+      "min": 1e-6,
+      "guess": 1e-05,
+      "max": 1e-4,
+      "sd_transf": 0.01
+    },
+
+    "r0": {
+      "partition_id": "variable_population", 
+      "transformation": "log",
+      "min": 15.0,
+      "guess": 20.0,
+      "max": 35.0,
+      "sd_transf": 0.02
+    },
+
+    "v": {
+      "partition_id": "identical_population", 
+      "transformation": "log", 
+      "unit": "D",
+      "type": "rate_as_duration",
+      "min": 5,
+      "guess": 11,
+      "max": 20,
+      "prior": "normal",
+      "sd_transf": 0.02
+    },
+
+    "sto": {
+      "partition_id": "identical_population", 
+      "transformation": "log",
+      "min": 0.1,
+      "guess": 0.1,
+      "max": 0.1,
+      "sd_transf": 0.0
+    },
+    
+    "rep": {
+      "partition_id": "identical_time_series",
+      "transformation": "logit",
+      "min": 0.5,
+      "guess":0.6,
+      "max": 0.8,
+      "sd_transf": 0.01
+    },
+
+    "phi": {
+      "partition_id": "data_stream",
+      "transformation":"log",
+      "group": {
+        "CDC": {
+          "min": {
+            "value": 0.1
+          },
+          "max":  {
+            "value": 0.1
+          },
+          "guess":  {
+            "value": 0.1
+          },
+          "sd_transf":  {
+            "value": 0.0
+          }
+        },
+        "google": {
+          "min":  {
+            "value": 0.1
+          },
+          "max":  {
+            "value": 0.1
+          },
+          "guess":  {
+            "value": 0.1
+          },
+          "sd_transf":  {
+            "value": 0.0
+          }
+        }
+      }
+    }
+  }
+}
 
 </pre>
 
@@ -1146,8 +1244,8 @@ write(toJSON(m, collapse=''), file="process.json")
     <p>
       Templates really shine for theta.json
       <ul>
-        <li>No risk to forgot variables added during model expansion</li>
-        <li>Way less boilerplate code...</li>
+        <li class="compact-list">No risk to forget variables added during model expansion</li>
+        <li class="compact-list">Way less boilerplate code...</li>
       </ul>
     </p>
 
@@ -1169,7 +1267,7 @@ write(toJSON(m, collapse=''), file="process.json")
       is used. For instance, in bifurcation analysis, <code>min</code>
       and <code>max</code> will be used to specify the range of the
       bifurcation parameter, whereas in Bayesian analysis they can be
-      used to define uniform priors on the parameters.
+      used to define the boundaries of a uniform prior on the parameters, or the 2.5% and 97.5% quantiles of a normal prior.
     </p>
 
   </div>
@@ -1191,10 +1289,10 @@ write(toJSON(m, collapse=''), file="process.json")
     <p>
       We have created/templated 3 files:
       <ul>
-        <li>context.json</li>
-        <li>process.json</li>
-        <li>link.json</li>
-        <li>theta.json</li>
+        <li class="compact-list">context.json</li>
+        <li class="compact-list">process.json</li>
+        <li class="compact-list">link.json</li>
+        <li class="compact-list">theta.json</li>
       </ul>
 
       We are now ready to <strong>implement</strong> our model.
@@ -1212,7 +1310,7 @@ write(toJSON(m, collapse=''), file="process.json")
 
 
 <pre class="prettyprint">
-plom install context.json process.json link.json -o my_model
+plom build
 </pre>
 
     <p>

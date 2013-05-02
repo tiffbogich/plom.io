@@ -2,18 +2,31 @@
 
 <div class="row">
 
-  <div class="span7">
-    <h1>Modeling made Social</h1>
+  <div class="span12">
+    <h1 align=center>Take full control of PLoM</h1>
+    <br>
+    <p class="lead" align=center>The web interface provides you with everything you need to get started with inference methods, and share your work. The command line tools
+     give you full control. 
+    <br>
+     <p class="lead" align=center>
+     If you are eager to push the library to the limit, or if you simply want an overview of the philosophy and tools behind the web interface, this documentation is for you.
+    </p>
+    <br>
+    <br>
+    <h4> Use the command line interface to search, clone, build, fit and publish:
+    </h4>
+  </div>
+</div>
 
-    <p>Let's say that you are interested in Measles:</p>
-    
+<div class="row">
+  <div class="span6">    
     <ol>
       <li>
-        <strong>Search</strong> the library for a tutorial
+        <strong>Search</strong> the library for a tutorial. Let's take measles as an example
         <pre class="prettyprint">plom search tutorial -d measles</pre>
-        <aside>The <code>-d --disease</code> option restrict your
+        <p class="bit-aside">The <code>-d --disease</code> option restrict your
         search to the specified disease. Run <code>plom --help</code>
-        to see all the available options.</aside>
+        to see all the available options.</p>
       </li>
 
       <li>
@@ -23,19 +36,19 @@
         <aside>
           We get a new directory containing 4 files:
           <ul>
-            <li>
-              <a href="/doc/modeler/create#context">context.json</a>: the context of your model (the data, the spatial and age structure if any...)
+            <li class="compact-list">
+              <a href="/doc/modeler/create#context">context.json</a>: the context of your model
             </li>
 
-            <li>
-              <a href="/doc/modeler/create#process">process.json</a>: the semantic of the process model
+            <li class="compact-list">
+              <a href="/doc/modeler/create#process">process.json</a>: the description of the process model
             </li>
 
-            <li>
-              <a href="/doc/modeler/create#link">link.json</a>: the semantic of the observation model
+            <li class="compact-list">
+              <a href="/doc/modeler/create#link">link.json</a>: the description of the observation model linking the process to the data
             </li>
 
-            <li>
+            <li class="compact-list">
               <a href="/doc/modeler/create#theta">theta.json</a>: the parameter values, reflecting the current consensus within the PLoM community.
             </li>
           </ul>
@@ -43,12 +56,17 @@
 
       </li>
 
+
+
+      </ol>
+    </div>
+    <div class="span6">
+    <ol start="3">
       <li>
         <strong>Build</strong> the model.
         <pre class="prettyprint">plom build</pre>        
         We now have a model/ directory containing plug-and-play infererence methods plugged to our model.
       </li>
-
       
       <li>
         <strong>Fit</strong> theta <a href="/doc/modeler/play">chaining</a> the built inference methods:
@@ -57,19 +75,10 @@ fit theta -B | ./pmcmc ode -M 1000000</pre>
       </li>
 
       <li>
-        <strong>Publish</strong> to the library.
-        <ul>
-          <li>
-            Create a design.json ensuring reproducibility of your results:
-            <pre class="prettyprint">fit replicate theta.json "pmcmc ode -M 1000000" 4 --run</pre>
-          </li>
-
-          <li>
-            Submit it.
-            <pre class="prettyprint">plom publish design.json</pre>
-          </li>
-
-        </ul>
+        <strong>Publish</strong> to the library. Create a design.json ensuring reproducibility of your results, and share them.
+            <pre class="prettyprint">fit replicate theta.json "pmcmc ode -M 1000000" 4 --run
+plom publish design.json</pre>
+       </li>
 
           <li>
             Go <strong>social</strong>.  Point your browser to the
@@ -88,9 +97,12 @@ fit theta -B | ./pmcmc ode -M 1000000</pre>
 
 
   </div>
+</div>
 
-
-  <div class="span5">
+<br>
+<br>
+<div class="row">
+  <div class="span6">
     <h1>Learn the concepts</h1>
 
     <ol>
@@ -100,7 +112,9 @@ fit theta -B | ./pmcmc ode -M 1000000</pre>
       <li><a href="/doc/modeler/h1n1">Capturing unknown variations of key parameters</a></li>
       <li><a href="/doc/modeler/refs">References</a></li>
     </ol>
+  </div>
 
+  <div class="span6">
     <h1>Install the packages</h1>
 
     <p>First make sure that you have installed <a href="http://nodejs.org">Node.js</a></p> 

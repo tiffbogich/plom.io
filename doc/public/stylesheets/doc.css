@@ -33,3 +33,15 @@ code.sfr-pattern{
 code.sfr-pattern strong{
   color:#D14;
 }
+
+li {margin-top: 1.5em;}
+
+.compact-list {margin-top: 0.2em;}
+
+.bit-aside {margin-top: 0em;}
+
+.no-bullets {
+    list-style-type:none;
+    padding:0;
+    margin:0;
+}
