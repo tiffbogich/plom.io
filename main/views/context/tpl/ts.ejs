@@ -1,0 +1,45 @@
+<div class="span4">
+  <ul class="thumbnails">
+    <% time_series.forEach(function(ts, i){ %>
+    <li class="span4">
+      <div class="thumbnail">
+        <div class="alert alert-error hide">
+          <strong>Error! </strong><span class="error"></span>
+        </div>
+
+        <form>
+          <div class="control-group">
+            <label class="control-label" for="<%= ts %>"><strong><%= ts.split('__').join('; ') %></strong></label>           
+            <div class="controls">
+              <input class="input-xlarge" id="<%= ts %>" type="text" name="description" placeholder="required description" required/>
+              <span class="help-inline hide">Please add a description</span>
+            </div>
+          </div>
+
+          <p>
+            <span>populations :</span> <span class="select-result">none</span>
+          </p>
+          <p>
+            <button type="button" class="btn map" data-toggle="collapse" data-target="#map<%= i %>">Edit...</button>    
+            <span class="text-error hide">Please map the populations observed by <%= ts.split('__').join('; ') %></span>
+          </p>
+
+          <div id="map<%= i %>" class="collapse">
+            <small class="muted">
+              Select the population observed by the time series. Hold down the
+              Ctrl/Command key to make multiple non-adjacent selections.
+            </small>
+
+            <ol class="selectable">
+              <% population.forEach(function(x){ %>
+              <li class="ui-widget-content"><%= x.split('__').join(' ; ') %></li>
+              <% }); %>
+            </ol>
+          </div>
+        </form>
+
+      </div>
+    </li>
+    <% }) %>
+  </ul>
+</div>

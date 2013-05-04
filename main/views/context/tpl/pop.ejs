@@ -1,0 +1,13 @@
+<div class="span4">
+  <h4>Populations</h4>
+  <% population.forEach(function(x, i){ %>
+  <form>
+    <div class="control-group">
+      <label class="control-label" for="<%= x %>"><strong><%= x.split('__').join('; ') %></strong></label>           
+      <div class="controls">
+        <input class="input-xlarge" id="<%= x %>" type="text" name="comment" placeholder="optional description"/>
+      </div>
+    </div>
+  </form>
+  <% }) %>
+</div>

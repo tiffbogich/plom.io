@@ -6,6 +6,7 @@ var express = require('express')
   , ejs = require('ejs')
   , filters = require('./lib/filters')
   , routes = require('./routes')
+  , context = require('./routes/context')
   , review = require('./routes/review')
   , requests = require('./routes/requests')
   , user = require('./routes/user')
@@ -87,6 +88,14 @@ app.configure('production', function(){
 
 
 //var settingsJSON = require('./lib/middleware/settingsJSON');
+
+
+app.get('/template/context', secure, csrf, context.index);
+app.post('/upload/context', secure, csrf, context.upload);
+app.post('/commit/context', secure, csrf, context.commit);
+
+
+
 
 // Routes
 app.get('/', csrf, routes.welcome);

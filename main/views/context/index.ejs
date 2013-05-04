@@ -1,0 +1,189 @@
+<% include ../layout %>
+
+<script src="/lib/jquery.form.js"></script>
+<script src="/javascripts/context.js"></script>
+<style>
+  #feedback { font-size: 1.4em; }
+  .selectable .ui-selecting { background: #FE CA40; }
+  .selectable .ui-selected { background: rgb(112,197, 235); color: white; }
+  .selectable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+  .selectable li { margin: 3px; padding: 0.4em; height: 18px; }
+  .greyed { opacity:0.2; }
+</style>
+
+
+<% include ../header %>
+
+
+
+<div class="row" id="templateContext">
+
+  <!-- ========================= -->
+  <!-- CONTEXT & POPULATION SIZE -->
+  <!-- ========================= -->
+  <div class="span4 context-step">
+    <h3>1. Context</h3>
+
+    <div class="alert alert-error hide">
+      <strong>Error! </strong><span class="error"></span>
+    </div>
+
+    <form id="formContext" action="/upload/context" method="post" enctype="multipart/form-data">
+
+      <div class="disease">
+        <select name="disease">
+          <option value="measles">Measles</option>
+          <option value="influenza">Influenza</option>
+          <option value="dengue">Dengue</option>
+        </select>
+        <button class="btn remove-disease">remove</button>
+      </div>
+      <button class="btn add">add disease</button>
+
+
+      <div class="control-group">
+        <label class="control-label">Location: </label>
+        <div class="controls">
+          <input class="input-xlarge" type="text" name="location" placeholder="Location (e.g. Paris, France)" required/>
+          <span class="help-inline hide">Please add a location</span>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Description: </label>
+        <div class="controls">
+          <textarea class="input-xlarge" rows:3 name="description" placeholder="required description" required></textarea>
+          <span class="help-inline hide">Please add a description</span>
+        </div>
+      </div>
+
+      <label> Frequency:
+        <select name="frequency">
+          <option value="D">daily</option>
+          <option value="W">weekly</option>
+          <option value="M">monthly</option>
+          <option value="Y">yearly</option>
+        </select>
+      </label>
+
+      <label for="N">Upload the population sizes (N.csv)</label>
+      <input id="N" type="file" name="metadata"/>
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
+      <button type="submit" class="btn hide"><i class="icon-arrow-up"></i> Upload</button>
+    </form>
+    <div class="row" id="population"></div>    
+  </div>
+  
+  <!-- =========== -->
+  <!-- TIME SERIES -->
+  <!-- =========== -->      
+  <div class="span4 context-step greyed" id="timeSeries">
+    <h3>2. Time series</h3>
+
+    <div class="alert alert-error hide">
+      <strong>Error! </strong><span class="error"></span>
+    </div>
+
+    <form id="formData" action="/upload/context" method="post" enctype="multipart/form-data">
+      <label for="data">Upload the time series (data.csv)</label>
+      <input id="data" type="file" name="data"/>
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
+      <button type="submit" class="btn hide"><i class="icon-arrow-up"></i> Upload</button>
+    </form>
+    <div class="row" id="ts"></div>    
+  </div>
+
+  <!-- ============================ -->
+  <!-- ADDITIONAL DATA AND METADATA -->
+  <!-- ============================ -->
+  <div class="span4 context-step greyed" id="extra">
+    <div id="extraData">
+      <h3>3.1 Additional data</h3>
+      <p class="muted">(proportion under surveillance...)</p>
+
+      <div class="replicate">
+        <div class="alert alert-error hide">
+          <strong>Error! </strong><span class="error"></span>
+        </div>
+
+        <form class="formExtraData" action="/upload/context" method="post" enctype="multipart/form-data">
+          <div class="control-group">
+            <label class="control-label">Name: </label>
+            <div class="controls">
+              <input class="input-small" type="text" name="name" placeholder="Name" required/>
+              <span class="help-inline hide">Name must be an unique single word</span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Description: </label>
+            <div class="controls">
+              <input class="input-xlarge" type="text" name="description" placeholder="required description" required/>
+              <span class="help-inline hide">Please add a description</span>
+            </div>
+          </div>
+          <input type="file" name="data"/>
+          <input type="hidden" name="_csrf" value="<%= token %>"/>
+          <button type="submit" class="btn hide"><i class="icon-arrow-up"></i> Upload</button>
+          <button class="btn remove-form">remove</button>
+        </form>
+        <hr/>
+      </div>
+      <button class="btn add">add</button>
+    </div>
+
+    <div id="extraMetaData">
+      <h3>3.2 Additional Meta data</h3>
+      <p class="muted">(birth rates, death rates, ...)</p>
+      <div class="replicate">
+        <div class="alert alert-error hide">
+          <strong>Error! </strong><span class="error"></span>
+        </div>
+
+        <form class="formExtraMetaData" action="/upload/context" method="post" enctype="multipart/form-data">
+          <div class="control-group">
+            <label class="control-label">Name: </label>
+            <div class="controls">
+              <input class="input-small" type="text" name="name" placeholder="Name" required/>
+              <span class="help-inline hide">Name must an unique single word</span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Description: </label>
+            <div class="controls">
+              <input class="input-xlarge" type="text" name="description" placeholder="required description" required/>
+              <span class="help-inline hide">Please add a description</span>
+            </div>
+          </div>
+          <input type="file" name="metadata"/>
+          <input type="hidden" name="_csrf" value="<%= token %>"/>
+          <button type="submit" class="btn hide"><i class="icon-arrow-up"></i> Upload</button>
+          <button class="btn remove-form">remove</button>
+        </form>
+        <hr/>
+      </div>
+      <button class="btn add">add</button>
+    </div>
+
+    <h3>3.3 Submit</h3>
+
+    <div class="alert alert-error hide">
+      <strong>Error! </strong><span class="error"></span>
+    </div>
+    
+    <form id="commitContext" method="post" action="/commit/context">
+      <input type="hidden" name="_csrf" value="<%= token %>"/>
+      <label class="checkbox">
+        <input type="checkbox"> By clicking on this box I agree
+        that all the uploaded material will be licensed under a
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US" target="blank">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US" target="blank"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a>
+
+      </label>
+      <button class="btn btn-success">Submit</button>
+    </form>
+
+  </div>
+
+</div>
+
+<hr />
+<% include ../footer %>
