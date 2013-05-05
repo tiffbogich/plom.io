@@ -1,36 +1,45 @@
 <% include ../layout %>
 
 <div class="page-header">
-  <h1>Aiming for flexibility, precision and efficiency</h1>
-  <h1><small>Combining fast and exact plug-and-play algorithms</small></h1>
+  <h1> Bayesian inference with flexible and efficient tools</h1>
 </div>
 
 
 <div class="row">
 
-  <div class="span12">
+  <div class="span1">
+  </div>
+  <div class="span10">
 
-<p class="lead" >
-Recents efforts for plug-and-play inference methods have lead to the definition of a rich diversity of algorithms. Some rely on clever approximations, and are very quick to run. Some others offer the possibility to make no approximation whatsoever. The goal of PLoM is to take the best out of this variety of methods, making it easier and more feasible to use the most precise and demanding algorithms, while keeping everything plug-and-play.
-</p>
+<h1><small></small></h1>
 
- </div>
-</div>
-
-
-<div class="page-header">
-  <h1>The Bayesian paradigm <small>Iteratively building knowledge up</small></h1>
-</div>
-
-<div class="row">
-
-  <div class="span12">
 
 <p  class="lead" >
-PLoM allows you to incorporate previous knowledge on the parameters of your model, which you'll challenge by confronting it to data. Eventually, evrything will boil down to the exploration of $p(\theta|y)$, the posterior density of your parameters given the data, and to the estimation of model choice indicators.
+By adopting a Bayesian philosophy, PLoM is able to propose a simple workflow. Start defining a context, process, link and theta. Then, simply and explore the posterior density  $p(\theta,x_{0:n}|y_{1:n})$ in order to: <br>
+
+<ol class="lead">
+	<li>compare prior and posterior densities to learn and discuss parameter values</li>
+	<li>derive model choice indicators to compare theories</li>
+</ol>
+
+  <h1><small>Combine fast and exact plug-and-play algorithms</small></h1>
+
+<p class="lead" >
+Recents efforts for plug-and-play inference methods have lead to the definition of a rich diversity of algorithms to maximise and sample from probability distributions. Some rely on clever approximations and are very quick to run. Some others offer the possibility to make no approximation whatsoever.
 </p>
-<p class="lead" > To that end, all you need to do is find the mode(s) of your posterior density, explore it, and check that results from your exploration are reproducible and informative.
+<p class="lead" >
+The goal of PLoM is to take the best out of this variety of methods, making it easier and more feasible to use the most precise and demanding algorithms, while keeping everything plug-and-play.
 </p>
+
+<p class="lead" >
+A standard routine we propose is to randomly pick values (<code>lhs</code>) in the parameter space before picking the best sampled value to more carefully look for a mode of an approximated posterior density (<code>ksimplex</code>). From this mode, the approximated posterior density is explored (<code>kmcmc</code>) to efficicently initialise the asymptotically exact particle MCMC algorithm (<code>ksimplex</code>), in its adaptive form. This webpage is meant to help you take control of each of these tools.
+</p>
+
+<h1><small>Quick peer-review to guarantee reproducibility</small></h1>
+<p class="lead" >
+Upload your results on plom.io to assess that your results are reliable and informative, ask validation from your peers, and instantaneously share your work.  
+</p>
+
 
  </div>
 </div>
@@ -62,75 +71,40 @@ PLoM allows you to incorporate previous knowledge on the parameters of your mode
 </div>
 
 
+
+
 <div class="page-header">
-  <h1>Making sense of noise <small>All noise</small></h1>
+  <h1>Different levels of approximation <small>Pick your choice</small></h1>
 </div>
+
 
 <div class="row">
 
-  <div class="span12">
+  <div class="span4">
+     <h3>Poisson process with stochastic rates</h3>
+     In a finite population, infection dynamics are  <strong>intrinsically stochastic</strong> and the number of individuals is  <strong>discrete </strong>. <br>
+     The 'psr' formalism is a natural way to  <strong>preserve these properties</strong> while remaining computationnally tractable independently of the size of the population. 
+  </div>
 
-    <p>
-        Your model:
-      <ul>
-        <li>
-          doesn't have environmental stochasticity or diffusions
-          <ul>
-            <li>You care about demograpic stochasticity: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>sto</strong> [options]</code></li>
-            <li>You don't: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>deter</strong> [options]</code></li>
-          </ul>
-        </li>
+  <div class="span4">
+     <h3>Stochastic Differential Equation</h3>
+     Diffusion processes are an ubiquitous family of models used to monitor the  <strong>stochastic evolution of continuous quantities </strong> over time.  <br>
+     As such, the litterature and methodology on the subject is abundant. We particularly rely on approximate filtering solutions suggested by Rudoplh Kalman in the 60's, and subsequent developement.
+  </div>
 
-
-        <li>
-          contains <strong>environmental stochasticity</strong>:
-          <ul>
-            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>sto</strong> [options]</code></li>
-            <li>You don't: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>deter</strong> [options]</code></li>
-          </ul>
-        </li>
-
-
-        <li>
-          contains some <strong>diffusions</strong>:
-          <ul>
-            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>sto</strong> [options]</code></li>
-            <li>You don't: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>deter</strong> [options]</code></li>
-          </ul>
-        </li>
-
-
-        <li>
-          contains some diffusions <strong>and</strong> environmental stochasticity :
-          <ul>
-            <li>You also care about demograpic stochasticity: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>sto</strong> [options]</code></li>
-            <li>You don't: <code class="sfr-pattern">fit theta [options] | ./algorithm <strong>deter</strong> [options]</code></li>
-          </ul>
-        </li>
-
-      </ul>
-    </p>
-
-    <p>
-      You want to:
-      <ul>
-        <li>
-          Quickly turn off environmental stochasticity: 
-          <code class="sfr-pattern">fit theta <strong>--no_env</strong> [options] | ./algorithm &#60;command&#62; [options]</code>
-        </li>
-        <li>
-          Quickly turn off the diffusions: 
-          <code class="sfr-pattern">fit theta <strong>--no_drift</strong> [options] | ./algorithm &#60;command&#62; [options]</code>
-        </li>
-      </ul>
-    </p>
-
-    <p><strong>Let's explore the possibilities...</strong></p>
-
+  <div class="span4">
+     <h3>Ordinary Differential Equation</h3>
+     If <strong>all sources of noise are neglected</strong>, the evolution of epidemics over time is deterministic. <br>
+     Unless you are enclined to consider that your population is infinite and that all environmental factors are explicitely included in your model, results obtained under this formalism should be taken with caution.
   </div>
 
 </div>
 
+<div class="row">
+  <div class="span12">
+       <br>These formalisms respectivelly correspond to the <code>psr</code>, <code>sde</code> and  <code>ode</code> commands. Their use will be illustrated in the following sections. If you want to specifically cancel the effect of one source of stochasticity included in your model, you can use <code>--no_dem_sto</code>,  <code>--no_env_sto</code> or  <code>--no_diff</code>.
+  </div> 
+</div>
 
 
 
@@ -218,6 +192,8 @@ fit theta | ./kalman sto --traj
     </p>
   </div>
 </div>
+
+
 
 
 <div class="page-header">
@@ -741,6 +717,8 @@ fit theta mle.json | ./pmcmc sto -J 1000 -M 10000
   </div>
 
 </div>
+
+
 
 
 

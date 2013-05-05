@@ -76,7 +76,7 @@ fit theta -B | ./pmcmc ode -M 1000000</pre>
 
       <li>
         <strong>Publish</strong> to the library. Create a design.json ensuring reproducibility of your results, and share them.
-            <pre class="prettyprint">fit replicate theta.json "pmcmc ode -M 1000000" 4 --run
+            <pre class="prettyprint">fit replicate theta.json "pmcmc ode -M 500000" 4 --run
 plom publish design.json</pre>
        </li>
 
