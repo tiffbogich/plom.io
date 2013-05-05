@@ -43,8 +43,9 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
     , matMarginSize = maxtextlength/2 * textfont // /2 is completely arbitrary TODO: understand fonts size
     , matSize = matTotSize - matMarginSize
     , cellSize = matSize/(nbpars-1)
-    , growFact = 1.2;
-
+    , growFact = 1.2
+    , priorFirst = 0;
+  
   ///////////////////////////////
   // main structures definition
   ///////////////////////////////
@@ -221,7 +222,27 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       };
     });
 
+  d3.select("#density1")
+    .on("click",function(d){
+      if (priorFirst){
+	priorFirst = 0;
+      } else {
+	priorFirst = 1;
+      };
+      updateDensity1(data, activeCell[0], priorFirst);
+      updateDensity2(data, activeCell[1], priorFirst);
+    });
 
+  d3.select("#density2")
+    .on("click",function(d){
+      if (priorFirst){
+	priorFirst = 0;
+      } else {
+	priorFirst = 1;
+      };
+      updateDensity1(data, activeCell[0], priorFirst);
+      updateDensity2(data, activeCell[1], priorFirst);
+    });
 
   function mouseov(indi,indj){
 
@@ -307,8 +328,8 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
       updateCorr1(data, indi, indj);
       updateCorr2(data, indj, indi);
 
-      updateDensity1(data, indi);
-      updateDensity2(data, indj);
+      updateDensity1(data, indi, priorFirst);
+      updateDensity2(data, indj, priorFirst);
 
       updateTrace(data,indi);
       updateAutocorr(data,indi);

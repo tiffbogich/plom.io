@@ -1,4 +1,4 @@
-function plotDensity(diag, i, ind, width, height){
+function plotDensity(diag, i, ind, width, height, priorFirst){
   
   width = width || 220;
   height = height || 220;
@@ -6,9 +6,12 @@ function plotDensity(diag, i, ind, width, height){
   var data = [];
   diag[i][i].posterior.x.forEach(function(x, k){
     data.push({
-      x: x, 
+      xpost: diag[i][i].posterior.x[k], 
       ypost: diag[i][i].posterior.y[k],
-      yprior: diag[i][i].prior.y[k],
+      xpriorRestr: diag[i][i].priorRestr.x[k], 
+      ypriorRestr: diag[i][i].priorRestr.y[k],
+      xprior: diag[i][i].prior.x[k], 
+      yprior: diag[i][i].prior.y[k]
     });
   });
 
@@ -20,12 +23,13 @@ function plotDensity(diag, i, ind, width, height){
 
   var x = d3.scale.linear()
     .range([0, width])
-    .domain(d3.extent(data, function(d) { return d.x; })).nice();
-
+    .domain(d3.extent(data, function(d) { return d.xpost; })).nice();
   var y = d3.scale.linear()
     .range([height, 0])
     .domain(d3.extent(data, function(d) { return d.ypost; })).nice();
+  
  
+
   var color_hash = {
     0 : ["prior", d3.rgb(234,234,234)],
     1 : ["post.", d3.rgb(200,200,200)] 
@@ -42,12 +46,16 @@ function plotDensity(diag, i, ind, width, height){
     .ticks(3);
 
   var linepost = d3.svg.line()
-    .x(function(d) { return x(d.x); })
+    .x(function(d) { return x(d.xpost); })
     .y(function(d) { return y(d.ypost); });
 
+  var linepriorRestr = d3.svg.line()
+      .x(function(d) { return x(d.xpriorRestr); })
+      .y(function(d) { return y(d.ypriorRestr); });
+
   var lineprior = d3.svg.line()
-    .x(function(d) { return x(d.x); })
-    .y(function(d) { return y(d.yprior); });
+      .x(function(d) { return x(d.xprior); })
+      .y(function(d) { return y(d.yprior); });
 
   var svg = d3.select("#density" + ind).append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -71,11 +79,11 @@ function plotDensity(diag, i, ind, width, height){
     .attr("id", "y-axis-density" + ind)
     .attr("class", "y axis")
     .call(yAxis);
-
+  
   svg.append("path")
     .datum(data)
     .attr("class", "density_prior")
-    .attr("d", lineprior);
+    .attr("d", linepriorRestr);
 
   svg.append("path")
     .datum(data)
@@ -90,7 +98,7 @@ function plotDensity(diag, i, ind, width, height){
     .attr("width",100);
 
   var tmp = [{x:1},{x:2}];
-  
+
   legend.selectAll("rect")
     .data(tmp)
     .enter()
@@ -116,38 +124,56 @@ function plotDensity(diag, i, ind, width, height){
       var color = color_hash[tmp.indexOf(d)][0];
       return color;
     });
-
-
-
-  return function(diag, i){
+   
+  return function(diag, i, priorFirst){
 
     var data = [];
     var xlabel = diag[i][i].par + ':' + diag[i][i].group;
 
     diag[i][i].posterior.x.forEach(function(x, k){
       data.push({
-        x: x, 
-        ypost: diag[i][i].posterior.y[k],
-	yprior: diag[i][i].prior.y[k],
+	xpost: diag[i][i].posterior.x[k], 
+	ypost: diag[i][i].posterior.y[k],
+	xpriorRestr: diag[i][i].priorRestr.x[k], 
+	ypriorRestr: diag[i][i].priorRestr.y[k],
+	xprior: diag[i][i].prior.x[k], 
+	yprior: diag[i][i].prior.y[k]
       });
     });
 
-    x.domain(d3.extent(data, function(d) { return d.x; })).nice();
+    if (priorFirst){
+      x.domain(d3.extent(data, function(d) { return d.xprior; })).nice();
+    } else {
+      x.domain(d3.extent(data, function(d) { return d.xpost; })).nice();
+    };
     y.domain(d3.extent(data, function(d) { return d.ypost; })).nice();
+
     xAxis.scale(x);
     yAxis.scale(y);
 
-    svg.select(".density_prior")
-      .datum(data)
-      .transition()
-      .duration(200)
-      .attr("d", lineprior)
-
-    svg.select(".density_post")
-      .datum(data)
-      .transition()
-      .duration(200)
-      .attr("d", linepost)
+    if (priorFirst){
+      svg.select(".density_post")
+	.datum(data)
+	.transition()
+	.duration(200)
+	.attr("d", linepost)
+      svg.select(".density_prior")
+	.datum(data)
+	.transition()
+	.duration(200)
+	.attr("d", lineprior)
+    } else {
+      svg.select(".density_prior")
+	.datum(data)
+	.transition()
+	.duration(200)
+	.attr("d", linepriorRestr)
+      svg.select(".density_post")
+	.datum(data)
+	.transition()
+	.duration(200)
+	.attr("d", linepost)
+    };
 
     d3.select("#x-axis-density" + ind)
       .call(xAxis)

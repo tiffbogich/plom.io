@@ -39,14 +39,14 @@ $(document).ready(function() {
       $.getJSON('/diagnostic/'+ model.result.theta._id + '/'+ model.result.theta.trace_id, function(diagnostic) {
 
         diagnostic.detail.forEach(function(x, i){
-          plotDensity(diagnostic.detail, i, diagnostic.detail[i][i].par + diagnostic.detail[i][i].group, 260, 200);
+          plotDensity(diagnostic.detail, i, diagnostic.detail[i][i].par + diagnostic.detail[i][i].group, 260, 200,0);
         });
 
 
         var updateCorr1 = plotCorr(diagnostic.detail, 0, 1, 1)
           , updateCorr2 = plotCorr(diagnostic.detail, 1, 0, 2)
-          , updateDensity1 = plotDensity(diagnostic.detail, 0, 1)
-          , updateDensity2 = plotDensity(diagnostic.detail, 1, 2)
+          , updateDensity1 = plotDensity(diagnostic.detail, 0, 1, 0)
+          , updateDensity2 = plotDensity(diagnostic.detail, 1, 2, 0)
           , updateTrace = plotTrace(diagnostic.detail, 0, 1)
           , updateAutocorr = plotAutocorr(diagnostic.detail,0,1)
           , updateMat = parMatrix(diagnostic.detail, updateCorr1, updateCorr2, updateDensity1, updateDensity2, updateTrace, updateAutocorr);
