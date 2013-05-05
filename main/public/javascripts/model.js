@@ -9,6 +9,7 @@ $(document).ready(function(){
   });
 
 
+
   $.getJSON('/template/model', function(tpl){
 
     var tplReaction = _.template(tpl['reaction']);
