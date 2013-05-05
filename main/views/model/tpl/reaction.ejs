@@ -1,0 +1,18 @@
+<% reactions.forEach(function(r){ %>
+<li>
+  <div class="alert alert-error hide">
+    <strong>Error! </strong><span class="error"></span>
+  </div>
+
+  <form class="form-inline reaction">
+    <input type="text" name="from" class="input-mini" placeholder="from" value="<%= r.from || '' %>" required />
+    <input type="text" name="to" class="input-mini" placeholder="to" value="<%= r.to || '' %>" required />
+    <input type="text" name="rate" class="input-small" placeholder="rate" value="<%= r.rate || '' %>" required />
+    <input type="text" name="comment" class="input-medium" placeholder="comment" value="<%= r.comment || '' %>" required />
+    <label class="checkbox">
+      <input type="checkbox" <% if ('tag' in r){ %>checked="checked"<% } %>> transmission
+    </label>
+    <button class="btn remove-reaction"><i class="icon-remove"></i></button>
+  </form>
+</li>
+<% }) %>

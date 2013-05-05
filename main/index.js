@@ -7,6 +7,7 @@ var express = require('express')
   , filters = require('./lib/filters')
   , routes = require('./routes')
   , context = require('./routes/context')
+  , model = require('./routes/model')
   , review = require('./routes/review')
   , requests = require('./routes/requests')
   , user = require('./routes/user')
@@ -94,6 +95,7 @@ app.get('/template/context', secure, csrf, context.index);
 app.post('/upload/context', secure, csrf, context.upload);
 app.post('/commit/context', secure, csrf, context.commit);
 
+app.get('/template/model', secure, csrf, model.index);
 
 
 

@@ -1,0 +1,47 @@
+<% include ../layout %>
+
+<script src="/javascripts/model.js"></script>
+
+<% include ../header %>
+
+<hr/>
+
+<div class="row">
+
+  <div class="span8">
+
+    <ul id="reactions"></ul>
+
+    <button id="addReaction" class="btn">Add</button>
+    
+
+  </div>
+
+  <div class="span4">
+
+    <div class="input-append">
+      <input class="span3" type="text">
+      <button class="btn" type="button">Search</button>
+    </div>
+
+    <ul class="thumbnails">
+      <% for(var i=0; i<5; i++) { %>
+      <li class="span4">
+        <div class="thumbnail">
+          <img data-src="holder.js/300x200" alt="">
+          <h3>Thumbnail label</h3>
+          <p><a href="/component/517eec6a635800c2e766434a" class="btn fork">Fork</a></p>
+        </div>
+      </li>
+      <% } %>
+    </ul>
+
+
+
+  </div>
+
+</div>
+
+
+<hr />
+<% include ../footer %>
