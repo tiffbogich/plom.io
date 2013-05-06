@@ -1,0 +1,3 @@
+<% reactions.forEach(function(r){ %>
+<option value="<%= encodeURIComponent(JSON.stringify({from:r.from, to:r.to, rate:r.rate})) %>"><%= r.from + ' &rarr; ' + r.to + ', ' + r.rate %></option>
+<% }) %>
