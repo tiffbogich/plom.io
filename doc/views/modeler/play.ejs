@@ -25,14 +25,14 @@ By adopting a Bayesian philosophy, PLoM is able to propose a simple workflow. St
   <h1><small>Combine fast and exact plug-and-play algorithms</small></h1>
 
 <p class="lead" >
-Recents efforts for plug-and-play inference methods have lead to the definition of a rich diversity of algorithms to maximise and sample from probability distributions. Some rely on clever approximations and are very quick to run. Some others offer the possibility to make no approximation whatsoever.
+Recents efforts towards plug-and-play inference methods have lead to a rich diversity of algorithms to maximise and sample from probability distributions. Some rely on clever approximations and are very quick to run, and others offer the possibility to make no approximation whatsoever.
 </p>
 <p class="lead" >
 The goal of PLoM is to take the best out of this variety of methods, making it easier and more feasible to use the most precise and demanding algorithms, while keeping everything plug-and-play.
 </p>
 
 <p class="lead" >
-A standard routine we propose is to randomly pick values (<code>lhs</code>) in the parameter space before picking the best sampled value to more carefully look for a mode of an approximated posterior density (<code>ksimplex</code>). From this mode, the approximated posterior density is explored (<code>kmcmc</code>) to efficicently initialise the asymptotically exact particle MCMC algorithm (<code>ksimplex</code>), in its adaptive form. This webpage is meant to help you take control of each of these tools.
+A standard routine we propose is to randomly sample values (<code>lhs</code>) in the parameter space, before picking the best sampled one to more carefully look for a mode of the approximated posterior density (<code>ksimplex</code>). From this mode, the same approximated posterior density is explored (<code>kmcmc</code>) to efficicently initialise the asymptotically exact particle MCMC algorithm (<code>ksimplex</code>), in its adaptive form. This webpage is meant to help you take control of each of these tools.
 </p>
 
 <h1><small>Quick peer-review to guarantee reproducibility</small></h1>
@@ -64,7 +64,9 @@ Upload your results on plom.io to assess that your results are reliable and info
         <li>
           designed to <strong>chain</strong> inference methods
         </li>
-      </ul>      
+      </ul>
+      <br>
+      Quickly plot your results using the PLoM R package. Corresponding commands will be given along the webpage.      
     </p>
 
   </div>
@@ -89,7 +91,7 @@ Upload your results on plom.io to assess that your results are reliable and info
   <div class="span4">
      <h3>Stochastic Differential Equation</h3>
      Diffusion processes are an ubiquitous family of models used to monitor the  <strong>stochastic evolution of continuous quantities </strong> over time.  <br>
-     As such, the litterature and methodology on the subject is abundant. We particularly rely on approximate filtering solutions suggested by Rudoplh Kalman in the 60's, and subsequent developement.
+     As such, the litterature and methodology on the subject is abundant. We particularly rely on approximate filtering solutions suggested by Rudoplh Kalman in the 60's, and subsequent developements.
   </div>
 
   <div class="span4">
@@ -102,7 +104,7 @@ Upload your results on plom.io to assess that your results are reliable and info
 
 <div class="row">
   <div class="span12">
-       <br>These formalisms respectivelly correspond to the <code>psr</code>, <code>sde</code> and  <code>ode</code> commands. Their use will be illustrated in the following sections. If you want to specifically cancel the effect of one source of stochasticity included in your model, you can use <code>--no_dem_sto</code>,  <code>--no_env_sto</code> or  <code>--no_diff</code>.
+       <br>These formalisms respectivelly correspond to the <code>psr</code>, <code>sde</code> and  <code>ode</code> commands. Their use will be illustrated in the following sections. If you want to specifically cancel the effect of one source of stochasticity included in your model, you can use <code>--no_dem_sto</code>,  <code>--no_white_noise</code> or  <code>--no_diff</code>.
   </div> 
 </div>
 
@@ -118,16 +120,16 @@ Upload your results on plom.io to assess that your results are reliable and info
     <h3>Simulation</h3>
 
     <p>100 realisations of the observation process of your model,
-      neglecting <strong>demographic stochasticity</strong>:</p>
+      under the <code>ode</code> formalism:</p>
 
     <pre class="prettyprint">
-fit theta | ./simul deter -J 100 --traj
+fit theta | ./simul ode -J 100 --traj
 </pre>
 
-    <p>The same, but <strong>with</strong> demographic stochasticity:</p>
+    <p>The same, but accounting for demographic stochasticity through the <code>psr</code> formalism:</p>
 
     <pre class="prettyprint">
-fit theta | ./simul sto -J 100 --traj --no_filter
+fit theta | ./simul psr -J 100 --traj
 </pre>
 
     <p><i class="icon-eye-open"></i> Plot:
@@ -139,13 +141,10 @@ fit theta | ./simul sto -J 100 --traj --no_filter
   <div class="span4">
     <h3>Particle Filter</h3>
 
-    <p>Trying to reconstruct some hidden states: run a particle filter
-      (a.k.a <strong>Sequential Monte Carlo</strong>) using 100
-      particles:</p>
+    <p>Run a particle filter (a.k.a <strong>Sequential Monte Carlo</strong>) to reconstruct the trajectories of the system given the data, using 100 particles:</p>
 
     <pre class="prettyprint">
-fit theta | ./smc sto -J 100 --traj
-</pre>
+fit theta | ./smc psr -J 100 --traj</pre>
 
 
     <p><i class="icon-eye-open"></i> Plot:
@@ -160,19 +159,15 @@ fit theta | ./smc sto -J 100 --traj
 
     <p>
       No time to waste with particles? Strongly believe the world is
-      gaussian?<br/> Use an <strong>Extended Kalman Filter</strong>.
+      Gaussian? Use an <strong>Extended Kalman Filter</strong>.<br>
+      Note that the EKF will only work under the <code>sde</code> formalism. 
     </p>
 
 <pre class="prettyprint">
-fit theta | ./kalman sto --traj
+fit theta | ./kalman sde --traj
 </pre>
 
-    <p>
-      <code>sto</code>? Yes, we compute a diffusion approximation of
-      your stochastic process so that you can assess to the demographic
-      stochasticity.
-    </p>
-
+   
     <p><i class="icon-eye-open"></i> Plot:
       <code>plot.X()</code>
     </p>
@@ -185,8 +180,8 @@ fit theta | ./kalman sto --traj
 <div class="row">
   <div class="span12">
     <p>
-      Yes, <strong>all this (and what follows) work with</strong> <code class="sfr-pattern">deter</code>
-      <strong>or</strong> <code class="sfr-pattern">sto</code> and
+      <br>
+      Yes, <strong>all this (and what follows) works</strong>
       without requiring you to recode different implementations of your
       model. Express your idea; PLoM does the dirty work.
     </p>
@@ -203,10 +198,10 @@ fit theta | ./kalman sto --traj
 <div class="row">
 
   <div class="span4">
-    <h3>Simplex (and least-squares)</h3>
+    <h3>Simplex</br> (and least-squares)</h3>
     <p>There is no stochasticity in your world and you don't even care
-    about the observation process: Run a Simplex for 10000
-    iterations.</p>
+    about the observation process: run a Simplex for 10000
+    iterations to minimize the least-squares distance.</p>
 
     <pre class="prettyprint">
 fit theta | ./simplex -M 10000 --least_square
@@ -229,17 +224,11 @@ fit theta | ./simplex -M 10000
   <div class="span4">
     <h3>Simplex-Kalman (ksimplex)</h3>
 
-    <p>You think that demographic stochasticity matters, but you want
+    <p>You care about the demographic or environmental noise contained in your model, but you want
     to keep it fast?</p>
 
     <pre class="prettyprint">
-fit theta | ./ksimplex sto
-</pre>
-
-    <p>You neglect demographic stochasticity?</p>
-
-    <pre class="prettyprint">
-fit theta | ./ksimplex deter
+fit theta | ./ksimplex -M 10000
 </pre>
 
     <p><i class="icon-eye-open"></i> Plot:
@@ -250,63 +239,9 @@ fit theta | ./ksimplex deter
   </div>
 
   <div class="span4">
-    <h3>Use the results in simulation</h3>
+    <h3>Iterated filtering<br>(MIF)</h3>
 
-    <p>
-      Want to check out the results? Tell PLoM to use the
-      previous results as initial conditions of your new algorithm using
-      the <code>-B</code> option of <code>fit</code>:
-    </p>
-
-    <ul>
-      <li>
-        Start with a simplex:
-<pre class="prettyprint">
-fit theta | ./simplex -M 1000
-</pre>
-      </li>
-<li>
-      Use the result for a SMC:
-<pre class="prettyprint">
-fit theta -B | ./smc sto -J 100 --traj
-</pre>
-</li>
-      
-    </ul>
-
-    
-
-    <p><i class="icon-eye-open"></i> Plot:
-      <code>plot.X()</code> and <code>plot.hat()</code>
-    </p>
-
-  </div>
-
-</div>
-
-<div class="row">
-<div class="span12">
-  Yes, you can <strong>chain</strong> PLoM methods without
-  having to edit any scripts or configuration files. Learn more about PLoM
-  pipes with <code>fit --help</code>.
-</div>
-</div>
-
-
-
-
-
-<div class="page-header">
-  <h1>No more approximations <small>Because often noise matters</small></h1>
-</div>
-
-<div class="row">
-
-  <div class="span4">
-    <h3>MIF</h3>
-
-    <p>Want to find the <strong>maximum likelihood estimates</strong> taking into account <strong>both</strong>
-        process and observation noise? Use <em>Maximum Likelihood via
+    <p>Want to find the maximum likelihood estimates without SDE or Gaussian approximations, accounting for both process and observation noise? Use <em>Maximum Likelihood via
         Iterated filtering</em> (MIF):</p>
 
     <pre class="prettyprint">
@@ -324,14 +259,72 @@ fit theta | ./mif sto -J 1000 -M 100 -a 0.95 -b 3
 
   </div>
 
+</div>
+
+<div class="row">
+<div class="span12">
+  <br>    
+  <p>
+      To check the results of your trajectory matching, tell PLoM to use the
+      previous results as initial conditions of your new algorithm using
+      the <code>-B</code> option of <code>fit</code>.
+      Yes, you can <strong>chain</strong> PLoM methods without
+      having to edit any scripts or configuration files. Learn more about PLoM
+      pipes with <code>fit --help</code>.<br>
+      <strong>By default, these algorithms maximize the log-likelihood.</strong> To prepare for a posterior density 
+      exploration, account for the prior with <code>--prior</code>.
+  </p>
+</div>
+</div>
+
+
+
+
+
+<div class="page-header">
+  <h1>Explore <small>Randomly walk across the posterior density</small></h1>
+</div>
+
+<div class="row">
+ 
+ <div class="span12">
+    <p>
+    Current algorithms implemented in PLoM use a random walk to explore the target density.
+    This exploration relies on an underlying covariance that should capture the shape of the
+    target density. This is something you are not very sure about beforehand, as it
+    is what you are trying to figure out! Don't worry, the algorithm will correct itself and 
+    learn progressively from what it has seen. 
+    <p>
+  </div>
+
+</div>
+<div class="row">
+
+ <div class="span4">
+    <h3>Kalman MCMC</h3>
+
+
+    </p> 
+        You have nothing against the Gaussian and SDE approximations, or want to avoid spending too much time in this learning phase, let the <code>kmcmc</code> do its part of the job!
+
+    </p>
+    <pre class="prettyprint">
+fit theta | ./kmcmc sde --full -M 10000
+</pre>
+
+    <p><i class="icon-eye-open"></i> Plot:
+      <code>plot.best()</code>, <code>plot.posteriors()</code> and <code>plot.corr()</code>
+    </p>
+
+  </div>
+
   <div class="span4">
     <h3>pMCMC</h3>
 
-    <p>Have some priors, want to try a Bayesian approach? Use <em>particle
-        Monte Carlo Markov chain</em> (pMCMC):</p>
+    <p>Want no Gaussian or SDE approximation? Rely on particles with the pMCMC algorithm:</p>
 
     <pre class="prettyprint">
-fit theta | ./pmcmc sto -J 1000 -M 10000
+fit theta | ./pmcmc psr -J 1000 -M 10000 --full
 </pre>
 
 
@@ -343,36 +336,17 @@ fit theta | ./pmcmc sto -J 1000 -M 10000
   </div>
 
   <div class="span4">
-    <h3>Combine</h3>
-
-    <p>Ok, let's have fun:</p>
-
-    <ul>
-    <li>Start with a simplex:
-<pre class="prettyprint">
-fit theta | ./simplex -M 1000
-</pre>
-    </li>
-
-    <li>Refine it with a ksimplex:
-<pre class="prettyprint">
-fit theta -B | ./ksimplex sto -M 1000
-</pre>
-    </li>
-
-
-    <li>Refine it with a MIF:
-<pre class="prettyprint">
-fit theta -B | ./mif sto -J 1000 -M 100 -a 0.95 -b 3
-</pre>
-    </li>
-
-    <li>Terminate with a pMCMC:
-<pre class="prettyprint">
-fit theta -B | ./pmcmc sto -J 1000 -M 100000
-</pre>
-</li>
-    </ul>
+    <h3>Combine</h3>    
+    <p>Ok, let's have fun:<br>
+    Start with a simplex:
+    </p>
+    <pre class="prettyprint">fit theta | ./simplex -M 1000</pre>
+    <p>Refine it with a ksimplex:</p>
+    <pre class="prettyprint">fit theta -B | ./ksimplex -M 1000</pre>
+    <p>Make a quick Kalman-based exploration:</p>
+    <pre class="prettyprint">fit theta -B | ./kmcmc -M 2000 --full</pre>
+    <p>Terminate with a pMCMC, learning the covariance from the previous run:
+    <pre class="prettyprint">fit theta -B -C | ./pmcmc psr -J 1000 -M 100000 --full</pre>
     <p><i class="icon-eye-open"></i> Plot:
       <code>plot.best()</code>
     </p>
@@ -395,7 +369,7 @@ fit theta -B | ./pmcmc sto -J 1000 -M 100000
 
 
 <div class="page-header">
-  <h1>Don't get stuck in that local maxima <small>Advanced design on the cloud</small></h1>
+  <h1>Escaping local maxima <small>Advanced design on the cloud</small></h1>
 </div>
 
 <div class="row">
@@ -459,14 +433,14 @@ fit bootstrap theta.json design.json --queue PBS && ./run_designs.sh
  "seed": "any string you like",
  "cmd": [
    {"fit": "-D",
-    "algorithm": "mif sto -M 100 -J 1000"}
+    "algorithm": "mif psr -M 100 -J 1000"}
   ]
 }
 </pre>
 
     <p>Or template it:</p>
     <pre class="prettyprint">
-fit lhs theta.json "mif --sto -M 100 -J 1000" 100 --queue SGE
+fit lhs theta.json "mif psr -M 100 -J 1000" 100 --queue SGE
 </pre>
 
     <p>Run it on the cloud:</p>
@@ -508,7 +482,7 @@ fit bootstrap theta.json design.json --queue SGE && ./run_designs.sh
    {
     "comment": "Get the initial conditions by skipping 1000 time steps",
     "fit": "-D",
-    "algorithm": "simul deter -T 1000"
+    "algorithm": "simul ode -T 1000"
    },
    {
     "comment": "Refines the estimate of these (-X) values only (-I) using a simplex (least-squares)",
@@ -518,7 +492,7 @@ fit bootstrap theta.json design.json --queue SGE && ./run_designs.sh
    {
     "comment": "Concludes with a MIF that is now happily initialized and repeat that 3 times (chaining)",
     "fit": "-B",
-    "algorithm": "mif sto -J 4000 -M 100",
+    "algorithm": "mif psr -J 4000 -M 100",
     "repeat": 3
    }
   ]
@@ -550,180 +524,11 @@ fit bootstrap theta.json design.json --queue SGE && ./run_designs.sh
 
 
 
-<div class="page-header">
-  <h1>Take a first quick walk around <small>before you run a pMCMC</small></h1>
-</div>
-
-<div class="row">
-
-  <div class="span4">
-    <h3>Hey, I have priors!</h3>
-
-    <p>
-      The pMCMC is not an optimisation algorithm, so you may want to
-      help it by launching an LHS ksimplex combination first. Note
-      that you are interested in the posterior density rather than in
-      the likelihood alone: say it with the <code>--prior</code>
-      option.
-    </p>
-
-    <p>Here would be a templated <code><i class="icon-file"></i>design.json</code> example:</p>
-
-    <pre class="prettyprint">
-fit lhs theta.json "ksimplex sto -M 10000 --prior" 100</pre>
-
-  </div>
-
-  <div class="span4">
-    <h3>All together?</h3>
-
-     <p>
-        If you have many parameters to estimate, having the pMCMC update them one by one can be long... Try the <code>--full</code> option to allow updating the whole vector at once! 
-     <p>
-    </p>
-        It will be specifically helpful when your parameters have intricate roles in the model, but it's also a bit more adventurous. Put all luck on your side by first getting a feel of the target's shape!
-    </p>
-     <pre class="prettyprint">
-fit theta -B | ./pmcmc sto --full -M 10000
-</pre>
-
-  </div>
-  
-  
-  
-  <div class="span4">
-    <h3>Get a first feel of the target's shape</h3>
-
-     <p>
-        The pMCMC algorithm relies on an underlying covariance that should capture the shape of the target density. Of course, this is something you are not very sure about beforehand, as this is what you are trying to figure out with the pMCMC! Don't worry, the algorithm will correct itself and learn progressively from what it has seen. 
-    <p>
-    </p> 
-        To avoid spending too much time in this learning phase, let the <code>kmcmc</code> do its part of the job: it's about 100 times faster!
-
-    </p>
-    Start with:
-        <pre class="prettyprint">
-fit theta -B | ./kmcmc sto --full -M 10000
-</pre>
-    And carry on with the pMCMC:
-        <pre class="prettyprint">
-fit theta -B -C | ./pmcmc sto --cov --full -M 10000
-</pre>
-
-  </div>
-</div>
-
-
-
-
-
-
-
 
 
 
 <div class="page-header">
-  <h1>Be confident <small>and credible</small></h1>
-</div>
-
-
-<div class="row">
-  <div class="span4">
-    <h3>Store the MLE</h3>
-
-    <p>
-      Store the maximum likelihood estimate from the LHS run that gave
-      the best results (let's say number 68 as reported by <code>plot.convergence()</code>). 
-    </p>
-
-
-<pre class="prettyprint">
-fit theta -B results/lhs/best_68.output > mle.json
-</pre>
-
-
-  </div>
-
-
-  <div class="span4">
-    <h3>Slices</h3>
-
-    <p>Compute your slices super fast and see if it is worth
-    continuing...</p>
-
-
-    <p>Template a design: <code><i class="icon-file"></i>slice.json</code></p>
-<pre class="prettyprint">
-fit --slice mle.json "smc --sto -J 1000" 20
-</pre>
-
-    <p>Run it:</p>
-
-<pre class="prettyprint">
-./run_designs.sh
-</pre>
-
-    <p><i class="icon-eye-open"></i> Plot:
-      <code>plot.slices()</code></code>
-    </p>
-    
-  </div>
-
-
-  <div class="span4">
-    <h3>Profiles</h3>
-
-    <p>It is said to be an easy way to get <strong>confidence intervals</strong>.</p>
-
-    <p>Template a design: <code><i class="icon-file"></i>profile.json</code></p>
-<pre class="prettyprint">
-fit --profile mle.json "mif --sto -J 1000 -M 100" 20 --queue SGE
-</pre>
-
-    <p>Run it:</p>
-
-<pre class="prettyprint">
-./run_designs.sh
-</pre>
-
-
-    <p><i class="icon-eye-open"></i> Plot:
-      <code>plot.profiles()</code>
-    </p>
-        
-  </div>
-  
-</div>
-
-
-<div class="row">
-  
-  <div class="span6">
-    <h3>Sample the peak(s)</h3>
-
-    <p>
-      Because some good posteriors are all you truly need to get <strong>credible intervals</strong>.
-    </p>
-
-    <pre class="prettyprint">
-fit theta mle.json | ./pmcmc sto -J 1000 -M 10000
-</pre>
-
-
-    <p><i class="icon-eye-open"></i> Plot:
-      <code>plot.best()</code>, <code>plot.posteriors()</code> and <code>plot.corr()</code>
-    </p>
-
-  </div>
-
-</div>
-
-
-
-
-
-<div class="page-header">
-  <h1>Expand your knowledge <small>Inference with style</small></h1>
+  <h1>Expand your knowledge <small>A first example</small></h1>
 </div>
 
 <div class="row">
