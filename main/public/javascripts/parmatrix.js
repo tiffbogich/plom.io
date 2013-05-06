@@ -188,7 +188,9 @@ function parMatrix(data, updateCorr1, updateCorr2, updateDensity1, updateDensity
               .classed('hidden', true)
           } else {
             clickedCell = activeCell;
+	    activMatClicked = false;
             mouseov(clickedCell[0],clickedCell[1]);
+	    activMatClicked = true;
             d3.select("#lock")
               .classed('hidden', false)
               .style("left", posActCell.left + cellSize/4 + "px")
