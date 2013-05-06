@@ -10,12 +10,163 @@
 
   <div class="span8">
 
+    <!-- ========= -->
+    <!-- REACTIONS -->
+    <!-- ========= -->
+    <h3>Process Model</h3>
+    <h4>Reactions</h4>
     <ul id="reactions"></ul>
-
     <button id="addReaction" class="btn">Add</button>
-    
+
+    <!-- ====== -->
+    <!-- NOISES -->
+    <!-- ====== -->
+    <div class="row">
+      <div class="span4" id="whiteNoises">
+        <h4>White noise</h4>
+
+        <ul class="thumbnails">
+          <li class="span4">
+            <div class="thumbnail">
+              <div class="alert alert-error hide">
+                <strong>Error! </strong><span class="error"></span>
+              </div>
+              <form class="white-noise">
+                <label>reaction(s): <br/><select name="reaction" class="select-reactions" multiple="multiple"></select></label>
+                <label>sd: <input name="sd" type="text" class="input-mini"/></label>
+              </form>                 
+              <button class="btn remove">remove</button>
+            </div>
+          </li>
+        </ul>
+        <button class="btn add">add</button>
+      </div>
+
+      <div class="span4" id="diffusions">
+        <h4>Diffusion</h4>
+
+        <ul class="thumbnails">
+          <li class="span4">
+            <div class="thumbnail">
+              <div class="alert alert-error hide">
+                <strong>Error! </strong><span class="error"></span>
+              </div>
+              <form class="diffusion">
+                <label> parameter: <br/><select name="parameter" class="select-parameters"></select></label>
+                <label> volatility: <input name="volatility" type="text" class="input-mini"/></label>
+              </form>                 
+              <button class="btn remove">remove</button>
+            </div>
+          </li>
+        </ul>
+        <button class="btn add">add</button>
+
+      </div>
+
+    </div>
+
+    <hr/>
+
+    <!-- =================== -->
+    <!-- OBSERVATION PROCESS -->
+    <!-- =================== -->
+    <h3>Observation Process</h3>
+
+    <div class="row">
+      <!-- ================== -->
+      <!-- OBSERVED VARIABLES -->
+      <!-- ================== -->
+      <div class="span4">
+        <h4>Observed variables</h4>
+
+        <div id="incidences">
+          <h5>Incidence</h5>
+          <ul class="thumbnails">
+            <li class="span4">
+              <div class="thumbnail">
+                <div class="alert alert-error hide">
+                  <strong>Error! </strong><span class="error"></span>
+                </div>
+
+                <form class="incidence">
+                  <label> Name: <input name="name" type="text" class="input-mini"/></label>
+                  <label> Description: <br/> <input name="description" type="text" class="input-large"/></label>
+                  <label> Definition: <br/><select name="definition" class="select-reactions" multiple="multiple"></select></label>
+                  <label> Time Series: <br/><select name="time_series_id" class="select-ts" multiple="multiple">
+                      <% context.time_series.filter(function(x) {return x.id.split('__')[2] === 'inc';}).forEach(function(ts){ %>
+                      <option value="<%= ts.id %>"><%= ts.id.split('__').slice(0,2).join(' ; ') %></option>
+                      <% }) %>
+                  </select></label>
+                </form>
+                
+                <button class="btn remove">remove</button>
+              </div>
+            </li>
+          </ul>
+
+          <button class="btn add">add</button>
+        </div>
+
+        <div id="prevalences">
+          <h5>Prevalence</h5>
+          <ul class="thumbnails">
+            <li class="span4">
+              <div class="thumbnail">
+                <div class="alert alert-error hide">
+                  <strong>Error! </strong><span class="error"></span>
+                </div>
+
+                <form class="prevalence">
+                  <label> Name: <input name="name" type="text" class="input-mini"/></label>
+                  <label> Description: <br/> <input name="description" type="text" class="input-large"/></label>
+                  <label> Definition: <br/><select name="definition" class="select-states" multiple="multiple"></select></label>
+                  <label> Time Series: <br/><select name="time_series_id" class="select-ts" multiple="multiple">
+                      <% context.time_series.filter(function(x) {return x.id.split('__')[2] === 'prev';}).forEach(function(ts){ %>
+                      <option value="<%= ts.id %>"><%= ts.id.split('__').slice(0,2).join(' ; ') %></option>
+                      <% }) %>
+                  </select></label>
+                </form>
+                
+                <button class="btn remove">remove</button>
+              </div>
+            </li>
+
+          </ul>
+          <button class="btn add">add</button>
+        </div>       
+      </div>
+
+      <!-- ================= -->
+      <!-- OBSERVATION MODEL -->
+      <!-- ================= -->
+      <div class="span4">
+        <h4>Observation model</h4>
+
+        <div class="alert alert-error hide">
+          <strong>Error! </strong><span class="error"></span>
+        </div>
+
+        <form class="observation-model">
+          <label>distribution: <br/>
+            <select name="distribution">
+              <option value="discretized_normal">discretized normal</option>
+            </select>            
+          </label>
+          <label>mean: <br/><input name="mean" type="text" placeholder="rep*prop*x" /></label>
+          <label>var: <br/><input name="var" type="text" placeholder="rep*(1.0-rep)*prop*x + (rep*phi*prop*x)**2" /></label>
+        </form>
+      </div>
+
+    </div>
+
+    <button id="submit" class="btn btn-success">Submit</button>
 
   </div>
+
+
+  <!-- ============== -->
+  <!-- LIST OF MODELS -->
+  <!-- ============== -->
 
   <div class="span4">
 
@@ -26,21 +177,23 @@
 
     <ul class="thumbnails">
       <% for(var i=0; i<5; i++) { %>
-      <li class="span4">
-        <div class="thumbnail">
-          <img data-src="holder.js/300x200" alt="">
-          <h3>Thumbnail label</h3>
-          <p><a href="/component/517eec6a635800c2e766434a" class="btn fork">Fork</a></p>
-        </div>
-      </li>
-      <% } %>
+         <li class="span4">
+           <div class="thumbnail">
+             <img data-src="holder.js/300x200" alt="">
+             <h3>Thumbnail label</h3>
+             <p><a href="/component/517eec6a635800c2e766434a" class="btn fork">Fork</a></p>
+           </div>
+         </li>
+         <% } %>
     </ul>
-
-
 
   </div>
 
+
+
 </div>
+
+
 
 
 <hr />
